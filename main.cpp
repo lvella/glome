@@ -4,7 +4,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cmath>
-#include <GL/glut.h>
+#include <SDL.h>
 #include <GL/glu.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
@@ -198,7 +198,7 @@ void draw()
 
   draw_ship();
 
-  glutSwapBuffers();
+  SDL_GL_SwapBuffers();
 }
 
 void mul_mat_vec(const float *m, const float *v, float *r)
@@ -236,10 +236,8 @@ void printm(const float *m)
   std::cout << std::endl;
 }
 
-void update(int nulo)
+void update()
 {
-  glutTimerFunc(40, update, 0);
-
   const float c = cos(speed);
   const float s = sin(speed);
   const float ahead[] = {1,0,0,0,  0,1,0,0,  0,0,c,-s,  0,0,s,c};
@@ -253,8 +251,6 @@ void update(int nulo)
   glRotated(dy, 0, 1, 0);
   glMultMatrixf(ahead);
   glMultMatrixf(t);
-
-  glutPostRedisplay();
 }
 
 void mouse_motion(int x, int y)
@@ -266,47 +262,79 @@ void mouse_motion(int x, int y)
   dx = double(y) / double(HEIGHT / 2);
 }
 
-void mouse_button(int button, int state, int x, int y)
+/*void mouse_button(int button, int state, int x, int y)
 {
   if(button == GLUT_LEFT_BUTTON)
     {
       speed = (state == GLUT_DOWN) ? -0.03 : 0.0;
     }
+}*/
+
+void main_loop()
+{
+  const int FPS = 60;
+  bool running = true;
+  Uint32 ticks = SDL_GetTicks();
+
+  while(running) {
+    // Treat events
+    {
+      SDL_Event e;
+      while(SDL_PollEvent(&e)) {
+      
+      }
+    }
+
+    update();
+    draw();
+
+    // Fix framerate
+    {
+      // TODO: maybe clk_div is useful here...
+      const int period = 1000/60;
+      Uint32 now = SDL_GetTicks();
+      int delay = period - int(now - ticks);
+      if(delay > 0)
+	SDL_Delay(delay);
+      ticks = now;
+    }
+  }
 }
 
 int main(int argc, char **argv)
 {
-  int window;
+  // SDL startup
+  if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
+    cerr << "Unable to initialize SDL: " << SDL_GetError() << '\n';
+  }
+  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+  SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL);
+  SDL_WM_SetCaption("Navinha", NULL);
 
-  glutInit(&argc, argv);
-  glutInitDisplayMode(GLUT_DOUBLE);
-  glutInitWindowSize(WIDTH, HEIGHT);
-  window = glutCreateWindow("Navinha");
-  glutSetWindow(window);
-
+  // OpenGL nonchanging settings
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
   glClearDepth(1.0f);
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_BLEND);
-  glEnable(GL_TEXTURE_2D);
+  //glEnable(GL_TEXTURE_2D);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 
-  // Fancy fog
+  // Fancy OpenGL fog
+  glFogi(GL_FOG_MODE, GL_EXP);
   {
-    float fcolor[] = {0.0f, 0.0f, 0.0f, 1.0f};
-
-    glFogi(GL_FOG_MODE, GL_EXP);
+    const float fcolor[] = {0.0f, 0.0f, 0.0f, 1.0f};
     glFogfv(GL_FOG_COLOR, fcolor);
-    glFogf(GL_FOG_DENSITY, 0.55f);
-    glHint(GL_FOG_HINT, GL_NICEST);
-    glFogf(GL_FOG_END, M_PI);
-    glFogf(GL_FOG_START, 2.0f);
-    glEnable(GL_FOG);
   }
+  glFogf(GL_FOG_DENSITY, 0.55f);
+  glHint(GL_FOG_HINT, GL_NICEST);
+  glFogf(GL_FOG_END, M_PI);
+  glFogf(GL_FOG_START, 2.0f);
+  glEnable(GL_FOG);
 
+  // 3D to 2D projection
   glViewport(0, 0, WIDTH, HEIGHT);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
@@ -314,14 +342,12 @@ int main(int argc, char **argv)
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
+  // 4D to 3D projection
   initialize_shader();
+
   initialize_vars();
 
-  glutDisplayFunc(draw);
-  glutMotionFunc(mouse_motion);
-  glutPassiveMotionFunc(mouse_motion);
-  glutMouseFunc(mouse_button);
-  update(0);
+  main_loop();
 
-  glutMainLoop();
+  SDL_Quit();
 }
