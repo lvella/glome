@@ -262,17 +262,18 @@ void mouse_motion(int x, int y)
   dx = double(y) / double(HEIGHT / 2);
 }
 
-/*void mouse_button(int button, int state, int x, int y)
+void mouse_button(int button, int state)
 {
-  if(button == GLUT_LEFT_BUTTON)
+  if(button == SDL_BUTTON_LEFT)
     {
-      speed = (state == GLUT_DOWN) ? -0.03 : 0.0;
+      speed = (state == SDL_PRESSED) ? -0.01 : 0.0;
     }
-}*/
+}
 
 void main_loop()
 {
   const int FPS = 60;
+  uint64_t frame_count = 0;
   bool running = true;
   Uint32 ticks = SDL_GetTicks();
 
@@ -281,7 +282,18 @@ void main_loop()
     {
       SDL_Event e;
       while(SDL_PollEvent(&e)) {
-      
+	switch(e.type) {
+	case SDL_QUIT:
+	  running = false;
+	  break;
+	case SDL_MOUSEMOTION:
+	  mouse_motion(e.motion.x, e.motion.y);
+	  break;
+	case SDL_MOUSEBUTTONDOWN:
+	case SDL_MOUSEBUTTONUP:
+	  mouse_button(e.button.button, e.button.state);
+	  break;
+	}
       }
     }
 
@@ -298,7 +310,10 @@ void main_loop()
 	SDL_Delay(delay);
       ticks = now;
     }
+    ++frame_count;
   }
+
+  cout << frame_count << " frames rendered." << endl;
 }
 
 int main(int argc, char **argv)
