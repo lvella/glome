@@ -115,33 +115,6 @@ void draw()
   glColor3f(.0f, 1.0f, 1.0f);
   draw_meridian(z, s, c, z);
 
-  /*
-  glColor3f(1.0f, 1.0f, 1.0f);
-  {
-    // 1 0 0 0
-    double n[] = {c[1], s[1], 0, 0};
-    double s[] = {c[1], -s[1], 0, 0};
-    double e[] = {c[1], 0, s[1], 0};
-    double w[] = {c[1], 0, -s[1], 0};
-    double f[] = {c[1], 0, 0, s[1]};
-    double r[] = {c[1], 0, 0, -s[1]};
-
-    draw_diamond(n, s, e, w, f, r);
-  }
-
-  {
-    // 0 1 0 0
-    double n[] = { s[1], c[1],     0,     0};
-    double s[] = {-s[1], c[1],     0,     0};
-    double e[] = {    0, c[1],  s[1],     0};
-    double w[] = {    0, c[1], -s[1],     0};
-    double f[] = {    0, c[1],     0,  s[1]};
-    double r[] = {    0, c[1],     0, -s[1]};
-
-    draw_diamond(n, s, e, w, f, r);
-  }
-  */
-
   glutSwapBuffers();
 }
 
@@ -198,14 +171,6 @@ void update(int nulo)
   glMultMatrixf(ahead);
   glMultMatrixf(t);
 
-  /*
-    {
-    float t[16];
-    glGetFloatv(GL_MODELVIEW_MATRIX, t);
-    printm(t);
-    }
-  */
-
   glutPostRedisplay();
 }
 
@@ -216,8 +181,6 @@ void mouse_motion(int x, int y)
 
   dy = double(x) / double(WIDTH / 2);
   dx = double(y) / double(HEIGHT / 2);
-  /*player.turn(double(-x) / double(WIDTH / 2),
-			double(y) / double(HEIGHT / 2));*/
 }
 
 void mouse_button(int button, int state, int x, int y)
@@ -226,55 +189,6 @@ void mouse_button(int button, int state, int x, int y)
     {
       speed = (state == GLUT_DOWN) ? -0.03 : 0.0;
     }
-}
-
-void key_press(unsigned char key, int x, int y){
-  /*
-    switch(key)
-    {
-    case 27:
-      exit(0);
-      break;
-
-    case 'q':
-      ++dx;
-      break;
-    case 'a':
-      --dx;
-      break;
-    case 'w':
-      ++dy;
-      break;
-    case 's':
-      --dy;
-      break;
-    case 'e':
-      ++dz;
-      break;
-    case 'd':
-      --dz;
-      break;
-
-    case 'r':
-      ++dtx;
-      break;
-    case 'f':
-      --dtx;
-      break;
-    case 't':
-      ++dty;
-      break;
-    case 'g':
-      --dty;
-      break;
-    case 'y':
-      ++dtz;
-      break;
-    case 'h':
-      --dtz;
-      break;
-    }
-  */
 }
 
 int main(int argc, char **argv)
@@ -323,7 +237,6 @@ int main(int argc, char **argv)
   glutDisplayFunc(draw);
   glutMotionFunc(mouse_motion);
   glutPassiveMotionFunc(mouse_motion);
-  glutKeyboardFunc(key_press);
   glutMouseFunc(mouse_button);
   update(0);
 
