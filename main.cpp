@@ -8,6 +8,7 @@
 #include <GL/glu.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include "ship.hpp"
 
 using namespace std;
 
@@ -23,6 +24,8 @@ double dx = 0, dy = 0;
 
 // Speed
 double speed = 0;
+
+Ship ship;
 
 void initialize_vars()
 {
@@ -82,107 +85,6 @@ void draw_meridian(const double *a, const double *b, const double *c, const doub
   glEnd();
 }
 
-void vertex_conv(float x, float y, float z)
-{
-  x /= 10;
-  y /= 10;
-  z /= 10;
-  float d = 1+x*x+y*y+z*z;
-  float n[4] = {2*x/d, 2*y/d, 2*z/d, (-1+x*x+y*y+z*z)/d};
-  glVertex4fv(n);
-}
-
-void draw_ship()
-{
-  //float scale[] = {0.1,0,0,0,  0,0.1,0,0,  0,0,0.1,0,  0,0,0,0.1};
-
-  /*glPushMatrix();
-  glMultMatrix(scale);*/
-
-  glColor3f(1.0, 1.0, 1.0);
-
-  glBegin(GL_LINE_STRIP);
-  vertex_conv(.0f, .0f, -.7f);
-  vertex_conv(.0f, -.1f, .0f);
-  vertex_conv(-.08f, .0f, .0f);
-  vertex_conv(.08f, .0f, .0f);
-  vertex_conv(.0f, -.1f, .0f);
-  glEnd();
-  glBegin(GL_LINE_STRIP);
-  vertex_conv(-.08f, .0f, -.0f);
-  vertex_conv(.0f, .0f, -.7f);
-  vertex_conv(.08f, .0f, -.0f);
-  glEnd();
-  // Wings
-  glBegin(GL_LINE_LOOP);
-  vertex_conv(.0f, -.025f, -.04f);
-  vertex_conv(.4f, -.03f, .01f);
-  vertex_conv(.47f, 0.02f, 0.08f);
-  vertex_conv(.42f, -.033f, -.11f);
-  vertex_conv(.0f, -.0f, -.44f);
-  vertex_conv(-.42f, -.033f, -.11f);
-  vertex_conv(-.47f, 0.02f, 0.08f);
-  vertex_conv(-.4f, -.03f, .01f);
-  glEnd();
-  glBegin(GL_LINES);
-  vertex_conv(.4f, -.03f, .01f);
-  vertex_conv(.42f, -.033f, -.11f);
-  vertex_conv(-.4f, -.03f, .01f);
-  vertex_conv(-.42f, -.033f, -.11f);
-  glEnd();
-
-  // Cannons
-  glBegin(GL_LINE_STRIP);
-  vertex_conv(.3f, -.03f, -.36f);
-  vertex_conv(.3f, -.05f, -.1f);
-  vertex_conv(.27f, -.03f, -.1f);
-  vertex_conv(.33f, -.03f, -.1f);
-  vertex_conv(.30f, -.05f, -.1f);
-  glEnd();
-  glBegin(GL_LINE_LOOP);
-  vertex_conv(.3f, -.03f, -.36f);
-  vertex_conv(.3f, -.05f, -.405f);
-  vertex_conv(.3f, -.03f, -.45f);
-  vertex_conv(.3f, -.01f, -.405f);
-  vertex_conv(.3f, -.03f, -.36f);
-  vertex_conv(.28f, -.03f, -.405f);
-  vertex_conv(.3f, -.03f, -.45f);
-  vertex_conv(.32f, -.03f, -.405f);
-  glEnd();
-  glBegin(GL_LINE_LOOP);
-  vertex_conv(.3f, -.05f, -.405f);
-  vertex_conv(.32f, -.03f, -.405f);
-  vertex_conv(.3f, -.01f, -.405f);
-  vertex_conv(.28f, -.03f, -.405f);
-  glEnd();
-
-  glBegin(GL_LINE_STRIP);
-  vertex_conv(-.3f, -.03f, -.36f);
-  vertex_conv(-.3f, -.05f, -.1f);
-  vertex_conv(-.27f, -.03f, -.1f);
-  vertex_conv(-.33f, -.03f, -.1f);
-  vertex_conv(-.30f, -.05f, -.1f);
-  glEnd();
-  glBegin(GL_LINE_LOOP);
-  vertex_conv(-.3f, -.03f, -.36f);
-  vertex_conv(-.3f, -.05f, -.405f);
-  vertex_conv(-.3f, -.03f, -.45f);
-  vertex_conv(-.3f, -.01f, -.405f);
-  vertex_conv(-.3f, -.03f, -.36f);
-  vertex_conv(-.28f, -.03f, -.405f);
-  vertex_conv(-.3f, -.03f, -.45f);
-  vertex_conv(-.32f, -.03f, -.405f);
-  glEnd();
-  glBegin(GL_LINE_LOOP);
-  vertex_conv(-.3f, -.05f, -.405f);
-  vertex_conv(-.32f, -.03f, -.405f);
-  vertex_conv(-.3f, -.01f, -.405f);
-  vertex_conv(-.28f, -.03f, -.405f);
-  glEnd();
-
-  /*glPopMatrix();*/
-}
-
 void draw()
 {
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -200,7 +102,7 @@ void draw()
   glColor3f(.0f, 1.0f, 1.0f);
   draw_meridian(z, s, c, z);
 
-  draw_ship();
+  ship.draw();
 
   SDL_GL_SwapBuffers();
 }
@@ -337,6 +239,7 @@ int main(int argc, char **argv)
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_BLEND);
   //glEnable(GL_TEXTURE_2D);
+  glEnableClientState(GL_VERTEX_ARRAY);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
@@ -365,6 +268,8 @@ int main(int argc, char **argv)
   initialize_shader();
 
   initialize_vars();
+
+  Ship::initialize();
 
   main_loop();
 
