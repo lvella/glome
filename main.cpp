@@ -58,8 +58,12 @@ void initialize_shader()
   glShaderSource(s, 1, &ptr,NULL);
   glCompileShader(s);
 
-  glGetShaderInfoLog(s, 10000, NULL, err);
-  cout << "Shader compilation log:\n" << err << '\n';
+  {
+    GLsizei length;
+    glGetShaderInfoLog(s, 10000, &length, err);
+    if(length)
+      cout << "Shader compilation log:\n" << err << '\n';
+  }
 
   p = glCreateProgram();
   glAttachShader(p,s);
