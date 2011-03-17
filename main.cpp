@@ -10,6 +10,7 @@
 #include <GL/glext.h>
 
 #include "4dmath.hpp"
+#include "matrix4.hpp"
 #include "ship.hpp"
 
 using namespace std;
@@ -112,19 +113,14 @@ void draw()
 
 void update()
 {
-  const float cx = cos(speed[0]);
-  const float sx = sin(speed[0]);
-  const float left[] = {cx,0,0,-sx, 0,1,0,0,  0,0,1,0,  sx,0,0,cx};
-
   float t[16];
-
   glGetFloatv(GL_MODELVIEW_MATRIX, t);
   glLoadIdentity();
   glRotated(dx, 1, 0, 0);
   glRotated(dy, 0, 1, 0);
-  glMultMatrixf(ahead_matrix(speed[2]));
-  glMultMatrixf(up_matrix(speed[1]));
-  glMultMatrixf(left);
+  (ztrans_matrix(speed[2]) *
+   ytrans_matrix(speed[1]) *
+   xtrans_matrix(speed[0])).multToGL();
   glMultMatrixf(t);
 }
 
@@ -141,11 +137,11 @@ void mouse_button(int button, int state)
 {
   if(button == SDL_BUTTON_LEFT)
     {
-      speed[2] = (state == SDL_PRESSED) ? -0.01 : 0.0;
+      speed[2] = (state == SDL_PRESSED) ? 0.01 : 0.0;
     }
   else if(button == SDL_BUTTON_RIGHT)
     {
-      speed[2] = (state == SDL_PRESSED) ? 0.01 : 0.0;
+      speed[2] = (state == SDL_PRESSED) ? -0.01 : 0.0;
     }
 }
 
@@ -154,16 +150,16 @@ key_pressed(int key)
 {
   switch(key)
   {
-    case SDLK_s:
+    case SDLK_w:
 	speed[1] = -0.01;
 	break;
-    case SDLK_w:
+    case SDLK_s:
 	speed[1] = 0.01;
 	break;
-    case SDLK_a:
+    case SDLK_d:
 	speed[0] = -0.01;
 	break;
-    case SDLK_d:
+    case SDLK_a:
 	speed[0] = 0.01;
 	break;
   }

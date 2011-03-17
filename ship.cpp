@@ -186,8 +186,7 @@ void Ship::initialize()
 void Ship::draw()
 {
   glPushMatrix();
-  glLoadMatrixf(ahead_matrix(-0.20));
-  glMultMatrixf(up_matrix(-0.05));
+  (ztrans_matrix(-0.20) * ytrans_matrix(-0.05)).loadToGL();
   glCallList(dlist);
   glPopMatrix();
 }

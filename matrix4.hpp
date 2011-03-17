@@ -30,15 +30,10 @@
 #include <cassert>
 #include <algorithm>
 #include <iostream>
+#include <GL/gl.h>
 
 typedef float Real;
 
-/** \addtogroup Core
- *  @{
- */
-/** \addtogroup Math
- *  @{
- */
 /** Class encapsulating a standard 4x4 homogeneous matrix.
     @remarks
     OGRE uses column vectors when applying matrix multiplications,
@@ -77,8 +72,9 @@ protected:
   /// The matrix entries, indexed by [row][col].
   union {
     Real m[4][4];
-    Real _m[16];
+    Real _m[16]; // This shit is stored transposed compared to OpenGL...
   };
+
 public:
   /** Default constructor.
       @note
@@ -88,28 +84,15 @@ public:
   {
   }
 
-  inline Matrix4(
-		 Real m00, Real m01, Real m02, Real m03,
+  inline Matrix4(Real m00, Real m01, Real m02, Real m03,
 		 Real m10, Real m11, Real m12, Real m13,
 		 Real m20, Real m21, Real m22, Real m23,
 		 Real m30, Real m31, Real m32, Real m33 )
   {
-    m[0][0] = m00;
-    m[0][1] = m01;
-    m[0][2] = m02;
-    m[0][3] = m03;
-    m[1][0] = m10;
-    m[1][1] = m11;
-    m[1][2] = m12;
-    m[1][3] = m13;
-    m[2][0] = m20;
-    m[2][1] = m21;
-    m[2][2] = m22;
-    m[2][3] = m23;
-    m[3][0] = m30;
-    m[3][1] = m31;
-    m[3][2] = m32;
-    m[3][3] = m33;
+    m[0][0] = m00; m[0][1] = m01; m[0][2] = m02; m[0][3] = m03;
+    m[1][0] = m10; m[1][1] = m11; m[1][2] = m12; m[1][3] = m13;
+    m[2][0] = m20; m[2][1] = m21; m[2][2] = m22; m[2][3] = m23;
+    m[3][0] = m30; m[3][1] = m31; m[3][2] = m32; m[3][3] = m33;
   }
 
   /** Exchange the contents of this matrix with another. 
@@ -294,13 +277,6 @@ public:
 		   scalar*m[3][0], scalar*m[3][1], scalar*m[3][2], scalar*m[3][3]);
   }
 
-  /** For passing it to OpenGL
-   */
-  inline operator Real*()
-  {
-    return _m;
-  }
-
   /** Function for writing to a stream.
    */
   inline friend std::ostream& operator <<
@@ -319,11 +295,15 @@ public:
     o << ")";
     return o;
   }
+
+  void loadToGL() const {
+    glLoadTransposeMatrixf(_m);
+  }
+  void multToGL() const {
+    glMultTransposeMatrixf(_m);
+  }
 		
   Matrix4 adjoint() const;
   Real determinant() const;
   Matrix4 inverse() const;
 };
-
-/** @} */
-/** @} */
