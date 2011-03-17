@@ -103,7 +103,7 @@ void draw()
   glColor3f(.0f, 1.0f, 1.0f);
   draw_meridian(z, s, c, z);
 
-  //ship.draw();
+  ship.draw();
 
   SDL_GL_SwapBuffers();
 }

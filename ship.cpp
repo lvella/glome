@@ -112,12 +112,12 @@ static void vertex_conv(const float *in, float scale, float *out)
   float x = in[0] * scale;
   float y = in[1] * scale;
   float z = in[2] * scale;
-  float d = 1+x*x+y*y+z*z;
+  float d = 1 + x*x + y*y + z*z;
 
   out[0] = 2*x/d;
   out[1] = 2*y/d;
   out[2] = 2*z/d;
-  out[4] = (-1+x*x+y*y+z*z)/d;
+  out[3] = (-1 + x*x + y*y + z*z) / d;
 }
 
 void Ship::initialize()
@@ -126,7 +126,7 @@ void Ship::initialize()
   glGenBuffers(1, &ibo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, ilen * sizeof(uint16_t), NULL, GL_STATIC_DRAW);
-  uint16_t *idata = (uint16_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+  uint16_t *idata = (uint16_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
 
   // Remove redundant vertices while filling the index buffer
   typedef map<v3, uint16_t> vmap;
@@ -147,22 +147,24 @@ void Ship::initialize()
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, vlen * 4 * sizeof(float), NULL, GL_STATIC_DRAW);
-  float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+  float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
   // Convert to 4D coordinates and fill the buffer
   for(iter i = m.begin(); i != m.end(); ++i) {
     vertex_conv(i->first.v, 0.1f, &vdata[i->second * 4]);
   }
+
   glUnmapBuffer(GL_ARRAY_BUFFER);
   vdata = NULL;
 }
 
 void Ship::draw()
 {
-  int offset = 0;
+  uint16_t *offset = NULL;
+
   glColor3ub(255, 255, 255);
   glVertexPointer(4, GL_FLOAT, 0, NULL);
-  glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 5, GL_UNSIGNED_SHORT, (void*)offset);
-  glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 3, GL_UNSIGNED_SHORT, (void*)(offset+=5));
+  glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 5, GL_UNSIGNED_SHORT, offset);
+  glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 3, GL_UNSIGNED_SHORT, offset+=5);
   glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 8, GL_UNSIGNED_SHORT, (void*)(offset+=3));
   glDrawRangeElements(GL_LINES, 0, ilen-1, 4, GL_UNSIGNED_SHORT, (void*)(offset+=8));
   glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 5, GL_UNSIGNED_SHORT, (void*)(offset+=4));
