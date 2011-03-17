@@ -230,7 +230,7 @@ int main(int argc, char **argv)
   }
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL);
-  SDL_WM_SetCaption("Navinha", NULL);
+  SDL_WM_SetCaption("Glome", NULL);
 
   // OpenGL nonchanging settings
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
