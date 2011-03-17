@@ -8,6 +8,8 @@
 #include <GL/glu.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
+
+#include "4dmath.hpp"
 #include "ship.hpp"
 
 using namespace std;
@@ -110,14 +112,6 @@ void draw()
 
 void update()
 {
-  const float cz = cos(speed[2]);
-  const float sz = sin(speed[2]);
-  const float ahead[] = {1,0,0,0,  0,1,0,0,  0,0,cz,-sz,  0,0,sz,cz};
-
-  const float cy = cos(speed[1]);
-  const float sy = sin(speed[1]);
-  const float up[] = {1,0,0,0,  0,cy,0,-sy,  0,0,1,0,  0,sy,0,cy};
-
   const float cx = cos(speed[0]);
   const float sx = sin(speed[0]);
   const float left[] = {cx,0,0,-sx, 0,1,0,0,  0,0,1,0,  sx,0,0,cx};
@@ -128,8 +122,8 @@ void update()
   glLoadIdentity();
   glRotated(dx, 1, 0, 0);
   glRotated(dy, 0, 1, 0);
-  glMultMatrixf(ahead);
-  glMultMatrixf(up);
+  glMultMatrixf(ahead_matrix(speed[2]));
+  glMultMatrixf(up_matrix(speed[1]));
   glMultMatrixf(left);
   glMultMatrixf(t);
 }

@@ -1,11 +1,13 @@
 #define GL_GLEXT_PROTOTYPES
 #include <map>
 #include <algorithm>
+#include <cmath>
 #include <cassert>
 #include <GL/gl.h>
 #include <GL/glext.h>
 #include <stdint.h>
 
+#include "4dmath.hpp"
 #include "ship.hpp"
 
 using namespace std;
@@ -165,6 +167,8 @@ void Ship::initialize()
     uint16_t *offset = NULL;
     glColor3ub(255, 255, 255);
     glVertexPointer(4, GL_FLOAT, 0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 5, GL_UNSIGNED_SHORT, offset);
     glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 3, GL_UNSIGNED_SHORT, offset+=5);
     glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 8, GL_UNSIGNED_SHORT, offset+=3);
@@ -181,7 +185,11 @@ void Ship::initialize()
 
 void Ship::draw()
 {
+  glPushMatrix();
+  glLoadMatrixf(ahead_matrix(-0.20));
+  glMultMatrixf(up_matrix(-0.05));
   glCallList(dlist);
+  glPopMatrix();
 }
 
 void Ship::update()
