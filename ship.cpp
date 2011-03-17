@@ -4,6 +4,7 @@
 #include <cassert>
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include <stdint.h>
 
 #include "ship.hpp"
 
