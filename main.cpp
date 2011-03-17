@@ -108,41 +108,6 @@ void draw()
   SDL_GL_SwapBuffers();
 }
 
-void mul_mat_vec(const float *m, const float *v, float *r)
-{
-  for(int i = 0; i < 4; ++i)
-    r[i] = m[i*4+0]*v[0] + m[i*4+1]*v[1] + m[i*4+2]*v[2] + m[i*4+3]*v[3];
-}
-
-void normalize_mat(float *f)
-{
-  for(int i = 0; i < 4; ++i)
-    {
-      float d = sqrt(f[i*4]*f[i*4]
-		     + f[i*4+1]*f[i*4+1]
-		     + f[i*4+2]*f[i*4+2]
-		     + f[i*4+3]*f[i*4+3]);
-
-      for(int j = 0; j < 4; ++j)
-	f[i*4+j] /= d;
-    }
-}
-
-void transpose_mat(const float *m0, float *m1)
-{
-  for(int i = 0; i < 4; ++i)
-    for(int j = 0; j < 4; ++j)
-      m1[j*4+i] = m0[i*4+j];
-}
-
-void printm(const float *m)
-{
-  for(int i = 0; i < 4; ++i)
-      printf("%01.02f %01.02f %01.02f %01.02f\n",
-	     m[i], m[4+i], m[8+i], m[12+i]);
-  std::cout << std::endl;
-}
-
 void update()
 {
   const float cz = cos(speed[2]);
@@ -155,12 +120,11 @@ void update()
 
   const float cx = cos(speed[0]);
   const float sx = sin(speed[0]);
-  const float left[] = {cx,0,0,-sx, 0,1,0,0,    0,0,1,0,  sx,0,0,cx};
+  const float left[] = {cx,0,0,-sx, 0,1,0,0,  0,0,1,0,  sx,0,0,cx};
 
-  float t[16], tt[16];
-  float m1[16], m2[16];
+  float t[16];
+
   glGetFloatv(GL_MODELVIEW_MATRIX, t);
-
   glLoadIdentity();
   glRotated(dx, 1, 0, 0);
   glRotated(dy, 0, 1, 0);
@@ -196,17 +160,11 @@ key_pressed(int key)
 {
   switch(key)
   {
-    case SDLK_w:
-	speed[2] = -0.01;
-	break;
     case SDLK_s:
-	speed[2] = 0.01;
-	break;
-    case SDLK_q:
-	speed[1] = 0.01;
-	break;
-    case SDLK_e:
 	speed[1] = -0.01;
+	break;
+    case SDLK_w:
+	speed[1] = 0.01;
 	break;
     case SDLK_a:
 	speed[0] = -0.01;
@@ -222,16 +180,10 @@ key_released(int key)
 {
   switch(key)
   {
-    case SDLK_w:
-	speed[2] = 0.0f;
-	break;
     case SDLK_s:
-	speed[2] = 0.0f;
-	break;
-    case SDLK_q:
 	speed[1] = 0.0f;
 	break;
-    case SDLK_e:
+    case SDLK_w:
 	speed[1] = 0.0f;
 	break;
     case SDLK_a:
