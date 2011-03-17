@@ -8,6 +8,8 @@
 #include <GL/glu.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
+
+#include "4dmath.hpp"
 #include "ship.hpp"
 
 using namespace std;
@@ -23,7 +25,7 @@ double z[360];
 double dx = 0, dy = 0;
 
 // Speed
-double speed = 0;
+double speed[3] = {0.0, 0.0, 0.0};
 
 Ship ship;
 
@@ -36,6 +38,7 @@ void initialize_vars()
       s[i] = sin(n);
       z[i] = 0.0;
     }
+  
 }
 
 void initialize_shader()
@@ -107,55 +110,21 @@ void draw()
   SDL_GL_SwapBuffers();
 }
 
-void mul_mat_vec(const float *m, const float *v, float *r)
-{
-  for(int i = 0; i < 4; ++i)
-    r[i] = m[i*4+0]*v[0] + m[i*4+1]*v[1] + m[i*4+2]*v[2] + m[i*4+3]*v[3];
-}
-
-void normalize_mat(float *f)
-{
-  for(int i = 0; i < 4; ++i)
-    {
-      float d = sqrt(f[i*4]*f[i*4]
-		     + f[i*4+1]*f[i*4+1]
-		     + f[i*4+2]*f[i*4+2]
-		     + f[i*4+3]*f[i*4+3]);
-
-      for(int j = 0; j < 4; ++j)
-	f[i*4+j] /= d;
-    }
-}
-
-void transpose_mat(const float *m0, float *m1)
-{
-  for(int i = 0; i < 4; ++i)
-    for(int j = 0; j < 4; ++j)
-      m1[j*4+i] = m0[i*4+j];
-}
-
-void printm(const float *m)
-{
-  for(int i = 0; i < 4; ++i)
-      printf("%01.02f %01.02f %01.02f %01.02f\n",
-	     m[i], m[4+i], m[8+i], m[12+i]);
-  std::cout << std::endl;
-}
-
 void update()
 {
-  const float c = cos(speed);
-  const float s = sin(speed);
-  const float ahead[] = {1,0,0,0,  0,1,0,0,  0,0,c,-s,  0,0,s,c};
+  const float cx = cos(speed[0]);
+  const float sx = sin(speed[0]);
+  const float left[] = {cx,0,0,-sx, 0,1,0,0,  0,0,1,0,  sx,0,0,cx};
 
-  float t[16], tt[16];
-  float m1[16], m2[16];
+  float t[16];
+
   glGetFloatv(GL_MODELVIEW_MATRIX, t);
-
   glLoadIdentity();
   glRotated(dx, 1, 0, 0);
   glRotated(dy, 0, 1, 0);
-  glMultMatrixf(ahead);
+  glMultMatrixf(ahead_matrix(speed[2]));
+  glMultMatrixf(up_matrix(speed[1]));
+  glMultMatrixf(left);
   glMultMatrixf(t);
 }
 
@@ -172,9 +141,54 @@ void mouse_button(int button, int state)
 {
   if(button == SDL_BUTTON_LEFT)
     {
-      speed = (state == SDL_PRESSED) ? -0.01 : 0.0;
+      speed[2] = (state == SDL_PRESSED) ? -0.01 : 0.0;
+    }
+  else if(button == SDL_BUTTON_RIGHT)
+    {
+      speed[2] = (state == SDL_PRESSED) ? 0.01 : 0.0;
     }
 }
+
+void
+key_pressed(int key)
+{
+  switch(key)
+  {
+    case SDLK_s:
+	speed[1] = -0.01;
+	break;
+    case SDLK_w:
+	speed[1] = 0.01;
+	break;
+    case SDLK_a:
+	speed[0] = -0.01;
+	break;
+    case SDLK_d:
+	speed[0] = 0.01;
+	break;
+  }
+}
+
+void
+key_released(int key)
+{
+  switch(key)
+  {
+    case SDLK_s:
+	speed[1] = 0.0f;
+	break;
+    case SDLK_w:
+	speed[1] = 0.0f;
+	break;
+    case SDLK_a:
+	speed[0] = 0.0f;
+	break;
+    case SDLK_d:
+	speed[0] = 0.0f;
+	break;
+  }
+}
+
 
 void main_loop()
 {
@@ -198,6 +212,12 @@ void main_loop()
 	case SDL_MOUSEBUTTONDOWN:
 	case SDL_MOUSEBUTTONUP:
 	  mouse_button(e.button.button, e.button.state);
+	  break;
+	case SDL_KEYDOWN:
+	  key_pressed(e.key.keysym.sym);
+	  break;
+	case SDL_KEYUP:
+	  key_released(e.key.keysym.sym);
 	  break;
 	}
       }
@@ -230,7 +250,7 @@ int main(int argc, char **argv)
   }
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL);
-  SDL_WM_SetCaption("Glome", NULL);
+  SDL_WM_SetCaption("Navigna", NULL);
 
   // OpenGL nonchanging settings
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

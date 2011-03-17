@@ -1,10 +1,13 @@
 #define GL_GLEXT_PROTOTYPES
 #include <map>
 #include <algorithm>
+#include <cmath>
 #include <cassert>
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include <stdint.h>
 
+#include "4dmath.hpp"
 #include "ship.hpp"
 
 using namespace std;
@@ -86,11 +89,6 @@ static const float vdesc[][3] = {
   {-.3f, -.01f, -.405f},
   {-.28f, -.03f, -.405f}}; // 4
 
-static const uint16_t ilen = sizeof(vdesc) / sizeof(float[3]);
-static uint16_t vlen;
-static GLuint vbo;
-static GLuint ibo;
-
 struct v3 {
   v3(const float *val) {
     v[0] = val[0];
@@ -106,26 +104,33 @@ struct v3 {
   float v[3];
 };
 
+static int dlist;
+
 static void vertex_conv(const float *in, float scale, float *out)
 {
   float x = in[0] * scale;
   float y = in[1] * scale;
   float z = in[2] * scale;
-  float d = 1+x*x+y*y+z*z;
+  float d = 1 + x*x + y*y + z*z;
 
   out[0] = 2*x/d;
   out[1] = 2*y/d;
   out[2] = 2*z/d;
-  out[4] = (-1+x*x+y*y+z*z)/d;
+  out[3] = (-1 + x*x + y*y + z*z) / d;
 }
 
 void Ship::initialize()
 {
+  const uint16_t ilen = sizeof(vdesc) / sizeof(float[3]);
+  uint16_t vlen = 0;
+  GLuint vbo;
+  GLuint ibo;
+
   // Create index buffer
   glGenBuffers(1, &ibo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, ilen * sizeof(uint16_t), NULL, GL_STATIC_DRAW);
-  uint16_t *idata = (uint16_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
+  uint16_t *idata = (uint16_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
 
   // Remove redundant vertices while filling the index buffer
   typedef map<v3, uint16_t> vmap;
@@ -146,30 +151,45 @@ void Ship::initialize()
   glGenBuffers(1, &vbo);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, vlen * 4 * sizeof(float), NULL, GL_STATIC_DRAW);
-  float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+  float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
   // Convert to 4D coordinates and fill the buffer
   for(iter i = m.begin(); i != m.end(); ++i) {
     vertex_conv(i->first.v, 0.1f, &vdata[i->second * 4]);
   }
+
   glUnmapBuffer(GL_ARRAY_BUFFER);
   vdata = NULL;
+
+  // Create the display list
+  dlist = glGenLists (1);
+  glNewList(dlist, GL_COMPILE);
+  {
+    uint16_t *offset = NULL;
+    glColor3ub(255, 255, 255);
+    glVertexPointer(4, GL_FLOAT, 0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 5, GL_UNSIGNED_SHORT, offset);
+    glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 3, GL_UNSIGNED_SHORT, offset+=5);
+    glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 8, GL_UNSIGNED_SHORT, offset+=3);
+    glDrawRangeElements(GL_LINES, 0, ilen-1, 4, GL_UNSIGNED_SHORT, offset+=8);
+    glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 5, GL_UNSIGNED_SHORT, offset+=4);
+    glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 8, GL_UNSIGNED_SHORT, offset+=5);
+    glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 4, GL_UNSIGNED_SHORT, offset+=8);
+    glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 5, GL_UNSIGNED_SHORT, offset+=4);
+    glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 8, GL_UNSIGNED_SHORT, offset+=5);
+    glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 4, GL_UNSIGNED_SHORT, offset+=8);
+  }
+  glEndList();
 }
 
 void Ship::draw()
 {
-  int offset = 0;
-  glColor3ub(255, 255, 255);
-  glVertexPointer(4, GL_FLOAT, 0, NULL);
-  glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 5, GL_UNSIGNED_SHORT, (void*)offset);
-  glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 3, GL_UNSIGNED_SHORT, (void*)(offset+=5));
-  glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 8, GL_UNSIGNED_SHORT, (void*)(offset+=3));
-  glDrawRangeElements(GL_LINES, 0, ilen-1, 4, GL_UNSIGNED_SHORT, (void*)(offset+=8));
-  glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 5, GL_UNSIGNED_SHORT, (void*)(offset+=4));
-  glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 8, GL_UNSIGNED_SHORT, (void*)(offset+=5));
-  glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 4, GL_UNSIGNED_SHORT, (void*)(offset+=8));
-  glDrawRangeElements(GL_LINE_STRIP, 0, ilen-1, 5, GL_UNSIGNED_SHORT, (void*)(offset+=4));
-  glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 8, GL_UNSIGNED_SHORT, (void*)(offset+=5));
-  glDrawRangeElements(GL_LINE_LOOP, 0, ilen-1, 4, GL_UNSIGNED_SHORT, (void*)(offset+=8));
+  glPushMatrix();
+  glLoadMatrixf(ahead_matrix(-0.20));
+  glMultMatrixf(up_matrix(-0.05));
+  glCallList(dlist);
+  glPopMatrix();
 }
 
 void Ship::update()
