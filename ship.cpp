@@ -199,6 +199,23 @@ void Ship::draw()
 
 void Ship::update(Matrix4 &old_rot)
 {
+  float h = h_tilt - h_req;
+  float v = v_tilt - v_req;
+
+  /* Limit the turning speed to 0.02 rads per frame. */
+  if(h > 0.02)
+    h = 0.02;
+  else if(h < -0.02)
+    h = -0.02;
+
+  if(v > 0.02)
+    v = 0.02;
+  else if(v < -0.02)
+    v = -0.02;
+
+  h_tilt -= h;
+  v_tilt -= v;
+
   old_rot = rot;
   rot = yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
 }
