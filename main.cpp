@@ -22,9 +22,6 @@ double s[360];
 double c[360];
 double z[360];
 
-// Rotation
-double dx = 0, dy = 0;
-
 // Speed
 double speed[3] = {0.0, 0.0, 0.0};
 
@@ -114,13 +111,16 @@ void draw()
 void update()
 {
   float t[16];
+  Matrix4 rot;
+
+  ship.update(rot);
+
   glGetFloatv(GL_MODELVIEW_MATRIX, t);
   glLoadIdentity();
-  glRotated(dx, 1, 0, 0);
-  glRotated(dy, 0, 1, 0);
-  (ztrans_matrix(speed[2]) *
-   ytrans_matrix(speed[1]) *
-   xtrans_matrix(speed[0])).multToGL();
+  (rot.transpose() *
+   zw_matrix(speed[2]) *
+   yw_matrix(speed[1]) *
+   xw_matrix(speed[0])).multToGL();
   glMultMatrixf(t);
 }
 
@@ -129,8 +129,7 @@ void mouse_motion(int x, int y)
   x -= WIDTH / 2;
   y -= HEIGHT / 2;
 
-  dy = double(x) / double(WIDTH / 2);
-  dx = double(y) / double(HEIGHT / 2);
+  ship.rotate(float(x) / float(WIDTH / 2), float(y) / float(HEIGHT / 2));
 }
 
 void mouse_button(int button, int state)

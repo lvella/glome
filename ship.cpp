@@ -183,15 +183,22 @@ void Ship::initialize()
   glEndList();
 }
 
+Ship::Ship():
+    rot(Matrix4::IDENTITY)
+{}
+
 void Ship::draw()
 {
+  const Matrix4 offset(zw_matrix(-0.23) * yw_matrix(-0.05));
+
   glPushMatrix();
-  (ztrans_matrix(-0.20) * ytrans_matrix(-0.05)).loadToGL();
+  (offset * rot).loadToGL();
   glCallList(dlist);
   glPopMatrix();
 }
 
-void Ship::update()
+void Ship::update(Matrix4 &old_rot)
 {
-
+  old_rot = rot;
+  rot = yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
 }
