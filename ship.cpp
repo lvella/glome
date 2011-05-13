@@ -193,9 +193,10 @@ Ship::Ship():
 void Ship::draw()
 {
   glPushMatrix();
-  t.loadToGL();
+  t.multToGL();
   glCallList(dlist);
   glPopMatrix();
+
 }
 
 void Ship::update()

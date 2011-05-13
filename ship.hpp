@@ -22,6 +22,10 @@ public:
     speed = s;
   }
 
+  inline const Matrix4& transformation() const {
+    return t;
+  }
+
 private:
   float v_req, h_req;
   float v_tilt, h_tilt;

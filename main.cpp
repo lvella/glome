@@ -88,6 +88,11 @@ void draw_meridian(const double *a, const double *b, const double *c, const doub
 
 void draw()
 {
+  const Matrix4 offset(zw_matrix(-0.23) * yw_matrix(-0.05));
+
+  // Camera transform
+  (offset * ship.transformation().transpose()).loadToGL();
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
   glColor3f(.0f, .0f, 1.0f);
@@ -103,7 +108,6 @@ void draw()
   glColor3f(.0f, 1.0f, 1.0f);
   draw_meridian(z, s, c, z);
 
-  //const Matrix4 offset(zw_matrix(-0.23) * yw_matrix(-0.05));
   ship.draw();
 
   SDL_GL_SwapBuffers();
@@ -111,16 +115,7 @@ void draw()
 
 void update()
 {
-  //float t[16];
-
   ship.update();
-
-  /*glGetFloatv(GL_MODELVIEW_MATRIX, t);
-  glLoadIdentity();
-  (zw_matrix(speed[2]) *
-   yw_matrix(speed[1]) *
-   xw_matrix(speed[0])).multToGL();
-  glMultMatrixf(t);*/
 }
 
 void mouse_motion(int x, int y)
