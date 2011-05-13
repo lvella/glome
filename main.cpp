@@ -4,6 +4,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cmath>
+#include <deque>
 #include <SDL.h>
 #include <GL/glu.h>
 #include <GL/gl.h>
@@ -22,8 +23,8 @@ double s[360];
 double c[360];
 double z[360];
 
-// Speed
-double speed[3] = {0.0, 0.0, 0.0};
+// Camera transform historic
+std::deque<Matrix4> cam_hist(10, Matrix4::IDENTITY);
 
 Ship ship;
 
@@ -88,10 +89,12 @@ void draw_meridian(const double *a, const double *b, const double *c, const doub
 
 void draw()
 {
-  const Matrix4 offset(zw_matrix(-0.23) * yw_matrix(-0.05));
+  const Matrix4 offset(zw_matrix(-0.15) * yw_matrix(-0.05));
 
   // Camera transform
-  (offset * ship.transformation().transpose()).loadToGL();
+  (offset * cam_hist.front()).loadToGL();
+  cam_hist.pop_front();
+  cam_hist.push_back(ship.transformation().transpose());
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -144,7 +147,7 @@ void mouse_button(int button, int state)
 void
 key_pressed(int key)
 {
-  switch(key)
+  /*switch(key)
   {
     case SDLK_w:
 	speed[1] = -0.01;
@@ -158,13 +161,13 @@ key_pressed(int key)
     case SDLK_a:
 	speed[0] = 0.01;
 	break;
-  }
+  }*/
 }
 
 void
 key_released(int key)
 {
-  switch(key)
+  /*switch(key)
   {
     case SDLK_s:
 	speed[1] = 0.0f;
@@ -178,7 +181,7 @@ key_released(int key)
     case SDLK_d:
 	speed[0] = 0.0f;
 	break;
-  }
+  }*/
 }
 
 
