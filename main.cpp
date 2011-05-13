@@ -103,6 +103,7 @@ void draw()
   glColor3f(.0f, 1.0f, 1.0f);
   draw_meridian(z, s, c, z);
 
+  //const Matrix4 offset(zw_matrix(-0.23) * yw_matrix(-0.05));
   ship.draw();
 
   SDL_GL_SwapBuffers();
@@ -110,18 +111,16 @@ void draw()
 
 void update()
 {
-  float t[16];
-  Matrix4 rot;
+  //float t[16];
 
-  ship.update(rot);
+  ship.update();
 
-  glGetFloatv(GL_MODELVIEW_MATRIX, t);
+  /*glGetFloatv(GL_MODELVIEW_MATRIX, t);
   glLoadIdentity();
-  (rot.transpose() *
-   zw_matrix(speed[2]) *
+  (zw_matrix(speed[2]) *
    yw_matrix(speed[1]) *
    xw_matrix(speed[0])).multToGL();
-  glMultMatrixf(t);
+  glMultMatrixf(t);*/
 }
 
 void mouse_motion(int x, int y)
@@ -134,14 +133,17 @@ void mouse_motion(int x, int y)
 
 void mouse_button(int button, int state)
 {
+  float speed;
   if(button == SDL_BUTTON_LEFT)
     {
-      speed[2] = (state == SDL_PRESSED) ? 0.01 : 0.0;
+      speed = (state == SDL_PRESSED) ? -0.01 : 0.0;
     }
   else if(button == SDL_BUTTON_RIGHT)
     {
-      speed[2] = (state == SDL_PRESSED) ? -0.01 : 0.0;
+      speed = (state == SDL_PRESSED) ? 0.01 : 0.0;
     }
+
+  ship.move(speed);
 }
 
 void

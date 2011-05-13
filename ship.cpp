@@ -184,38 +184,41 @@ void Ship::initialize()
 }
 
 Ship::Ship():
-    rot(Matrix4::IDENTITY)
+    t(Matrix4::IDENTITY),
+    v_tilt(0.0f),
+    h_tilt(0.0f),
+    speed(0.0f)
 {}
 
 void Ship::draw()
 {
-  const Matrix4 offset(zw_matrix(-0.23) * yw_matrix(-0.05));
-
   glPushMatrix();
-  (offset * rot).loadToGL();
+  t.loadToGL();
   glCallList(dlist);
   glPopMatrix();
 }
 
-void Ship::update(Matrix4 &old_rot)
+void Ship::update()
 {
+  /* Maximum turning delta per frame in radians. */
+  const float MAXD = 0.03;
+
   float h = h_tilt - h_req;
   float v = v_tilt - v_req;
 
-  /* Limit the turning speed to 0.02 rads per frame. */
-  if(h > 0.02)
-    h = 0.02;
-  else if(h < -0.02)
-    h = -0.02;
+  /* Limit the turning speed to MAXD rads per frame. */
+  if(h > MAXD)
+    h = MAXD;
+  else if(h < -MAXD)
+    h = -MAXD;
 
-  if(v > 0.02)
-    v = 0.02;
-  else if(v < -0.02)
-    v = -0.02;
+  if(v > MAXD)
+    v = MAXD;
+  else if(v < -MAXD)
+    v = -MAXD;
 
   h_tilt -= h;
   v_tilt -= v;
 
-  old_rot = rot;
-  rot = yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
+  t = t * zw_matrix(speed) * yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
 }
