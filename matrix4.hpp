@@ -282,17 +282,15 @@ public:
   inline friend std::ostream& operator <<
   ( std::ostream& o, const Matrix4& mat )
   {
-    o << "Matrix4(";
     for (size_t i = 0; i < 4; ++i)
       {
-	o << " row" << (unsigned)i << "{";
 	for(size_t j = 0; j < 4; ++j)
 	  {
-	    o << mat[i][j] << " ";
+	    o << mat[i][j] << ", ";
 	  }
-	o << "}";
+	o << '\n';
       }
-    o << ")";
+    o << "\n\n";
     return o;
   }
 
@@ -301,6 +299,9 @@ public:
   }
   void multToGL() const {
     glMultTransposeMatrixf(_m);
+  }
+  void loadFromGL() {
+    glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, _m);
   }
 		
   Matrix4 adjoint() const;
