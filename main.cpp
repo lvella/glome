@@ -13,6 +13,7 @@
 #include "4dmath.hpp"
 #include "matrix4.hpp"
 #include "ship.hpp"
+#include "projectile.hpp"
 
 using namespace std;
 
@@ -112,6 +113,7 @@ void draw()
   draw_meridian(z, s, c, z);
 
   ship.draw();
+  Projectile::draw_all();
 
   SDL_GL_SwapBuffers();
 }
@@ -119,6 +121,7 @@ void draw()
 void update()
 {
   ship.update();
+  Projectile::update_all();
 }
 
 void mouse_motion(int x, int y)
@@ -134,11 +137,11 @@ void mouse_button(int button, int state)
   float speed;
   if(button == SDL_BUTTON_LEFT)
     {
-      speed = (state == SDL_PRESSED) ? -0.01 : 0.0;
+      speed = (state == SDL_PRESSED) ? -0.0003 : 0.0;
     }
   else if(button == SDL_BUTTON_RIGHT)
     {
-      speed = (state == SDL_PRESSED) ? 0.01 : 0.0;
+      speed = (state == SDL_PRESSED) ? 0.0003 : 0.0;
     }
 
   ship.move(speed);
@@ -147,9 +150,12 @@ void mouse_button(int button, int state)
 void
 key_pressed(int key)
 {
-  /*switch(key)
+  switch(key)
   {
     case SDLK_w:
+      ship.shot();
+  }
+    /*
 	speed[1] = -0.01;
 	break;
     case SDLK_s:

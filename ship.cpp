@@ -9,6 +9,7 @@
 
 #include "4dmath.hpp"
 #include "ship.hpp"
+#include "projectile.hpp"
 
 using namespace std;
 
@@ -202,24 +203,39 @@ void Ship::draw()
 void Ship::update()
 {
   /* Maximum turning delta per frame in radians. */
-  const float MAXD = 0.03;
+  const float MAXR = 0.03;
 
+  /* Maximum speed, in radians per second. */
+  const float MAXS = 0.012;
+
+  /* Turning */
   float h = h_tilt - h_req;
   float v = v_tilt - v_req;
 
   /* Limit the turning speed to MAXD rads per frame. */
-  if(h > MAXD)
-    h = MAXD;
-  else if(h < -MAXD)
-    h = -MAXD;
-
-  if(v > MAXD)
-    v = MAXD;
-  else if(v < -MAXD)
-    v = -MAXD;
+  if(h > MAXR)
+    h = MAXR;
+  else if(h < -MAXR)
+    h = -MAXR;
+  if(v > MAXR)
+    v = MAXR;
+  else if(v < -MAXR)
+    v = -MAXR;
 
   h_tilt -= h;
   v_tilt -= v;
 
+  /* Accelerating */
+  speed += accel;
+  if(speed > MAXS)
+    speed = MAXS;
+  else if(speed < -MAXS)
+    speed = -MAXS;
+
   t = t * zw_matrix(speed) * yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
+}
+
+void Ship::shot()
+{
+  Projectile::shot(t, zw_matrix(-0.05 + speed));
 }

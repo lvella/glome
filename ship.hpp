@@ -10,16 +10,15 @@ public:
   Ship();
   void draw();
   void update();
+  void shot();
   inline void rotate(float rx, float ry)
   {
     h_req = rx / 100.0;
-    v_req = ry / 100.0;
-    /*h_req = rx * 50.0 * M_PI / 180.0;
-    v_req = ry * 37.0 * M_PI / 180.0;*/
+    v_req = -ry / 100.0;
   }
-  inline void move(float s)
+  inline void move(float a)
   {
-    speed = s;
+    accel = a;
   }
 
   inline const Matrix4& transformation() const {
@@ -29,7 +28,7 @@ public:
 private:
   float v_req, h_req;
   float v_tilt, h_tilt;
-  float speed;
+  float accel, speed;
 
   Matrix4 t;
 };
