@@ -11,6 +11,7 @@
 #include <GL/glext.h>
 
 #include "4dmath.hpp"
+#include "input.hpp"
 #include "matrix4.hpp"
 #include "ship.hpp"
 #include "projectile.hpp"
@@ -28,6 +29,7 @@ double z[360];
 std::deque<Matrix4> cam_hist(10, Matrix4::IDENTITY);
 
 Ship ship;
+Input input(&ship);
 
 void initialize_vars()
 {
@@ -124,73 +126,6 @@ void update()
   Projectile::update_all();
 }
 
-void mouse_motion(int x, int y)
-{
-  x -= WIDTH / 2;
-  y -= HEIGHT / 2;
-
-  ship.rotate(float(x) / float(WIDTH / 2), float(y) / float(HEIGHT / 2));
-}
-
-void mouse_button(int button, int state)
-{
-  float speed;
-  if(button == SDL_BUTTON_LEFT)
-    {
-      speed = (state == SDL_PRESSED) ? -0.0003 : 0.0;
-    }
-  else if(button == SDL_BUTTON_RIGHT)
-    {
-      speed = (state == SDL_PRESSED) ? 0.0003 : 0.0;
-    }
-
-  ship.move(speed);
-}
-
-void
-key_pressed(int key)
-{
-  switch(key)
-  {
-    case SDLK_w:
-      ship.shot();
-  }
-    /*
-	speed[1] = -0.01;
-	break;
-    case SDLK_s:
-	speed[1] = 0.01;
-	break;
-    case SDLK_d:
-	speed[0] = -0.01;
-	break;
-    case SDLK_a:
-	speed[0] = 0.01;
-	break;
-  }*/
-}
-
-void
-key_released(int key)
-{
-  /*switch(key)
-  {
-    case SDLK_s:
-	speed[1] = 0.0f;
-	break;
-    case SDLK_w:
-	speed[1] = 0.0f;
-	break;
-    case SDLK_a:
-	speed[0] = 0.0f;
-	break;
-    case SDLK_d:
-	speed[0] = 0.0f;
-	break;
-  }*/
-}
-
-
 void main_loop()
 {
   const int FPS = 60;
@@ -201,27 +136,7 @@ void main_loop()
   while(running) {
     // Treat events
     {
-      SDL_Event e;
-      while(SDL_PollEvent(&e)) {
-	switch(e.type) {
-	case SDL_QUIT:
-	  running = false;
-	  break;
-	case SDL_MOUSEMOTION:
-	  mouse_motion(e.motion.x, e.motion.y);
-	  break;
-	case SDL_MOUSEBUTTONDOWN:
-	case SDL_MOUSEBUTTONUP:
-	  mouse_button(e.button.button, e.button.state);
-	  break;
-	case SDL_KEYDOWN:
-	  key_pressed(e.key.keysym.sym);
-	  break;
-	case SDL_KEYUP:
-	  key_released(e.key.keysym.sym);
-	  break;
-	}
-      }
+      input.handle(running);
     }
 
     update();
