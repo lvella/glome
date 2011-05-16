@@ -155,7 +155,7 @@ void Ship::initialize()
   float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
   // Convert to 4D coordinates and fill the buffer
   for(iter i = m.begin(); i != m.end(); ++i) {
-    vertex_conv(i->first.v, 0.1f, &vdata[i->second * 4]);
+    vertex_conv(i->first.v, 0.01f, &vdata[i->second * 4]);
   }
 
   glUnmapBuffer(GL_ARRAY_BUFFER);
@@ -189,7 +189,7 @@ Ship::Ship():
     v_tilt(0.0f),
     h_tilt(0.0f),
     speed(0.0f),
-    sps(6),
+    sps(13),
     last_shot(SDL_GetTicks())
 {}
 
@@ -208,7 +208,7 @@ void Ship::update()
   const float MAXR = 0.03;
 
   /* Maximum speed, in radians per second. */
-  const float MAXS = 0.012;
+  const float MAXS = 0.0012;
 
   /* Turning */
   float h = h_tilt - h_req;

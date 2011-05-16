@@ -40,12 +40,12 @@ void Projectile::draw()
   t.multToGL();
   glColor3ub(255, 255, 255);
   glBegin(GL_LINES);
-  glVertex4f(0.05, 0.0, 0.0, w);
-  glVertex4f(-0.05, 0.0, 0.0, w);
-  glVertex4f(0.0, 0.05, 0.0, w);
-  glVertex4f(0.0, -0.05, 0.0, w);
-  glVertex4f(0.0, 0.0, 0.05, w);
-  glVertex4f(0.0, 0.0, -0.05, w);
+  glVertex4f(0.0025, 0.0, 0.0, w);
+  glVertex4f(-0.0025, 0.0, 0.0, w);
+  glVertex4f(0.0, 0.0025, 0.0, w);
+  glVertex4f(0.0, -0.0025, 0.0, w);
+  glVertex4f(0.0, 0.0, 0.0025, w);
+  glVertex4f(0.0, 0.0, -0.0025, w);
   glEnd();
   glPopMatrix();
 }

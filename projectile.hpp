@@ -16,7 +16,7 @@ private:
   inline bool dead()
   {
     // Maximum Time To Live
-    return ttl >= (max_ttl - 1);
+    return ttl >= max_ttl;
   }
 
   Matrix4 t;

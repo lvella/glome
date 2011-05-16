@@ -92,7 +92,7 @@ void draw_meridian(const double *a, const double *b, const double *c, const doub
 
 void draw()
 {
-  const Matrix4 offset(zw_matrix(-0.15) * yw_matrix(-0.05));
+  const Matrix4 offset(zw_matrix(-0.015) * yw_matrix(-0.005));
 
   // Camera transform
   (offset * cam_hist.front()).loadToGL();
@@ -196,7 +196,7 @@ int main(int argc, char **argv)
   glViewport(0, 0, WIDTH, HEIGHT);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(45, double(WIDTH) / double(HEIGHT), 0.01, 5);
+  gluPerspective(45, double(WIDTH) / double(HEIGHT), 0.001, 5);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 

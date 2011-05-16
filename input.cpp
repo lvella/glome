@@ -58,18 +58,18 @@ Input::mouse_motion(int x, int y)
 void
 Input::mouse_button(int button, int state)
 {
-  float speed;
+  float accel;
 
   if(button == SDL_BUTTON_LEFT)
   {
-    speed = (state == SDL_PRESSED) ? -0.0003 : 0.0;
+    accel = (state == SDL_PRESSED) ? -0.00003 : 0.0;
   }
   else if(button == SDL_BUTTON_RIGHT)
   {
-    speed = (state == SDL_PRESSED) ? 0.0003 : 0.0;
+    accel = (state == SDL_PRESSED) ? 0.00003 : 0.0;
   }
 
-  ship->move(speed);
+  ship->move(accel);
 }
 
 void
