@@ -351,19 +351,20 @@ void Ship::update()
   else if(speed_s < -MAXS_S)
     speed_s = -MAXS_S;
 
+  /* Shooting */
+  if(sh)
+    this->do_shot();
+
   t = t * zw_matrix(speed) * yw_matrix(speed_v) * xw_matrix(speed_h) * xy_matrix(speed_s) * yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
 }
 
-void Ship::shot(bool a)
+void Ship::do_shot()
 {
-  if(a)
+  const int p = 1000 / sps;
+  Uint32 now = SDL_GetTicks();
+  if(int(now - last_shot) >= p)
   {
-    const int p = 1000 / sps;
-    Uint32 now = SDL_GetTicks();
-    if(int(now - last_shot) >= p)
-    {
-      Projectile::shot(t, zw_matrix(-0.05 + speed));
-      last_shot = now;
-    }
+    Projectile::shot(t, zw_matrix(-0.05 + speed));
+    last_shot = now;
   }
 }

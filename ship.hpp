@@ -12,7 +12,6 @@ public:
   Ship();
   void draw();
   void update();
-  void shot(bool);
 
   inline void rotate(float rx, float ry)
   {
@@ -55,12 +54,19 @@ public:
     spinr = a;
   }
 
+  inline void shot(bool a)
+  {
+    sh = a;
+  }
+
   inline const Matrix4& transformation() const
   {
     return t;
   }
 
 private:
+  void do_shot();
+
   float v_req, h_req;
   float v_tilt, h_tilt;
   float accel, speed;
@@ -73,6 +79,7 @@ private:
   bool right;
   bool spinl;
   bool spinr;
+  bool sh;
   int sps;
   Uint32 last_shot;
 
