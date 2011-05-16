@@ -188,7 +188,9 @@ Ship::Ship():
     t(Matrix4::IDENTITY),
     v_tilt(0.0f),
     h_tilt(0.0f),
-    speed(0.0f)
+    speed(0.0f),
+    sps(6),
+    last_shot(SDL_GetTicks())
 {}
 
 void Ship::draw()
@@ -237,5 +239,11 @@ void Ship::update()
 
 void Ship::shot()
 {
-  Projectile::shot(t, zw_matrix(-0.05 + speed));
+  const int p = 1000 / sps;
+  Uint32 now = SDL_GetTicks();
+  if(int(now - last_shot) >= p)
+  {
+    Projectile::shot(t, zw_matrix(-0.05 + speed));
+    last_shot = now;
+  }
 }

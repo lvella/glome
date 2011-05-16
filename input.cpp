@@ -40,10 +40,10 @@ Input::handle(bool& r)
         key_released(e.key.keysym.sym);
         break;
 	  }
-
-    if(w)
-      ship->shot();
 	}
+
+  if(w)
+    ship->shot();
 }
 
 void

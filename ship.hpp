@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SDL.h>
+
 #include "matrix4.hpp"
 
 class Ship
@@ -29,6 +31,8 @@ private:
   float v_req, h_req;
   float v_tilt, h_tilt;
   float accel, speed;
+  int sps;
+  Uint32 last_shot;
 
   Matrix4 t;
 };
