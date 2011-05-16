@@ -16,10 +16,11 @@ private:
   inline bool dead()
   {
     // Maximum Time To Live
-    return ttl > 500;
+    return ttl >= (max_ttl - 1);
   }
 
   Matrix4 t;
   Matrix4 ds;
   unsigned short ttl;
+  unsigned short max_ttl;
 };
