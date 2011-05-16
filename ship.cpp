@@ -189,6 +189,9 @@ Ship::Ship():
     v_tilt(0.0f),
     h_tilt(0.0f),
     speed(0.0f),
+    speed_v(0.0f),
+    speed_h(0.0f),
+    speed_s(0.0f),
     sps(13),
     last_shot(SDL_GetTicks())
 {}
@@ -209,6 +212,11 @@ void Ship::update()
 
   /* Maximum speed, in radians per second. */
   const float MAXS = 0.0012;
+  const float MAXS_V = 0.0004;
+  const float MAXS_H = 0.0004;
+  const float MAXS_S = 0.02;
+
+  float accel_v = 0.f, accel_h = 0.f, accel_s = 0.f;
 
   /* Turning */
   float h = h_tilt - h_req;
@@ -227,6 +235,97 @@ void Ship::update()
   h_tilt -= h;
   v_tilt -= v;
 
+  /* Handle input commands */
+  float AV = 0.00004;
+  if(up || down)
+  {
+    accel_v = AV;
+    if(down)
+      accel_v = -accel_v;
+  }
+  else
+  {
+    if(speed_v > 0.f)
+    {
+      accel_v = -AV;
+      if((speed_v + accel_v) < 0.f)
+      {
+        speed_v = 0.f;
+        accel_v = 0.f;
+      }
+
+    }
+    else if(speed_v < 0.f)
+    {
+      accel_v = AV;
+      if((speed_v + accel_v) > 0.f)
+      {
+        speed_v = 0.f;
+        accel_v = 0.f;
+      }
+    }
+  }
+
+  float AH = 0.00004;
+  if(left || right)
+  {
+    accel_h = AH;
+    if(left)
+      accel_h = -accel_h;
+  }
+  else
+  {
+    if(speed_h > 0.f)
+    {
+      accel_h = -AH;
+      if((speed_h + accel_h) < 0.f)
+      {
+        speed_h = 0.f;
+        accel_h = 0.f;
+      }
+
+    }
+    else if(speed_h < 0.f)
+    {
+      accel_h = AH;
+      if((speed_h + accel_h) > 0.f)
+      {
+        speed_h = 0.f;
+        accel_h = 0.f;
+      }
+    }
+  }
+
+  float AS = 0.002;
+  if(spinl || spinr)
+  {
+    accel_s = AS;
+    if(spinr)
+      accel_s = -accel_s;
+  }
+  else
+  {
+    if(speed_s > 0.f)
+    {
+      accel_s = -AS;
+      if((speed_s + accel_s) < 0.f)
+      {
+        speed_s = 0.f;
+        accel_s = 0.f;
+      }
+
+    }
+    else if(speed_s < 0.f)
+    {
+      accel_s = AS;
+      if((speed_s + accel_s) > 0.f)
+      {
+        speed_s = 0.f;
+        accel_s = 0.f;
+      }
+    }
+  }
+
   /* Accelerating */
   speed += accel;
   if(speed > MAXS)
@@ -234,16 +333,37 @@ void Ship::update()
   else if(speed < -MAXS)
     speed = -MAXS;
 
-  t = t * zw_matrix(speed) * yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
+  speed_v += accel_v;
+  if(speed_v > MAXS_V)
+    speed_v = MAXS_V;
+  else if(speed_v < -MAXS_V)
+    speed_v = -MAXS_V;
+
+  speed_h += accel_h;
+  if(speed_h > MAXS_H)
+    speed_h = MAXS_H;
+  else if(speed_h < -MAXS_H)
+    speed_h = -MAXS_H;
+
+  speed_s += accel_s;
+  if(speed_s > MAXS_S)
+    speed_s = MAXS_S;
+  else if(speed_s < -MAXS_S)
+    speed_s = -MAXS_S;
+
+  t = t * zw_matrix(speed) * yw_matrix(speed_v) * xw_matrix(speed_h) * xy_matrix(speed_s) * yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
 }
 
-void Ship::shot()
+void Ship::shot(bool a)
 {
-  const int p = 1000 / sps;
-  Uint32 now = SDL_GetTicks();
-  if(int(now - last_shot) >= p)
+  if(a)
   {
-    Projectile::shot(t, zw_matrix(-0.05 + speed));
-    last_shot = now;
+    const int p = 1000 / sps;
+    Uint32 now = SDL_GetTicks();
+    if(int(now - last_shot) >= p)
+    {
+      Projectile::shot(t, zw_matrix(-0.05 + speed));
+      last_shot = now;
+    }
   }
 }

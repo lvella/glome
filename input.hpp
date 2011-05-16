@@ -15,9 +15,6 @@ private:
   Ship* ship;
   void mouse_motion(int x, int y);
   void mouse_button(int button, int state);
-  void key_pressed(int key);
-  void key_released(int key);
-
-  bool w;
+  void key_event(SDL_Event key);
 };
 

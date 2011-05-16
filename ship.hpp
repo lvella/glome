@@ -12,18 +12,51 @@ public:
   Ship();
   void draw();
   void update();
-  void shot();
+  void shot(bool);
+
   inline void rotate(float rx, float ry)
   {
     h_req = rx / 100.0;
     v_req = -ry / 100.0;
   }
+
   inline void move(float a)
   {
     accel = a;
   }
 
-  inline const Matrix4& transformation() const {
+  inline void move_up(bool a)
+  {
+    up = a;
+  }
+
+  inline void move_down(bool a)
+  {
+    down = a;
+  }
+
+  inline void move_left(bool a)
+  {
+    left = a;
+  }
+
+  inline void move_right(bool a)
+  {
+    right = a;
+  }
+
+  inline void move_spinl(bool a)
+  {
+    spinl = a;
+  }
+
+  inline void move_spinr(bool a)
+  {
+    spinr = a;
+  }
+
+  inline const Matrix4& transformation() const
+  {
     return t;
   }
 
@@ -31,8 +64,18 @@ private:
   float v_req, h_req;
   float v_tilt, h_tilt;
   float accel, speed;
+  float speed_v;
+  float speed_h;
+  float speed_s;
+  bool up;
+  bool down;
+  bool left;
+  bool right;
+  bool spinl;
+  bool spinr;
   int sps;
   Uint32 last_shot;
 
   Matrix4 t;
 };
+
