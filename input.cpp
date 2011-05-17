@@ -113,6 +113,8 @@ Input::mouse_button(int button, int state)
   {
     accel = (state == SDL_PRESSED) ? 0.00002 : 0.0;
   }
+  else
+    return;
 
   ship->move(accel);
 }
