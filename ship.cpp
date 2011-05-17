@@ -185,7 +185,7 @@ void Ship::initialize()
 }
 
 Ship::Ship():
-    t(Matrix4::IDENTITY),
+    Object(Matrix4::IDENTITY),
     v_tilt(0.0f),
     h_tilt(0.0f),
     speed(0.0f),

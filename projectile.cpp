@@ -25,7 +25,7 @@ void Projectile::draw_all()
 }
 
 Projectile::Projectile(const Matrix4& from, const Matrix4& speed):
-  t(from),
+  Object(from),
   ds(speed),
   ttl(0),
   max_ttl((2 * M_PI) / 0.05)

@@ -2,9 +2,9 @@
 
 #include <SDL.h>
 
-#include "matrix4.hpp"
+#include "object.hpp"
 
-class Ship
+class Ship: public Object
 {
 public:
   static void initialize();
@@ -59,11 +59,6 @@ public:
     sh = a;
   }
 
-  inline const Matrix4& transformation() const
-  {
-    return t;
-  }
-
 private:
   void do_shot();
 
@@ -86,7 +81,5 @@ private:
   bool sh;
   int sps;
   Uint32 last_shot;
-
-  Matrix4 t;
 };
 

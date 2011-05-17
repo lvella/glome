@@ -1,8 +1,9 @@
 #pragma once
 
 #include "matrix4.hpp"
+#include "object.hpp"
 
-class Projectile
+class Projectile: public Object
 {
 public:
   static void shot(const Matrix4& from, const Matrix4& speed);
@@ -19,7 +20,6 @@ private:
     return ttl >= max_ttl;
   }
 
-  Matrix4 t;
   Matrix4 ds;
   unsigned short ttl;
   unsigned short max_ttl;
