@@ -179,6 +179,7 @@ int main(int argc, char **argv)
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+  glLineWidth(1.5f);
 
   // Fancy OpenGL fog
   glFogi(GL_FOG_MODE, GL_EXP);

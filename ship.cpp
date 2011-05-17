@@ -211,7 +211,7 @@ void Ship::update()
   const float MAXR = 0.03;
 
   /* Maximum speed, in radians per second. */
-  const float MAXS = 0.0012;
+  const float MAXS = 0.0015;
   const float MAXS_V = 0.0004;
   const float MAXS_H = 0.0004;
   const float MAXS_S = 0.02;
