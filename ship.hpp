@@ -67,9 +67,9 @@ public:
 private:
   void do_shot();
 
-  inline void handle_commands(bool, bool, float &, float &, float);
+  inline static void handle_commands(bool, bool, float &, float &, float);
 
-  inline void accelerate(float &, float &, float);
+  inline static void accelerate(float &, float &, float);
 
   float v_req, h_req;
   float v_tilt, h_tilt;
