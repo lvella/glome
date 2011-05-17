@@ -236,126 +236,63 @@ void Ship::update()
   v_tilt -= v;
 
   /* Handle input commands */
-  float AV = 0.00004;
-  if(up || down)
-  {
-    accel_v = AV;
-    if(down)
-      accel_v = -accel_v;
-  }
-  else
-  {
-    if(speed_v > 0.f)
-    {
-      accel_v = -AV;
-      if((speed_v + accel_v) < 0.f)
-      {
-        speed_v = 0.f;
-        accel_v = 0.f;
-      }
-
-    }
-    else if(speed_v < 0.f)
-    {
-      accel_v = AV;
-      if((speed_v + accel_v) > 0.f)
-      {
-        speed_v = 0.f;
-        accel_v = 0.f;
-      }
-    }
-  }
-
-  float AH = 0.00004;
-  if(left || right)
-  {
-    accel_h = AH;
-    if(left)
-      accel_h = -accel_h;
-  }
-  else
-  {
-    if(speed_h > 0.f)
-    {
-      accel_h = -AH;
-      if((speed_h + accel_h) < 0.f)
-      {
-        speed_h = 0.f;
-        accel_h = 0.f;
-      }
-
-    }
-    else if(speed_h < 0.f)
-    {
-      accel_h = AH;
-      if((speed_h + accel_h) > 0.f)
-      {
-        speed_h = 0.f;
-        accel_h = 0.f;
-      }
-    }
-  }
-
-  float AS = 0.002;
-  if(spinl || spinr)
-  {
-    accel_s = AS;
-    if(spinr)
-      accel_s = -accel_s;
-  }
-  else
-  {
-    if(speed_s > 0.f)
-    {
-      accel_s = -AS;
-      if((speed_s + accel_s) < 0.f)
-      {
-        speed_s = 0.f;
-        accel_s = 0.f;
-      }
-
-    }
-    else if(speed_s < 0.f)
-    {
-      accel_s = AS;
-      if((speed_s + accel_s) > 0.f)
-      {
-        speed_s = 0.f;
-        accel_s = 0.f;
-      }
-    }
-  }
+  handle_commands(up, down, speed_v, accel_v, 0.00004);
+  handle_commands(right, left, speed_h, accel_h, 0.00004);
+  handle_commands(spinl, spinr, speed_s, accel_s, 0.002);
 
   /* Accelerating */
-  speed += accel;
-  if(speed > MAXS)
-    speed = MAXS;
-  else if(speed < -MAXS)
-    speed = -MAXS;
-
-  speed_v += accel_v;
-  if(speed_v > MAXS_V)
-    speed_v = MAXS_V;
-  else if(speed_v < -MAXS_V)
-    speed_v = -MAXS_V;
-
-  speed_h += accel_h;
-  if(speed_h > MAXS_H)
-    speed_h = MAXS_H;
-  else if(speed_h < -MAXS_H)
-    speed_h = -MAXS_H;
-
-  speed_s += accel_s;
-  if(speed_s > MAXS_S)
-    speed_s = MAXS_S;
-  else if(speed_s < -MAXS_S)
-    speed_s = -MAXS_S;
+  accelerate(speed, accel, MAXS);
+  accelerate(speed_v, accel_v, MAXS_V);
+  accelerate(speed_h, accel_h, MAXS_H);
+  accelerate(speed_s, accel_s, MAXS_S);
 
   /* Shooting */
   if(sh)
     this->do_shot();
 
   t = t * zw_matrix(speed) * yw_matrix(speed_v) * xw_matrix(speed_h) * xy_matrix(speed_s) * yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
+}
+
+void
+Ship::accelerate(float& speed, float& accel, float max)
+{
+  speed += accel;
+  if(speed > max)
+    speed = max;
+  else if(speed < -max)
+    speed = -max;
+}
+
+void
+Ship::handle_commands(bool k0, bool k1, float& speed, float& accel, float max_accel)
+{
+  if(k0 || k1)
+  {
+    accel = max_accel;
+    if(k1)
+      accel = -accel;
+  }
+  else
+  {
+    if(speed > 0.f)
+    {
+      accel = -max_accel;
+      if((speed + accel) < 0.f)
+      {
+        speed = 0.f;
+        accel = 0.f;
+      }
+    }
+    else if(speed < 0.f)
+    {
+      accel = max_accel;
+      if((speed + accel) > 0.f)
+      {
+        speed = 0.f;
+        accel = 0.f;
+      }
+    }
+  }
 }
 
 void Ship::do_shot()
