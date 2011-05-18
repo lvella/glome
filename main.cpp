@@ -9,10 +9,12 @@
 #include <GL/glu.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
+#include <png.h>
 
 #include "4dmath.hpp"
 #include "input.hpp"
 #include "matrix4.hpp"
+#include "minimap.hpp"
 #include "ship.hpp"
 #include "projectile.hpp"
 
@@ -30,6 +32,11 @@ std::deque<Matrix4> cam_hist(10, Matrix4::IDENTITY);
 
 Ship ship;
 Input input(&ship);
+MiniMap minimap;
+
+GLuint tex_2d;
+GLuint shader;
+GLuint program;
 
 void initialize_vars()
 {
@@ -45,7 +52,6 @@ void initialize_vars()
 
 void initialize_shader()
 {
-  GLuint s, p;
   const char vcode[] = 
 "void main() \
 { \
@@ -61,23 +67,23 @@ void initialize_shader()
 
   char err[10000];
 
-  s = glCreateShader(GL_VERTEX_SHADER);
+  shader = glCreateShader(GL_VERTEX_SHADER);
   ptr = vcode;
-  glShaderSource(s, 1, &ptr,NULL);
-  glCompileShader(s);
+  glShaderSource(shader, 1, &ptr,NULL);
+  glCompileShader(shader);
 
   {
     GLsizei length;
-    glGetShaderInfoLog(s, 10000, &length, err);
+    glGetShaderInfoLog(shader, 10000, &length, err);
     if(length)
       cout << "Shader compilation log:\n" << err << '\n';
   }
 
-  p = glCreateProgram();
-  glAttachShader(p,s);
+  program = glCreateProgram();
+  glAttachShader(program, shader);
 
-  glLinkProgram(p);
-  glUseProgram(p);
+  glLinkProgram(program);
+  glUseProgram(program);
 }
 
 void draw_meridian(const double *a, const double *b, const double *c, const double *d)
@@ -116,6 +122,7 @@ void draw()
 
   ship.draw();
   Projectile::draw_all();
+  minimap.draw();
 
   SDL_GL_SwapBuffers();
 }
@@ -124,6 +131,7 @@ void update()
 {
   ship.update();
   Projectile::update_all();
+  minimap.update();
 }
 
 void main_loop()
@@ -149,13 +157,138 @@ void main_loop()
       Uint32 now = SDL_GetTicks();
       int delay = period - int(now - ticks);
       if(delay > 0)
-	SDL_Delay(delay);
+	      SDL_Delay(delay);
       ticks = now;
     }
     ++frame_count;
   }
 
   cout << frame_count << " frames rendered." << endl;
+}
+
+void
+load_textures()
+{
+    //header for testing if it is a png
+   png_byte header[8];
+ 
+   //open file as binary
+   FILE *fp = fopen("map160.png", "rb");
+   if (!fp) {
+     exit(1);
+   }
+ 
+   //read the header
+   fread(header, 1, 8, fp);
+ 
+   //test if png
+   int is_png = !png_sig_cmp(header, 0, 8);
+   if (!is_png) {
+     fclose(fp);
+     exit(1);
+   }
+ 
+   //create png struct
+   png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL,
+       NULL, NULL);
+   if (!png_ptr) {
+     fclose(fp);
+     exit(1);
+   }
+ 
+   //create png info struct
+   png_infop info_ptr = png_create_info_struct(png_ptr);
+   if (!info_ptr) {
+     png_destroy_read_struct(&png_ptr, (png_infopp) NULL, (png_infopp) NULL);
+     fclose(fp);
+     exit(1);
+   }
+ 
+   //create png info struct
+   png_infop end_info = png_create_info_struct(png_ptr);
+   if (!end_info) {
+     png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp) NULL);
+     fclose(fp);
+     exit(1);
+   }
+ 
+   //png error stuff, not sure libpng man suggests this.
+   if (setjmp(png_jmpbuf(png_ptr))) {
+     png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+     fclose(fp);
+     exit(1);
+   }
+ 
+   //init png reading
+   png_init_io(png_ptr, fp);
+ 
+   //let libpng know you already read the first 8 bytes
+   png_set_sig_bytes(png_ptr, 8);
+ 
+   // read all the info up to the image data
+   png_read_info(png_ptr, info_ptr);
+ 
+   //variables to pass to get info
+   int bit_depth, color_type;
+   png_uint_32 twidth, theight;
+ 
+   // get info about png
+   png_get_IHDR(png_ptr, info_ptr, &twidth, &theight, &bit_depth, &color_type,
+       NULL, NULL, NULL);
+ 
+   //update width and height based on png info
+   int width = 160;
+   int height = 160;
+
+   width = twidth;
+   height = theight;
+ 
+  cout << "W: " << width << " | H: " << height << endl;
+
+   // Update the png info struct.
+   png_read_update_info(png_ptr, info_ptr);
+ 
+   // Row size in bytes.
+   int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+ 
+   // Allocate the image_data as a big block, to be given to opengl
+   png_byte *image_data = new png_byte[rowbytes * height];
+   if (!image_data) {
+     //clean up memory and close stuff
+     png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+     fclose(fp);
+     exit(1);
+   }
+ 
+   //row_pointers is for pointing to image_data for reading the png with libpng
+   png_bytep *row_pointers = new png_bytep[height];
+   if (!row_pointers) {
+     //clean up memory and close stuff
+     png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+     delete[] image_data;
+     fclose(fp);
+     exit(1);
+   }
+   // set the individual row_pointers to point at the correct offsets of image_data
+   for (int i = 0; i < height; ++i)
+     row_pointers[height - 1 - i] = image_data + i * rowbytes;
+ 
+   //read the png into image_data through row_pointers
+   png_read_image(png_ptr, row_pointers);
+ 
+   //Now generate the OpenGL texture object
+   glGenTextures(1, &tex_2d);
+   glBindTexture(GL_TEXTURE_2D, tex_2d);
+    cout << "T: " << tex_2d << endl;
+   glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA, width, height, 0,
+       GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) image_data);
+   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+ 
+   //clean up memory and close stuff
+   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
+   delete[] image_data;
+   delete[] row_pointers;
+   fclose(fp);
 }
 
 int main(int argc, char **argv)
@@ -206,9 +339,12 @@ int main(int argc, char **argv)
 
   initialize_vars();
 
+  load_textures();
+
   Ship::initialize();
 
   main_loop();
 
   SDL_Quit();
 }
+
