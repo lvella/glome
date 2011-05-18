@@ -9,8 +9,7 @@
 class RandomCube: public Object
 {
 public:
-  RandomCube():
-    Object(Matrix4::IDENTITY)
+  RandomCube()
   {
     srand(time(NULL));
     t = xy_matrix(rand()) * xz_matrix(rand()) * yz_matrix(rand()) *  xw_matrix(rand()) * yw_matrix(rand()) * zw_matrix(rand());

@@ -5,7 +5,7 @@
 class Object
 {
 public:
-  Object(const Matrix4& init):
+  Object(const Matrix4& init = Matrix4::IDENTITY):
     t(init)
   {}
   virtual ~Object() = 0;
