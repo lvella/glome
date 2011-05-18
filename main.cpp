@@ -34,9 +34,8 @@ Ship ship;
 Input input(&ship);
 MiniMap minimap;
 
-GLuint tex_2d;
-GLuint shader;
 GLuint program;
+GLuint tex_minimap;
 
 void initialize_vars()
 {
@@ -52,6 +51,7 @@ void initialize_vars()
 
 void initialize_shader()
 {
+  GLuint shader;
   const char vcode[] = 
 "void main() \
 { \
@@ -169,6 +169,33 @@ void main_loop()
 void
 load_textures()
 {
+  int i, j, tex_h, tex_w;
+  float cx, cy, d, tex_r;
+  unsigned char texture[256 * 256];
+  cx = cy = 127.5;
+  tex_h = tex_w = 256;
+  tex_r = 128;
+
+  for(i = 0; i < tex_h; ++i)
+  {
+    for(j = 0; j < tex_w; ++j)
+    {
+      d = sqrt(((i - cx) * (i - cx)) + ((j - cy) * (j - cy)));
+      texture[(i * tex_w) + j] = (d > tex_r) ? 0 : 142;
+    }
+  }
+
+  glGenTextures(1, &tex_minimap);
+  glBindTexture(GL_TEXTURE_2D, tex_minimap);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, tex_w, tex_h, 0,
+  GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+}
+
+/*
+void
+load_textures()
+{
     //header for testing if it is a png
    png_byte header[8];
  
@@ -243,8 +270,6 @@ load_textures()
    width = twidth;
    height = theight;
  
-  cout << "W: " << width << " | H: " << height << endl;
-
    // Update the png info struct.
    png_read_update_info(png_ptr, info_ptr);
  
@@ -279,7 +304,6 @@ load_textures()
    //Now generate the OpenGL texture object
    glGenTextures(1, &tex_2d);
    glBindTexture(GL_TEXTURE_2D, tex_2d);
-    cout << "T: " << tex_2d << endl;
    glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA, width, height, 0,
        GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) image_data);
    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
@@ -290,6 +314,7 @@ load_textures()
    delete[] row_pointers;
    fclose(fp);
 }
+*/
 
 int main(int argc, char **argv)
 {

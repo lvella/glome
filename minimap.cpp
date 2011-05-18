@@ -12,7 +12,7 @@
 
 using namespace std;
 
-extern GLuint tex_2d;
+extern GLuint tex_minimap;
 extern GLuint program;
 
 MiniMap::MiniMap()
@@ -73,9 +73,9 @@ MiniMap::draw()
   glEnd();
 
   glEnable(GL_TEXTURE_2D);
-  glBindTexture(GL_TEXTURE_2D, tex_2d);
+  glBindTexture(GL_TEXTURE_2D, tex_minimap);
 
-  glColor4f(1., 1., 1., 1.);
+  glColor3ub(14, 164, 3);
   glBegin(GL_QUADS);
   glTexCoord2f(0, 0);
   glVertex2f(l, t);
@@ -88,7 +88,6 @@ MiniMap::draw()
   glEnd();  
 
   glDisable(GL_TEXTURE_2D);
-
 
   glDisable2D();
 }

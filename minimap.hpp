@@ -7,5 +7,4 @@ public:
 
   void draw();
   void update();
-
 };
