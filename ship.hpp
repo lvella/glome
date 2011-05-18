@@ -1,7 +1,5 @@
 #pragma once
 
-#include <SDL.h>
-
 #include "object.hpp"
 
 class Ship: public Object
@@ -60,10 +58,7 @@ public:
   }
 
 private:
-  void do_shot();
-
   inline static void handle_commands(bool, bool, float &, float &, float);
-
   inline static void accelerate(float &, float &, float);
 
   float v_req, h_req;
@@ -80,6 +75,6 @@ private:
   bool spinr;
   bool sh;
   int sps;
-  Uint32 last_shot;
+  int shot_count;
 };
 
