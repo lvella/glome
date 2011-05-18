@@ -192,8 +192,8 @@ Ship::Ship():
     speed_v(0.0f),
     speed_h(0.0f),
     speed_s(0.0f),
-    sps(13),
-    last_shot(SDL_GetTicks())
+    sps(7),
+    shot_count(0)
 {}
 
 void Ship::draw()
@@ -202,7 +202,6 @@ void Ship::draw()
   t.multToGL();
   glCallList(dlist);
   glPopMatrix();
-
 }
 
 void Ship::update()
@@ -247,8 +246,15 @@ void Ship::update()
   accelerate(speed_s, accel_s, MAXS_S);
 
   /* Shooting */
-  if(sh)
-    this->do_shot();
+  shot_count -= sps;
+  if(shot_count < 0) {
+    if(sh) {
+      Projectile::shot(t, zw_matrix(-0.05 + speed));
+      shot_count += 60;
+    }
+    else
+      shot_count = 0;
+  }
 
   t = t * zw_matrix(speed) * yw_matrix(speed_v) * xw_matrix(speed_h) * xy_matrix(speed_s) * yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
 }
@@ -292,16 +298,5 @@ Ship::handle_commands(bool k0, bool k1, float& speed, float& accel, float max_ac
         accel = 0.f;
       }
     }
-  }
-}
-
-void Ship::do_shot()
-{
-  const int p = 1000 / sps;
-  Uint32 now = SDL_GetTicks();
-  if(int(now - last_shot) >= p)
-  {
-    Projectile::shot(t, zw_matrix(-0.05 + speed));
-    last_shot = now;
   }
 }
