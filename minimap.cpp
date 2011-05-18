@@ -21,7 +21,9 @@ MiniMap::MiniMap()
 
 void glEnable2D()
 {
+  glDisable(GL_DEPTH_TEST);
   glMatrixMode( GL_PROJECTION );
+  glPushMatrix();
   glLoadIdentity();
   glOrtho(0.0f, 800, 600, 0.0f, -1.0f, 1.0f);
   glMatrixMode( GL_MODELVIEW );
@@ -31,10 +33,10 @@ void glEnable2D()
 
 void glDisable2D()
 {
+  glEnable(GL_DEPTH_TEST);
   glUseProgram(program);
   glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(45, double(800) / double(600), 0.001, 5);
+  glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 }
@@ -42,26 +44,26 @@ void glDisable2D()
 void
 MiniMap::draw()
 {
+  extern const int HEIGHT;
+  extern const int WIDTH;
+  extern const float FOV;
+
+  const int radius = 80;
+  const int t = 10;
+  const int b = t + (2 * radius);
+  const int l = 10;
+  const int r = l + (2 * radius);
+
+  const float cx = l + radius;
+  const float cy = t + radius;
+
+  const float angle = asin(WIDTH * sin(FOV * M_PI / 360.0f) / HEIGHT);
+  const float dx = (radius * sin(angle));
+  const float ppx0 = cx - dx;
+  const float ppy = cy - (radius * cos(angle));
+  const float ppx1 = cx + dx;
+
   glEnable2D();
-
-  glLoadIdentity();  
-
-  int w = 800;
-  int h = 600;
-
-  int radius = 80;
-  int t = 10;
-  int b = t + (2 * radius);
-  int l = 10;
-  int r = l + (2 * radius);
-
-  float cx = l + radius;
-  float cy = t + radius;
-
-  float dx = (radius * sin(M_PI / 8.));
-  float ppx0 = cx - dx;
-  float ppy = cy - (radius * cos(M_PI / 8.));
-  float ppx1 = cx + dx;
 
   glColor3ub(14, 164, 3);
   glBegin(GL_LINES);
@@ -72,7 +74,6 @@ MiniMap::draw()
 
   glEnd();
 
-  glEnable(GL_TEXTURE_2D);
   glBindTexture(GL_TEXTURE_2D, tex_minimap);
 
   glColor3ub(14, 164, 3);
@@ -85,9 +86,9 @@ MiniMap::draw()
   glVertex2f(r, b);
   glTexCoord2f(0, 1);
   glVertex2f(l, b);
-  glEnd();  
+  glEnd();
 
-  glDisable(GL_TEXTURE_2D);
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   glDisable2D();
 }

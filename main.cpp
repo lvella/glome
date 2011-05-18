@@ -17,11 +17,14 @@
 #include "minimap.hpp"
 #include "ship.hpp"
 #include "projectile.hpp"
+#include "randomcube.hpp"
 
 using namespace std;
 
-const int HEIGHT = 600;
-const int WIDTH = 800;
+extern const int HEIGHT = 600;
+extern const int WIDTH = 800;
+
+extern const float FOV = 45.0f;
 
 double s[360];
 double c[360];
@@ -33,6 +36,7 @@ std::deque<Matrix4> cam_hist(10, Matrix4::IDENTITY);
 Ship ship;
 Input input(&ship);
 MiniMap minimap;
+RandomCube cube;
 
 GLuint program;
 GLuint tex_minimap;
@@ -102,29 +106,69 @@ void draw()
 
   // Camera transform
   (offset * cam_hist.front()).loadToGL();
-  cam_hist.pop_front();
-  cam_hist.push_back(ship.transformation().transpose());
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  glColor3f(.0f, .0f, 1.0f);
-  draw_meridian(z, z, s, c);
-  glColor3f(.0f, 1.f, .0f);
-  draw_meridian(z, s, z, c);
-  glColor3f(1.0f, .0f, .0f);
-  draw_meridian(s, z, z, c);
-  glColor3f(1.0f, 1.0f, .0f);
-  draw_meridian(s, c, z, z);
-  glColor3f(1.0f, .0f, 1.0f);
-  draw_meridian(s, z, c, z);
-  glColor3f(.0f, 1.0f, 1.0f);
-  draw_meridian(z, s, c, z);
+  {
+    glColor3f(.0f, .0f, 1.0f);
+    draw_meridian(z, z, s, c);
+    glColor3f(.0f, 1.f, .0f);
+    draw_meridian(z, s, z, c);
+    glColor3f(1.0f, .0f, .0f);
+    draw_meridian(s, z, z, c);
+    glColor3f(1.0f, 1.0f, .0f);
+    draw_meridian(s, c, z, z);
+    glColor3f(1.0f, .0f, 1.0f);
+    draw_meridian(s, z, c, z);
+    glColor3f(.0f, 1.0f, 1.0f);
+    draw_meridian(z, s, c, z);
 
-  ship.draw();
-  Projectile::draw_all();
+    ship.draw();
+    Projectile::draw_all();
+    cube.draw();
+  }
+
   minimap.draw();
 
+  {
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glLoadIdentity();
+    glViewport(10, HEIGHT-170, 160, 160);
+    glOrtho(-2, 2, -2, 2, -1.0f, 100.0f);
+
+    glMatrixMode(GL_MODELVIEW);
+
+    yz_matrix(M_PI/2).loadToGL();
+
+    // Field of vision (in case of being curve), fov 45 (TO CHANGE)
+    /*glPushMatrix();
+    glPushMatrix();
+    glRotatef(61.36/2, 0.0f, 1.0f, 0.0f);
+    glColor3f(0.0f, 1.0f, 0.0f);
+    draw_meridian(z, z, s, c);
+    glPopMatrix();
+    glRotatef(-61.36/2, 0.0f, 1.0f, 0.0f);
+    glColor3f(0.0f, 1.0f, 0.0f);
+    draw_meridian(z, z, s, c);
+    glPopMatrix();*/
+
+    cam_hist.front().multToGL();
+
+    ship.draw();
+    Projectile::draw_all();
+    cube.draw();
+
+    glMatrixMode(GL_PROJECTION);
+    glViewport(0, 0, WIDTH, HEIGHT);    
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+  }
+
   SDL_GL_SwapBuffers();
+
+  cam_hist.pop_front();
+  cam_hist.push_back(ship.transformation().transpose());
 }
 
 void update()
@@ -175,7 +219,7 @@ load_textures()
   cx = cy = 127.5;
   tex_h = tex_w = 256;
   tex_r = 128;
-  tex_r_lim = 113;
+  tex_r_lim = 120;
 
   for(i = 0; i < tex_h; ++i)
   {
@@ -184,7 +228,6 @@ load_textures()
       d = sqrt(((i - cx) * (i - cx)) + ((j - cy) * (j - cy)));
       texture[(i * tex_w) + j] = (d > tex_r) ? 0 : ((d < tex_r_lim) ? 142 : ((x *= (x = ((tex_r - d) / (tex_r - tex_r_lim)))) * 142));
     }
-    // (((tex_r - d) / (tex_r - tex_r_lim)) * ((tex_r - d) / (tex_r - tex_r_lim)))
   }
 
   glGenTextures(1, &tex_minimap);
@@ -193,130 +236,6 @@ load_textures()
   GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 }
-
-/*
-void
-load_textures()
-{
-    //header for testing if it is a png
-   png_byte header[8];
- 
-   //open file as binary
-   FILE *fp = fopen("map160.png", "rb");
-   if (!fp) {
-     exit(1);
-   }
- 
-   //read the header
-   fread(header, 1, 8, fp);
- 
-   //test if png
-   int is_png = !png_sig_cmp(header, 0, 8);
-   if (!is_png) {
-     fclose(fp);
-     exit(1);
-   }
- 
-   //create png struct
-   png_structp png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL,
-       NULL, NULL);
-   if (!png_ptr) {
-     fclose(fp);
-     exit(1);
-   }
- 
-   //create png info struct
-   png_infop info_ptr = png_create_info_struct(png_ptr);
-   if (!info_ptr) {
-     png_destroy_read_struct(&png_ptr, (png_infopp) NULL, (png_infopp) NULL);
-     fclose(fp);
-     exit(1);
-   }
- 
-   //create png info struct
-   png_infop end_info = png_create_info_struct(png_ptr);
-   if (!end_info) {
-     png_destroy_read_struct(&png_ptr, &info_ptr, (png_infopp) NULL);
-     fclose(fp);
-     exit(1);
-   }
- 
-   //png error stuff, not sure libpng man suggests this.
-   if (setjmp(png_jmpbuf(png_ptr))) {
-     png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-     fclose(fp);
-     exit(1);
-   }
- 
-   //init png reading
-   png_init_io(png_ptr, fp);
- 
-   //let libpng know you already read the first 8 bytes
-   png_set_sig_bytes(png_ptr, 8);
- 
-   // read all the info up to the image data
-   png_read_info(png_ptr, info_ptr);
- 
-   //variables to pass to get info
-   int bit_depth, color_type;
-   png_uint_32 twidth, theight;
- 
-   // get info about png
-   png_get_IHDR(png_ptr, info_ptr, &twidth, &theight, &bit_depth, &color_type,
-       NULL, NULL, NULL);
- 
-   //update width and height based on png info
-   int width = 160;
-   int height = 160;
-
-   width = twidth;
-   height = theight;
- 
-   // Update the png info struct.
-   png_read_update_info(png_ptr, info_ptr);
- 
-   // Row size in bytes.
-   int rowbytes = png_get_rowbytes(png_ptr, info_ptr);
- 
-   // Allocate the image_data as a big block, to be given to opengl
-   png_byte *image_data = new png_byte[rowbytes * height];
-   if (!image_data) {
-     //clean up memory and close stuff
-     png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-     fclose(fp);
-     exit(1);
-   }
- 
-   //row_pointers is for pointing to image_data for reading the png with libpng
-   png_bytep *row_pointers = new png_bytep[height];
-   if (!row_pointers) {
-     //clean up memory and close stuff
-     png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-     delete[] image_data;
-     fclose(fp);
-     exit(1);
-   }
-   // set the individual row_pointers to point at the correct offsets of image_data
-   for (int i = 0; i < height; ++i)
-     row_pointers[height - 1 - i] = image_data + i * rowbytes;
- 
-   //read the png into image_data through row_pointers
-   png_read_image(png_ptr, row_pointers);
- 
-   //Now generate the OpenGL texture object
-   glGenTextures(1, &tex_2d);
-   glBindTexture(GL_TEXTURE_2D, tex_2d);
-   glTexImage2D(GL_TEXTURE_2D,0, GL_RGBA, width, height, 0,
-       GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid*) image_data);
-   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
- 
-   //clean up memory and close stuff
-   png_destroy_read_struct(&png_ptr, &info_ptr, &end_info);
-   delete[] image_data;
-   delete[] row_pointers;
-   fclose(fp);
-}
-*/
 
 int main(int argc, char **argv)
 {
@@ -334,7 +253,7 @@ int main(int argc, char **argv)
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_BLEND);
-  //glEnable(GL_TEXTURE_2D);
+  glEnable(GL_TEXTURE_2D);
   glEnableClientState(GL_VERTEX_ARRAY);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -357,7 +276,7 @@ int main(int argc, char **argv)
   glViewport(0, 0, WIDTH, HEIGHT);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(45, double(WIDTH) / double(HEIGHT), 0.001, 5);
+  gluPerspective(FOV, double(WIDTH) / double(HEIGHT), 0.001, 5);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
