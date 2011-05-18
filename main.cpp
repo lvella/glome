@@ -170,19 +170,21 @@ void
 load_textures()
 {
   int i, j, tex_h, tex_w;
-  float cx, cy, d, tex_r;
+  float cx, cy, d, tex_r, tex_r_lim, x;
   unsigned char texture[256 * 256];
   cx = cy = 127.5;
   tex_h = tex_w = 256;
   tex_r = 128;
+  tex_r_lim = 113;
 
   for(i = 0; i < tex_h; ++i)
   {
     for(j = 0; j < tex_w; ++j)
     {
       d = sqrt(((i - cx) * (i - cx)) + ((j - cy) * (j - cy)));
-      texture[(i * tex_w) + j] = (d > tex_r) ? 0 : 142;
+      texture[(i * tex_w) + j] = (d > tex_r) ? 0 : ((d < tex_r_lim) ? 142 : ((x *= (x = ((tex_r - d) / (tex_r - tex_r_lim)))) * 142));
     }
+    // (((tex_r - d) / (tex_r - tex_r_lim)) * ((tex_r - d) / (tex_r - tex_r_lim)))
   }
 
   glGenTextures(1, &tex_minimap);
