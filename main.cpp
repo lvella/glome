@@ -246,6 +246,7 @@ int main(int argc, char **argv)
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL);
   SDL_WM_SetCaption("Navigna", NULL);
+  SDL_ShowCursor(SDL_DISABLE);
 
   // OpenGL nonchanging settings
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
