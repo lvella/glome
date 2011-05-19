@@ -17,6 +17,9 @@ MiniMap::MiniMap()
 
 void glEnable2D()
 {
+  // TODO: Investigate why fog is disabled and the lines become
+  // thiner if texture is enabled on ATI Catalyst. Shader's fault?
+  glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
   glMatrixMode( GL_PROJECTION );
   glPushMatrix();
@@ -29,6 +32,7 @@ void glEnable2D()
 
 void glDisable2D()
 {
+  glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
   glUseProgram(program);
   glMatrixMode(GL_PROJECTION);

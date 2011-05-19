@@ -103,9 +103,10 @@ void draw()
 
   // Camera transform
   (offset * cam_hist.front()).loadToGL();
+  cam_hist.pop_front();
+  cam_hist.push_back(ship.transformation().transpose());
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
   {
     glColor3f(.0f, .0f, 1.0f);
     draw_meridian(z, z, s, c);
@@ -126,7 +127,6 @@ void draw()
   }
 
   minimap.draw();
-
   {
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
@@ -136,21 +136,7 @@ void draw()
 
     glMatrixMode(GL_MODELVIEW);
 
-    yz_matrix(M_PI/2).loadToGL();
-
-    // Field of vision (in case of being curve), fov 45 (TO CHANGE)
-    /*glPushMatrix();
-    glPushMatrix();
-    glRotatef(61.36/2, 0.0f, 1.0f, 0.0f);
-    glColor3f(0.0f, 1.0f, 0.0f);
-    draw_meridian(z, z, s, c);
-    glPopMatrix();
-    glRotatef(-61.36/2, 0.0f, 1.0f, 0.0f);
-    glColor3f(0.0f, 1.0f, 0.0f);
-    draw_meridian(z, z, s, c);
-    glPopMatrix();*/
-
-    cam_hist.front().multToGL();
+    (yz_matrix(M_PI/2) * cam_hist.front()).loadToGL();
 
     ship.draw();
     Projectile::draw_all();
@@ -163,9 +149,6 @@ void draw()
   }
 
   SDL_GL_SwapBuffers();
-
-  cam_hist.pop_front();
-  cam_hist.push_back(ship.transformation().transpose());
 }
 
 void update()
@@ -232,6 +215,7 @@ load_textures()
   glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, tex_w, tex_h, 0,
   GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)texture);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 int main(int argc, char **argv)
@@ -261,7 +245,6 @@ int main(int argc, char **argv)
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_BLEND);
-  glEnable(GL_TEXTURE_2D);
   glEnableClientState(GL_VERTEX_ARRAY);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
