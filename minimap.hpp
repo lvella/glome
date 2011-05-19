@@ -7,4 +7,9 @@ public:
 
   void draw();
   void update();
+  void initialize();
+  void load_texture();
+
+private:
+  GLuint tex_minimap;
 };

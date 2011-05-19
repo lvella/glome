@@ -98,3 +98,31 @@ MiniMap::update()
 {
 }
 
+void
+MiniMap::load_texture()
+{
+  int i, j, tex_h, tex_w;
+  float cx, cy, d, tex_r, tex_r_lim, x;
+  unsigned char texture[256 * 256];
+  cx = cy = 127.5;
+  tex_h = tex_w = 256;
+  tex_r = 128;
+  tex_r_lim = 120;
+
+  for(i = 0; i < tex_h; ++i)
+  {
+    for(j = 0; j < tex_w; ++j)
+    {
+      d = sqrt(((i - cx) * (i - cx)) + ((j - cy) * (j - cy)));
+      texture[(i * tex_w) + j] = (d > tex_r) ? 0 : ((d < tex_r_lim) ? 142 : ((x *= (x = ((tex_r - d) / (tex_r - tex_r_lim)))) * 142));
+    }
+  }
+
+  glGenTextures(1, &tex_minimap);
+  glBindTexture(GL_TEXTURE_2D, tex_minimap);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, tex_w, tex_h, 0,
+  GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
