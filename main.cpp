@@ -9,7 +9,6 @@
 #include <GL/glu.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
-#include <png.h>
 
 #include "4dmath.hpp"
 #include "input.hpp"

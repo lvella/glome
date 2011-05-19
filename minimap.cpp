@@ -6,7 +6,6 @@
 #include <GL/glu.h>
 #include <GL/gl.h>
 #include <GL/glext.h>
-#include <png.h>
 
 #include "minimap.hpp"
 
