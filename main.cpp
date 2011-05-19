@@ -136,7 +136,7 @@ void draw()
 
     glMatrixMode(GL_MODELVIEW);
 
-    (yz_matrix(M_PI/2) * cam_hist.front()).loadToGL();
+    (yz_matrix(M_PI/2) * cam_hist.back()).loadToGL();
 
     ship.draw();
     Projectile::draw_all();
