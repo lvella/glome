@@ -1,4 +1,3 @@
-#define GL_GLEXT_PROTOTYPES
 #include <iostream>
 #include <cstdlib>
 #include <cstring>
@@ -6,9 +5,8 @@
 #include <cmath>
 #include <deque>
 #include <SDL.h>
+#include <GL/glew.h>
 #include <GL/glu.h>
-#include <GL/gl.h>
-#include <GL/glext.h>
 
 #include "4dmath.hpp"
 #include "input.hpp"
@@ -240,11 +238,22 @@ int main(int argc, char **argv)
 {
   // SDL startup
   if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
-    cerr << "Unable to initialize SDL: " << SDL_GetError() << '\n';
+    cerr << "Unable to initialize SDL: " << SDL_GetError() << endl;
+    return 1;
   }
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL);
   SDL_WM_SetCaption("Navigna", NULL);
+
+  // Using GLEW to get the OpenGL functions
+  {
+    GLenum err = glewInit();
+    if(err != GLEW_OK) {
+      cerr << "Unable to initialize GLEW: %s\n"
+	   << glewGetErrorString(err) << endl;
+      return 1;
+    }
+  }
 
   // OpenGL nonchanging settings
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

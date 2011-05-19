@@ -1,10 +1,8 @@
-#define GL_GLEXT_PROTOTYPES
 #include <map>
 #include <algorithm>
 #include <cmath>
 #include <cassert>
-#include <GL/gl.h>
-#include <GL/glext.h>
+#include <GL/glew.h>
 #include <stdint.h>
 
 #include "4dmath.hpp"

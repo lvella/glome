@@ -1,2 +1,2 @@
 all:
-	g++ *.cpp -o navigna -lGL -lGLU `sdl-config --cflags --libs` -g
+	g++ *.cpp -o navigna -lGL -lGLU -lGLEW `sdl-config --cflags --libs` -g

@@ -1,11 +1,8 @@
-#define GL_GLEXT_PROTOTYPES
 #include <cmath>
 #include <cstdlib>
 #include <iostream>
-
+#include <GL/glew.h>
 #include <GL/glu.h>
-#include <GL/gl.h>
-#include <GL/glext.h>
 
 #include "minimap.hpp"
 
