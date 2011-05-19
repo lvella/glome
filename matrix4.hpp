@@ -27,13 +27,10 @@
 */
 #pragma once
 
-#define GL_GLEXT_PROTOTYPES
 #include <cassert>
 #include <algorithm>
 #include <iostream>
-#include <GL/gl.h>
-#include <GL/glext.h>
-
+#include <GL/glew.h>
 
 typedef float Real;
 

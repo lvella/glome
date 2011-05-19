@@ -12,7 +12,7 @@ public:
   RandomCube()
   {
     srand(time(NULL));
-    t = xy_matrix(rand()) * xz_matrix(rand()) * yz_matrix(rand()) *  xw_matrix(rand()) * yw_matrix(rand()) * zw_matrix(rand());
+    t = xy_matrix(rand()/10000.0f) * xz_matrix(rand()/10000.0f) * yz_matrix(rand()/10000.0f) *  xw_matrix(rand()/10000.0f) * yw_matrix(rand()/10000.0f) * zw_matrix(rand()/10000.0f);
   }
 
   void draw()
