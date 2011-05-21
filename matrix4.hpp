@@ -32,6 +32,8 @@
 #include <iostream>
 #include <GL/glew.h>
 
+#include "vector4.hpp"
+
 typedef float Real;
 
 /** Class encapsulating a standard 4x4 homogeneous matrix.
@@ -162,7 +164,6 @@ public:
     return concatenate( m2 );
   }
 
-  /*
   inline Vector4 operator * (const Vector4& v) const
   {
     return Vector4(
@@ -172,7 +173,6 @@ public:
 		   m[3][0] * v.x + m[3][1] * v.y + m[3][2] * v.z + m[3][3] * v.w
 		   );
   }
-  */
 
   /** Matrix addition.
    */

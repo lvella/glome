@@ -36,6 +36,7 @@ MiniMap minimap;
 RandomCube cube;
 
 GLuint program;
+GLuint tex_ship;
 
 void initialize_vars()
 {
@@ -125,8 +126,32 @@ void draw()
     cube.draw();
   }
 
+  // Enable 2D
+  // TODO: Investigate why fog is disabled and the lines become
+  // thiner if texture is enabled on ATI Catalyst. Shader's fault?
+  glEnable(GL_TEXTURE_2D);
+  glDisable(GL_DEPTH_TEST);
+  glMatrixMode( GL_PROJECTION );
+  glPushMatrix();
+  glLoadIdentity();
+  glOrtho(0.0f, 800, 600, 0.0f, -1.0f, 1.0f);
+  glMatrixMode( GL_MODELVIEW );
+  glLoadIdentity();
+  glUseProgram(0);
+
   minimap.draw();
+
+  // Disable 2D
+  glDisable(GL_TEXTURE_2D);
+  glEnable(GL_DEPTH_TEST);
+  glUseProgram(program);
+  glMatrixMode(GL_PROJECTION);
+  glPopMatrix();
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
+
   {
+//    glEnable(GL_TEXTURE_2D);
     glMatrixMode(GL_PROJECTION);
     glPushMatrix();
     glLoadIdentity();
@@ -135,11 +160,71 @@ void draw()
 
     glMatrixMode(GL_MODELVIEW);
 
-    (yz_matrix(M_PI/2) * cam_hist.back()).loadToGL();
+    Matrix4 t = (yz_matrix(M_PI/2) * cam_hist.back());
+    t.loadToGL();
 
-    ship.draw();
+    //ship.draw();
+    glPushMatrix();
+    Matrix4 ts = t * ship.transformation();
+    ship.transformation().multToGL();
+    ts = ts.transpose();
+    Vector4 v0(0.00007, -0.00007, 0, 0.9996);
+    Vector4 v1(-0.00007, -0.00007, 0, 0.9996);
+    Vector4 v2(-0.00007, 0.00007, 0, 0.9996);
+    Vector4 v3(0.00007, 0.00007, 0, 0.9996);
+    glBindTexture(GL_TEXTURE_2D, tex_ship);
+    glColor3ub(255, 0, 0);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0);
+    Vector4 v(ts * v0);
+    glVertex4f(v.x, v.y, v.z, v.w);
+    glTexCoord2f(1, 0);
+    v = ts * v1;
+    glVertex4f(v.x, v.y, v.z, v.w);
+    glTexCoord2f(1, 1);
+    v = ts * v2;
+    glVertex4f(v.x, v.y, v.z, v.w);
+    glTexCoord2f(0, 1);
+    v = ts * v3;
+    glVertex4f(v.x, v.y, v.z, v.w);
+    glEnd();
+    glPopMatrix();
+    glBindTexture(GL_TEXTURE_2D, 0);
+  //  glDisable(GL_TEXTURE_2D);
+
     Projectile::draw_all();
-    cube.draw();
+
+    //cube.draw();
+
+    glPushMatrix();
+    Matrix4 tc = t * cube.transformation();
+    cube.transformation().multToGL();
+    tc = tc.transpose();
+    float a = 0.0000008;
+    float w = sqrt(1 - a * a);
+    Vector4 v4(a, -a, 0, w);
+    Vector4 v5(-a, -a, 0, w);
+    Vector4 v6(-a, a, 0, w);
+    Vector4 v7(a, a, 0, w);
+    glBindTexture(GL_TEXTURE_2D, tex_ship);
+    glColor3ub(0, 0, 255);
+    glBegin(GL_QUADS);
+    glTexCoord2f(0, 0);
+    v = tc * v4;
+    glVertex4f(v.x, v.y, v.z, v.w);
+    glTexCoord2f(1, 0);
+    v = tc * v5;
+    glVertex4f(v.x, v.y, v.z, v.w);
+    glTexCoord2f(1, 1);
+    v = tc * v6;
+    glVertex4f(v.x, v.y, v.z, v.w);
+    glTexCoord2f(0, 1);
+    v = tc * v7;
+    glVertex4f(v.x, v.y, v.z, v.w);
+    glEnd();
+    glPopMatrix();
+    glBindTexture(GL_TEXTURE_2D, 0);
+
 
     glMatrixMode(GL_PROJECTION);
     glViewport(0, 0, WIDTH, HEIGHT);    
@@ -187,6 +272,34 @@ void main_loop()
   }
 
   cout << frame_count << " frames rendered." << endl;
+}
+
+void
+load_textures()
+{
+  int i, j, tex_h, tex_w;
+  float cx, cy, d, tex_r, tex_r_lim, x;
+  unsigned char texture[16 * 16];
+  cx = cy = 7.5;
+  tex_h = tex_w = 16;
+  tex_r = 8;
+  tex_r_lim = 12;
+
+  for(i = 0; i < tex_h; ++i)
+  {
+    for(j = 0; j < tex_w; ++j)
+    {
+      d = sqrt(((i - cx) * (i - cx)) + ((j - cy) * (j - cy)));
+      texture[(i * tex_w) + j] = (d > tex_r) ? 0 : ((d < tex_r_lim) ? 255 : ((x *= (x = ((tex_r - d) / (tex_r - tex_r_lim)))) * 255));
+    }
+  }
+
+  glGenTextures(1, &tex_ship);
+  glBindTexture(GL_TEXTURE_2D, tex_ship);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, tex_w, tex_h, 0,
+  GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)texture);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 int main(int argc, char **argv)
@@ -247,6 +360,8 @@ int main(int argc, char **argv)
   initialize_shader();
 
   initialize_vars();
+
+  load_textures();
 
   minimap.load_texture();
 

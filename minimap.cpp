@@ -8,37 +8,10 @@
 
 using namespace std;
 
-extern GLuint tex_minimap;
 extern GLuint program;
 
 MiniMap::MiniMap()
 {
-}
-
-void glEnable2D()
-{
-  // TODO: Investigate why fog is disabled and the lines become
-  // thiner if texture is enabled on ATI Catalyst. Shader's fault?
-  glEnable(GL_TEXTURE_2D);
-  glDisable(GL_DEPTH_TEST);
-  glMatrixMode( GL_PROJECTION );
-  glPushMatrix();
-  glLoadIdentity();
-  glOrtho(0.0f, 800, 600, 0.0f, -1.0f, 1.0f);
-  glMatrixMode( GL_MODELVIEW );
-  glLoadIdentity();
-  glUseProgram(0);
-}
-
-void glDisable2D()
-{
-  glDisable(GL_TEXTURE_2D);
-  glEnable(GL_DEPTH_TEST);
-  glUseProgram(program);
-  glMatrixMode(GL_PROJECTION);
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
 }
 
 void
@@ -62,8 +35,6 @@ MiniMap::draw()
   const float ppx0 = cx - dx;
   const float ppy = cy - (radius * cos(angle));
   const float ppx1 = cx + dx;
-
-  glEnable2D();
 
   glColor3ub(14, 164, 3);
   glBegin(GL_LINES);
@@ -89,8 +60,6 @@ MiniMap::draw()
   glEnd();
 
   glBindTexture(GL_TEXTURE_2D, 0);
-
-  glDisable2D();
 }
 
 void
