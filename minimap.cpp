@@ -14,15 +14,12 @@
 
 using namespace std;
 
-extern GLuint program;
 extern GLuint tex_ship;
 extern std::deque<Matrix4> cam_hist;
 extern Ship ship;
 extern RandomCube cube;
 
-MiniMap::MiniMap()
-{
-}
+static GLuint tex_minimap, tex_object, program_map;
 
 void
 MiniMap::draw()
@@ -49,19 +46,34 @@ MiniMap::draw()
   const float ppx1 = cx + dx;
 */
 
-  // Enable 2D
-  glEnable(GL_TEXTURE_2D);
-  glDisable(GL_DEPTH_TEST);
+  // Change to minimap display area/projection.
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
   glLoadIdentity();
   glViewport(10, HEIGHT - 170, 160, 160);
-  glOrtho(-1, 1, -1, 1, -1.0f, 100.0f);
-  glUseProgram(0);
-
+  glOrtho(-1, 1, -1, 1, -1, 1);
   glMatrixMode(GL_MODELVIEW);
+
+  // Draw 2D green background.
+  glUseProgram(0);
+  glEnable(GL_TEXTURE_2D);
+  glDisable(GL_DEPTH_TEST);
+
   glPushMatrix();
   glLoadIdentity();
+
+  glColor3ub(14, 164, 3);
+  glBindTexture(GL_TEXTURE_2D, tex_minimap);
+  glBegin(GL_QUADS);
+  glTexCoord2f(0, 0);
+  glVertex2f(-1, -1);
+  glTexCoord2f(1, 0);
+  glVertex2f(1, -1);
+  glTexCoord2f(1, 1);
+  glVertex2f(1, 1);
+  glTexCoord2f(0, 1);
+  glVertex2f(-1, 1);
+  glEnd();
 
 /*
   // Draw field of vision
@@ -73,21 +85,6 @@ MiniMap::draw()
   glVertex2f(cx, cy);
   glEnd();
 */
-
-  // Draw minimap
-  glBindTexture(GL_TEXTURE_2D, tex_minimap);
-  glColor3ub(14, 164, 3);
-  glBegin(GL_QUADS);
-  glTexCoord2f(0, 0);
-  glVertex2f(-1, -1);
-  glTexCoord2f(1, 0);
-  glVertex2f(1, -1);
-  glTexCoord2f(1, 1);
-  glVertex2f(1, 1);
-  glTexCoord2f(0, 1);
-  glVertex2f(-1, 1);
-  glEnd();
-  glBindTexture(GL_TEXTURE_2D, 0);
 
   // Draw objects
   {
@@ -176,7 +173,6 @@ MiniMap::draw()
   }
 
   // Disable 2D
-  glUseProgram(program);
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
   glMatrixMode(GL_PROJECTION);
@@ -187,19 +183,7 @@ MiniMap::draw()
 }
 
 void
-MiniMap::update()
-{
-}
-
-void
-MiniMap::initialize()
-{
-  create_circle_texture(256, 0.8, 0, 142, tex_minimap);
-  create_circle_texture(16, 0.8, 0, 255, tex_object);
-}
-
-void
-MiniMap::create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
+create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
 {
   int i, j;
   float cx, cy, d, tex_r, tex_r_lim, x;
@@ -225,5 +209,12 @@ MiniMap::create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
   glBindTexture(GL_TEXTURE_2D, 0);
 
   free(texture);
+}
+
+void
+MiniMap::initialize()
+{
+  create_circle_texture(256, 0.8, 0, 142, tex_minimap);
+  create_circle_texture(16, 0.8, 0, 255, tex_object);
 }
 

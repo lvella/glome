@@ -32,7 +32,6 @@ std::deque<Matrix4> cam_hist(10, Matrix4::IDENTITY);
 
 Ship ship;
 Input input(&ship);
-MiniMap minimap;
 RandomCube cube;
 
 GLuint program;
@@ -104,6 +103,7 @@ void draw()
   cam_hist.pop_front();
   cam_hist.push_back(ship.transformation().transpose());
 
+  glUseProgram(program);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glColor3f(.0f, .0f, 1.0f);
   draw_meridian(z, z, s, c);
@@ -121,7 +121,7 @@ void draw()
   ship.draw();
   Projectile::draw_all();
   cube.draw();
-  minimap.draw();
+  MiniMap::draw();
 
   SDL_GL_SwapBuffers();
 }
@@ -130,7 +130,6 @@ void update()
 {
   ship.update();
   Projectile::update_all();
-  minimap.update();
 }
 
 void main_loop()
@@ -221,11 +220,8 @@ int main(int argc, char **argv)
 
   // 4D to 3D projection
   initialize_shader();
-
   initialize_vars();
-
-  minimap.initialize();
-
+  MiniMap::initialize();
   Ship::initialize();
 
   main_loop();
