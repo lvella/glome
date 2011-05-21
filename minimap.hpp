@@ -14,5 +14,5 @@ public:
 
 private:
   GLuint tex_minimap;
-  GLuint tex_ship;
+  GLuint tex_object;
 };

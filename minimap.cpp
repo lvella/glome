@@ -56,7 +56,7 @@ MiniMap::draw()
   glPushMatrix();
   glLoadIdentity();
   glViewport(10, HEIGHT - 170, 160, 160);
-  glOrtho(-2, 2, -2, 2, -1.0f, 100.0f);
+  glOrtho(-1, 1, -1, 1, -1.0f, 100.0f);
   glUseProgram(0);
 
   glMatrixMode(GL_MODELVIEW);
@@ -110,7 +110,7 @@ MiniMap::draw()
       Vector4 v2(-a, a, 0, w);
       Vector4 v3(a, a, 0, w);
 
-      glBindTexture(GL_TEXTURE_2D, tex_ship);
+      glBindTexture(GL_TEXTURE_2D, tex_object);
       glColor3ub(255, 0, 0);
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0);
@@ -149,7 +149,7 @@ MiniMap::draw()
       Vector4 v2(-a, a, 0, w);
       Vector4 v3(a, a, 0, w);
 
-      glBindTexture(GL_TEXTURE_2D, tex_ship);
+      glBindTexture(GL_TEXTURE_2D, tex_object);
       glColor3ub(0, 0, 255);
       glBegin(GL_QUADS);
       glTexCoord2f(0, 0);
@@ -195,7 +195,7 @@ void
 MiniMap::initialize()
 {
   create_circle_texture(256, 0.8, 0, 142, tex_minimap);
-  create_circle_texture(16, 0.8, 0, 255, tex_minimap);
+  create_circle_texture(16, 0.8, 0, 255, tex_object);
 }
 
 void

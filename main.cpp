@@ -105,25 +105,22 @@ void draw()
   cam_hist.push_back(ship.transformation().transpose());
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  {
-    glColor3f(.0f, .0f, 1.0f);
-    draw_meridian(z, z, s, c);
-    glColor3f(.0f, 1.f, .0f);
-    draw_meridian(z, s, z, c);
-    glColor3f(1.0f, .0f, .0f);
-    draw_meridian(s, z, z, c);
-    glColor3f(1.0f, 1.0f, .0f);
-    draw_meridian(s, c, z, z);
-    glColor3f(1.0f, .0f, 1.0f);
-    draw_meridian(s, z, c, z);
-    glColor3f(.0f, 1.0f, 1.0f);
-    draw_meridian(z, s, c, z);
+  glColor3f(.0f, .0f, 1.0f);
+  draw_meridian(z, z, s, c);
+  glColor3f(.0f, 1.f, .0f);
+  draw_meridian(z, s, z, c);
+  glColor3f(1.0f, .0f, .0f);
+  draw_meridian(s, z, z, c);
+  glColor3f(1.0f, 1.0f, .0f);
+  draw_meridian(s, c, z, z);
+  glColor3f(1.0f, .0f, 1.0f);
+  draw_meridian(s, z, c, z);
+  glColor3f(.0f, 1.0f, 1.0f);
+  draw_meridian(z, s, c, z);
 
-    ship.draw();
-    Projectile::draw_all();
-    cube.draw();
-  }
-
+  ship.draw();
+  Projectile::draw_all();
+  cube.draw();
   minimap.draw();
 
   SDL_GL_SwapBuffers();
