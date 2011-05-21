@@ -15,6 +15,7 @@
 #include "ship.hpp"
 #include "projectile.hpp"
 #include "randomcube.hpp"
+#include "shader.hpp"
 
 using namespace std;
 
@@ -34,7 +35,7 @@ Ship ship;
 Input input(&ship);
 RandomCube cube;
 
-GLuint program;
+static GLuint program;
 
 void initialize_vars()
 {
@@ -49,39 +50,8 @@ void initialize_vars()
 
 void initialize_shader()
 {
-  GLuint shader;
-  const char vcode[] = 
-"void main() \
-{ \
-  vec4 tmp = gl_ModelViewMatrix * gl_Vertex; \
-  tmp.xyz = tmp.xyz / (1.0 - tmp.w); \
-  tmp.w = 1.0; \
-  gl_Position = gl_ProjectionMatrix * tmp; \
-  gl_FrontColor = gl_Color; \
-  gl_FogFragCoord = length(gl_Position); \
-}";
-
-  const char *ptr;
-
-  char err[10000];
-
-  shader = glCreateShader(GL_VERTEX_SHADER);
-  ptr = vcode;
-  glShaderSource(shader, 1, &ptr,NULL);
-  glCompileShader(shader);
-
-  {
-    GLsizei length;
-    glGetShaderInfoLog(shader, 10000, &length, err);
-    if(length)
-      cout << "Shader compilation log:\n" << err << '\n';
-  }
-
-  program = glCreateProgram();
-  glAttachShader(program, shader);
-
-  glLinkProgram(program);
-  glUseProgram(program);
+#include "world_proj.glsl.hpp"
+  program = setup_vshader(world_proj_glsl, world_proj_glsl_len);
 }
 
 void draw_meridian(const double *a, const double *b, const double *c, const double *d)

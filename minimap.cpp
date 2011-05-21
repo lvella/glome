@@ -9,6 +9,7 @@
 #include "projectile.hpp"
 #include "randomcube.hpp"
 #include "ship.hpp"
+#include "shader.hpp"
 
 #include "minimap.hpp"
 
@@ -87,6 +88,8 @@ MiniMap::draw()
 */
 
   // Draw objects
+  glUseProgram(program_map);
+  glClear(GL_DEPTH_BUFFER_BIT);
   {
     Matrix4 t = (yz_matrix(M_PI / 2) * cam_hist.back());
     t.loadToGL();
@@ -216,5 +219,8 @@ MiniMap::initialize()
 {
   create_circle_texture(256, 0.8, 0, 142, tex_minimap);
   create_circle_texture(16, 0.8, 0, 255, tex_object);
+
+#include "minimap_proj.glsl.hpp"
+  program_map = setup_vshader(minimap_proj_glsl, minimap_proj_glsl_len);
 }
 
