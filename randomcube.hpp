@@ -36,7 +36,7 @@ public:
     glVertex4f(-a, a, -a, w);
     glVertex4f(a, a, -a, w);
 
-    glColor3ub(255, 255, 255);
+    glColor3ub(50, 50, 50);
     glVertex4f(a, a, a, w);
     glVertex4f(a, -a, a, w);
     glVertex4f(a, -a, -a, w);

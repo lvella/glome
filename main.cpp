@@ -88,9 +88,9 @@ void draw()
   glColor3f(.0f, 1.0f, 1.0f);
   draw_meridian(z, s, c, z);
 
-  ship.draw();
-  Projectile::draw_all();
   cube.draw();
+  Projectile::draw_all();
+  ship.draw();
   MiniMap::draw();
 
   SDL_GL_SwapBuffers();
