@@ -181,8 +181,6 @@ MiniMap::initialize()
   create_circle_texture(16, 0.8, 0, 255, tex_object);
 
 #include "minimap_proj.glsl.hpp"
-//#include "minimap_tex.glsl.hpp"
   program_map = setup_vshader(minimap_proj_glsl, minimap_proj_glsl_len);
-  //program_map = setup_vfshader(minimap_proj_glsl, minimap_tex_glsl, minimap_proj_glsl_len, minimap_tex_glsl_len);
 }
 
