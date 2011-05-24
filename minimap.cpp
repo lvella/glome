@@ -100,7 +100,7 @@ MiniMap::draw()
   ship.transformation().multToGL();
 
   glBindTexture(GL_TEXTURE_2D, tex_object);
-  glColor3ub(255, 0, 0);
+  glColor3ub(255, 255, 255);
   glBegin(GL_QUADS);
   glVertex2i(-1, -1);
   glVertex2i(1, -1);
@@ -118,7 +118,7 @@ MiniMap::draw()
   cube.transformation().multToGL();
 
   glBindTexture(GL_TEXTURE_2D, tex_object);
-  glColor3ub(0, 255, 0);
+  glColor3ub(255, 0, 0);
   glBegin(GL_QUADS);
   glVertex2i(-1, -1);
   glVertex2i(1, -1);
