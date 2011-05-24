@@ -20,7 +20,7 @@ extern std::deque<Matrix4> cam_hist;
 extern Ship ship;
 extern RandomCube cube;
 
-static GLuint tex_minimap, tex_object, program_map;
+static GLuint tex_minimap, tex_object, program_map, program;
 
 void
 MiniMap::draw()
@@ -57,6 +57,7 @@ MiniMap::draw()
 
   // Draw 2D green background.
   glUseProgram(0);
+  glDisable(GL_FOG);
   glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
 
@@ -91,40 +92,21 @@ MiniMap::draw()
   glUseProgram(program_map);
   glClear(GL_DEPTH_BUFFER_BIT);
   {
-    Matrix4 t = (yz_matrix(M_PI / 2) * cam_hist.back());
+    Matrix4 t = yz_matrix(M_PI / 2) * cam_hist.back();
     t.loadToGL();
 
     {
       // Draw ship object
-      //ship.draw();
       glPushMatrix();
-      Matrix4 ts = t * ship.transformation();
       ship.transformation().multToGL();
-      ts = ts.transpose();
-      float a = 0.00007;
-      float w = sqrt(1 - a * a);
-
-      // Real points
-      Vector4 v0(a, -a, 0, w);
-      Vector4 v1(-a, -a, 0, w);
-      Vector4 v2(-a, a, 0, w);
-      Vector4 v3(a, a, 0, w);
 
       glBindTexture(GL_TEXTURE_2D, tex_object);
       glColor3ub(255, 0, 0);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0);
-      Vector4 v(ts * v0);
-      glVertex4f(v.x, v.y, v.z, v.w);
-      glTexCoord2f(1, 0);
-      v = ts * v1;
-      glVertex4f(v.x, v.y, v.z, v.w);
-      glTexCoord2f(1, 1);
-      v = ts * v2;
-      glVertex4f(v.x, v.y, v.z, v.w);
-      glTexCoord2f(0, 1);
-      v = ts * v3;
-      glVertex4f(v.x, v.y, v.z, v.w);
+      glVertex2i(-1, -1);
+      glVertex2i(1, -1);
+      glVertex2i(1, 1);
+      glVertex2i(-1, 1);
       glEnd();
       glPopMatrix();
       glBindTexture(GL_TEXTURE_2D, 0);
@@ -135,54 +117,32 @@ MiniMap::draw()
 
     {
       // Draw cube object
-      //cube.draw();
       glPushMatrix();
-      Matrix4 tc = t * cube.transformation();
       cube.transformation().multToGL();
-      tc = tc.transpose();
-      float a = 0.0000002;
-      float w = sqrt(1 - a * a);
-
-      // Real points
-      Vector4 v0(a, -a, 0, w);
-      Vector4 v1(-a, -a, 0, w);
-      Vector4 v2(-a, a, 0, w);
-      Vector4 v3(a, a, 0, w);
 
       glBindTexture(GL_TEXTURE_2D, tex_object);
-      glColor3ub(0, 0, 255);
+      glColor3ub(0, 255, 0);
       glBegin(GL_QUADS);
-      glTexCoord2f(0, 0);
-      Vector4 v(tc * v0);
-      glVertex4f(v.x, v.y, v.z, v.w);
-      glTexCoord2f(1, 0);
-      v = tc * v1;
-      glVertex4f(v.x, v.y, v.z, v.w);
-      glTexCoord2f(1, 1);
-      v = tc * v2;
-      glVertex4f(v.x, v.y, v.z, v.w);
-      glTexCoord2f(0, 1);
-      v = tc * v3;
-      glVertex4f(v.x, v.y, v.z, v.w);
+      glVertex2i(-1, -1);
+      glVertex2i(1, -1);
+      glVertex2i(1, 1);
+      glVertex2i(-1, 1);
       glEnd();
       glPopMatrix();
       glBindTexture(GL_TEXTURE_2D, 0);
     }
-
-    glMatrixMode(GL_PROJECTION);
-    glViewport(0, 0, WIDTH, HEIGHT);    
-    glPopMatrix();
-    glMatrixMode(GL_MODELVIEW);
   }
 
   // Disable 2D
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_DEPTH_TEST);
+  glEnable(GL_FOG);
   glMatrixMode(GL_PROJECTION);
   glViewport(0, 0, WIDTH, HEIGHT);    
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
   glPopMatrix();
+
 }
 
 void
@@ -221,6 +181,8 @@ MiniMap::initialize()
   create_circle_texture(16, 0.8, 0, 255, tex_object);
 
 #include "minimap_proj.glsl.hpp"
+//#include "minimap_tex.glsl.hpp"
   program_map = setup_vshader(minimap_proj_glsl, minimap_proj_glsl_len);
+  //program_map = setup_vfshader(minimap_proj_glsl, minimap_tex_glsl, minimap_proj_glsl_len, minimap_tex_glsl_len);
 }
 

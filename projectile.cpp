@@ -34,18 +34,19 @@ Projectile::Projectile(const Matrix4& from, const Matrix4& speed):
 
 void Projectile::draw()
 {
-  const float w = -std::sqrt(1 - (0.05*0.05));
+  const float a = 0.0025;
+  const float w = -std::sqrt(1 - (a*a));
 
   glPushMatrix();
   t.multToGL();
   glColor3ub(255, 255, 255);
   glBegin(GL_LINES);
-  glVertex4f(0.0025, 0.0, 0.0, w);
-  glVertex4f(-0.0025, 0.0, 0.0, w);
-  glVertex4f(0.0, 0.0025, 0.0, w);
-  glVertex4f(0.0, -0.0025, 0.0, w);
-  glVertex4f(0.0, 0.0, 0.0025, w);
-  glVertex4f(0.0, 0.0, -0.0025, w);
+  glVertex4f(a, 0.0, 0.0, w);
+  glVertex4f(-a, 0.0, 0.0, w);
+  glVertex4f(0.0, a, 0.0, w);
+  glVertex4f(0.0, -a, 0.0, w);
+  glVertex4f(0.0, 0.0, a, w);
+  glVertex4f(0.0, 0.0, -a, w);
   glEnd();
   glPopMatrix();
 }

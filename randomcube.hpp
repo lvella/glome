@@ -18,7 +18,7 @@ public:
   void draw()
   {
     float a = 0.02;
-    float w = sqrt(1 - a*a);
+    float w = -sqrt(1 - a*a);
 
     glPushMatrix();
     t.multToGL();
