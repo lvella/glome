@@ -1,3 +1,5 @@
+#include <cstdlib>
+
 #include "input.hpp"
 
 using namespace std;
@@ -46,6 +48,9 @@ Input::key_event(SDL_Event e)
   int k = e.key.keysym.sym;
   switch(k)
   {
+  case SDLK_ESCAPE:
+    if(e.type == SDL_KEYDOWN)
+      exit(0);
   case SDLK_SPACE:
     if(e.type == SDL_KEYDOWN)
       ship->shot(true);
