@@ -167,6 +167,7 @@ int main(int argc, char **argv)
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
   glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
   glLineWidth(1.5f);
+  glAlphaFunc(GL_NOTEQUAL, 0.0f);
 
   // Fancy OpenGL fog
   glFogi(GL_FOG_MODE, GL_EXP);

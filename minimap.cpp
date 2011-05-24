@@ -90,52 +90,47 @@ MiniMap::draw()
 
   // Draw objects
   glUseProgram(program_map);
+  glEnable(GL_ALPHA_TEST);
+  glEnable(GL_DEPTH_TEST);
   glClear(GL_DEPTH_BUFFER_BIT);
-  {
-    Matrix4 t = yz_matrix(M_PI / 2) * cam_hist.back();
-    t.loadToGL();
+  (yz_matrix(M_PI / 2) * cam_hist.back()).loadToGL();
 
-    {
-      // Draw ship object
-      glPushMatrix();
-      ship.transformation().multToGL();
+  // Draw ship object
+  glPushMatrix();
+  ship.transformation().multToGL();
 
-      glBindTexture(GL_TEXTURE_2D, tex_object);
-      glColor3ub(255, 0, 0);
-      glBegin(GL_QUADS);
-      glVertex2i(-1, -1);
-      glVertex2i(1, -1);
-      glVertex2i(1, 1);
-      glVertex2i(-1, 1);
-      glEnd();
-      glPopMatrix();
-      glBindTexture(GL_TEXTURE_2D, 0);
-    }
+  glBindTexture(GL_TEXTURE_2D, tex_object);
+  glColor3ub(255, 0, 0);
+  glBegin(GL_QUADS);
+  glVertex2i(-1, -1);
+  glVertex2i(1, -1);
+  glVertex2i(1, 1);
+  glVertex2i(-1, 1);
+  glEnd();
+  glPopMatrix();
+  glBindTexture(GL_TEXTURE_2D, 0);
 
-    // Draw shots
-    Projectile::draw_all();
+  // Draw shots
+  Projectile::draw_all();
 
-    {
-      // Draw cube object
-      glPushMatrix();
-      cube.transformation().multToGL();
+  // Draw cube object
+  glPushMatrix();
+  cube.transformation().multToGL();
 
-      glBindTexture(GL_TEXTURE_2D, tex_object);
-      glColor3ub(0, 255, 0);
-      glBegin(GL_QUADS);
-      glVertex2i(-1, -1);
-      glVertex2i(1, -1);
-      glVertex2i(1, 1);
-      glVertex2i(-1, 1);
-      glEnd();
-      glPopMatrix();
-      glBindTexture(GL_TEXTURE_2D, 0);
-    }
-  }
+  glBindTexture(GL_TEXTURE_2D, tex_object);
+  glColor3ub(0, 255, 0);
+  glBegin(GL_QUADS);
+  glVertex2i(-1, -1);
+  glVertex2i(1, -1);
+  glVertex2i(1, 1);
+  glVertex2i(-1, 1);
+  glEnd();
+  glPopMatrix();
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   // Disable 2D
+  glDisable(GL_ALPHA_TEST);
   glDisable(GL_TEXTURE_2D);
-  glEnable(GL_DEPTH_TEST);
   glEnable(GL_FOG);
   glMatrixMode(GL_PROJECTION);
   glViewport(0, 0, WIDTH, HEIGHT);    
