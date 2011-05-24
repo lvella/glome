@@ -88,18 +88,11 @@ MiniMap::draw()
   glEnd();
 */
 
-  // Draw objects
-  glUseProgram(program_map);
-  glEnable(GL_ALPHA_TEST);
+  // Draw ship object
+  glBindTexture(GL_TEXTURE_2D, 0);
   glEnable(GL_DEPTH_TEST);
   glClear(GL_DEPTH_BUFFER_BIT);
-  (yz_matrix(M_PI / 2) * cam_hist.back()).loadToGL();
-
-  // Draw ship object
-  glPushMatrix();
-  ship.transformation().multToGL();
-
-  glBindTexture(GL_TEXTURE_2D, tex_object);
+  glLoadIdentity();
   glColor3ub(255, 255, 255);
   glBegin(GL_QUADS);
   glVertex2i(-1, -1);
@@ -107,8 +100,11 @@ MiniMap::draw()
   glVertex2i(1, 1);
   glVertex2i(-1, 1);
   glEnd();
-  glPopMatrix();
-  glBindTexture(GL_TEXTURE_2D, 0);
+
+  // Draw objects
+  glUseProgram(program_map);
+  glEnable(GL_ALPHA_TEST);
+  (yz_matrix(M_PI / 2) * cam_hist.back()).loadToGL();
 
   // Draw shots
   Projectile::draw_all();
