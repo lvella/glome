@@ -51,7 +51,7 @@ MiniMap::draw()
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
   glLoadIdentity();
-  glViewport(10, HEIGHT - 170, 160, 160);
+  glViewport(10, 10, 160, 160);
   glOrtho(-1, 1, -1, 1, -1, 1);
   glMatrixMode(GL_MODELVIEW);
 
@@ -95,10 +95,11 @@ MiniMap::draw()
   glLoadIdentity();
   glColor3ub(255, 255, 255);
   glBegin(GL_QUADS);
-  glVertex2i(-1, -1);
-  glVertex2i(1, -1);
-  glVertex2i(1, 1);
-  glVertex2i(-1, 1);
+  float a = 0.07;
+  glVertex2f(0, a);
+  glVertex2f(a, -a);
+  glVertex2f(0, -a/2.f);
+  glVertex2f(-a, -a);
   glEnd();
 
   // Draw objects
@@ -168,7 +169,7 @@ create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
 void
 MiniMap::initialize()
 {
-  create_circle_texture(256, 0.8, 0, 142, tex_minimap);
+  create_circle_texture(256, 0.9, 0, 142, tex_minimap);
   create_circle_texture(16, 0.8, 0, 255, tex_object);
 
 #include "minimap_proj.glsl.hpp"
