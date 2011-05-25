@@ -94,7 +94,7 @@ MiniMap::draw()
   glClear(GL_DEPTH_BUFFER_BIT);
   glLoadIdentity();
   glColor3ub(255, 255, 255);
-  glBegin(GL_QUADS);
+  glBegin(GL_TRIANGLE_FAN);
   float a = 0.07;
   glVertex2f(0, a);
   glVertex2f(a, -a);
