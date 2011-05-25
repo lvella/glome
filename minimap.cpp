@@ -21,6 +21,7 @@ extern Ship ship;
 extern RandomCube cube;
 
 static GLuint tex_minimap, tex_object, program_map, program;
+static GLint proj_only_uniform;
 
 void
 MiniMap::draw()
@@ -60,8 +61,6 @@ MiniMap::draw()
   glDisable(GL_FOG);
   glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
-
-  glPushMatrix();
   glLoadIdentity();
 
   glColor3ub(14, 164, 3);
@@ -108,9 +107,11 @@ MiniMap::draw()
   (yz_matrix(M_PI / 2) * cam_hist.back()).loadToGL();
 
   // Draw shots
-  Projectile::draw_all();
+  glUniform1i(proj_only_uniform, 1);
+  Projectile::draw_in_minimap();
 
   // Draw cube object
+  glUniform1i(proj_only_uniform, 0);
   glPushMatrix();
   cube.transformation().multToGL();
 
@@ -133,8 +134,6 @@ MiniMap::draw()
   glViewport(0, 0, WIDTH, HEIGHT);    
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
-  glPopMatrix();
-
 }
 
 void
@@ -174,5 +173,6 @@ MiniMap::initialize()
 
 #include "minimap_proj.glsl.hpp"
   program_map = setup_vshader(minimap_proj_glsl, minimap_proj_glsl_len);
+  proj_only_uniform = glGetUniformLocation(program_map, "proj_only");
 }
 
