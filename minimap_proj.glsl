@@ -1,4 +1,4 @@
-uniform bool proj_only = false;
+uniform bool proj_only;
 
 void main()
 {
