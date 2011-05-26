@@ -150,7 +150,7 @@ int main(int argc, char **argv)
   {
     GLenum err = glewInit();
     if(err != GLEW_OK) {
-      cerr << "Unable to initialize GLEW: %s\n"
+      cerr << "Unable to initialize GLEW:\n"
 	   << glewGetErrorString(err) << endl;
       return 1;
     }

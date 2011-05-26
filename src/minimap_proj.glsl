@@ -16,9 +16,9 @@ void main()
   vert.xyz = vert.xyz * r;
   vert.w = 1.0;
 
-  if(proj_only) {
-    gl_TexCoord[0] = gl_MultiTexCoord0;
-  } else {
+  gl_TexCoord[0] = gl_MultiTexCoord0;
+  if(!proj_only)
+  {
     gl_TexCoord[0].st = (gl_Vertex.xy + 1.0) * 0.5;
     vert.xy = vert.xy + gl_Vertex.xy * 0.05;
   } 
