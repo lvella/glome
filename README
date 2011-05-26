@@ -1,0 +1,17 @@
+Navigate through the surface of a hypersphere and kill your enemies.
+
+legenda: [ item opcional ]
+*gerar arquivos de configuração:
+	$autoreconf
+	[ $automake --add-missing (caso seja necessário né) ]
+	[ $autoreconf (so se tiver rodado automake --add-missing) ]
+	$automake -a -c (gera os Makefiles)
+
+*mudar/acrescentar alguma macro(m4):
+	$aclocal
+	-> gerar novamente arquivos de configuração
+	-> procedimento padrão
+
+*procedimento padrão para compilar:
+	$./configure
+	$make
