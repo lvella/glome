@@ -42,15 +42,15 @@ def export_mesh(obj, data):
 	try:
 		print('Exporting ' + obj.name + '.mesh in ' + export_path + ' directory')
 		bfile = open(export_path + '/' + obj.name + '.mesh', 'wb')
-		bfile.write(struct.pack('<f', len(data.vertices)))
+		bfile.write(struct.pack('<H', len(data.vertices)))
 		for v in data.vertices:
 			bfile.write(struct.pack('<f', v.co.x))
 			bfile.write(struct.pack('<f', v.co.y))
 			bfile.write(struct.pack('<f', v.co.z))
-		bfile.write(struct.pack('<f', len(data.edges)))
+		bfile.write(struct.pack('<H', len(data.edges)))
 		for e in data.edges:
-			bfile.write(struct.pack('<f', e.vertices[0].real))
-			bfile.write(struct.pack('<f', e.vertices[1].real))
+			bfile.write(struct.pack('<H', e.key[0]))
+			bfile.write(struct.pack('<H', e.key[1]))
 		bfile.close()
 	except:
 		pass
@@ -61,19 +61,20 @@ def read_file(obj, data):
 		print('Reading ' + obj.name + '.mesh from ' + export_path + ' directory')
 		bfile = open(export_path + '/' + obj.name + '.mesh', 'rb')
 		fsize = struct.calcsize('f')
-		nv = bfile.read(fsize)
-		print(struct.unpack('<f', nv)[0])
+		isize = struct.calcsize('H')
+		nv = bfile.read(isize)
+		print(struct.unpack('<H', nv)[0])
 		for v in data.vertices:
 			x = bfile.read(fsize)
 			y = bfile.read(fsize)
 			z = bfile.read(fsize)
 			print(struct.unpack('<f', x)[0], struct.unpack('<f', y)[0], struct.unpack('<f', z)[0])
-		ne = bfile.read(fsize)
-		print(struct.unpack('<f', ne)[0])
+		ne = bfile.read(isize)
+		print(struct.unpack('<H', ne)[0])
 		for e in data.edges:
-			e0 = bfile.read(fsize)
-			e1 = bfile.read(fsize)
-			print(struct.unpack('<f', e0)[0], struct.unpack('<f', e1)[0])
+			e0 = bfile.read(isize)
+			e1 = bfile.read(isize)
+			print(struct.unpack('<H', e0)[0], struct.unpack('<H', e1)[0])
 		bfile.close()
 	except:
 		pass
@@ -93,7 +94,7 @@ class ExportMeshNavigna(bpy.types.Operator):
 		for o in objs:
 			data = o.to_mesh(scene,True,'PREVIEW')
 			export_mesh(o, data)
-#			read_file(o,data)
+			read_file(o,data)
 		self.report({'INFO'}, "Done.")
 		return {'FINISHED'}
 
