@@ -1,5 +1,10 @@
 #pragma once
 
+#include <GL/glew.h>
+#include <cmath>
+
+class Matrix4;
+
 class Vector4
 {
 public:
@@ -11,27 +16,37 @@ public:
     w = wl;
   }
 
-  Vector4(const Vector4& ref)
+  Vector4 operator+(const Vector4& ref)
   {
-    x = ref.x;
-    y = ref.y;
-    z = ref.z;
-    w = ref.w;
+    return Vector4(x + ref.x, y + ref.y, z + ref.z, w + ref.w);
   }
 
-  void operator=(const Vector4& ref)
+  Vector4 operator-(const Vector4& ref)
   {
-    x = ref.x;
-    y = ref.y;
-    z = ref.z;
-    w = ref.w;
+    return Vector4(x-ref.x, y-ref.y, z-ref.z, w-ref.w);
   }
 
-//private:
-  float x;
-  float y;
-  float z;
-  float w;
-  //float v[4];
+  float length()
+  {
+    return sqrt(x*x + y*y + z*z + w*w);
+  }
+
+  void loadVertex()
+  {
+    glVertex4fv(v);
+  }
+
+private:
+  friend class Matrix4;
+
+  union {
+    struct {
+      float x;
+      float y;
+      float z;
+      float w;
+    };
+    float v[4];
+  };
 };
 

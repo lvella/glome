@@ -28,8 +28,7 @@ void Projectile::draw_in_minimap()
 {
   glBegin(GL_POINTS);
   for(unsigned int i = 0; i < shots.size(); ++i) {
-    const Matrix4 &t = shots[i].transformation();
-    glVertex4f(-t[0][3], -t[1][3], -t[2][3], -t[3][3]);
+    shots[i].transformation().position().loadVertex();
   }
   glEnd();
 }

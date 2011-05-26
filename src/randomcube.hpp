@@ -1,18 +1,25 @@
 #pragma once
 
-#include <time.h>
 #include <stdlib.h>
 #include <math.h>
 #include "object.hpp"
 #include "4dmath.hpp"
+#include "vector4.hpp"
+#include "ship.hpp"
 
 class RandomCube: public Object
 {
 public:
   RandomCube()
   {
-    srand(time(NULL));
-    t = xy_matrix(rand()/10000.0f) * xz_matrix(rand()/10000.0f) * yz_matrix(rand()/10000.0f) *  xw_matrix(rand()/10000.0f) * yw_matrix(rand()/10000.0f) * zw_matrix(rand()/10000.0f);
+    randomize();
+  }
+
+  void update()
+  {
+    extern Ship ship;
+    if((t.position() - ship.transformation().position()).length() < 0.03)
+      randomize();
   }
 
   void draw()
@@ -62,5 +69,10 @@ public:
     
     glEnd();
     glPopMatrix();
+  }
+
+private:
+  void randomize() {
+    t = xy_matrix(rand()/10000.0f) * xz_matrix(rand()/10000.0f) * yz_matrix(rand()/10000.0f) *  xw_matrix(rand()/10000.0f) * yw_matrix(rand()/10000.0f) * zw_matrix(rand()/10000.0f);
   }
 };

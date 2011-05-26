@@ -3,6 +3,7 @@
 #include <cstring>
 #include <cstdio>
 #include <cmath>
+#include <ctime>
 #include <deque>
 #include <SDL.h>
 #include <GL/glew.h>
@@ -99,6 +100,7 @@ void draw()
 void update()
 {
   ship.update();
+  cube.update();
   Projectile::update_all();
 }
 
@@ -136,6 +138,8 @@ void main_loop()
 
 int main(int argc, char **argv)
 {
+  srand(time(NULL));
+
   // SDL startup
   if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
     cerr << "Unable to initialize SDL: " << SDL_GetError() << endl;
