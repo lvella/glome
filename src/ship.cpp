@@ -78,7 +78,6 @@ void Ship::initialize()
   }
 
   fclose(fd);
-  printf("vlen: %d\nilen: %d\n", vlen, ilen);
 
   // Create the display list
   dlist = glGenLists (1);
