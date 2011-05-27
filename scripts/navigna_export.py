@@ -1,7 +1,6 @@
 #!BPY
 # -*- coding: utf-8 -*-
 #
-# Making with 2 tabs indentation
 
 """
 Name: 'Navigna Mesh Exporter'
@@ -37,16 +36,25 @@ import struct
 #TODO: Change to relative path in Blender (bpy.path.relpath(path))
 export_path = bpy.path.abspath('/tmp/')
 
+def vertex_conv(i, scale):
+	'Convert 3-D to 4-D coordinates'
+	x = i[0] * scale
+	y = i[1] * scale
+	z = i[2] * scale
+	d = 1 + x*x + y*y + z*z
+	return (2*x/d, 2*y/d, 2*z/d, (-1 + x*x + y*y + z*z)/d)
+
 #FIXME: Acochambration here! for display name of objects
 def export_mesh(obj, data):
 	try:
-		print('Exporting ' + obj.name + '.mesh in ' + export_path + ' directory')
-		bfile = open(export_path + '/' + obj.name + '.mesh', 'wb')
+		bfile = open(export_path + '/' + obj.name + '.wire', 'wb')
 		bfile.write(struct.pack('<H', len(data.vertices)))
 		for v in data.vertices:
-			bfile.write(struct.pack('<f', v.co.x))
-			bfile.write(struct.pack('<f', v.co.y))
-			bfile.write(struct.pack('<f', v.co.z))
+			out = vertex_conv(v.co, 0.0005)# scale is hardcoded?
+			bfile.write(struct.pack('<f', out[0]))
+			bfile.write(struct.pack('<f', out[1]))
+			bfile.write(struct.pack('<f', out[2]))
+			bfile.write(struct.pack('<f', out[3]))
 		bfile.write(struct.pack('<H', len(data.edges)))
 		for e in data.edges:
 			bfile.write(struct.pack('<H', e.key[0]))
@@ -58,8 +66,8 @@ def export_mesh(obj, data):
 # Only for testing
 def read_file(obj, data):
 	try:
-		print('Reading ' + obj.name + '.mesh from ' + export_path + ' directory')
-		bfile = open(export_path + '/' + obj.name + '.mesh', 'rb')
+		print('Reading ' + obj.name + '.wire from ' + export_path + ' directory')
+		bfile = open(export_path + '/' + obj.name + '.wire', 'rb')
 		fsize = struct.calcsize('f')
 		isize = struct.calcsize('H')
 		nv = bfile.read(isize)
@@ -68,7 +76,8 @@ def read_file(obj, data):
 			x = bfile.read(fsize)
 			y = bfile.read(fsize)
 			z = bfile.read(fsize)
-			print(struct.unpack('<f', x)[0], struct.unpack('<f', y)[0], struct.unpack('<f', z)[0])
+			w = bfile.read(fsize)
+			print(struct.unpack('<f', x)[0], struct.unpack('<f', y)[0], struct.unpack('<f', z)[0], struct.unpack('<f', w)[0])
 		ne = bfile.read(isize)
 		print(struct.unpack('<H', ne)[0])
 		for e in data.edges:
@@ -85,7 +94,7 @@ def read_file(obj, data):
 
 class ExportMeshNavigna(bpy.types.Operator):
 	bl_idname = "export.navigna"
-	bl_label = "Export Mesh to Navigna Game"
+	bl_label = "Export 4-D Mesh to Navigna Game"
 
 	def execute(self, context):
 		scene = context.scene
@@ -93,6 +102,7 @@ class ExportMeshNavigna(bpy.types.Operator):
 		objs = context.selected_objects
 		for o in objs:
 			data = o.to_mesh(scene,True,'PREVIEW')
+			self.report({'INFO'},'Exporting ' + o.name + '.wire in ' + export_path + ' directory.')
 			export_mesh(o, data)
 			read_file(o,data)
 		self.report({'INFO'}, "Done.")

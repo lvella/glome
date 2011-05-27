@@ -14,19 +14,6 @@ using namespace std;
 
 static int dlist;
 
-static void vertex_conv(const float *in, float scale, float *out)
-{
-  float x = in[0] * scale;
-  float y = in[1] * scale;
-  float z = in[2] * scale;
-  float d = 1 + x*x + y*y + z*z;
-
-  out[0] = 2*x/d;
-  out[1] = 2*y/d;
-  out[2] = 2*z/d;
-  out[3] = (-1 + x*x + y*y + z*z) / d;
-}
-
 void Ship::initialize()
 {
   int ret;
@@ -37,28 +24,21 @@ void Ship::initialize()
   uint16_t vlen;
 
   // Load file
-  fd = fopen("hunter.wire", "rb");
+  fd = fopen("Hunter0.wire", "rb");
 
   {
-    // Reading 3-D coordinates
+    // Reading 4-D coordinates
     ret = fread(&vlen, sizeof(vlen), 1, fd);
     assert(ret == 1);
-
-    float *vdata3 = new float[vlen * 3];
-    ret = fread(vdata3, sizeof(float) * 3, vlen, fd); 
-    assert(ret == vlen);
 
     // Create vertex buffer
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vlen * 4 * sizeof(float), NULL, GL_STATIC_DRAW);
-    float *vdata4 = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-    // Convert to 4-D coordinates and fill the buffer
-    for(int i = 0; i < vlen; ++i) {
-      vertex_conv(&vdata3[i * 3], 0.0005f, &vdata4[i * 4]);
-    }
+    float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
+		ret = fread(vdata, sizeof(float) * 4, vlen, fd); 
+		assert(ret == vlen);
     glUnmapBuffer(GL_ARRAY_BUFFER);
-    delete vdata3;
   }
 
   {
