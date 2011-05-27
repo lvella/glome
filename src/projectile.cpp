@@ -1,8 +1,33 @@
-#include <cmath>
+#include <math.h>
 #include <deque>
 #include "projectile.hpp"
 
 static std::deque<Projectile> shots;
+
+static void
+create_spherical_texture(int size, GLuint& tex)
+{
+  unsigned char* buffer = new unsigned char(size * size);
+  float r = (float)size / 2.0;
+
+  for(int i = 0; i < size; ++i)
+  {
+    for(int j = 0; j < size; ++j)
+    {
+      float d = hypotf(i - r, j - r);
+      buffer[(i * size) + j] = d > r ? 0u : (unsigned char)nearbyint(sqrtf(r*r - d*d) / r * 255.0);
+    }
+  }
+
+  glGenTextures(1, &tex);
+  glBindTexture(GL_TEXTURE_2D, tex);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, size, size, 0,
+  GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
+  delete buffer;
+}
 
 void Projectile::shot(const Matrix4& from, const Matrix4& speed)
 {

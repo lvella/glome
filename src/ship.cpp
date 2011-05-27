@@ -82,7 +82,7 @@ void Ship::initialize()
   // Create the display list
   dlist = glGenLists (1);
   glNewList(dlist, GL_COMPILE);
-  glColor3ub(255, 255, 255);
+  glColor3ub(80, 80, 80);
   glVertexPointer(4, GL_FLOAT, 0, NULL);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -98,7 +98,7 @@ Ship::Ship():
     speed_v(0.0f),
     speed_h(0.0f),
     speed_s(0.0f),
-    sps(7),
+    sps(15),
     shot_count(0),
     r_canon(yw_matrix(-0.01) * xw_matrix(0.01)),
     l_canon(yw_matrix(-0.01) * xw_matrix(-0.01))
