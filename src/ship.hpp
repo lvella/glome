@@ -76,5 +76,7 @@ private:
   bool sh;
   int sps;
   int shot_count;
+
+  Matrix4 r_canon, l_canon;
 };
 
