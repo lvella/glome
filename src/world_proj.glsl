@@ -5,5 +5,6 @@ void main()
   tmp.w = 1.0;
   gl_Position = gl_ProjectionMatrix * tmp;
   gl_FrontColor = gl_Color;
-  gl_FogFragCoord = length(gl_Position);
+  gl_TexCoord[0] = gl_MultiTexCoord0;
+  gl_FogFragCoord = gl_Position.z;
 }

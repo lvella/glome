@@ -58,13 +58,11 @@ void Projectile::update_all()
 void Projectile::draw_all()
 {
   if(shots.size() != 0) {
-    glDisable(GL_TEXTURE_2D);
+    glEnable(GL_TEXTURE_2D);
     glUseProgram(program_bullet);
     glBindTexture(GL_TEXTURE_2D, texture);
     for(unsigned int i = 0; i < shots.size(); ++i)
       shots[i].draw();
-    glUseProgram(0);
-    glBindTexture(GL_TEXTURE_2D, 0);
     glDisable(GL_TEXTURE_2D);
   }
 }
@@ -88,17 +86,22 @@ Projectile::Projectile(const Matrix4& from, const Matrix4& speed):
 
 void Projectile::draw()
 {
-  const float a = 0.0025;
-  const float w = -std::sqrt(1 - (a*a));
-
   glPushMatrix();
   t.multToGL();
-  glColor3ub(255, 255, 255);
   glBegin(GL_QUADS);
+
+  glColor3ub(255, 200, 150);
   glVertex2i(1, 1);
+
+  glColor3ub(150, 255, 150);
   glVertex2i(-1, 1);
+
+  glColor3ub(130, 100, 250);
   glVertex2i(-1, -1);
+
+  glColor3ub(255, 150, 150);
   glVertex2i(1, -1);
+
   glEnd();
   glPopMatrix();
 }

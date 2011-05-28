@@ -6,3 +6,7 @@ Main topics:
 - Improve ship file format and exporter
 - Create space objects (asteroids, stars, etc)
 - To model more ships
+
+Visual:
+- Make the colors of the shots random and moving
+- Shots as elipsoids

@@ -91,6 +91,7 @@ void draw()
 
   cube.draw();
   Projectile::draw_all();
+  glUseProgram(program);
   ship.draw();
   MiniMap::draw();
 
