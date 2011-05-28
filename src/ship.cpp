@@ -25,7 +25,7 @@ void Ship::initialize()
 
   // Load file
   fd = fopen("Hunter0.wire", "rb");
-
+	assert(fd != NULL);
   {
     // Reading 4-D coordinates
     ret = fread(&vlen, sizeof(vlen), 1, fd);

@@ -18,6 +18,7 @@
 #include "randomcube.hpp"
 #include "shader.hpp"
 #include "drawable.hpp"
+#include "init_gl.hpp"
 
 using namespace std;
 
@@ -155,15 +156,7 @@ int main(int argc, char **argv)
   SDL_WM_SetCaption("Navigna", NULL);
   //SDL_ShowCursor(SDL_DISABLE);
 
-  // Using GLEW to get the OpenGL functions
-  {
-    GLenum err = glewInit();
-    if(err != GLEW_OK) {
-      cerr << "Unable to initialize GLEW:\n"
-	   << glewGetErrorString(err) << endl;
-      return 1;
-    }
-  }
+  init_gl();
 
   // OpenGL nonchanging settings
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
