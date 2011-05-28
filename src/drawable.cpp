@@ -6,7 +6,7 @@
 #include "drawable.hpp"
 
 static std::list<Drawable*> drawable_objs;
-static GLuint tex_object;
+extern GLuint tex_object;
 
 void
 Drawable::draw_in_minimap()

@@ -21,7 +21,8 @@ extern std::deque<Matrix4> cam_hist;
 extern Ship ship;
 extern RandomCube* cube;
 
-static GLuint tex_minimap, tex_object, program_map, program;
+static GLuint tex_minimap, program_map;
+GLuint tex_object;
 static GLint proj_only_uniform;
 
 void
