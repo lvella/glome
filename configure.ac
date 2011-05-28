@@ -19,7 +19,7 @@ PKG_CHECK_MODULES([GLEW],[glew >= 1.5])
 # Check for SDL
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
-AM_PATH_SDL(1.2.14, :, AC_MSG_ERROR(SDL not found. Make sure sdl-config is in your PATH, or specify with --with-sdl-prefix))
+AM_PATH_SDL(1.2.11, :, AC_MSG_ERROR(SDL not found. Make sure sdl-config is in your PATH, or specify with --with-sdl-prefix))
 AC_LANG_RESTORE
 
 AC_CONFIG_FILES([
