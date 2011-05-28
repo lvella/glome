@@ -198,6 +198,7 @@ int main(int argc, char **argv)
   initialize_vars();
   MiniMap::initialize();
   Ship::initialize();
+  Projectile::initialize();
 
   main_loop();
 

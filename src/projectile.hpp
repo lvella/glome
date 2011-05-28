@@ -6,6 +6,7 @@
 class Projectile: public Object
 {
 public:
+  static void initialize();
   static void shot(const Matrix4& from, const Matrix4& speed);
   static void draw_all();
   static void draw_in_minimap();

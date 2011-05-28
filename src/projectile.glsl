@@ -1,15 +1,30 @@
+void proj(inout vec4 v)
+{
+  v = gl_ModelViewMatrix * v;
+  v = vec4(v.xyz / (1.0 - v.w), 1.0);
+}
+
 void main()
 {
-  float z = 0.005 * gl_Vertex.y;
-  vec4 vert = vec4(0.0, 0.0, z, -sqrt(1.0 - z));
+  vec4 zero = vec4(0.0, 0.0, 0.0, -1.0);
 
-  vert = gl_ModelViewMatrix * vert;
-  vert = vec4(vert.xyz / (1.0 - vert.w), 1.0);
+  float x = 0.002 * gl_Vertex.x;
+  vec4 side = vec4(x, 0.0, 0.0, -sqrt(1.0 - x*x));
+
+  float z = 0.005 * gl_Vertex.y;
+  vec4 front = vec4(0.0, 0.0, z, -sqrt(1.0 - z*z));
+
+  proj(zero);
+  proj(side);
+  proj(front);
+
+  float side_len = length(side);
+  side = vec4(normalize(cross(front.xyz, zero.xyz)) * side_len, 0.0);
+  front = front + side;
 
   gl_TexCoord[0] = gl_MultiTexCoord0;
-    gl_TexCoord[0].st = (gl_Vertex.xy + 1.0) * 0.5;
-    vert.xy = vert.xy + gl_Vertex.xy * 0.05;
+  gl_TexCoord[0].st = (gl_Vertex.xy + 1.0) * 0.5;
 
-  gl_FrontColor = pale_color + (gl_Color - pale_color) * (vert.z + 1.0) * 0.5;
-  gl_Position = gl_ProjectionMatrix * vert;
+  gl_FrontColor = gl_Color;
+  gl_Position = gl_ProjectionMatrix * front;
 }

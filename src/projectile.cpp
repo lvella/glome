@@ -1,5 +1,7 @@
 #include <math.h>
 #include <deque>
+#include "shader.hpp"
+
 #include "projectile.hpp"
 
 static std::deque<Projectile> shots;
@@ -7,7 +9,7 @@ static std::deque<Projectile> shots;
 static void
 create_spherical_texture(int size, GLuint& tex)
 {
-  unsigned char* buffer = new unsigned char(size * size);
+  unsigned char* buffer = (unsigned char *) malloc(size * size);
   float r = (float)size / 2.0;
 
   for(int i = 0; i < size; ++i)
@@ -26,7 +28,17 @@ create_spherical_texture(int size, GLuint& tex)
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  delete buffer;
+  free(buffer);
+}
+
+static GLuint texture, program_bullet;
+
+void Projectile::initialize()
+{
+  create_spherical_texture(64, texture);
+
+#include "projectile.glsl.hpp"
+  program_bullet = setup_vshader(projectile_glsl, projectile_glsl_len);
 }
 
 void Projectile::shot(const Matrix4& from, const Matrix4& speed)
@@ -45,8 +57,16 @@ void Projectile::update_all()
 
 void Projectile::draw_all()
 {
-  for(unsigned int i = 0; i < shots.size(); ++i)
-    shots[i].draw();
+  if(shots.size() != 0) {
+    glDisable(GL_TEXTURE_2D);
+    glUseProgram(program_bullet);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    for(unsigned int i = 0; i < shots.size(); ++i)
+      shots[i].draw();
+    glUseProgram(0);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_TEXTURE_2D);
+  }
 }
 
 void Projectile::draw_in_minimap()
@@ -74,13 +94,11 @@ void Projectile::draw()
   glPushMatrix();
   t.multToGL();
   glColor3ub(255, 255, 255);
-  glBegin(GL_LINES);
-  glVertex4f(a, 0.0, 0.0, w);
-  glVertex4f(-a, 0.0, 0.0, w);
-  glVertex4f(0.0, a, 0.0, w);
-  glVertex4f(0.0, -a, 0.0, w);
-  glVertex4f(0.0, 0.0, a, w);
-  glVertex4f(0.0, 0.0, -a, w);
+  glBegin(GL_QUADS);
+  glVertex2i(1, 1);
+  glVertex2i(-1, 1);
+  glVertex2i(-1, -1);
+  glVertex2i(1, -1);
   glEnd();
   glPopMatrix();
 }
