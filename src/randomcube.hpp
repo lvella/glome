@@ -1,5 +1,5 @@
 #pragma once
-#include <iostream>
+
 #include <stdlib.h>
 #include <math.h>
 #include "object.hpp"

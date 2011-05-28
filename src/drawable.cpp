@@ -6,6 +6,29 @@
 #include "drawable.hpp"
 
 static std::list<Drawable*> drawable_objs;
+static GLuint tex_object;
+
+void
+Drawable::draw_in_minimap()
+{
+  std::list<Drawable*>::iterator it = drawable_objs.begin();
+  for(; it != drawable_objs.end(); ++it)
+  {
+    glPushMatrix();
+    (*it)->transformation().multToGL();
+
+    glBindTexture(GL_TEXTURE_2D, tex_object);
+    glColor3ub(255, 0, 0);
+    glBegin(GL_QUADS);
+    glVertex2i(-1, -1);
+    glVertex2i(1, -1);
+    glVertex2i(1, 1);
+    glVertex2i(-1, 1);
+    glEnd();
+    glPopMatrix();
+    glBindTexture(GL_TEXTURE_2D, 0);
+  }
+}  
 
 Drawable*
 Drawable::create_ship()

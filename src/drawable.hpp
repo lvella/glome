@@ -12,6 +12,7 @@ public:
   virtual bool dead() { return false; }
   static void update_all();
   static void draw_all();
+  static void draw_in_minimap();
   static Drawable* create_ship();
   static Drawable* create_random_cube();
 };

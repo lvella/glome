@@ -34,6 +34,7 @@ double z[360];
 std::deque<Matrix4> cam_hist(10, Matrix4::IDENTITY);
 
 Ship ship;
+Ship* ship2;
 Input input(&ship);
 RandomCube* cube;
 
@@ -204,6 +205,7 @@ int main(int argc, char **argv)
   ship.initialize();
   Projectile::initialize();
   cube = (RandomCube*)Drawable::create_random_cube();
+  ship2 = (Ship*)Drawable::create_ship();
 
   main_loop();
 

@@ -10,6 +10,7 @@
 #include "randomcube.hpp"
 #include "ship.hpp"
 #include "shader.hpp"
+#include "drawable.hpp"
 
 #include "minimap.hpp"
 
@@ -135,19 +136,7 @@ MiniMap::draw()
 
   // Draw cube object
   glUniform1i(proj_only_uniform, 0);
-  glPushMatrix();
-  cube->transformation().multToGL();
-
-  glBindTexture(GL_TEXTURE_2D, tex_object);
-  glColor3ub(255, 0, 0);
-  glBegin(GL_QUADS);
-  glVertex2i(-1, -1);
-  glVertex2i(1, -1);
-  glVertex2i(1, 1);
-  glVertex2i(-1, 1);
-  glEnd();
-  glPopMatrix();
-  glBindTexture(GL_TEXTURE_2D, 0);
+  Drawable::draw_in_minimap();
 
   // Disable 2D
   glDisable(GL_ALPHA_TEST);
