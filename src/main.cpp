@@ -17,6 +17,7 @@
 #include "projectile.hpp"
 #include "randomcube.hpp"
 #include "shader.hpp"
+#include "drawable.hpp"
 
 using namespace std;
 
@@ -34,7 +35,7 @@ std::deque<Matrix4> cam_hist(10, Matrix4::IDENTITY);
 
 Ship ship;
 Input input(&ship);
-RandomCube cube;
+RandomCube* cube;
 
 static GLuint program;
 
@@ -89,7 +90,8 @@ void draw()
   glColor3f(.0f, 1.0f, 1.0f);
   draw_meridian(z, s, c, z);
 
-  cube.draw();
+  //cube.draw();
+  Drawable::draw_all();
   Projectile::draw_all();
   glUseProgram(program);
   ship.draw();
@@ -101,7 +103,8 @@ void draw()
 void update()
 {
   ship.update();
-  cube.update();
+  //cube.update();
+  Drawable::update_all();
   Projectile::update_all();
 }
 
@@ -198,8 +201,9 @@ int main(int argc, char **argv)
   initialize_shader();
   initialize_vars();
   MiniMap::initialize();
-  Ship::initialize();
+  ship.initialize();
   Projectile::initialize();
+  cube = (RandomCube*)Drawable::create_random_cube();
 
   main_loop();
 

@@ -1,11 +1,11 @@
 #pragma once
 
-#include "object.hpp"
+#include "drawable.hpp"
 
-class Ship: public Object
+class Ship: public Drawable
 {
 public:
-  static void initialize();
+  void initialize();
 
   Ship();
   void draw();
@@ -76,6 +76,9 @@ private:
   bool sh;
   int sps;
   int shot_count;
+
+  unsigned int id;
+  static unsigned int next_id;
 
   Matrix4 r_canon, l_canon;
 };

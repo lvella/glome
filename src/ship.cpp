@@ -23,6 +23,8 @@ void Ship::initialize()
   uint16_t ilen;
   uint16_t vlen;
 
+  id = next_id++;
+
   // Load file
   fd = fopen("Hunter0.wire", "rb");
 
@@ -32,7 +34,7 @@ void Ship::initialize()
     assert(ret == 1);
 
     // Create vertex buffer
-    glGenBuffers(1, &vbo);
+    glGenBuffers(id, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vlen * 4 * sizeof(float), NULL, GL_STATIC_DRAW);
     float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
@@ -46,7 +48,7 @@ void Ship::initialize()
     assert(ret == 1);
 
     // Create index buffer
-    glGenBuffers(1, &ibo);
+    glGenBuffers(id, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, ilen * sizeof(uint16_t) * 2, NULL, GL_STATIC_DRAW);
     uint16_t *idata = (uint16_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
@@ -60,7 +62,7 @@ void Ship::initialize()
   fclose(fd);
 
   // Create the display list
-  dlist = glGenLists (1);
+  dlist = glGenLists (id);
   glNewList(dlist, GL_COMPILE);
   glColor3ub(80, 80, 80);
   glVertexPointer(4, GL_FLOAT, 0, NULL);
@@ -71,7 +73,7 @@ void Ship::initialize()
 }
 
 Ship::Ship():
-    Object(Matrix4::IDENTITY),
+    Drawable(Matrix4::IDENTITY),
     v_tilt(0.0f),
     h_tilt(0.0f),
     speed(0.0f),
@@ -190,3 +192,5 @@ Ship::handle_commands(bool k0, bool k1, float& speed, float& accel, float max_ac
     }
   }
 }
+
+unsigned int Ship::next_id = 1;

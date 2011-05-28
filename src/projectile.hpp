@@ -1,9 +1,9 @@
 #pragma once
 
 #include "matrix4.hpp"
-#include "object.hpp"
+#include "drawable.hpp"
 
-class Projectile: public Object
+class Projectile: public Drawable
 {
 public:
   static void initialize();

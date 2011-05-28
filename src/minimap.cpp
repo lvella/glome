@@ -18,7 +18,7 @@ using namespace std;
 extern GLuint tex_ship;
 extern std::deque<Matrix4> cam_hist;
 extern Ship ship;
-extern RandomCube cube;
+extern RandomCube* cube;
 
 static GLuint tex_minimap, tex_object, program_map, program;
 static GLint proj_only_uniform;
@@ -136,7 +136,7 @@ MiniMap::draw()
   // Draw cube object
   glUniform1i(proj_only_uniform, 0);
   glPushMatrix();
-  cube.transformation().multToGL();
+  cube->transformation().multToGL();
 
   glBindTexture(GL_TEXTURE_2D, tex_object);
   glColor3ub(255, 0, 0);
