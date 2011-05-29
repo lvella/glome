@@ -103,7 +103,6 @@ MiniMap::draw()
 
   // Draw objects
   glUseProgram(program_map);
-  glEnable(GL_ALPHA_TEST);
   (yz_matrix(M_PI / 2) * cam_hist.back()).loadToGL();
 
   // Draw shots
@@ -150,7 +149,6 @@ MiniMap::draw()
   glBindTexture(GL_TEXTURE_2D, 0);
 
   // Disable 2D
-  glDisable(GL_ALPHA_TEST);
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_FOG);
   glMatrixMode(GL_PROJECTION);

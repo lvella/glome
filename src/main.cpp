@@ -167,6 +167,7 @@ int main(int argc, char **argv)
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_LINE_SMOOTH);
   glEnable(GL_BLEND);
+  glEnable(GL_ALPHA_TEST);
   glEnableClientState(GL_VERTEX_ARRAY);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
   glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
