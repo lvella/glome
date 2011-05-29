@@ -1,11 +1,11 @@
 #pragma once
 
-#include "object.hpp"
+#include "drawable.hpp"
 
-class Ship: public Object
+class Ship: public Drawable
 {
 public:
-  static void initialize();
+  void initialize();
 
   Ship();
   void draw();

@@ -6,8 +6,9 @@
 #include "4dmath.hpp"
 #include "vector4.hpp"
 #include "ship.hpp"
+#include "drawable.hpp"
 
-class RandomCube: public Object
+class RandomCube: public Drawable
 {
 public:
   RandomCube()

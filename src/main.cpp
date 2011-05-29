@@ -17,6 +17,8 @@
 #include "projectile.hpp"
 #include "randomcube.hpp"
 #include "shader.hpp"
+#include "drawable.hpp"
+#include "init_gl.hpp"
 
 using namespace std;
 
@@ -33,8 +35,9 @@ double z[360];
 std::deque<Matrix4> cam_hist(10, Matrix4::IDENTITY);
 
 Ship ship;
+Ship* ship2;
 Input input(&ship);
-RandomCube cube;
+RandomCube* cube;
 
 static GLuint program;
 
@@ -89,7 +92,8 @@ void draw()
   glColor3f(.0f, 1.0f, 1.0f);
   draw_meridian(z, s, c, z);
 
-  cube.draw();
+  //cube.draw();
+  Drawable::draw_all();
   Projectile::draw_all();
   glUseProgram(program);
   ship.draw();
@@ -100,7 +104,7 @@ void draw()
 
 void update()
 {
-  cube.update();
+  Drawable::update_all();
   Projectile::update_all();
   ship.update();
 }
@@ -151,15 +155,7 @@ int main(int argc, char **argv)
   SDL_WM_SetCaption("Navigna", NULL);
   //SDL_ShowCursor(SDL_DISABLE);
 
-  // Using GLEW to get the OpenGL functions
-  {
-    GLenum err = glewInit();
-    if(err != GLEW_OK) {
-      cerr << "Unable to initialize GLEW:\n"
-	   << glewGetErrorString(err) << endl;
-      return 1;
-    }
-  }
+  init_gl();
 
   // OpenGL nonchanging settings
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
@@ -199,8 +195,10 @@ int main(int argc, char **argv)
   initialize_shader();
   initialize_vars();
   MiniMap::initialize();
-  Ship::initialize();
+  ship.initialize();
   Projectile::initialize();
+  cube = (RandomCube*)Drawable::create_random_cube();
+  ship2 = (Ship*)Drawable::create_ship();
 
   main_loop();
 

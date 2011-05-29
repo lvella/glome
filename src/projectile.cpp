@@ -1,5 +1,6 @@
-#include <math.h>
+#include <cmath>
 #include <deque>
+
 #include "shader.hpp"
 #include "4dmath.hpp"
 
@@ -78,7 +79,7 @@ void Projectile::draw_in_minimap()
 }
 
 Projectile::Projectile(const Matrix4& from, float s):
-  Object(from),
+  Drawable(from),
   ds(zw_matrix(-s)),
   ttl(0),
   max_ttl((2 * M_PI) / s)

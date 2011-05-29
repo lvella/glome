@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <GL/glew.h>
 #include <stdint.h>
-
+#include <iostream>
 #include "4dmath.hpp"
 #include "ship.hpp"
 #include "projectile.hpp"
@@ -25,7 +25,7 @@ void Ship::initialize()
 
   // Load file
   fd = fopen("Hunter0.wire", "rb");
-
+	assert(fd != NULL);
   {
     // Reading 4-D coordinates
     ret = fread(&vlen, sizeof(vlen), 1, fd);
@@ -60,7 +60,7 @@ void Ship::initialize()
   fclose(fd);
 
   // Create the display list
-  dlist = glGenLists (1);
+  dlist = glGenLists(1);
   glNewList(dlist, GL_COMPILE);
   glColor3ub(80, 80, 80);
   glVertexPointer(4, GL_FLOAT, 0, NULL);
@@ -71,7 +71,7 @@ void Ship::initialize()
 }
 
 Ship::Ship():
-    Object(Matrix4::IDENTITY),
+    Drawable(Matrix4::IDENTITY),
     v_tilt(0.0f),
     h_tilt(0.0f),
     speed(0.0f),
@@ -190,3 +190,4 @@ Ship::handle_commands(bool k0, bool k1, float& speed, float& accel, float max_ac
     }
   }
 }
+
