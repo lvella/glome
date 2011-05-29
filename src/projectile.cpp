@@ -1,6 +1,7 @@
 #include <math.h>
 #include <deque>
 #include "shader.hpp"
+#include "4dmath.hpp"
 
 #include "projectile.hpp"
 
@@ -41,7 +42,7 @@ void Projectile::initialize()
   program_bullet = setup_vshader(projectile_glsl, projectile_glsl_len);
 }
 
-void Projectile::shot(const Matrix4& from, const Matrix4& speed)
+void Projectile::shot(const Matrix4& from, float speed)
 {
   shots.push_back(Projectile(from, speed));
 }
@@ -76,11 +77,11 @@ void Projectile::draw_in_minimap()
   glEnd();
 }
 
-Projectile::Projectile(const Matrix4& from, const Matrix4& speed):
+Projectile::Projectile(const Matrix4& from, float s):
   Object(from),
-  ds(speed),
+  ds(zw_matrix(-s)),
   ttl(0),
-  max_ttl((2 * M_PI) / 0.05)
+  max_ttl((2 * M_PI) / s)
 {
 }
 

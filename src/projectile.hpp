@@ -7,13 +7,13 @@ class Projectile: public Object
 {
 public:
   static void initialize();
-  static void shot(const Matrix4& from, const Matrix4& speed);
+  static void shot(const Matrix4& from, float speed);
   static void draw_all();
   static void draw_in_minimap();
   static void update_all();
 
 private:
-  Projectile(const Matrix4& from, const Matrix4& speed);
+  Projectile(const Matrix4& from, float speed);
   void draw();
   void update();
   inline bool dead()

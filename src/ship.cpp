@@ -80,8 +80,8 @@ Ship::Ship():
     speed_s(0.0f),
     sps(15),
     shot_count(0),
-    r_canon(yw_matrix(-0.01) * xw_matrix(0.01)),
-    l_canon(yw_matrix(-0.01) * xw_matrix(-0.01))
+    r_canon(xw_matrix(0.005) * zw_matrix(-0.015)),
+    l_canon(xw_matrix(-0.005) * zw_matrix(-0.015))
 {}
 
 void Ship::draw()
@@ -138,7 +138,7 @@ void Ship::update()
   if(shot_count < 0) {
     if(sh) {
       static bool right = true;
-      Projectile::shot(t * (right ? r_canon : l_canon), zw_matrix(-0.05 + speed));
+      Projectile::shot(t * (right ? r_canon : l_canon), 0.02 - speed);
       shot_count += 60;
       right = !right;
     }

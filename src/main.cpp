@@ -100,9 +100,9 @@ void draw()
 
 void update()
 {
-  ship.update();
   cube.update();
   Projectile::update_all();
+  ship.update();
 }
 
 void main_loop()
