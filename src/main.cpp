@@ -9,6 +9,10 @@
 #include <GL/glew.h>
 #include <GL/glu.h>
 
+#include <boost/asio.hpp>
+#include <boost/bind.hpp>
+#include <boost/thread.hpp>
+
 #include "4dmath.hpp"
 #include "input.hpp"
 #include "matrix4.hpp"
@@ -19,8 +23,10 @@
 #include "shader.hpp"
 #include "drawable.hpp"
 #include "init_gl.hpp"
+#include "udp_server.hpp"
 
 using namespace std;
+using namespace boost::asio::ip;
 
 extern const int HEIGHT = 600;
 extern const int WIDTH = 800;
@@ -35,9 +41,18 @@ double z[360];
 std::deque<Matrix4> cam_hist(10, Matrix4::IDENTITY);
 
 Ship ship;
-Ship* ship2;
+//Ship* ship2;
 Input input(&ship);
 RandomCube* cube;
+boost::asio::io_service gIOService;
+udp_server* server;
+udp::socket* cl_socket;
+udp::endpoint* receiver_endpoint;
+bool isServer;
+bool isClient;
+string orig;
+string host;
+short port;
 
 static GLuint program;
 
@@ -107,6 +122,16 @@ void update()
   Drawable::update_all();
   Projectile::update_all();
   ship.update();
+
+  if(isServer)
+  {
+    server->update();
+  }
+  else if(isClient)
+  {
+    boost::array<float, 4> send_buf = {0.0, 0.0, 0.0, 0.0};
+    cl_socket->send_to(boost::asio::buffer(send_buf), *receiver_endpoint);
+  }
 }
 
 void main_loop()
@@ -197,8 +222,42 @@ int main(int argc, char **argv)
   MiniMap::initialize();
   ship.initialize();
   Projectile::initialize();
-  cube = (RandomCube*)Drawable::create_random_cube();
+  //cube = (RandomCube*)Drawable::create_random_cube();
   //ship2 = (Ship*)Drawable::create_ship();
+
+  // Configure network
+  if(argc == 1)
+  {
+    isServer = isClient = false;
+  }
+  else
+  {
+    if(argc == 4)
+    {
+      host = argv[2];
+      port = atoi(argv[3]);
+    }
+    else if(argc == 5)
+    {
+      orig = argv[2];
+      host = argv[3];
+      port = atoi(argv[4]);
+    }
+    isServer = (atoi(argv[1]) == 0);
+    isClient = !isServer;
+  }
+  if(isServer)
+  {
+    server = new udp_server(port);
+  }
+  else if(isClient)
+  {
+    receiver_endpoint = new udp::endpoint(udp::v4(), port);
+    receiver_endpoint->address(boost::asio::ip::address::from_string(host));
+
+    cl_socket = new udp::socket(gIOService);
+    cl_socket->open(udp::v4());
+  }
 
   main_loop();
 
