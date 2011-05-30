@@ -28,7 +28,7 @@ Drawable::draw_in_minimap()
     glPopMatrix();
     glBindTexture(GL_TEXTURE_2D, 0);
   }
-}  
+}
 
 Drawable*
 Drawable::create_ship()

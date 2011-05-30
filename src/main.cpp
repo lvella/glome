@@ -198,7 +198,7 @@ int main(int argc, char **argv)
   ship.initialize();
   Projectile::initialize();
   cube = (RandomCube*)Drawable::create_random_cube();
-  ship2 = (Ship*)Drawable::create_ship();
+  //ship2 = (Ship*)Drawable::create_ship();
 
   main_loop();
 
