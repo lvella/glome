@@ -3,6 +3,7 @@
 #include <GL/glew.h>
 
 #ifdef WIN32
+#include <windows.h>
 #include <GL/wglew.h>
 #else
 #include <GL/glxew.h>
@@ -24,8 +25,12 @@ void init_gl()
 
   if(! GLEW_VERSION_2_1)
   {
-    // TODO: use message box on windows...
-    cerr << "Navigna requires at least OpenGL 2.1" << endl;
+    const char *msg = "Navigna requires at least OpenGL 2.1";
+#ifdef WIN32
+    MessageBoxA(NULL, msg, NULL, MB_OK);
+#else
+    cerr << msg << endl;
+#endif
     exit(1);
   }
 
