@@ -32,23 +32,21 @@ MiniMap::draw()
   extern const int WIDTH;
   extern const float FOV;
 
-/*
   // Calculate field of vision
-  const int radius = 80;
-  const int t = 10;
-  const int b = t + (2 * radius);
+  const float radius = 75.0;
+  const int t = 160;
+  const int b = 10;
   const int l = 10;
-  const int r = l + (2 * radius);
+  const int r = 160;
 
-  const float cx = l + radius;
-  const float cy = t + radius;
+  const float cx = 0;
+  const float cy = 0;
 
   const float angle = asin(WIDTH * sin(FOV * M_PI / 360.0f) / HEIGHT);
   const float dx = (radius * sin(angle));
-  const float ppx0 = cx - dx;
-  const float ppy = cy - (radius * cos(angle));
-  const float ppx1 = cx + dx;
-*/
+  const float ppx0 = (cx - dx) / radius;
+  const float ppy = ((cy + (radius * cos(angle))) / radius) * 0.9;
+  const float ppx1 = (cx + dx) / radius;
 
   // Change to minimap display area/projection.
   glMatrixMode(GL_PROJECTION);
@@ -77,8 +75,8 @@ MiniMap::draw()
   glTexCoord2f(0, 1);
   glVertex2f(-1, 1);
   glEnd();
+  glBindTexture(GL_TEXTURE_2D, 0);
 
-/*
   // Draw field of vision
   glColor3ub(14, 164, 3);
   glBegin(GL_LINES);
@@ -87,7 +85,6 @@ MiniMap::draw()
   glVertex2f(ppx1, ppy);
   glVertex2f(cx, cy);
   glEnd();
-*/
 
   // Draw ship object
   glBindTexture(GL_TEXTURE_2D, 0);
@@ -110,7 +107,7 @@ MiniMap::draw()
   // Draw shots
   glUniform1i(proj_only_uniform, 1);
   Projectile::draw_in_minimap();
-
+/*
   // Draw meridians
   {
     extern double s[360];
@@ -133,7 +130,7 @@ MiniMap::draw()
     draw_meridian(z, s, c, z);
     glLineWidth(1.5f);
   }
-
+*/
   // Draw cube object
   glUniform1i(proj_only_uniform, 0);
   Drawable::draw_in_minimap();
