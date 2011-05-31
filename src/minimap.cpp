@@ -107,7 +107,7 @@ MiniMap::draw()
   // Draw shots
   glUniform1i(proj_only_uniform, 1);
   Projectile::draw_in_minimap();
-/*
+
   // Draw meridians
   {
     extern double s[360];
@@ -130,7 +130,7 @@ MiniMap::draw()
     draw_meridian(z, s, c, z);
     glLineWidth(1.5f);
   }
-*/
+
   // Draw cube object
   glUniform1i(proj_only_uniform, 0);
   Drawable::draw_in_minimap();

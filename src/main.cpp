@@ -5,6 +5,7 @@
 #include <cmath>
 #include <ctime>
 #include <deque>
+#include <vector>
 #include <SDL.h>
 #include <GL/glew.h>
 #include <GL/glu.h>
@@ -12,7 +13,6 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
-#include <vector>
 
 #include "4dmath.hpp"
 #include "input.hpp"

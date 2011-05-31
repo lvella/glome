@@ -23,10 +23,24 @@ void Ship::initialize()
   GLuint ibo;
   uint16_t ilen;
   uint16_t vlen;
+  uint16_t nguns;
 
   // Load file
   fd = fopen("Hunter0.wire", "rb");
-	assert(fd != NULL);
+  assert(fd != NULL);
+  {
+    // Reading Guns Matrix
+    ret = fread(&nguns, sizeof(nguns), 1, fd);
+    assert(ret == 1);
+    Real m2[4][4];
+    ret = fread(m2, sizeof(float), 16, fd);
+    assert (ret == 16);
+    r_canon.setm(m2);
+    ret = fread(m2, sizeof(float), 16, fd);
+    assert (ret == 16);
+    l_canon.setm(m2);
+  }
+
   {
     // Reading 4-D coordinates
     ret = fread(&vlen, sizeof(vlen), 1, fd);
@@ -37,8 +51,8 @@ void Ship::initialize()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vlen * 4 * sizeof(float), NULL, GL_STATIC_DRAW);
     float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-		ret = fread(vdata, sizeof(float) * 4, vlen, fd); 
-		assert(ret == vlen);
+    ret = fread(vdata, sizeof(float) * 4, vlen, fd); 
+    assert(ret == vlen);
     glUnmapBuffer(GL_ARRAY_BUFFER);
   }
 
@@ -81,9 +95,9 @@ Ship::Ship():
     speed_s(0.0f),
     sps(15),
     shot_count(0),
-    q(false),
-    r_canon(xw_matrix(0.005) * zw_matrix(-0.015)),
-    l_canon(xw_matrix(-0.005) * zw_matrix(-0.015))
+    q(false)
+//    r_canon(xw_matrix(0.005) * zw_matrix(-0.015)),
+//    l_canon(xw_matrix(-0.005) * zw_matrix(-0.015))
 {
 }
 
