@@ -11,6 +11,9 @@ Navigate through the surface of a hypersphere and kill your enemies.
   libboost-thread-dev >= 1.42
   libboost-system-dev >= 1.42
 
+* Optional packages:
+  Doxygen
+
 * Generate configuration files:
   $ autoreconf
   [ $ automake --add-missing ] (if necessary)
@@ -25,6 +28,9 @@ Navigate through the surface of a hypersphere and kill your enemies.
 * Compile:
   $ ./configure
   $ make
+
+* Generate documentation:
+  $ make doxygen-doc
 
 * Play:
   $ cd src

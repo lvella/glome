@@ -21,7 +21,7 @@ DX_RTF_FEATURE(OFF)
 DX_XML_FEATURE(OFF)
 DX_PDF_FEATURE(OFF)
 DX_PS_FEATURE(OFF)
-DX_INIT_DOXYGEN(Castaneum, Doxyfile.cfg, [docs])
+DX_INIT_DOXYGEN(Navigna, Doxyfile.cfg, [docs])
 
 m4_include([m4/ax_boost_base.m4])
 AX_BOOST_BASE([1.42],,AC_MSG_FAILURE())

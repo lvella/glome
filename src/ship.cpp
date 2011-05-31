@@ -26,19 +26,21 @@ void Ship::initialize()
   uint16_t nguns;
 
   // Load file
-  fd = fopen("Hunter0.wire", "rb");
+  fd = fopen("hunter.wire", "rb");
   assert(fd != NULL);
   {
     // Reading Guns Matrix
     ret = fread(&nguns, sizeof(nguns), 1, fd);
     assert(ret == 1);
+
     Real m2[4][4];
     ret = fread(m2, sizeof(float), 16, fd);
     assert (ret == 16);
-    r_canon.setm(m2);
+    l_canon.setm(m2);
+
     ret = fread(m2, sizeof(float), 16, fd);
     assert (ret == 16);
-    l_canon.setm(m2);
+    r_canon.setm(m2);
   }
 
   {
