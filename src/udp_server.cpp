@@ -55,17 +55,19 @@ udp_server::update()
       }
       cout << endl;
 */
+      boost::array<float, 16> send_buf;
+      Matrix4 t = cl->getShip()->transformation();
+      int i, j, k;
+      for(i = 0, k = 0; i < 4; ++i)
+        for(j = 0; j < 4; ++j, ++k)
+          send_buf[k] = t[i][j];
+
+      boost::system::error_code ignored_error;
+      socket.send_to(boost::asio::buffer(send_buf),
+                     remote_endpoint,
+                     0,
+                     ignored_error);
     }
-
-    // Process what to send back..
-
-/*
-    boost::system::error_code ignored_error;
-    socket.send_to(boost::asio::buffer(message),
-                   remote_endpoint,
-                   boost::asio::transfer_all(),
-                   ignored_error);
-*/
   }
   while(bytes != 0);
 }
