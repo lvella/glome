@@ -307,7 +307,7 @@ public:
   Vector4 position() const {
     return Vector4(-m[0][3], -m[1][3], -m[2][3], -m[3][3]);
   }
-		
+
   Matrix4 adjoint() const;
   Real determinant() const;
   Matrix4 inverse() const;

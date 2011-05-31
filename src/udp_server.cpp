@@ -16,7 +16,7 @@ extern std::list<Drawable*> drawable_objs;
 void
 udp_server::update()
 {
-  boost::array<float, 4> recv_buf;
+  boost::array<int, 1024> recv_buf;
   udp::endpoint remote_endpoint;
   boost::system::error_code error;
   unsigned int bytes;
@@ -29,9 +29,9 @@ udp_server::update()
                       remote_endpoint,
                       0,
                       error);
-    if(bytes < 25)
+    if(bytes == 0)
     {
-      cout << "Received " << bytes << " bytes." << endl;
+      ;//cout << "Received " << bytes << " bytes." << endl;
     }
     else
     {
@@ -41,16 +41,20 @@ udp_server::update()
       {
         cl = new Client();
         cl_map[addr] = cl;
-        drawable_objs.push_front(cl->getShip());
       }
       else
         cl = it->second;
 
-      //cout << "Received from " << addr << ": ";
-      //for(unsigned int i = 0; i < recv_buf.size(); ++i)
-      //  cout << recv_buf[i] << ' ';
-      //cout << endl;
-
+      cl->parseMessage(recv_buf, bytes);
+/*
+      cout << "Received " << bytes << " bytes from " << addr << ": ";
+      int nums = bytes / sizeof(int);
+      for(int i = 0; i < nums; ++i)
+      {
+        cout << recv_buf[i] << ' ';
+      }
+      cout << endl;
+*/
     }
 
     // Process what to send back..

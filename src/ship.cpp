@@ -9,6 +9,7 @@
 #include "4dmath.hpp"
 #include "ship.hpp"
 #include "projectile.hpp"
+#include "protocol.hpp"
 
 using namespace std;
 
@@ -80,9 +81,11 @@ Ship::Ship():
     speed_s(0.0f),
     sps(15),
     shot_count(0),
+    q(false),
     r_canon(xw_matrix(0.005) * zw_matrix(-0.015)),
     l_canon(xw_matrix(-0.005) * zw_matrix(-0.015))
-{}
+{
+}
 
 void Ship::draw()
 {
@@ -158,6 +161,16 @@ Ship::accelerate(float& speed, float& accel, float max)
   else if(speed < -max)
     speed = -max;
 }
+
+/*
+const char *
+Ship::make_message()
+{
+  string ret = message;
+  message = "";
+  return ret.c_str();
+}
+*/
 
 void
 Ship::handle_commands(bool k0, bool k1, float& speed, float& accel, float max_accel)

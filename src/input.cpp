@@ -26,6 +26,7 @@ Input::handle(bool& r)
     {
       case SDL_QUIT:
         r = false;
+        ship->quit();
         break;
       case SDL_MOUSEMOTION:
         mouse_motion(e.motion.x, e.motion.y);
@@ -50,7 +51,10 @@ Input::key_event(SDL_Event e)
   {
   case SDLK_ESCAPE:
     if(e.type == SDL_KEYDOWN)
+    {
       exit(0);
+      ship->quit();
+    }
   case SDLK_SPACE:
     if(e.type == SDL_KEYDOWN)
       ship->shot(true);
@@ -99,6 +103,7 @@ Input::key_event(SDL_Event e)
 void
 Input::mouse_motion(int x, int y)
 {
+  ship->motion(x, y);
   x -= WIDTH / 2;
   y -= HEIGHT / 2;
 
@@ -110,13 +115,16 @@ Input::mouse_button(int button, int state)
 {
   float accel;
 
+  bool a = (state == SDL_PRESSED);
   if(button == SDL_BUTTON_LEFT)
   {
-    accel = (state == SDL_PRESSED) ? -0.00002 : 0.0;
+    accel = a ? -0.00002 : 0.0;
+    ship->move_forward(a);
   }
   else if(button == SDL_BUTTON_RIGHT)
   {
-    accel = (state == SDL_PRESSED) ? 0.00002 : 0.0;
+    accel = a ? 0.00002 : 0.0;
+    ship->move_backward(a);
   }
   else
     return;

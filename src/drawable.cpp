@@ -5,7 +5,9 @@
 
 #include "drawable.hpp"
 #include <iostream>
+
 using namespace std;
+
 std::list<Drawable*> drawable_objs;
 extern GLuint tex_object;
 
@@ -68,7 +70,7 @@ Drawable::draw_all()
   for(; it != drawable_objs.end(); ++it)
   {
     Matrix4 t = ((Ship*)(*it))->transformation();
-    cout << "Drawing pos (" << t[0][3] << ',' << t[1][3] << ',' << t[2][3] << ',' << t[3][3] << endl;
+    //cout << "Drawing pos (" << t[0][3] << ',' << t[1][3] << ',' << t[2][3] << ',' << t[3][3] << ')' << endl;
     (*it)->draw();
   }
 }

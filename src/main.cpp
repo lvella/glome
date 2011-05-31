@@ -12,6 +12,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/thread.hpp>
+#include <vector>
 
 #include "4dmath.hpp"
 #include "input.hpp"
@@ -77,9 +78,9 @@ void draw_meridian(const double *a, const double *b, const double *c, const doub
 {
   glBegin(GL_LINES);
   for(int i = 0; i < 360; ++i)
-    {
-      glVertex4d(a[i], b[i], c[i], d[i]);
-    }
+  {
+    glVertex4d(a[i], b[i], c[i], d[i]);
+  }
   glEnd();
 }
 
@@ -129,8 +130,13 @@ void update()
   }
   else if(isClient)
   {
-    boost::array<float, 4> send_buf = {0.0, 0.0, 0.0, 0.0};
-    cl_socket->send_to(boost::asio::buffer(send_buf), *receiver_endpoint);
+    const vector<int>& v = ship.getMessage();
+    if(v.size() > 0)
+    {
+      int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
+      //cout << "Size: " << v.size() << " | RE: " << re << endl;
+      ship.clearMessage();
+    }
   }
 }
 
@@ -222,7 +228,7 @@ int main(int argc, char **argv)
   MiniMap::initialize();
   ship.initialize();
   Projectile::initialize();
-  //cube = (RandomCube*)Drawable::create_random_cube();
+  cube = (RandomCube*)Drawable::create_random_cube();
   //ship2 = (Ship*)Drawable::create_ship();
 
   // Configure network
