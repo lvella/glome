@@ -1,4 +1,4 @@
-AC_PREREQ([2.63])
+AC_PREREQ([2.60])
 
 AC_INIT([Navigna], [1.0], [support@fractal.com])
 
@@ -8,6 +8,24 @@ AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([-Wall -Werror])
 
 AC_PROG_CXX
+
+#http://www.gnu.org/software/autoconf-archive/ax_prog_doxygen.html
+m4_include([m4/ax_prog_doxygen.m4])
+DX_DOXYGEN_FEATURE(ON)
+DX_DOT_FEATURE(ON)
+DX_HTML_FEATURE(ON)
+DX_CHM_FEATURE(OFF)
+DX_CHI_FEATURE(OFF)
+DX_MAN_FEATURE(OFF)
+DX_RTF_FEATURE(OFF)
+DX_XML_FEATURE(OFF)
+DX_PDF_FEATURE(OFF)
+DX_PS_FEATURE(OFF)
+DX_INIT_DOXYGEN(Castaneum, Doxyfile.cfg, [docs])
+
+m4_include([m4/ax_boost_base.m4])
+AX_BOOST_BASE([1.42],,AC_MSG_FAILURE())
+
 
 #http://sources.redhat.com/automake/automake.html#Extending-aclocal
 # Check for OpenGL
