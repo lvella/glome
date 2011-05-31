@@ -1,17 +1,31 @@
 Navigate through the surface of a hypersphere and kill your enemies.
 
-legenda: [ item opcional ]
-*gerar arquivos de configuração:
-	$autoreconf
-	[ $automake --add-missing (caso seja necessário né) ]
-	[ $autoreconf (so se tiver rodado automake --add-missing) ]
-	$automake -a -c (gera os Makefiles)
+* Necessary packages (used in Debian 6 and Ubuntu 11.04):
+  build-essential
+  automake (This and below only if you do not have "configure" script generated)
+  autoconf
+  libgl1-mesa-dev
+  libglu1-mesa-dev
+  libglew1.5-dev
+  libsdl1.2-dev
+  libboost-thread-dev >= 1.42
+  libboost-system-dev >= 1.42
 
-*mudar/acrescentar alguma macro(m4):
-	$aclocal
-	-> gerar novamente arquivos de configuração
-	-> procedimento padrão
+* Generate configuration files:
+  $ autoreconf
+  [ $ automake --add-missing ] (if necessary)
+  [ $ autoreconf ] (if command above executed)
+  $ automake -a -c (generate Makefiles)
 
-*procedimento padrão para compilar:
-	$./configure
-	$make
+* To change some macro (m4):
+  $ aclocal
+  -> generate configuration files again
+  -> standard procedure
+
+* Compile:
+  $ ./configure
+  $ make
+
+* Play:
+  $ cd src
+  $ ./navigna
