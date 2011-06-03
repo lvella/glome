@@ -80,8 +80,8 @@ void Ship::initialize()
   dlist = glGenLists(1);
   glNewList(dlist, GL_COMPILE);
   glColor3ub(80, 80, 80);
-  glVertexPointer(4, GL_FLOAT, 0, NULL);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glVertexPointer(4, GL_FLOAT, 0, NULL);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
   glDrawRangeElements(GL_LINES, 0, vlen-1, ilen*2, GL_UNSIGNED_SHORT, NULL);
   glEndList();

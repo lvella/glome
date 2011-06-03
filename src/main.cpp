@@ -25,6 +25,7 @@
 #include "drawable.hpp"
 #include "init_gl.hpp"
 #include "udp_server.hpp"
+#include "meridian.hpp"
 
 using namespace std;
 using namespace boost::asio::ip;
@@ -57,31 +58,10 @@ short port;
 
 static GLuint program;
 
-void initialize_vars()
-{
-  for(int i = 0; i < 360; ++i)
-  {
-    double n = i * M_PI / 180;
-    c[i] = cos(n);
-    s[i] = sin(n);
-    z[i] = 0.0;
-  }
-}
-
 void initialize_shader()
 {
 #include "world_proj.glsl.hpp"
   program = setup_vshader(world_proj_glsl, world_proj_glsl_len);
-}
-
-void draw_meridian(const double *a, const double *b, const double *c, const double *d)
-{
-  glBegin(GL_LINES);
-  for(int i = 0; i < 360; ++i)
-  {
-    glVertex4d(a[i], b[i], c[i], d[i]);
-  }
-  glEnd();
 }
 
 void draw()
@@ -93,20 +73,9 @@ void draw()
   cam_hist.pop_front();
   cam_hist.push_back(ship.transformation().transpose());
 
-  glUseProgram(program);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glColor3f(.0f, .0f, 1.0f);
-  draw_meridian(z, z, s, c);
-  glColor3f(.0f, 1.f, .0f);
-  draw_meridian(z, s, z, c);
-  glColor3f(1.0f, .0f, .0f);
-  draw_meridian(s, z, z, c);
-  glColor3f(1.0f, 1.0f, .0f);
-  draw_meridian(s, c, z, z);
-  glColor3f(1.0f, .0f, 1.0f);
-  draw_meridian(s, z, c, z);
-  glColor3f(.0f, 1.0f, 1.0f);
-  draw_meridian(z, s, c, z);
+  glUseProgram(program);
+  draw_meridians();
 
   //cube.draw();
   Drawable::draw_all();
@@ -224,7 +193,7 @@ int main(int argc, char **argv)
 
   // 4D to 3D projection
   initialize_shader();
-  initialize_vars();
+  initialize_meridians();
   MiniMap::initialize();
   ship.initialize();
   Projectile::initialize();

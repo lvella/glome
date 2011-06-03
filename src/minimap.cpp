@@ -11,6 +11,7 @@
 #include "ship.hpp"
 #include "shader.hpp"
 #include "drawable.hpp"
+#include "meridian.hpp"
 
 #include "minimap.hpp"
 
@@ -108,28 +109,7 @@ MiniMap::draw()
   glUniform1i(proj_only_uniform, 1);
   Projectile::draw_in_minimap();
 
-  // Draw meridians
-  {
-    extern double s[360];
-    extern double c[360];
-    extern double z[360];
-    extern void draw_meridian(const double *a, const double *b, const double *c, const double *d);
-
-    glLineWidth(1.0f);
-    glColor3f(.0f, .0f, 1.0f);
-    draw_meridian(z, z, s, c);
-    glColor3f(.0f, 1.f, .0f);
-    draw_meridian(z, s, z, c);
-    glColor3f(1.0f, .0f, .0f);
-    draw_meridian(s, z, z, c);
-    glColor3f(1.0f, 1.0f, .0f);
-    draw_meridian(s, c, z, z);
-    glColor3f(1.0f, .0f, 1.0f);
-    draw_meridian(s, z, c, z);
-    glColor3f(.0f, 1.0f, 1.0f);
-    draw_meridian(z, s, c, z);
-    glLineWidth(1.5f);
-  }
+  draw_meridians();
 
   // Draw cube object
   glUniform1i(proj_only_uniform, 0);
