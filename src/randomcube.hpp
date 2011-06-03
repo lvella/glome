@@ -7,6 +7,8 @@
 #include "vector4.hpp"
 #include "ship.hpp"
 #include "drawable.hpp"
+#include "projectile.hpp"
+#include <deque>
 
 class RandomCube: public Drawable
 {
@@ -19,8 +21,11 @@ public:
   void update()
   {
     extern Ship ship;
-    if((t.position() - ship.transformation().position()).length() < 0.03)
+    extern std::deque<Projectile> shots;
+    for(unsigned int i = 0; i < shots.size(); ++i){
+    if((t.position() - shots[i].transformation().position()).squared_length() < 0.03*0.03)
       randomize();
+    }
   }
 
   void draw()

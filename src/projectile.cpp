@@ -6,7 +6,7 @@
 
 #include "projectile.hpp"
 
-static std::deque<Projectile> shots;
+std::deque<Projectile> shots;
 
 static void
 create_spherical_texture(int size, GLuint& tex)
