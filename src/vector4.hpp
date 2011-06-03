@@ -35,9 +35,14 @@ public:
     return v[elem];
   }
 
+  float squared_length()
+  {
+    return x*x + y*y + z*z + w*w;
+  }
+
   float length()
   {
-    return sqrt(x*x + y*y + z*z + w*w);
+    return sqrt(squared_length());
   }
 
   void loadVertex()

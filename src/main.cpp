@@ -91,20 +91,43 @@ void update()
 {
   Drawable::update_all();
   Projectile::update_all();
-  ship.update();
+  //ship.update();
 
   if(isServer)
   {
+    ship.update();
     server->update();
   }
   else if(isClient)
   {
-    const vector<int>& v = ship.getMessage();
+        const vector<int>& v = ship.getMessage();
     if(v.size() > 0)
     {
       int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
       //cout << "Size: " << v.size() << " | RE: " << re << endl;
       ship.clearMessage();
+
+      //cout << "Old matrix: " << endl;
+      //cout << ship.transformation() << endl;
+
+      boost::array<float, 16> recv_buf;
+      udp::endpoint sender_endpoint;
+      size_t len = cl_socket->receive_from(boost::asio::buffer(recv_buf), sender_endpoint);
+      if(len < (sizeof(float) * 16))
+        cout << "Error" << endl;
+      else
+      {
+        //cout << "Setando" << endl;
+        Matrix4 m;
+        int k;
+        for(int i = 0, k = 0; i < 4; ++i)
+          for(int j = 0; j < 4; ++j, ++k)
+            m[i][j] = recv_buf[k];
+        ship.set(m);
+      }
+
+      //cout << "New matrix: " << endl;
+      //cout << ship.transformation() << endl;
     }
   }
 }
