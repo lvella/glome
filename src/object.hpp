@@ -15,6 +15,11 @@ public:
     return t;
   }
 
+  void set(const Matrix4& ref)
+  {
+    t = ref;
+  }
+
 protected:
   Matrix4 t;
 };
