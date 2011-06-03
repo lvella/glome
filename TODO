@@ -1,3 +1,9 @@
+Build system:
+- Check for Glew in default locations, use pkg-config as fallback
+- Check for command xxd in system (build time dependency)
+- Use make to build .wire files from .blend
+  - Check for blender 1.5x in system (build time dependency)
+
 Main topics:
 - Collision
 - Physics
