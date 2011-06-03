@@ -32,7 +32,7 @@ AX_BOOST_BASE([1.42],,AC_MSG_FAILURE())
 AC_CHECK_OPENGL
 
 #check for libglew
-PKG_CHECK_MODULES([GLEW],[glew >= 1.5])
+#PKG_CHECK_MODULES([GLEW],[glew >= 1.5])
 
 # Check for SDL
 AC_LANG_SAVE

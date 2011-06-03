@@ -69,6 +69,29 @@ AC_SUBST(LIBGLX_CFLAGS)
 AC_SUBST(LIBGLX_LIBS)
 ])
 
+dnl AC_CHECK_GLEW([ACTION-IF-FOUND [, ACTION-IF-NOT-FOUND]])
+dnl
+AC_DEFUN(AC_CHECK_GLEW,
+[
+AC_CHECK_HEADER(GL/glew.h, have_glew=yes, have_glew=no)
+if test $have_glew = yes ; then
+  AC_CHECK_LIB(GLEW, glewInit,, have_glew=no)
+fi
+
+if test $have_glew = yes ; then
+  ifelse([$1], , :, [$1])
+  LIBGLEW_LIBS="-lGLEW"
+  LIBGLEW_CFLAGS=""
+else
+  ifelse([$2], , :, [$2])
+  LIBGLEW_LIBS=""
+  LIBGLEW_CFLAGS=""
+fi
+
+AC_SUBST(LIBGLEW_CFLAGS)
+AC_SUBST(LIBGLEW_LIBS)
+])
+
 
 # AC_CHECK_OPENGL
 #
@@ -76,7 +99,8 @@ AC_SUBST(LIBGLX_LIBS)
 
 AC_DEFUN(AC_CHECK_OPENGL,
 [
-AC_CHECK_GL( [AC_CHECK_GLU(have_opengl=yes)] )
+AC_CHECK_GL( [AC_CHECK_GLU(have_opengl=yes) AC_CHECK_GLEW(have_opengl=yes)] )
+
 
 if test "$have_opengl" = yes ; then
   OPENGL_CFLAGS="$LIBGL_CFLAGS $LIBGLU_CFLAGS"
