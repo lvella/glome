@@ -91,11 +91,11 @@ void update()
 {
   Drawable::update_all();
   Projectile::update_all();
-  //ship.update();
+  ship.update();
 
   if(isServer)
   {
-    ship.update();
+    //ship.update();
     server->update();
   }
   else if(isClient)
