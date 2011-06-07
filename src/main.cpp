@@ -195,14 +195,14 @@ int main(int argc, char **argv)
   glAlphaFunc(GL_NOTEQUAL, 0.0f);
 
   // Fancy OpenGL fog
-  glFogi(GL_FOG_MODE, GL_EXP);
   {
     const float fcolor[] = {0.0f, 0.0f, 0.0f, 1.0f};
     glFogfv(GL_FOG_COLOR, fcolor);
   }
-  glFogf(GL_FOG_DENSITY, 0.55f);
+  glFogi(GL_FOG_MODE, GL_EXP);
+  glFogf(GL_FOG_DENSITY, 0.9f);
   glHint(GL_FOG_HINT, GL_NICEST);
-  glFogf(GL_FOG_END, M_PI);
+  glFogf(GL_FOG_END, 3.0f);
   glFogf(GL_FOG_START, 2.0f);
   glEnable(GL_FOG);
 
