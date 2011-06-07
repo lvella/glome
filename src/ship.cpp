@@ -28,19 +28,17 @@ void Ship::initialize()
   // Load file
   fd = fopen("hunter.wire", "rb");
   assert(fd != NULL);
+
   {
     // Reading Guns Matrix
     ret = fread(&nguns, sizeof(nguns), 1, fd);
     assert(ret == 1);
 
-    Real m2[4][4];
-    ret = fread(m2, sizeof(float), 16, fd);
+    ret = fread(&l_canon[0][0], sizeof(float), 16, fd);
     assert (ret == 16);
-    l_canon.setm(m2);
 
-    ret = fread(m2, sizeof(float), 16, fd);
+    ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
     assert (ret == 16);
-    r_canon.setm(m2);
   }
 
   {
