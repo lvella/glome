@@ -59,26 +59,26 @@ def fill_matrix(l):
 def xw_matrix(angle):
   c = cos(angle)
   s = sin(angle)
-  return (c, 0, 0, -s,
+  return fill_matrix((c, 0, 0, -s,
     0, 1, 0, 0,
     0, 0, 1, 0,
-    s, 0, 0, c)
+    s, 0, 0, c))
 
 def yw_matrix(angle):
   c = cos(angle)
   s = sin(angle)
-  return (1, 0, 0, 0,
+  return fill_matrix((1, 0, 0, 0,
     0, c, 0, -s,
     0, 0, 1, 0,
-    0, s, 0, c)
+    0, s, 0, c))
 
 def zw_matrix(angle):
   c = cos(angle)
   s = sin(angle)
-  return (1, 0, 0, 0,
+  return fill_matrix((1, 0, 0, 0,
     0, 1, 0, 0,
     0, 0, c, -s,
-    0, 0, s, c)
+    0, 0, s, c))
 
 def vertex_conv(i, scale):
   'Convert 3-D to 4-D coordinates'
@@ -89,20 +89,14 @@ def vertex_conv(i, scale):
   return (2*x/d, 2*y/d, 2*z/d, (-1 + x*x + y*y + z*z)/d)
 
 def matrix_gen(v):
-  for i in range(0, len(v)):
-    v[i] /= scale
-  return fill_matrix(xw_matrix(v[0])) * fill_matrix(yw_matrix(v[1])) *  fill_matrix(zw_matrix(v[2]))
+  return xw_matrix(v[0] * scale) * yw_matrix(v[2] * scale) *  zw_matrix(v[1] * scale)
 
 def export(data):
   bfile = open(export_path + '/' + lobjs[0].name + '.wire', 'wb')
   #exporting guns
   bfile.write(struct.pack('<H', len(lguns)))
   for g in lguns:
-    v = []
-    v.append(g.location.x)
-    v.append(g.location.y)
-    v.append(g.location.z)
-    t = matrix_gen(v)
+    t = matrix_gen(g.location - lobjs[0].location)
     for i in range(0, 4):
       for j in range(0, 4):
         bfile.write(struct.pack('<f', t[i][j]))
