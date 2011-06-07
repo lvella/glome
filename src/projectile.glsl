@@ -8,10 +8,10 @@ void main()
 {
   vec4 origin = vec4(0.0, 0.0, 0.0, -1.0);
 
-  float z = 0.007 * gl_Vertex.y;
+  float z = 0.004 * gl_Vertex.y;
   vec4 front = vec4(0.0, 0.0, z, -sqrt(1.0 - z*z));
 
-  float x = 0.002 * gl_Vertex.x;
+  float x = 0.001 * gl_Vertex.x;
   vec4 side = vec4(x, 0.0, 0.0, -sqrt(1.0 - x*x));
 
   proj(origin);
