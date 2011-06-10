@@ -4,8 +4,8 @@
 
 using namespace std;
 
-const int HEIGHT = 600;
-const int WIDTH = 800;
+extern const int HEIGHT;
+extern const int WIDTH;
 
 KbInput::KbInput(Ship* s)
 {
