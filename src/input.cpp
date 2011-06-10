@@ -9,7 +9,7 @@ const int WIDTH = 800;
 
 Input::Input(Ship* s)
 {
-	ship = s;
+  ship = s;
 }
 
 Input::~Input()
@@ -39,8 +39,8 @@ Input::handle(bool& r)
       case SDL_KEYUP:
         key_event(e);
         break;
-	  }
-	}
+    }
+  }
 }
 
 void
