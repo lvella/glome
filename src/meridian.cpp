@@ -37,27 +37,27 @@ initialize_meridians()
   glPushMatrix();
 
   glColor3f(1.0f, 1.0f, .0f);
-  glDrawArrays(GL_LINES, 0, 4 * 360);
+  glDrawArrays(GL_LINES, 0, 360);
 
   xz_matrix(M_PI / 2.0).multToGL();
   glColor3f(.0f, 1.f, 1.0f);
-  glDrawArrays(GL_LINES, 0, 4 * 360);
+  glDrawArrays(GL_LINES, 0, 360);
 
   yz_matrix(M_PI / 2.0).multToGL();
   glColor3f(1.0f, .0f, 1.0f);
-  glDrawArrays(GL_LINES, 0, 4 * 360);
+  glDrawArrays(GL_LINES, 0, 360);
 
   xw_matrix(-M_PI / 2.0).multToGL();
   glColor3f(1.0f, .0f, .0f);
-  glDrawArrays(GL_LINES, 0, 4 * 360);
+  glDrawArrays(GL_LINES, 0, 360);
 
   yw_matrix(-M_PI / 2.0).multToGL();
   glColor3f(.0f, .0f, 1.0f);
-  glDrawArrays(GL_LINES, 0, 4 * 360);
+  glDrawArrays(GL_LINES, 0, 360);
 
   yz_matrix(M_PI / 2.0).multToGL();
   glColor3f(.0f, 1.0f, 0.0f);
-  glDrawArrays(GL_LINES, 0, 4 * 360);
+  glDrawArrays(GL_LINES, 0, 360);
 
   glPopMatrix();
   glBindBuffer(GL_ARRAY_BUFFER, 0);
