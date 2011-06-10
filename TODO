@@ -16,3 +16,7 @@ Main topics:
 Visual:
 - Make the colors of the shots random and moving
 - Make shots fade to transparent as they age
+
+Optimization:
+- There are lots of unecessary allocations/deallocations, including in
+camera history (STL containers). Remove them.
