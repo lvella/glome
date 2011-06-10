@@ -1,12 +1,15 @@
+#include <stdlib.h>
+#include <iostream>
 #include <cmath>
-#include <deque>
+#include <list>
 
 #include "shader.hpp"
 #include "4dmath.hpp"
 
 #include "projectile.hpp"
 
-std::deque<Projectile> shots;
+typedef std::list<Projectile> SList;
+static SList shots;
 
 static void
 create_spherical_texture(int size, GLuint& tex)
@@ -50,11 +53,11 @@ void Projectile::shot(const Matrix4& from, float speed)
 
 void Projectile::update_all()
 {
-  while(!shots.empty() && shots[0].dead())
+  while(!shots.empty() && shots.front().dead())
     shots.pop_front();
 
-  for(unsigned int i = 0; i < shots.size(); ++i)
-    shots[i].update();
+  for(SList::iterator i = shots.begin(); i != shots.end(); ++i)
+    i->update();
 }
 
 void Projectile::draw_all()
@@ -63,8 +66,8 @@ void Projectile::draw_all()
     glEnable(GL_TEXTURE_2D);
     glUseProgram(program_bullet);
     glBindTexture(GL_TEXTURE_2D, texture);
-    for(unsigned int i = 0; i < shots.size(); ++i)
-      shots[i].draw();
+    for(SList::iterator i = shots.begin(); i != shots.end(); ++i)
+      i->draw();
     glDisable(GL_TEXTURE_2D);
   }
 }
@@ -72,10 +75,23 @@ void Projectile::draw_all()
 void Projectile::draw_in_minimap()
 {
   glBegin(GL_POINTS);
-  for(unsigned int i = 0; i < shots.size(); ++i) {
-    shots[i].transformation().position().loadVertex();
+  for(SList::iterator i = shots.begin(); i != shots.end(); ++i) {
+    i->transformation().position().loadVertex();
   }
   glEnd();
+}
+
+bool Projectile::collide(const Vector4& position, float radius)
+{
+  radius *= radius;
+
+  for(SList::iterator i = shots.begin(); i != shots.end(); ++i)
+    if((position - i->transformation().position()).squared_length() < radius) {
+      shots.erase(i);
+      return true;
+    }
+
+  return false;
 }
 
 Projectile::Projectile(const Matrix4& from, float s):

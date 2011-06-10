@@ -1,6 +1,7 @@
 #pragma once
 
 #include "matrix4.hpp"
+#include "vector4.hpp"
 #include "drawable.hpp"
 
 class Projectile: public Drawable
@@ -11,6 +12,7 @@ public:
   static void draw_all();
   static void draw_in_minimap();
   static void update_all();
+  static bool collide(const Vector4& position, float radius);
 
 private:
   Projectile(const Matrix4& from, float speed);

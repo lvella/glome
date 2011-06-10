@@ -20,12 +20,8 @@ public:
 
   void update()
   {
-    extern Ship ship;
-    extern std::deque<Projectile> shots;
-    for(unsigned int i = 0; i < shots.size(); ++i){
-    if((t.position() - shots[i].transformation().position()).squared_length() < 0.03*0.03)
+    if(Projectile::collide(t.position(), 0.03f))
       randomize();
-    }
   }
 
   void draw()
