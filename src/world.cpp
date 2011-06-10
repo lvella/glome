@@ -3,6 +3,8 @@
 #include "minimap.hpp"
 #include "meridian.hpp"
 #include "shader.hpp"
+#include "input.hpp"
+#include "kbinput.hpp"
 
 #include "world.hpp"
 
@@ -15,15 +17,16 @@ void World::initialize()
 }
 
 World::World():
-  kbi(&ship),
   cam_hist(10, Matrix4::IDENTITY)
-{}
+{
+  Input::Kb::set_ship(&ship);
+}
 
 bool World::update()
 {
   bool run;
   // Treat events
-  run = kbi.handle();
+  run = Input::handle();
 
   cube.update();
   Projectile::update_all();

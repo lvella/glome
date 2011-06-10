@@ -122,7 +122,7 @@ int main(int argc, char **argv)
   srand(time(NULL));
 
   // SDL startup
-  if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
+  if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) != 0) {
     cerr << "Unable to initialize SDL: " << SDL_GetError() << endl;
     return 1;
   }
@@ -130,6 +130,7 @@ int main(int argc, char **argv)
   SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL);
   SDL_WM_SetCaption("Navigna", NULL);
   //SDL_ShowCursor(SDL_DISABLE);
+  SDL_JoystickEventState(SDL_ENABLE);
 
   init_gl();
 

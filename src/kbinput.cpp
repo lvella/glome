@@ -7,47 +7,19 @@ using namespace std;
 extern const int HEIGHT;
 extern const int WIDTH;
 
-KbInput::KbInput(Ship* s)
+namespace Input {
+namespace Kb {
+
+static Ship* ship;
+
+void
+set_ship(Ship* s)
 {
   ship = s;
 }
 
-KbInput::~KbInput()
-{
-}
-
 bool
-KbInput::handle()
-{
-  bool run = true;
-  SDL_Event e;
-  while(SDL_PollEvent(&e))
-  {
-    switch(e.type)
-    {
-      case SDL_QUIT:
-        run = false;
-        ship->quit();
-        break;
-      case SDL_MOUSEMOTION:
-        mouse_motion(e.motion.x, e.motion.y);
-        break;
-      case SDL_MOUSEBUTTONDOWN:
-      case SDL_MOUSEBUTTONUP:
-        mouse_button(e.button.button, e.button.state);
-        break;
-      case SDL_KEYDOWN:
-      case SDL_KEYUP:
-        run = key_event(e);
-        break;
-    }
-  }
-
-  return run;
-}
-
-bool
-KbInput::key_event(SDL_Event e)
+key_event(SDL_Event e)
 {
   int k = e.key.keysym.sym;
   switch(k)
@@ -106,7 +78,7 @@ KbInput::key_event(SDL_Event e)
 }
 
 void
-KbInput::mouse_motion(int x, int y)
+mouse_motion(int x, int y)
 {
   ship->motion(x, y);
   x -= WIDTH / 2;
@@ -116,7 +88,7 @@ KbInput::mouse_motion(int x, int y)
 }
 
 void
-KbInput::mouse_button(int button, int state)
+mouse_button(int button, int state)
 {
   float accel;
 
@@ -137,3 +109,5 @@ KbInput::mouse_button(int button, int state)
   ship->move(accel);
 }
 
+}
+}

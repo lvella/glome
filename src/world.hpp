@@ -3,7 +3,6 @@
 #include <deque>
 #include "ship.hpp"
 #include "randomcube.hpp"
-#include "kbinput.hpp"
 #include "matrix4.hpp"
 
 class World
@@ -21,7 +20,7 @@ private:
   Ship ship;
   RandomCube cube;
 
-  KbInput kbi;
+  //KbInput kbi;
   //JsInput jsi;
 
   // Camera transform historic
