@@ -4,8 +4,8 @@ bin_PROGRAMS = navigna
 navigna_LDADD = $(SDL_LIBS) $(GLEW_LIBS) -lboost_system -lboost_thread
 BUILT_SOURCES = minimap_proj.glsl.hpp world_proj.glsl.hpp projectile.glsl.hpp
 navigna_SOURCES = 4dmath.cpp main.cpp meridian.cpp matrix4.cpp projectile.cpp shader.cpp \
-	input.cpp object.cpp minimap.cpp ship.cpp drawable.cpp init_gl.cpp udp_server.cpp \
-	client.cpp randomcube.cpp
+	kbinput.cpp object.cpp minimap.cpp ship.cpp drawable.cpp init_gl.cpp udp_server.cpp \
+	client.cpp randomcube.cpp world.cpp
 
 minimap_proj.glsl.hpp: minimap_proj.glsl
 	xxd -i minimap_proj.glsl > minimap_proj.glsl.hpp

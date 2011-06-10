@@ -1,10 +1,10 @@
 #pragma once
 
-#include <GL/glu.h>
+class World;
 
 namespace MiniMap
 {
-  void draw();
+  void draw(World& world, const Matrix4& center);
   void update();
   void initialize();
 }

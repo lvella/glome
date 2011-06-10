@@ -7,27 +7,25 @@
 
 #include "4dmath.hpp"
 #include "projectile.hpp"
-#include "randomcube.hpp"
 #include "ship.hpp"
 #include "shader.hpp"
-#include "drawable.hpp"
 #include "meridian.hpp"
+#include "world.hpp"
 
 #include "minimap.hpp"
 
 using namespace std;
 
 extern GLuint tex_ship;
-extern std::deque<Matrix4> cam_hist;
 extern Ship ship;
 extern RandomCube* cube;
 
 static GLuint tex_minimap, program_map;
-GLuint tex_object;
+static GLuint tex_object;
 static GLint proj_only_uniform;
 
 void
-MiniMap::draw()
+MiniMap::draw(World& world, const Matrix4& center)
 {
   extern const int HEIGHT;
   extern const int WIDTH;
@@ -103,17 +101,17 @@ MiniMap::draw()
 
   // Draw objects
   glUseProgram(program_map);
-  (yz_matrix(M_PI / 2) * cam_hist.back()).loadToGL();
+  (yz_matrix(M_PI / 2) * center).loadToGL();
 
   // Draw shots
   glUniform1i(proj_only_uniform, 1);
   Projectile::draw_in_minimap();
-
   draw_meridians();
 
-  // Draw cube object
   glUniform1i(proj_only_uniform, 0);
-  Drawable::draw_in_minimap();
+  glBindTexture(GL_TEXTURE_2D, tex_object);
+  world.fill_minimap();
+  glBindTexture(GL_TEXTURE_2D, 0);
 
   // Disable 2D
   glDisable(GL_TEXTURE_2D);

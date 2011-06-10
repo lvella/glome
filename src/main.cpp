@@ -4,7 +4,6 @@
 #include <cstdio>
 #include <cmath>
 #include <ctime>
-#include <deque>
 #include <vector>
 #include <SDL.h>
 #include <GL/glew.h>
@@ -15,17 +14,14 @@
 #include <boost/thread.hpp>
 
 #include "4dmath.hpp"
-#include "input.hpp"
 #include "matrix4.hpp"
 #include "minimap.hpp"
+#include "meridian.hpp"
 #include "ship.hpp"
 #include "projectile.hpp"
-#include "randomcube.hpp"
-#include "shader.hpp"
-#include "drawable.hpp"
 #include "init_gl.hpp"
 #include "udp_server.hpp"
-#include "meridian.hpp"
+#include "world.hpp"
 
 using namespace std;
 using namespace boost::asio::ip;
@@ -35,17 +31,6 @@ extern const int WIDTH = 800;
 
 extern const float FOV = 45.0f;
 
-double s[360];
-double c[360];
-double z[360];
-
-// Camera transform historic
-std::deque<Matrix4> cam_hist(10, Matrix4::IDENTITY);
-
-Ship ship;
-//Ship* ship2;
-Input input(&ship);
-RandomCube* cube;
 boost::asio::io_service gIOService;
 udp_server* server;
 udp::socket* cl_socket;
@@ -56,38 +41,7 @@ string orig;
 string host;
 short port;
 
-static GLuint program;
-
-void initialize_shader()
-{
-#include "world_proj.glsl.hpp"
-  program = setup_vshader(world_proj_glsl, world_proj_glsl_len);
-}
-
-void draw()
-{
-  const Matrix4 offset(yz_matrix(0.2) * zw_matrix(-0.015) * yw_matrix(-0.01));
-
-  // Camera transform
-  (offset * cam_hist.front()).loadToGL();
-  cam_hist.pop_front();
-  cam_hist.push_back(ship.transformation().transpose());
-
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glUseProgram(program);
-  draw_meridians();
-
-  //cube.draw();
-  Drawable::draw_all();
-  Projectile::draw_all();
-  glUseProgram(program);
-  ship.draw();
-  MiniMap::draw();
-
-  SDL_GL_SwapBuffers();
-}
-
-void update()
+/* void update()
 {
   Drawable::update_all();
   Projectile::update_all();
@@ -130,23 +84,22 @@ void update()
       //cout << ship.transformation() << endl;
     }
   }
-}
+}*/
 
 void main_loop()
 {
+  static World world;
+
   const int FPS = 60;
   uint64_t frame_count = 0;
   bool running = true;
   Uint32 ticks = SDL_GetTicks();
 
   while(running) {
-    // Treat events
-    {
-      input.handle(running);
-    }
+    running = world.update();
 
-    update();
-    draw();
+    world.draw();
+    SDL_GL_SwapBuffers();
 
     // Fix framerate
     {
@@ -215,13 +168,11 @@ int main(int argc, char **argv)
   glLoadIdentity();
 
   // 4D to 3D projection
-  initialize_shader();
   initialize_meridians();
+  World::initialize();
   MiniMap::initialize();
-  ship.initialize();
+  Ship::initialize();
   Projectile::initialize();
-  cube = (RandomCube*)Drawable::create_random_cube();
-  //ship2 = (Ship*)Drawable::create_ship();
 
   // Configure network
   if(argc == 1)

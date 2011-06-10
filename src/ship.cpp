@@ -14,6 +14,8 @@
 using namespace std;
 
 static int dlist;
+Matrix4 Ship::r_canon;
+Matrix4 Ship::l_canon;
 
 void Ship::initialize()
 {

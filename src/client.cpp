@@ -11,7 +11,7 @@ extern int HEIGHT;
 
 Client::Client()
 {
-  ship = (Ship*)Drawable::create_ship();
+  //ship = (Ship*)Drawable::create_ship();
 }
 
 void
@@ -51,7 +51,7 @@ Client::parseMessage(boost::array<int, 1024> msg, unsigned int bytes)
     switch(msg[i])
     {
     case QUIT:
-      drawable_objs.remove(ship);
+      //drawable_objs.remove(ship);
       break;
     case TURN:
       x = msg[++i];

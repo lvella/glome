@@ -1,31 +1,32 @@
 #include <cstdlib>
 
-#include "input.hpp"
+#include "kbinput.hpp"
 
 using namespace std;
 
 const int HEIGHT = 600;
 const int WIDTH = 800;
 
-Input::Input(Ship* s)
+KbInput::KbInput(Ship* s)
 {
   ship = s;
 }
 
-Input::~Input()
+KbInput::~KbInput()
 {
 }
 
-void
-Input::handle(bool& r)
+bool
+KbInput::handle()
 {
+  bool run = true;
   SDL_Event e;
   while(SDL_PollEvent(&e))
   {
     switch(e.type)
     {
       case SDL_QUIT:
-        r = false;
+        run = false;
         ship->quit();
         break;
       case SDL_MOUSEMOTION:
@@ -37,14 +38,16 @@ Input::handle(bool& r)
         break;
       case SDL_KEYDOWN:
       case SDL_KEYUP:
-        key_event(e);
+        run = key_event(e);
         break;
     }
   }
+
+  return run;
 }
 
-void
-Input::key_event(SDL_Event e)
+bool
+KbInput::key_event(SDL_Event e)
 {
   int k = e.key.keysym.sym;
   switch(k)
@@ -52,8 +55,8 @@ Input::key_event(SDL_Event e)
   case SDLK_ESCAPE:
     if(e.type == SDL_KEYDOWN)
     {
-      exit(0);
       ship->quit();
+      return false;
     }
   case SDLK_SPACE:
     if(e.type == SDL_KEYDOWN)
@@ -98,10 +101,12 @@ Input::key_event(SDL_Event e)
       ship->move_spinr(false);
     break;
   }
+
+  return true;
 }
 
 void
-Input::mouse_motion(int x, int y)
+KbInput::mouse_motion(int x, int y)
 {
   ship->motion(x, y);
   x -= WIDTH / 2;
@@ -111,7 +116,7 @@ Input::mouse_motion(int x, int y)
 }
 
 void
-Input::mouse_button(int button, int state)
+KbInput::mouse_button(int button, int state)
 {
   float accel;
 

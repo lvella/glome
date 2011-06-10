@@ -4,17 +4,17 @@
 
 #include "ship.hpp"
 
-class Input
+class KbInput
 {
 public:
-  Input(Ship* s);
-  virtual ~Input();
-  void handle(bool& r);
+  KbInput(Ship* s);
+  virtual ~KbInput();
+  bool handle();
 
 private:
   Ship* ship;
   void mouse_motion(int x, int y);
   void mouse_button(int button, int state);
-  void key_event(SDL_Event key);
+  bool key_event(SDL_Event key);
 };
 

@@ -7,13 +7,7 @@ class Drawable: public Object
 public:
   Drawable(): Object() {}
   Drawable(const Matrix4& from): Object(from) {}
-  virtual void update() {}
-  virtual void draw() {}
-  virtual bool dead() { return false; }
-  static void update_all();
-  static void draw_all();
-  static void draw_in_minimap();
-  static Drawable* create_ship();
-  static Drawable* create_random_cube();
+  virtual ~Drawable();
+  virtual void draw() = 0;
+  void draw_in_minimap();
 };
-

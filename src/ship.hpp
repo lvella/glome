@@ -10,7 +10,7 @@
 class Ship: public Drawable
 {
 public:
-  void initialize();
+  static void initialize();
 
   Ship();
   void draw();
@@ -135,6 +135,6 @@ private:
   int shot_count;
   std::vector<int> message;
 
-  Matrix4 r_canon, l_canon;
+  static Matrix4 r_canon, l_canon;
 };
 
