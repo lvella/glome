@@ -5,7 +5,7 @@
 #include <GL/glew.h>
 #include <GL/glu.h>
 
-#include "matrix4.hpp"
+#include "4dmath.hpp"
 #include "projectile.hpp"
 #include "randomcube.hpp"
 #include "ship.hpp"
