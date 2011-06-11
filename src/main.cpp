@@ -27,8 +27,8 @@
 using namespace std;
 using namespace boost::asio::ip;
 
-extern const int HEIGHT = 600;
 extern const int WIDTH = 800;
+extern const int HEIGHT = 600;
 
 extern const float FOV = 45.0f;
 
@@ -128,9 +128,9 @@ int main(int argc, char **argv)
     return 1;
   }
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL);
+  SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL | SDL_FULLSCREEN);
   SDL_WM_SetCaption("Navigna", NULL);
-  //SDL_ShowCursor(SDL_DISABLE);
+  SDL_ShowCursor(SDL_DISABLE);
   SDL_JoystickEventState(SDL_ENABLE);
 
   init_gl();
@@ -162,10 +162,10 @@ int main(int argc, char **argv)
   glEnable(GL_FOG);
 
   // 3D to 2D projection
-  glViewport(0, 0, WIDTH, HEIGHT);
+  //glViewport(0, 0, WIDTH, HEIGHT);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(FOV, double(WIDTH) / double(HEIGHT), 0.001, 5);
+  gluPerspective(FOV, 0.5*double(WIDTH) / double(HEIGHT), 0.001, 5);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 

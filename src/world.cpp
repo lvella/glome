@@ -17,11 +17,13 @@ void World::initialize()
   program = setup_vshader(world_proj_glsl, world_proj_glsl_len);
 }
 
-World::World():
-  cam_hist(10, Matrix4::IDENTITY)
+World::World()
 {
-  Input::Kb::set_ship(&ship);
-  Input::Js::set_ship(&ship);
+  Input::Kb::set_ship(&ship[0]);
+  Input::Js::set_ship(&ship[1]);
+
+  cam_hist[0].resize(10, Matrix4::IDENTITY);
+  cam_hist[1].resize(10, Matrix4::IDENTITY);
 }
 
 bool World::update()
@@ -32,32 +34,42 @@ bool World::update()
 
   cube.update();
   Projectile::update_all();
-  ship.update();
+  ship[0].update();
+  ship[1].update();
 
   return run;
 }
 
 void World::draw()
 {
+  extern const int WIDTH, HEIGHT;
   const Matrix4 offset(yz_matrix(0.2) * zw_matrix(-0.015) * yw_matrix(-0.01));
-  Matrix4 center = ship.transformation().transpose();
-
-  // Camera transform
-  (offset * cam_hist.front()).loadToGL();
-  cam_hist.pop_front();
-  cam_hist.push_back(center);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glUseProgram(program);
-  draw_meridians();
+  for(iter = 0; iter < 2; ++iter)
+    {
+      int wstart = iter * WIDTH/2;
+      glViewport(wstart, 0, WIDTH/2, HEIGHT);
+      Matrix4 center = ship[iter].transformation().transpose();
 
-  cube.draw();
-  Projectile::draw_all();
-  glUseProgram(program);
-  ship.draw();
-  MiniMap::draw(*this, center);
+      // Camera transform
+      (offset * cam_hist[iter].front()).loadToGL();
+      cam_hist[iter].pop_front();
+      cam_hist[iter].push_back(center);
+
+      glUseProgram(program);
+      draw_meridians();
+
+      cube.draw();
+      Projectile::draw_all();
+      glUseProgram(program);
+      ship[0].draw();
+      ship[1].draw();
+      MiniMap::draw(wstart, *this, center);
+    }
 }
 
 void World::fill_minimap() {
   cube.draw_in_minimap();
+  ship[(iter+1) & 1].draw_in_minimap();
 }
