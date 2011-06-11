@@ -5,6 +5,7 @@
 #include "shader.hpp"
 #include "input.hpp"
 #include "kbinput.hpp"
+#include "jsinput.hpp"
 
 #include "world.hpp"
 
@@ -20,6 +21,7 @@ World::World():
   cam_hist(10, Matrix4::IDENTITY)
 {
   Input::Kb::set_ship(&ship);
+  Input::Js::set_ship(&ship);
 }
 
 bool World::update()

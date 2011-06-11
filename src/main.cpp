@@ -22,6 +22,7 @@
 #include "init_gl.hpp"
 #include "udp_server.hpp"
 #include "world.hpp"
+#include "jsinput.hpp"
 
 using namespace std;
 using namespace boost::asio::ip;
@@ -168,7 +169,8 @@ int main(int argc, char **argv)
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
-  // 4D to 3D projection
+  // Initializations
+  Input::Js::initialize(0);
   initialize_meridians();
   World::initialize();
   MiniMap::initialize();

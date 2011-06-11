@@ -20,9 +20,6 @@ private:
   Ship ship;
   RandomCube cube;
 
-  //KbInput kbi;
-  //JsInput jsi;
-
   // Camera transform historic
   std::deque<Matrix4> cam_hist;
 };
