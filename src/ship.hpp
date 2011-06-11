@@ -135,6 +135,8 @@ private:
   int shot_count;
   std::vector<int> message;
 
+  bool rcanon_shot_last;
+
   static Matrix4 r_canon, l_canon;
 };
 

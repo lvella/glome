@@ -97,7 +97,8 @@ Ship::Ship():
     speed_s(0.0f),
     sps(15),
     shot_count(0),
-    q(false)
+    q(false),
+    rcanon_shot_last(false)
 //    r_canon(xw_matrix(0.005) * zw_matrix(-0.015)),
 //    l_canon(xw_matrix(-0.005) * zw_matrix(-0.015))
 {
@@ -156,10 +157,9 @@ void Ship::update()
   shot_count -= sps;
   if(shot_count < 0) {
     if(sh) {
-      static bool right = true;
-      Projectile::shot(t * (right ? r_canon : l_canon), 0.02 - speed);
+      Projectile::shot(t * (rcanon_shot_last ? l_canon : r_canon), 0.02 - speed);
       shot_count += 60;
-      right = !right;
+      rcanon_shot_last = !rcanon_shot_last;
     }
     else
       shot_count = 0;

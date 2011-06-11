@@ -17,12 +17,10 @@ public:
   void fill_minimap();
 
 private:
-  Ship ship;
+  int iter;
+  Ship ship[2];
   RandomCube cube;
 
-  //KbInput kbi;
-  //JsInput jsi;
-
   // Camera transform historic
-  std::deque<Matrix4> cam_hist;
+  std::deque<Matrix4> cam_hist[2];
 };

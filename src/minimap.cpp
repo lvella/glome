@@ -25,7 +25,7 @@ static GLuint tex_object;
 static GLint proj_only_uniform;
 
 void
-MiniMap::draw(World& world, const Matrix4& center)
+MiniMap::draw(int wstart, World& world, const Matrix4& center)
 {
   extern const int HEIGHT;
   extern const int WIDTH;
@@ -41,7 +41,7 @@ MiniMap::draw(World& world, const Matrix4& center)
   const float cx = 0;
   const float cy = 0;
 
-  const float angle = asin(WIDTH * sin(FOV * M_PI / 360.0f) / HEIGHT);
+  const float angle = asin(0.5f * WIDTH * sin(FOV * M_PI / 360.0f) / HEIGHT);
   const float dx = (radius * sin(angle));
   const float ppx0 = (cx - dx) / radius;
   const float ppy = ((cy + (radius * cos(angle))) / radius) * 0.9;
@@ -51,7 +51,7 @@ MiniMap::draw(World& world, const Matrix4& center)
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
   glLoadIdentity();
-  glViewport(10, 10, 160, 160);
+  glViewport(wstart + 10, 10, 160, 160);
   glOrtho(-1, 1, -1, 1, -1, 1);
   glMatrixMode(GL_MODELVIEW);
 

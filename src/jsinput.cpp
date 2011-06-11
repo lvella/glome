@@ -35,33 +35,55 @@ void axis_event(const SDL_JoyAxisEvent &e)
     if(e.value < 16000 && e.value > -16000) {
       ship->move_left(false);
       ship->move_right(false);
-    } else if(e.axis > 16000) {
+    } else if(e.value > 16000) {
       ship->move_right(true);
     } else {
       ship->move_left(true);
     }
   } else if(e.axis == 1) {
-      if(e.value < 16000 && e.value > -16000) {
+      if(e.value > -16000 && e.value < 16000) {
         ship->move_down(false);
         ship->move_up(false);
-      } else if(e.axis > 16000) {
-        ship->move_up(true);
-      } else {
+      } else if(e.value > 16000) {
         ship->move_down(true);
+      } else {
+        ship->move_up(true);
       }
   } else if(e.axis == 2 || e.axis == 3) {
       if(e.axis == 2) {
         turn_x = e.value / 32768.0f;
       } else {
-        turn_y = e.value / 32768.0f;
+        turn_y = -e.value / 32768.0f;
       }
+
       ship->rotate(turn_x, turn_y);
    }
 }
 
 void button_event(const SDL_JoyButtonEvent &e)
 {
-  // TO BE CONTINUED
+  bool p = e.state == SDL_PRESSED;
+
+  switch(e.button) {
+  case 1: // L3
+    ship->move_spinl(p);
+    break;
+  case 2: // R3
+    ship->move_spinr(p);
+    break;
+
+  case 8: // L2
+    ship->move(p ? 0.00002 : 0.0);
+    break;
+  case 9: // R2
+    ship->move(p ? -0.00002 : 0.0);
+    break;
+
+  case 10: // L1
+  case 11: // R1
+    ship->shot(p);
+    break;
+  }
 }
 
 }
