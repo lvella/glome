@@ -8,12 +8,12 @@ navigna_SOURCES = 4dmath.cpp main.cpp meridian.cpp matrix4.cpp projectile.cpp sh
 	client.cpp randomcube.cpp world.cpp input.cpp jsinput.cpp
 
 minimap_proj.glsl.hpp: minimap_proj.glsl
-	xxd -i minimap_proj.glsl > minimap_proj.glsl.hpp
+	${XXD} -i minimap_proj.glsl > minimap_proj.glsl.hpp
 
 world_proj.glsl.hpp: world_proj.glsl
-	xxd -i world_proj.glsl > world_proj.glsl.hpp
+	${XXD} -i world_proj.glsl > world_proj.glsl.hpp
 
 projectile.glsl.hpp: projectile.glsl
-	xxd -i projectile.glsl > projectile.glsl.hpp
+	${XXD} -i projectile.glsl > projectile.glsl.hpp
 
 CLEANFILES = ${BUILT_SOURCES}

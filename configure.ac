@@ -26,7 +26,6 @@ DX_INIT_DOXYGEN(Navigna, Doxyfile.cfg, [docs])
 m4_include([m4/ax_boost_base.m4])
 AX_BOOST_BASE([1.42],,AC_MSG_FAILURE())
 
-
 #http://sources.redhat.com/automake/automake.html#Extending-aclocal
 # Check for OpenGL
 AC_CHECK_OPENGL
@@ -42,9 +41,12 @@ AC_LANG_RESTORE
 # Check for Blender
 AC_CHECK_BLENDER
 
+# Check for xxd
+AC_PATH_PROG([XXD], [xxd], , [$PATH])
+
 AC_CONFIG_FILES([
 	Makefile
-	src/Makefile
 	data/Makefile
+	src/Makefile
 ])
 AC_OUTPUT
