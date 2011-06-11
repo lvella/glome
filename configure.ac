@@ -30,7 +30,6 @@ AX_BOOST_BASE([1.42],,AC_MSG_FAILURE())
 #http://sources.redhat.com/automake/automake.html#Extending-aclocal
 # Check for OpenGL
 AC_CHECK_OPENGL
-
 #check for libglew
 #PKG_CHECK_MODULES([GLEW],[glew >= 1.5])
 
@@ -40,8 +39,12 @@ AC_LANG_CPLUSPLUS
 AM_PATH_SDL(1.2.11, :, AC_MSG_ERROR(SDL not found. Make sure sdl-config is in your PATH, or specify with --with-sdl-prefix))
 AC_LANG_RESTORE
 
+# Check for Blender
+AC_CHECK_BLENDER
+
 AC_CONFIG_FILES([
 	Makefile
 	src/Makefile
+	data/Makefile
 ])
 AC_OUTPUT

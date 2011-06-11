@@ -28,7 +28,7 @@ void Ship::initialize()
   uint16_t nguns;
 
   // Load file
-  fd = fopen("hunter.wire", "rb");
+  fd = fopen("../data/hunter.wire", "rb");
   assert(fd != NULL);
 
   {

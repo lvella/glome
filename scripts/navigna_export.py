@@ -38,7 +38,7 @@ import math
 from math import *
 
 #TODO: Change to relative path in Blender (bpy.path.relpath(path))
-export_path = bpy.path.abspath('/tmp/')
+#export_path = bpy.path.abspath('/tmp/')
 
 #Objects list
 lobjs = []
@@ -47,38 +47,32 @@ lguns = []
 #Object scale
 scale = 0.0005
 
-def fill_matrix(l):
-  t = mathutils.Matrix()
-  k = 0
-  for i in range(0, 4): 
-    for j in range(0, 4):
-      t[i][j] = l[k]
-      k += 1
-  return t
-
 def xw_matrix(angle):
   c = cos(angle)
   s = sin(angle)
-  return fill_matrix((c, 0, 0, -s,
-    0, 1, 0, 0,
-    0, 0, 1, 0,
-    s, 0, 0, c))
+  return mathutils.Matrix(((c, 0, 0, -s),
+    (0, 1, 0, 0),
+    (0, 0, 1, 0),
+    (s, 0, 0, c)))
 
 def yw_matrix(angle):
   c = cos(angle)
   s = sin(angle)
-  return fill_matrix((1, 0, 0, 0,
-    0, c, 0, -s,
-    0, 0, 1, 0,
-    0, s, 0, c))
+  return mathutils.Matrix(((1, 0, 0, 0),
+    (0, c, 0, -s),
+    (0, 0, 1, 0),
+    (0, s, 0, c)))
 
 def zw_matrix(angle):
   c = cos(angle)
   s = sin(angle)
-  return fill_matrix((1, 0, 0, 0,
-    0, 1, 0, 0,
-    0, 0, c, -s,
-    0, 0, s, c))
+  return mathutils.Matrix(((1, 0, 0, 0),
+    (0, 1, 0, 0),
+    (0, 0, c, -s),
+    (0, 0, s, c)))
+
+def matrix_gen(v):
+  return xw_matrix(v[0] * scale) * yw_matrix(-v[2] * scale) *  zw_matrix(v[1] * scale)
 
 def vertex_conv(i, scale):
   'Convert 3-D to 4-D coordinates'
@@ -88,22 +82,19 @@ def vertex_conv(i, scale):
   d = 1 + x*x + y*y + z*z
   return (2*x/d, 2*y/d, 2*z/d, (-1 + x*x + y*y + z*z)/d)
 
-def matrix_gen(v):
-  return xw_matrix(v[0] * scale) * yw_matrix(v[2] * scale) *  zw_matrix(v[1] * scale)
-
 def export(data):
-  bfile = open(export_path + '/' + lobjs[0].name + '.wire', 'wb')
+  bfile = open(lobjs[0].name + '.wire', 'wb')
   #exporting guns
   bfile.write(struct.pack('<H', len(lguns)))
   for g in lguns:
     t = matrix_gen(g.location - lobjs[0].location)
     for i in range(0, 4):
-      for j in range(0, 4):
+      for j in range(0, 4):    
         bfile.write(struct.pack('<f', t[i][j]))
   #exporting Navigna
   export_mesh(bfile, data)
   bfile.close()
-  read_file(data) #for testing only
+#  read_file(data) #for testing only
 
 def export_mesh(bfile, data):
   bfile.write(struct.pack('<H', len(data.vertices)))
@@ -120,8 +111,8 @@ def export_mesh(bfile, data):
 
 # Only for testing
 def read_file(data):
-  print('Reading ' + lobjs[0].name + '.wire from ' + export_path + ' directory')
-  bfile = open(export_path + '/' + lobjs[0].name + '.wire', 'rb')
+#  print('Reading ' + lobjs[0].name + '.wire from ' + export_path + ' directory')
+  bfile = open(lobjs[0].name + '.wire', 'rb')
   fsize = struct.calcsize('f')
   isize = struct.calcsize('H')
   #Reading Header
@@ -132,8 +123,7 @@ def read_file(data):
     for i in range(0, 4):
       for j in range(0, 4):
         a = bfile.read(fsize)
-        print(struct.unpack('<f', a)[0])
-  #Reading Navigna
+        print(struct.unpack('<f', a)[0])  #Reading Navigna
   nv = bfile.read(isize)
   print(struct.unpack('<H', nv)[0])
   for v in data.vertices:
@@ -154,39 +144,24 @@ def read_file(data):
 # Begin #
 #########
 
-class ExportMeshNavigna(bpy.types.Operator):
-  bl_idname = "export.navigna"
-  bl_label = "Export 4-D Mesh to Navigna Game"
-
-  def execute(self, context):
-    scene = context.scene
-    #FIXME: Maybe (objs = scene.objects) is better, but i dont know how to take selected objects in the scene, only in the context
-    objs = context.selected_objects
-    for o in objs:
-      if(re.search(('gun'), o.name) != None):
-        lguns.append(o)
-      else:
-        lobjs.append(o)
-    data = lobjs[0].to_mesh(scene,True,'PREVIEW')
-    export(data)
-    self.report({'INFO'},'Exporting ' + lobjs[0].name + '.wire in ' + export_path + ' directory.')
-    for o in objs:
-      if(re.search(('gun'), o.name) != None):
-        lguns.pop()
-      else:
-        lobjs.pop()
-    print(lobjs)
-    print(lguns)
-    self.report({'INFO'}, "Done.")
-    return {'FINISHED'}
-
-# registering and menu integration
-def register():
-  bpy.utils.register_class(ExportMeshNavigna)
-
-# unregistering and removing menus
-def unregister():
-  bpy.utils.unregister_class(ExportMeshNavigna)
+def export_mesh_navigna():
+  scene = bpy.context.scene
+  #FIXME: Maybe (objs = scene.objects) is better, but i dont know how to take selected objects in the scene, only in the context
+  objs = bpy.context.visible_objects
+  for o in objs:
+    if(re.search(('gun'), o.name) != None):
+      lguns.append(o)
+    else:
+      lobjs.append(o)
+  data = lobjs[0].to_mesh(scene,True,'PREVIEW')
+  export(data)
+  for o in objs:
+    if(re.search(('gun'), o.name) != None):
+      lguns.pop()
+    else:
+      lobjs.pop()
+#  print(lobjs)
+#  print(lguns)
 
 if __name__ == "__main__":
-  register()
+  export_mesh_navigna()
