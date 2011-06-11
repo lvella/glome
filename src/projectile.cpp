@@ -44,9 +44,9 @@ void Projectile::initialize()
   program_bullet = setup_vshader(projectile_glsl, projectile_glsl_len);
 }
 
-void Projectile::shot(const Matrix4& from, float speed)
+void Projectile::shot(Ship *s, const Matrix4& from, float speed)
 {
-  shots.push_back(Projectile(from, speed));
+  shots.push_back(Projectile(s, from, speed));
 }
 
 void Projectile::update_all()
@@ -92,11 +92,27 @@ bool Projectile::collide(const Vector4& position, float radius)
   return false;
 }
 
-Projectile::Projectile(const Matrix4& from, float s):
+bool Projectile::collide(Ship *s)
+{
+  const float r = 0.01f * 0.01f;
+  Vector4 p = s->transformation().position();
+
+  for(SList::iterator i = shots.begin(); i != shots.end(); ++i) {
+    if(s != i->owner && (p - i->transformation().position()).squared_length() < r) {
+      shots.erase(i);
+      return true;
+    }
+  }
+
+  return false;
+}
+
+Projectile::Projectile(Ship *s, const Matrix4& from, float speed):
   Drawable(from),
-  ds(zw_matrix(-s)),
+  ds(zw_matrix(-speed)),
+  owner(s),
   ttl(0),
-  max_ttl((2 * M_PI) / s)
+  max_ttl((2 * M_PI) / speed)
 {
 }
 

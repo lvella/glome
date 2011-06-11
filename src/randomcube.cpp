@@ -11,12 +11,6 @@ RandomCube::RandomCube()
   randomize();
 }
 
-void RandomCube::update()
-{
-  if(Projectile::collide(t.position(), 0.03f))
-    randomize();
-}
-
 void RandomCube::draw()
 {
   float a = 0.02;

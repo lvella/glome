@@ -19,6 +19,7 @@ public:
 private:
   int iter;
   Ship ship[2];
+  unsigned int points[2];
   RandomCube cube;
 
   // Camera transform historic
