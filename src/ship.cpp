@@ -28,7 +28,11 @@ void Ship::initialize()
   uint16_t nguns;
 
   // Load file
-  fd = fopen("../data/hunter.wire", "rb");
+  #include "config.hpp"
+  cout << DATA_DIR << endl;
+  char dir[] = DATA_DIR;
+  strcat(dir,"/hunter.wire");
+  fd = fopen(dir, "rb");
   assert(fd != NULL);
 
   {

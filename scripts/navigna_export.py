@@ -37,15 +37,11 @@ import struct
 import math
 from math import *
 
-#TODO: Change to relative path in Blender (bpy.path.relpath(path))
-#export_path = bpy.path.abspath('/tmp/')
-
-#Objects list
-lobjs = []
-#Guns list
+# Guns list
 lguns = []
-#Object scale
+# Object scale
 scale = 0.0005
+gscale = 0.001
 
 def xw_matrix(angle):
   c = cos(angle)
@@ -72,7 +68,7 @@ def zw_matrix(angle):
     (0, 0, s, c)))
 
 def matrix_gen(v):
-  return xw_matrix(v[0] * scale) * yw_matrix(-v[2] * scale) *  zw_matrix(v[1] * scale)
+  return xw_matrix(v[0] * gscale) * yw_matrix(v[2] * gscale) *  zw_matrix(v[1] * gscale)
 
 def vertex_conv(i, scale):
   'Convert 3-D to 4-D coordinates'
@@ -82,19 +78,19 @@ def vertex_conv(i, scale):
   d = 1 + x*x + y*y + z*z
   return (2*x/d, 2*y/d, 2*z/d, (-1 + x*x + y*y + z*z)/d)
 
-def export(data):
-  bfile = open(lobjs[0].name + '.wire', 'wb')
+def export(obj, data):
+  bfile = open(obj.name + '.wire', 'wb')
   #exporting guns
   bfile.write(struct.pack('<H', len(lguns)))
   for g in lguns:
-    t = matrix_gen(g.location - lobjs[0].location)
-    for i in range(0, 4):
-      for j in range(0, 4):    
+    t = matrix_gen(g.location - obj.location)
+    for i in range(0, t.row_size):
+      for j in range(0, t.col_size):
         bfile.write(struct.pack('<f', t[i][j]))
-  #exporting Navigna
+  #exporting Navigna mesh
   export_mesh(bfile, data)
   bfile.close()
-#  read_file(data) #for testing only
+#  read_file(obj, data) #for testing only
 
 def export_mesh(bfile, data):
   bfile.write(struct.pack('<H', len(data.vertices)))
@@ -110,16 +106,14 @@ def export_mesh(bfile, data):
     bfile.write(struct.pack('<H', e.key[1]))
 
 # Only for testing
-def read_file(data):
-#  print('Reading ' + lobjs[0].name + '.wire from ' + export_path + ' directory')
-  bfile = open(lobjs[0].name + '.wire', 'rb')
+def read_file(obj, data):
+  bfile = open(obj.name + '.wire', 'rb')
   fsize = struct.calcsize('f')
   isize = struct.calcsize('H')
   #Reading Header
   ng = bfile.read(isize)
   print(struct.unpack('<H', ng)[0])
   for g in lguns:
-    #FIXME: t.col_size and t.row_size is hardcoded
     for i in range(0, 4):
       for j in range(0, 4):
         a = bfile.read(fsize)
@@ -146,22 +140,18 @@ def read_file(data):
 
 def export_mesh_navigna():
   scene = bpy.context.scene
-  #FIXME: Maybe (objs = scene.objects) is better, but i dont know how to take selected objects in the scene, only in the context
   objs = bpy.context.visible_objects
   for o in objs:
     if(re.search(('gun'), o.name) != None):
       lguns.append(o)
-    else:
-      lobjs.append(o)
-  data = lobjs[0].to_mesh(scene,True,'PREVIEW')
-  export(data)
+    if(o.type == 'MESH'):
+      obj = o
+  data = obj.to_mesh(scene,True,'PREVIEW')
+  export(obj, data)
+  #clean
   for o in objs:
     if(re.search(('gun'), o.name) != None):
       lguns.pop()
-    else:
-      lobjs.pop()
-#  print(lobjs)
-#  print(lguns)
 
 if __name__ == "__main__":
   export_mesh_navigna()

@@ -32,15 +32,15 @@ if test "x$want_blender" = "xyes" ; then
     if test "$BLENDER" = "no" ; then
       AC_MSG_ERROR(Blender not Found)
     fi
-  fi #FIXME: version is hardcoded. There is a way to change this?
-    MIN_BLENDER_VERSION=ifelse([$1], ,2.57,$1)
+  fi
+    MIN_BLENDER_VERSION=$1
     AC_MSG_CHECKING(for Blender - version >= $MIN_BLENDER_VERSION)
     BLENDER_VERSION=`$BLENDER --version | awk 'NR > 1{exit};1' | cut -d' ' -f2`
-  #  blender_major_version=`echo $BLENDER_VERSION | sed 's/^\([[0-9]]*\).*/\1/'`
-  #  blender_minor_version=`echo $BLENDER_VERSION | sed 's/^\([[0-9]]*\)\.\([[0-9]]*\)\([[0-9]]*\).*/\2\3/'`
+#    blender_major_version=`echo $BLENDER_VERSION | sed 's/^\([[0-9]]*\).*/\1/'`
+#    blender_minor_version=`echo $BLENDER_VERSION | sed 's/^\([[0-9]]*\)\.\([[0-9]]*\)\([[0-9]]*\).*/\2\3/'`
     if test "$BLENDER_VERSION" != "$MIN_BLENDER_VERSION" ; then
       AC_MSG_RESULT(no)
-      AC_MSG_ERROR(Blender version 2.57 is required)
+      AC_MSG_ERROR(Blender version $MIN_BLENDER_VERSION is required)
     else
       AC_MSG_RESULT(yes)
     fi
