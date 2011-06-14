@@ -10,8 +10,9 @@
 #include "ship.hpp"
 #include "randomcube.hpp"
 #include "matrix4.hpp"
+#include "world.hpp"
 
-class NetWorld
+class NetWorld: public World
 {
 public:
   static void initialize();
