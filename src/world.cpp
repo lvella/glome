@@ -1,3 +1,4 @@
+#include <iostream>
 #include "4dmath.hpp"
 #include "projectile.hpp"
 #include "minimap.hpp"
@@ -19,6 +20,10 @@ void World::initialize()
 
 World::World()
 {
+  points[0] = points[1] = 0;
+
+  ship[1].setTransformation(yw_matrix(M_PI));
+
   Input::Kb::set_ship(&ship[0]);
   Input::Js::set_ship(&ship[1]);
 
@@ -32,10 +37,20 @@ bool World::update()
   // Treat events
   run = Input::handle();
 
-  cube.update();
   Projectile::update_all();
-  ship[0].update();
-  ship[1].update();
+
+  Vector4 c = cube.transformation().position();
+
+  for(int i = 0; i < 2; ++i) {
+    ship[i].update();
+    if(Projectile::collide(&ship[i]))
+      ship[i].setTransformation(cube.transformation() * yw_matrix(M_PI));
+
+    if((c - ship[i].transformation().position()).squared_length() < (0.03f * 0.03f)) {
+      cube.randomize();
+      std::cout << "Ship " << i << " scored " << ++points[i] << " points!" << std::endl;
+    }
+  }
 
   return run;
 }

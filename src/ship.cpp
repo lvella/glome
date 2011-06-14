@@ -28,7 +28,11 @@ void Ship::initialize()
   uint16_t nguns;
 
   // Load file
-  fd = fopen("hunter.wire", "rb");
+  #include "config.hpp"
+  cout << DATA_DIR << endl;
+  char dir[] = DATA_DIR;
+  strcat(dir,"/hunter.wire");
+  fd = fopen(dir, "rb");
   assert(fd != NULL);
 
   {
@@ -52,8 +56,8 @@ void Ship::initialize()
     glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vlen * 4 * sizeof(float), NULL, GL_STATIC_DRAW);
-    float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_READ_WRITE);
-    ret = fread(vdata, sizeof(float) * 4, vlen, fd); 
+    float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
+    ret = fread(vdata, sizeof(float) * 4, vlen, fd);
     assert(ret == vlen);
     glUnmapBuffer(GL_ARRAY_BUFFER);
   }
@@ -66,7 +70,7 @@ void Ship::initialize()
     glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, ilen * sizeof(uint16_t) * 2, NULL, GL_STATIC_DRAW);
-    uint16_t *idata = (uint16_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_READ_WRITE);
+    uint16_t *idata = (uint16_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
 
     ret = fread(idata, sizeof(uint16_t) * 2, ilen, fd);
     assert(ret == ilen);
@@ -162,7 +166,7 @@ void Ship::update()
   shot_count -= sps;
   if(shot_count < 0) {
     if(sh) {
-      Projectile::shot(t * (rcanon_shot_last ? l_canon : r_canon), 0.02 - speed);
+      Projectile::shot(this, t * (rcanon_shot_last ? l_canon : r_canon), 0.02 - speed);
       shot_count += 60;
       rcanon_shot_last = !rcanon_shot_last;
     }

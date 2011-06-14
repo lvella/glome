@@ -15,7 +15,7 @@ public:
     return t;
   }
 
-  void set(const Matrix4& ref)
+  void setTransformation(const Matrix4& ref)
   {
     t = ref;
   }

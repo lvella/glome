@@ -3,7 +3,10 @@ AC_PREREQ([2.60])
 AC_INIT([Navigna], [1.0], [support@fractal.com])
 
 AC_CONFIG_AUX_DIR([build-aux])
-AC_CONFIG_HEADERS([config.h])
+
+AC_CONFIG_HEADERS([src/config.hpp])
+DATA_DIR=`${PWDCMD-pwd}`/data
+AC_DEFINE_UNQUOTED([DATA_DIR], ["$DATA_DIR"] , [Data directory])
 
 AM_INIT_AUTOMAKE([-Wall -Werror])
 
@@ -26,11 +29,9 @@ DX_INIT_DOXYGEN(Navigna, Doxyfile.cfg, [docs])
 m4_include([m4/ax_boost_base.m4])
 AX_BOOST_BASE([1.42],,AC_MSG_FAILURE())
 
-
 #http://sources.redhat.com/automake/automake.html#Extending-aclocal
 # Check for OpenGL
 AC_CHECK_OPENGL
-
 #check for libglew
 #PKG_CHECK_MODULES([GLEW],[glew >= 1.5])
 
@@ -40,8 +41,15 @@ AC_LANG_CPLUSPLUS
 AM_PATH_SDL(1.2.11, :, AC_MSG_ERROR(SDL not found. Make sure sdl-config is in your PATH, or specify with --with-sdl-prefix))
 AC_LANG_RESTORE
 
+# Check for Blender
+AC_CHECK_BLENDER([2.57])
+
+# Check for xxd
+AC_PATH_PROG([XXD], [xxd], , [$PATH])
+
 AC_CONFIG_FILES([
 	Makefile
+	data/Makefile
 	src/Makefile
 ])
 AC_OUTPUT
