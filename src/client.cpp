@@ -1,17 +1,35 @@
+#include <iostream>
 #include <list>
 
 #include "drawable.hpp"
 #include "protocol.hpp"
+#include "udp_server.hpp"
+#include "net_world.hpp"
+#include "4dmath.hpp"
 
 #include "client.hpp"
 
-extern std::list<Drawable*> drawable_objs;
 extern int WIDTH;
 extern int HEIGHT;
 
-Client::Client()
+extern NetWorld* world;
+
+using namespace std;
+using boost::asio::ip::udp;
+
+Client::Client(udp::endpoint* end)
 {
-  //ship = (Ship*)Drawable::create_ship();
+  last_msg = 0;
+  remote_endpoint = end;
+  ship = world->next_ship(
+        xy_matrix(rand()/10000.0f)
+      * xz_matrix(rand()/10000.0f)
+      * yz_matrix(rand()/10000.0f)
+      * xw_matrix(rand()/10000.0f)
+      * yw_matrix(rand()/10000.0f)
+      * zw_matrix(rand()/10000.0f));
+  make_init_pos_msg();
+  Server::send_to_client(message, this);
 }
 
 void
@@ -41,11 +59,37 @@ Client::motion(int x, int y)
 }
 
 void
+Client::make_new_ship_msg(const Matrix4& t, unsigned int id)
+{
+  message.push_back(NEW_SHIP);
+  message.push_back(id);
+  for(int i = 0; i < 4; ++i)
+    for(int j = 0; j < 4; ++j)
+      message.push_back(t[i][j]);
+}
+
+void
+Client::make_init_pos_msg()
+{
+  const Matrix4& t = ship->transformation();
+  message.push_back(INIT_POS);
+  for(int i = 0; i < 4; ++i)
+    for(int j = 0; j < 4; ++j)
+      message.push_back(t[i][j]);
+}
+
+void
 Client::parseMessage(boost::array<int, 1024> msg, unsigned int bytes)
 {
   unsigned int nums = bytes / sizeof(int);
   unsigned int i = 0;
   int x, y;
+/*
+  for(int i = 0; i < nums; ++i)
+    cout << msg[i] << ' ';
+  cout << endl;
+*/
+  last_msg = msg[i++];
   while(i < nums)
   {
     switch(msg[i])
@@ -85,8 +129,11 @@ Client::parseMessage(boost::array<int, 1024> msg, unsigned int bytes)
     case SPIN_R:
       ship->move_spinr(msg[++i] == 0);
       break;
+    default:
+      std::cout << "Error: protocol doesn't know what to do with header '" << msg[i] << '.' << std::endl;
+      break;
     }
     ++i;
-  }   
+  }
 }
 

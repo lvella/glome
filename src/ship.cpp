@@ -91,6 +91,9 @@ Ship::Ship():
     Drawable(Matrix4::IDENTITY),
     v_tilt(0.0f),
     h_tilt(0.0f),
+    v_req(0.0f),
+    h_req(0.0f),
+    accel(0.0f),
     speed(0.0f),
     speed_v(0.0f),
     speed_h(0.0f),
@@ -98,10 +101,12 @@ Ship::Ship():
     sps(15),
     shot_count(0),
     q(false),
-    rcanon_shot_last(false)
+    rcanon_shot_last(false),
+    msg_id(0)
 //    r_canon(xw_matrix(0.005) * zw_matrix(-0.015)),
 //    l_canon(xw_matrix(-0.005) * zw_matrix(-0.015))
 {
+  message.push_back(msg_id);
 }
 
 void Ship::draw()
@@ -164,7 +169,6 @@ void Ship::update()
     else
       shot_count = 0;
   }
-
   t = t * zw_matrix(speed) * yw_matrix(speed_v) * xw_matrix(speed_h) * xy_matrix(speed_s) * yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
 }
 

@@ -1,5 +1,6 @@
 #pragma once
 
+// INPUT
 #define QUIT 0
 #define TURN 1 
 #define MOVE_F 2
@@ -14,3 +15,7 @@
 #define COMMAND_BEGIN 0
 #define COMMAND_END 1
 
+// OPS
+#define JOIN_GAME 11
+#define NEW_SHIP 12
+#define INIT_POS 13
