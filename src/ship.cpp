@@ -6,10 +6,12 @@
 #include <GL/glew.h>
 #include <stdint.h>
 #include <iostream>
+#include <sstream>
 #include "4dmath.hpp"
 #include "ship.hpp"
 #include "projectile.hpp"
 #include "protocol.hpp"
+#include "config.hpp"
 
 using namespace std;
 
@@ -28,12 +30,13 @@ void Ship::initialize()
   uint16_t nguns;
 
   // Load file
-  #include "config.hpp"
-  cout << DATA_DIR << endl;
-  char dir[] = DATA_DIR;
-  strcat(dir,"/hunter.wire");
-  fd = fopen(dir, "rb");
-  assert(fd != NULL);
+ 
+  {
+    stringstream dir;
+    dir << DATA_DIR << "/hunter.wire";
+    fd = fopen(dir.str().c_str(), "rb");
+    assert(fd != NULL);
+  }
 
   {
     // Reading Guns Matrix
