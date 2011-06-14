@@ -19,9 +19,9 @@ public:
 
   NetWorld(bool, std::string, short int);
 
-  bool update();
-  void draw();
-  void fill_minimap();
+  virtual bool update();
+  virtual void draw();
+  virtual void fill_minimap();
   Ship* next_ship(const Matrix4& ref = Matrix4::IDENTITY);
   void handle_socket(const boost::system::error_code& error, std::size_t bytes);
   const std::vector<Ship*>& ships_list() { return ships; }
@@ -33,6 +33,7 @@ private:
   boost::asio::ip::udp::endpoint* receiver_endpoint;
   boost::asio::ip::udp::socket* cl_socket;
   std::vector<Ship*> ships;
+  std::vector<unsigned int> points;
   RandomCube cube;
   boost::asio::ip::udp::endpoint remote_endpoint;
   boost::array<float, 1024> recv_buf;

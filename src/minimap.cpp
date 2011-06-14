@@ -18,14 +18,13 @@ using namespace std;
 
 extern GLuint tex_ship;
 extern Ship ship;
-extern RandomCube* cube;
 
 static GLuint tex_minimap, program_map;
 static GLuint tex_object;
 static GLint proj_only_uniform;
 
 void
-MiniMap::draw(int wstart, World& world, const Matrix4& center)
+MiniMap::draw(int wstart, World* world, const Matrix4& center)
 {
   extern const int HEIGHT;
   extern const int WIDTH;
@@ -110,7 +109,7 @@ MiniMap::draw(int wstart, World& world, const Matrix4& center)
 
   glUniform1i(proj_only_uniform, 0);
   glBindTexture(GL_TEXTURE_2D, tex_object);
-  world.fill_minimap();
+  world->fill_minimap();
   glBindTexture(GL_TEXTURE_2D, 0);
 
   // Disable 2D

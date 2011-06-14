@@ -21,7 +21,8 @@
 #include "projectile.hpp"
 #include "init_gl.hpp"
 #include "udp_server.hpp"
-#include "world.hpp"
+#include "net_world.hpp"
+#include "split_world.hpp"
 #include "jsinput.hpp"
 
 using namespace std;
@@ -33,14 +34,12 @@ extern const int HEIGHT = 600;
 extern const float FOV = 45.0f;
 
 boost::asio::io_service gIOService;
-udp_server* server;
-udp::socket* cl_socket;
-udp::endpoint* receiver_endpoint;
 bool isServer;
 bool isClient;
 string orig;
 string host;
 short port;
+World* world;
 
 /* void update()
 {
@@ -89,7 +88,7 @@ short port;
 
 void main_loop()
 {
-  static World world;
+  world = new SplitWorld();
 
   const int FPS = 60;
   uint64_t frame_count = 0;
@@ -97,9 +96,9 @@ void main_loop()
   Uint32 ticks = SDL_GetTicks();
 
   while(running) {
-    running = world.update();
+    running = world->update();
 
-    world.draw();
+    world->draw();
     SDL_GL_SwapBuffers();
 
     // Fix framerate
@@ -172,11 +171,12 @@ int main(int argc, char **argv)
   // Initializations
   Input::Js::initialize(0);
   initialize_meridians();
-  World::initialize();
+  SplitWorld::initialize();
   MiniMap::initialize();
   Ship::initialize();
   Projectile::initialize();
 
+/*
   // Configure network
   if(argc == 1)
   {
@@ -210,7 +210,7 @@ int main(int argc, char **argv)
     cl_socket = new udp::socket(gIOService);
     cl_socket->open(udp::v4());
   }
-
+*/
   main_loop();
 
   SDL_Quit();

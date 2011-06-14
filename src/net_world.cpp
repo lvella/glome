@@ -32,7 +32,7 @@ Ship*
 NetWorld::next_ship(const Matrix4& ref)
 {
   ships.push_back(new Ship());
-  ships[ships.size() - 1]->set_t(ref);
+  ships[ships.size() - 1]->setTransformation(ref);
   return ships[ships.size() - 1];
 }
 
@@ -54,7 +54,7 @@ NetWorld::handle_socket(const boost::system::error_code& error, std::size_t byte
       case INIT_POS:
         it = recv_buf.begin() + i + 1;
         copy(it, it + 16, &t[0][0]);
-        ships[0]->set_t(t);
+        ships[0]->setTransformation(t);
         i += 17;
         break;
       case NEW_SHIP:
@@ -122,11 +122,22 @@ NetWorld::update()
   // Treat events
   run = Input::handle();
 
-  cube.update();
   Projectile::update_all();
 
+  Vector4 c = cube.transformation().position();
+
   for(int i = 0; i < ships.size(); ++i)
+  {
     ships[i]->update();
+    if(Projectile::collide(ships[i]))
+      ships[i]->setTransformation(cube.transformation() * yw_matrix(M_PI));
+
+    if((c - ships[i]->transformation().position()).squared_length() < (0.03f * 0.03f))
+    {
+      cube.randomize();
+      //std::cout << "Ship " << i << " scored " << ++points[i] << " points!" << std::endl;
+    }
+  }
 
   // Network update
   {
@@ -169,7 +180,7 @@ NetWorld::draw()
   for(int i = 0; i < ships.size(); ++i)
     ships[i]->draw();
 
-  MiniMap::draw(0, *this, center);
+  MiniMap::draw(0, this, center);
 }
 
 void

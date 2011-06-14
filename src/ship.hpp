@@ -107,12 +107,17 @@ public:
 
   const std::vector<int>& getMessage() const { return message; }
 
-  void clearMessage() { message.clear(); }
+  void clearMessage()
+  {
+    message.clear();
+    message.push_back(++msg_id);
+  }
 
 private:
   inline static void handle_commands(bool, bool, float &, float &, float);
   inline static void accelerate(float &, float &, float);
 
+  unsigned int msg_id;
   float v_req, h_req;
   float v_tilt, h_tilt;
   float accel, speed;
