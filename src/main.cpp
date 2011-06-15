@@ -36,60 +36,13 @@ extern const float FOV = 45.0f;
 boost::asio::io_service gIOService;
 bool isServer;
 bool isClient;
-string orig;
 string host;
 short port;
 World* world;
-
-/* void update()
-{
-  Drawable::update_all();
-  Projectile::update_all();
-  ship.update();
-
-  if(isServer)
-  {
-    //ship.update();
-    server->update();
-  }
-  else if(isClient)
-  {
-        const vector<int>& v = ship.getMessage();
-    if(v.size() > 0)
-    {
-      int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
-      //cout << "Size: " << v.size() << " | RE: " << re << endl;
-      ship.clearMessage();
-
-      //cout << "Old matrix: " << endl;
-      //cout << ship.transformation() << endl;
-
-      boost::array<float, 16> recv_buf;
-      udp::endpoint sender_endpoint;
-      size_t len = cl_socket->receive_from(boost::asio::buffer(recv_buf), sender_endpoint);
-      if(len < (sizeof(float) * 16))
-        cout << "Error" << endl;
-      else
-      {
-        //cout << "Setando" << endl;
-        Matrix4 m;
-        int k;
-        for(int i = 0, k = 0; i < 4; ++i)
-          for(int j = 0; j < 4; ++j, ++k)
-            m[i][j] = recv_buf[k];
-        ship.set(m);
-      }
-
-      //cout << "New matrix: " << endl;
-      //cout << ship.transformation() << endl;
-    }
-  }
-}*/
+bool isSplit;
 
 void main_loop()
 {
-  world = new SplitWorld();
-
   const int FPS = 60;
   uint64_t frame_count = 0;
   bool running = true;
@@ -168,49 +121,41 @@ int main(int argc, char **argv)
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 
-  // Initializations
-  Input::Js::initialize(0);
-  initialize_meridians();
-  SplitWorld::initialize();
-  MiniMap::initialize();
-  Ship::initialize();
-  Projectile::initialize();
-
-/*
   // Configure network
   if(argc == 1)
   {
     isServer = isClient = false;
+    isSplit = true;
   }
-  else
+  else if(argc == 4)
   {
-    if(argc == 4)
-    {
-      host = argv[2];
-      port = atoi(argv[3]);
-    }
-    else if(argc == 5)
-    {
-      orig = argv[2];
-      host = argv[3];
-      port = atoi(argv[4]);
-    }
+    host = argv[2];
+    port = atoi(argv[3]);
+
+    isSplit = false;
     isServer = (atoi(argv[1]) == 0);
     isClient = !isServer;
   }
-  if(isServer)
-  {
-    server = new udp_server(port);
-  }
-  else if(isClient)
-  {
-    receiver_endpoint = new udp::endpoint(udp::v4(), port);
-    receiver_endpoint->address(boost::asio::ip::address::from_string(host));
 
-    cl_socket = new udp::socket(gIOService);
-    cl_socket->open(udp::v4());
+  // Initializations
+  Input::Js::initialize(0);
+  initialize_meridians();
+  if(isSplit)
+  {
+    SplitWorld::initialize();
+    world = new SplitWorld();
   }
-*/
+  else
+  {
+    NetWorld::initialize();
+    if(isServer)
+      Server::initialize(port);
+    world = new NetWorld(isClient, host, port);
+  }
+  MiniMap::initialize();
+  Ship::initialize();
+  Projectile::initialize();
+
   main_loop();
 
   SDL_Quit();
