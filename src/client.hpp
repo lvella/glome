@@ -19,6 +19,7 @@ public:
   void motion(int x, int y);
   void parseMessage(boost::array<int, 1024>, unsigned int);
   Ship* get_ship() { return ship; }
+  void make_update_ship_msg(const Matrix4& t, unsigned int id);
   void make_new_ship_msg(const Matrix4& t, unsigned int id);
   void make_init_pos_msg();
   const std::vector<float>& get_message() { return message; } ;

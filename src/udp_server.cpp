@@ -24,7 +24,7 @@ boost::array<int, 1024> recv_buf;
 boost::asio::deadline_timer* timer;
 map<string, Client*> end_cl_map;
 const int pkg_lim = 5;
-const int delta = 1000; // in ms
+const int delta = 1; // in ms
 int pkg_count;
 
 void
@@ -32,7 +32,6 @@ set_timer()
 {
   timer->expires_from_now(boost::posix_time::milliseconds(delta));
   timer->async_wait(handle_timer);
-  gIOService.poll();
 }
 
 void
@@ -67,7 +66,7 @@ send_to_client(Client* cl)
 }
 
 void
-sync_client_world(Client* cl)
+sync_client_world(Client* cl, bool update)
 {
   const vector<Ship*>& ships = world->ships_list();
   Ship* cl_s = cl->get_ship();
@@ -77,7 +76,12 @@ sync_client_world(Client* cl)
     if(ships[i] == cl_s)
       id = i;
     else
-      cl->make_new_ship_msg(ships[i]->transformation(), (i < id) ? (i + 1) : id);
+    {
+      if(update)
+        cl->make_update_ship_msg(ships[i]->transformation(), (i <= id) ? (i + 1) : id);
+      else
+        cl->make_new_ship_msg(ships[i]->transformation(), (i <= id) ? (i + 1) : id);
+    }
   }
   send_to_client(cl);
 }
@@ -95,7 +99,7 @@ handle_socket(const boost::system::error_code& error, std::size_t bytes)
       udp::endpoint* new_end = new udp::endpoint(remote_endpoint);
       cl = new Client(new_end);
       end_cl_map[addr] = cl;
-      sync_client_world(cl);
+      sync_client_world(cl, false);
     }
     else
     {
@@ -107,8 +111,7 @@ handle_socket(const boost::system::error_code& error, std::size_t bytes)
     {
       pkg_count = 0;
       timer->cancel();
-      gIOService.poll();
-      //update_clients();
+      update_clients();
       set_timer();
     }
 
@@ -121,39 +124,22 @@ handle_timer(const boost::system::error_code& error)
 {
   if(!error)
   {
-    if(pkg_count > 0)
-    {
-      //update_clients();
-      pkg_count = 0;
-    }
+    update_clients();
     set_timer();
   }
+  else
+    ;//cout << "TIMER ERROR: " << error.message().data() << endl;
 }
 
 void
 update_clients()
 {
-/*
-  boost::array<float, 16> send_buf;
-  Client* cl;
-  int i, j, k;
-  map<udp::endpoint*, Client*>::iterator it = end_cl_map.begin();
-  
-  for(++it; it != end_cl_map.end(); ++it)
-  {
-    cl = it->second;
-    Matrix4 t = cl->getShip()->transformation();
-    for(i = 0, k = 0; i < 4; ++i)
-      for(j = 0; j < 4; ++j, ++k)
-        send_buf[k] = t[i][j];
+  if(end_cl_map.size() == 0)
+    return;
 
-    boost::system::error_code ignored_error;
-    socket->send_to(boost::asio::buffer(send_buf),
-                   remote_endpoint,
-                   0,
-                   ignored_error);
-  }
-*/
+  map<string, Client*>::iterator it = end_cl_map.begin();
+  for(; it != end_cl_map.end(); ++it)
+    sync_client_world(it->second);
 }
 
 void

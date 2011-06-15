@@ -19,3 +19,6 @@
 #define JOIN_GAME 11
 #define NEW_SHIP 12
 #define INIT_POS 13
+#define UPDATE_SHIP 14
+#define SHIP_POS 15
+

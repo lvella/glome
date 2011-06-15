@@ -59,6 +59,16 @@ Client::motion(int x, int y)
 }
 
 void
+Client::make_update_ship_msg(const Matrix4& t, unsigned int id)
+{
+  message.push_back(UPDATE_SHIP);
+  message.push_back(id);
+  for(int i = 0; i < 4; ++i)
+    for(int j = 0; j < 4; ++j)
+      message.push_back(t[i][j]);
+}
+
+void
 Client::make_new_ship_msg(const Matrix4& t, unsigned int id)
 {
   message.push_back(NEW_SHIP);

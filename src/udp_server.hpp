@@ -18,5 +18,5 @@ namespace Server
   void set_timer();
   void send_to_client(const std::vector<float>&, Client *);
   void send_to_client(Client *);
-  void sync_client_world(Client* cl);
+  void sync_client_world(Client* cl, bool update = true);
 }

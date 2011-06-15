@@ -60,10 +60,22 @@ NetWorld::handle_socket(const boost::system::error_code& error, std::size_t byte
         break;
       case NEW_SHIP:
         s_id = recv_buf[++i];
+        //if(s_id != ships.size())
+          //cout << "It should not happen.." << endl;
         it = recv_buf.begin() + i + 1;
         copy(it, it + 16, &t[0][0]);
         i += 17;
         next_ship(t);
+        break;
+      case UPDATE_SHIP:
+        s_id = recv_buf[++i];
+        //cout << "UPDATE SHIP " << s_id << endl;
+        it = recv_buf.begin() + i + 1;
+        copy(it, it + 16, &t[0][0]);
+        i += 17;
+        if(s_id >= ships.size())
+          cout << "Trying to update position of ship " << s_id << ", but i have only " << ships.size() << '.' << endl;
+        ships[s_id]->setTransformation(t);
         break;
       }
     }
@@ -135,6 +147,9 @@ NetWorld::update()
 
   Vector4 c = cube.transformation().position();
 
+  ships[0]->update();
+
+/*
   for(int i = 0; i < ships.size(); ++i)
   {
     ships[i]->update();
@@ -147,6 +162,7 @@ NetWorld::update()
       //std::cout << "Ship " << i << " scored " << ++points[i] << " points!" << std::endl;
     }
   }
+*/
 
   // Network update
   {
