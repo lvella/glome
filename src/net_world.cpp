@@ -13,6 +13,7 @@
 #include "kbinput.hpp"
 #include "jsinput.hpp"
 #include "protocol.hpp"
+#include "main.hpp"
 
 #include "net_world.hpp"
 
@@ -100,6 +101,14 @@ NetWorld::NetWorld(bool isc, string host, short int port)
                                       boost::asio::placeholders::bytes_transferred));
 
   }
+
+  // 3-D to 2-D projection
+  glViewport(0, 0, WIDTH, HEIGHT);
+  glMatrixMode(GL_PROJECTION);
+  glLoadIdentity();
+  gluPerspective(FOV, double(WIDTH) / double(HEIGHT), 0.001, 5);
+  glMatrixMode(GL_MODELVIEW);
+  glLoadIdentity();
 }
 
 void
@@ -159,11 +168,10 @@ NetWorld::update()
 void
 NetWorld::draw()
 {
-  extern const int WIDTH, HEIGHT;
   const Matrix4 offset(yz_matrix(0.2) * zw_matrix(-0.015) * yw_matrix(-0.01));
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  glViewport(0, 0, WIDTH, HEIGHT);
+
   Matrix4 center = ships[0]->transformation().transpose();
 
   // Camera transform

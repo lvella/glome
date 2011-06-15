@@ -25,13 +25,15 @@
 #include "split_world.hpp"
 #include "jsinput.hpp"
 
+#include "main.hpp"
+
 using namespace std;
 using namespace boost::asio::ip;
 
-extern const int WIDTH = 800;
-extern const int HEIGHT = 600;
+const int WIDTH = 800;
+const int HEIGHT = 600;
 
-extern const float FOV = 45.0f;
+const float FOV = 45.0f;
 
 boost::asio::io_service gIOService;
 bool isServer;
@@ -112,14 +114,6 @@ int main(int argc, char **argv)
   glFogf(GL_FOG_END, 3.0f);
   glFogf(GL_FOG_START, 2.0f);
   glEnable(GL_FOG);
-
-  // 3D to 2D projection
-  //glViewport(0, 0, WIDTH, HEIGHT);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(FOV, 0.5*double(WIDTH) / double(HEIGHT), 0.001, 5);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
 
   // Configure network
   if(argc == 1)

@@ -8,6 +8,7 @@
 #include "input.hpp"
 #include "kbinput.hpp"
 #include "jsinput.hpp"
+#include "main.hpp"
 
 #include "split_world.hpp"
 
@@ -58,14 +59,22 @@ bool SplitWorld::update()
 
 void SplitWorld::draw()
 {
-  extern const int WIDTH, HEIGHT;
   const Matrix4 offset(yz_matrix(0.2) * zw_matrix(-0.015) * yw_matrix(-0.01));
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   for(iter = 0; iter < 2; ++iter)
     {
       int wstart = iter * WIDTH/2;
-      glViewport(wstart, 0, WIDTH/2, HEIGHT);
+
+      {
+        glViewport(wstart, 0, WIDTH/2, HEIGHT);
+        glMatrixMode(GL_PROJECTION);
+        glLoadIdentity();
+        gluPerspective(FOV, 0.5*double(WIDTH) / double(HEIGHT), 0.001, 5);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+      }
+
       Matrix4 center = ship[iter].transformation().transpose();
 
       // Camera transform
