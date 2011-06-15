@@ -23,8 +23,8 @@ udp::endpoint remote_endpoint;
 boost::array<int, 1024> recv_buf;
 boost::asio::deadline_timer* timer;
 map<string, Client*> end_cl_map;
-const int pkg_lim = 5;
-const int delta = 1; // in ms
+const int pkg_lim = 200000000;
+const int delta = 1000; // in ms
 int pkg_count;
 
 void
@@ -74,7 +74,10 @@ sync_client_world(Client* cl, bool update)
   for(int i = 0; i < ships.size(); ++i)
   {
     if(ships[i] == cl_s)
+    {
       id = i;
+      cl->make_update_ship_msg(ships[i]->transformation(), 0);
+    }
     else
     {
       if(update)

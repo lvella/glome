@@ -12,7 +12,7 @@
 extern int WIDTH;
 extern int HEIGHT;
 
-extern NetWorld* world;
+extern World* world;
 
 using namespace std;
 using boost::asio::ip::udp;
@@ -21,13 +21,16 @@ Client::Client(udp::endpoint* end)
 {
   last_msg = 0;
   remote_endpoint = end;
-  ship = world->next_ship(
+  ship = ((NetWorld*)world)->next_ship(
+		  /*
         xy_matrix(rand()/10000.0f)
       * xz_matrix(rand()/10000.0f)
       * yz_matrix(rand()/10000.0f)
       * xw_matrix(rand()/10000.0f)
       * yw_matrix(rand()/10000.0f)
-      * zw_matrix(rand()/10000.0f));
+      * zw_matrix(rand()/10000.0f)
+      */
+		  Matrix4::IDENTITY);
   make_init_pos_msg();
   Server::send_to_client(message, this);
 }

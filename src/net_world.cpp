@@ -75,7 +75,17 @@ NetWorld::handle_socket(const boost::system::error_code& error, std::size_t byte
         i += 17;
         if(s_id >= ships.size())
           cout << "Trying to update position of ship " << s_id << ", but i have only " << ships.size() << '.' << endl;
-        ships[s_id]->setTransformation(t);
+
+        if(s_id == 0)
+        {
+          interp = true;
+          param_t = 0.0f;
+          interp_from = ships[0]->transformation();
+          interp_to = t;
+          //cout << "Setando interpolação:\nFrom:\n" << interp_from << "To:\n" << interp_to << endl;
+        }
+        else
+          ships[s_id]->setTransformation(t);
         break;
       }
     }
@@ -87,7 +97,9 @@ NetWorld::handle_socket(const boost::system::error_code& error, std::size_t byte
                                         boost::asio::placeholders::bytes_transferred));
 }
 
-NetWorld::NetWorld(bool isc, string host, short int port)
+NetWorld::NetWorld(bool isc, string host, short int port):
+		interp(false),
+		param_t(0.0f)
 {
   ships.push_back(new Ship());
   Input::Kb::set_ship(ships[0]);
@@ -147,7 +159,30 @@ NetWorld::update()
 
   Vector4 c = cube.transformation().position();
 
-  ships[0]->update();
+  if(!interp)
+    ships[0]->update();
+  else
+  {
+	if(param_t > 1.1f)
+	{
+	  interp = false;
+	  param_t = 0.f;
+	}
+	else
+	{
+	  ships[0]->setTransformation(interp_from.interpolation(interp_to, param_t));
+	  //cout << "Interpolando: " << param_t * 10 << '\n' << ships[0]->transformation() << endl;
+	  param_t += 0.1f;
+	}
+  }
+
+  if(!isClient)
+    for(int e = 1; e < ships.size(); ++e)
+      ships[e]->update();
+  else
+  {
+
+  }
 
 /*
   for(int i = 0; i < ships.size(); ++i)
