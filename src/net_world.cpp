@@ -14,6 +14,8 @@
 #include "jsinput.hpp"
 #include "protocol.hpp"
 #include "main.hpp"
+#include "net_input.hpp"
+#include "udp_server.hpp"
 
 #include "net_world.hpp"
 
@@ -42,53 +44,7 @@ NetWorld::handle_socket(const boost::system::error_code& error, std::size_t byte
 {
   if(!error)
   {
-    unsigned int nums = bytes / sizeof(int);
-    unsigned int i = 0;
-    int s_id;
-    int x, y;
-    Matrix4 t;
-    boost::array<float, 16>::iterator it;
-    while(i < nums)
-    {
-      switch(int(recv_buf[i]))
-      {
-      case INIT_POS:
-        it = recv_buf.begin() + i + 1;
-        copy(it, it + 16, &t[0][0]);
-        ships[0]->setTransformation(t);
-        i += 17;
-        break;
-      case NEW_SHIP:
-        s_id = recv_buf[++i];
-        //if(s_id != ships.size())
-          //cout << "It should not happen.." << endl;
-        it = recv_buf.begin() + i + 1;
-        copy(it, it + 16, &t[0][0]);
-        i += 17;
-        next_ship(t);
-        break;
-      case UPDATE_SHIP:
-        s_id = recv_buf[++i];
-        //cout << "UPDATE SHIP " << s_id << endl;
-        it = recv_buf.begin() + i + 1;
-        copy(it, it + 16, &t[0][0]);
-        i += 17;
-        if(s_id >= ships.size())
-          cout << "Trying to update position of ship " << s_id << ", but i have only " << ships.size() << '.' << endl;
-
-        if(s_id == 0)
-        {
-          interp = true;
-          param_t = 0.0f;
-          interp_from = ships[0]->transformation();
-          interp_to = t;
-          //cout << "Setando interpolação:\nFrom:\n" << interp_from << "To:\n" << interp_to << endl;
-        }
-        else
-          ships[s_id]->setTransformation(t);
-        break;
-      }
-    }
+	NetInput::parse_message(recv_buf, bytes, true);
   }
 
   cl_socket->async_receive_from(boost::asio::buffer(recv_buf),
@@ -158,7 +114,7 @@ NetWorld::update()
   Projectile::update_all();
 
   Vector4 c = cube.transformation().position();
-
+/*
   if(!interp)
     ships[0]->update();
   else
@@ -175,14 +131,13 @@ NetWorld::update()
 	  param_t += 0.1f;
 	}
   }
-
-  if(!isClient)
-    for(int e = 1; e < ships.size(); ++e)
+*/
+  //if(!isClient)
+    for(int e = 0; e < ships.size(); ++e)
       ships[e]->update();
-  else
-  {
-
-  }
+  //else
+  //{
+  //}
 
 /*
   for(int i = 0; i < ships.size(); ++i)
@@ -200,17 +155,16 @@ NetWorld::update()
 */
 
   // Network update
+  Ship* ship = ships[0];
+  const vector<int>& v = ship->getMessage();
+  if(v.size() > 0)
   {
-    if(isClient)
-    {
-      Ship* ship = ships[0];
-      const vector<int>& v = ship->getMessage();
-      if(v.size() > 1)
-      {
-        int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
-        ship->clearMessage();
-      }
-    }
+	if(isClient)
+      int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
+	else
+	  Server::send_to_all(v, v.size() * sizeof(int), 0);
+
+    ship->clearMessage();
   }
 
   return run;

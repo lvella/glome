@@ -1,11 +1,13 @@
-#include <map>
+#include <algorithm>
 #include <iostream>
+#include <map>
 
 #include <boost/thread.hpp>
 
 #include "client.hpp"
 #include "net_world.hpp"
 #include "protocol.hpp"
+#include "net_input.hpp"
 
 #include "udp_server.hpp"
 
@@ -18,9 +20,10 @@ using boost::asio::ip::udp;
 namespace Server
 {
 
+float buf[1025];
 boost::asio::ip::udp::socket* socket;
 udp::endpoint remote_endpoint;
-boost::array<int, 1024> recv_buf;
+boost::array<float, 1024> recv_buf;
 boost::asio::deadline_timer* timer;
 map<string, Client*> end_cl_map;
 const int pkg_lim = 200000000;
@@ -40,6 +43,17 @@ start_receive()
   socket->async_receive_from(boost::asio::buffer(recv_buf),
                       remote_endpoint,
                       handle_socket);
+}
+
+inline void
+send_to_client(const boost::array<float, 1024>& message, unsigned int bytes, Client* cl)
+{
+  boost::system::error_code ignored_error;
+  socket->send_to(boost::asio::buffer(message, bytes),
+                 cl->target(),
+                 0,
+                 ignored_error);
+  cl->clear_message();
 }
 
 void
@@ -76,14 +90,14 @@ sync_client_world(Client* cl, bool update)
     if(ships[i] == cl_s)
     {
       id = i;
-      cl->make_update_ship_msg(ships[i]->transformation(), 0);
+      cl->make_update_ship_msg(ships[i]->transformation(), true);
     }
     else
     {
       if(update)
-        cl->make_update_ship_msg(ships[i]->transformation(), (i <= id) ? (i + 1) : id);
+        cl->make_update_ship_msg(ships[i]->transformation());
       else
-        cl->make_new_ship_msg(ships[i]->transformation(), (i <= id) ? (i + 1) : id);
+        cl->make_new_ship_msg(ships[i]->transformation());
     }
   }
   send_to_client(cl);
@@ -107,9 +121,12 @@ handle_socket(const boost::system::error_code& error, std::size_t bytes)
     else
     {
       cl = it->second;
-      cl->parseMessage(recv_buf, bytes);
+      send_to_all(recv_buf, bytes, cl->get_id());
+      NetInput::set_ship(cl->get_ship());
+      NetInput::parse_message(recv_buf, bytes, false);
     }
 
+    /*
     if(++pkg_count == pkg_lim)
     {
       pkg_count = 0;
@@ -117,6 +134,7 @@ handle_socket(const boost::system::error_code& error, std::size_t bytes)
       update_clients();
       set_timer();
     }
+    */
 
     start_receive();
   }
@@ -152,7 +170,7 @@ initialize(short int port, int threads)
   socket = new boost::asio::ip::udp::socket(gIOService, udp::endpoint(udp::v4(), port));
   timer = new boost::asio::deadline_timer(gIOService);
   start_receive();
-  set_timer();
+  //set_timer();
   for(int i = 0; i < threads; ++i)
     boost::thread service(boost::bind(&boost::asio::io_service::run, &gIOService));
 }

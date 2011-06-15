@@ -110,7 +110,7 @@ public:
   void clearMessage()
   {
     message.clear();
-    message.push_back(++msg_id);
+    //message.push_back(++msg_id);
   }
 
 private:
