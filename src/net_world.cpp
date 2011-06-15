@@ -156,7 +156,7 @@ NetWorld::update()
 
   // Network update
   Ship* ship = ships[0];
-  const vector<int>& v = ship->getMessage();
+  const vector<float>& v = ship->getMessage();
   if(v.size() > 0)
   {
 	if(isClient)

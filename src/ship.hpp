@@ -105,7 +105,7 @@ public:
     message.push_back(QUIT);
   }
 
-  const std::vector<int>& getMessage() const { return message; }
+  const std::vector<float>& getMessage() const { return message; }
 
   void clearMessage()
   {
@@ -138,7 +138,7 @@ private:
   bool q;
   int sps;
   int shot_count;
-  std::vector<int> message;
+  std::vector<float> message;
 
   bool rcanon_shot_last;
 
