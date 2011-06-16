@@ -37,6 +37,10 @@ private:
   RandomCube cube;
   boost::asio::ip::udp::endpoint remote_endpoint;
   boost::array<float, 1024> recv_buf;
+  bool interp;
+  float param_t;
+  Matrix4 interp_from;
+  Matrix4 interp_to;
 
   // Camera transform historic
   std::deque<Matrix4> cam_hist;

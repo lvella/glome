@@ -122,7 +122,7 @@ Ship::Ship():
 //    r_canon(xw_matrix(0.005) * zw_matrix(-0.015)),
 //    l_canon(xw_matrix(-0.005) * zw_matrix(-0.015))
 {
-  message.push_back(msg_id);
+  //message.push_back(msg_id);
 }
 
 void Ship::draw()

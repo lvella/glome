@@ -14,6 +14,8 @@
 #include "jsinput.hpp"
 #include "protocol.hpp"
 #include "main.hpp"
+#include "net_input.hpp"
+#include "udp_server.hpp"
 
 #include "net_world.hpp"
 
@@ -42,31 +44,7 @@ NetWorld::handle_socket(const boost::system::error_code& error, std::size_t byte
 {
   if(!error)
   {
-    unsigned int nums = bytes / sizeof(int);
-    unsigned int i = 0;
-    int s_id;
-    int x, y;
-    Matrix4 t;
-    boost::array<float, 16>::iterator it;
-    while(i < nums)
-    {
-      switch(int(recv_buf[i]))
-      {
-      case INIT_POS:
-        it = recv_buf.begin() + i + 1;
-        copy(it, it + 16, &t[0][0]);
-        ships[0]->setTransformation(t);
-        i += 17;
-        break;
-      case NEW_SHIP:
-        s_id = recv_buf[++i];
-        it = recv_buf.begin() + i + 1;
-        copy(it, it + 16, &t[0][0]);
-        i += 17;
-        next_ship(t);
-        break;
-      }
-    }
+	NetInput::parse_message(recv_buf, bytes, true);
   }
 
   cl_socket->async_receive_from(boost::asio::buffer(recv_buf),
@@ -75,7 +53,9 @@ NetWorld::handle_socket(const boost::system::error_code& error, std::size_t byte
                                         boost::asio::placeholders::bytes_transferred));
 }
 
-NetWorld::NetWorld(bool isc, string host, short int port)
+NetWorld::NetWorld(bool isc, string host, short int port):
+		interp(false),
+		param_t(0.0f)
 {
   ships.push_back(new Ship());
   Input::Kb::set_ship(ships[0]);
@@ -134,7 +114,32 @@ NetWorld::update()
   Projectile::update_all();
 
   Vector4 c = cube.transformation().position();
+/*
+  if(!interp)
+    ships[0]->update();
+  else
+  {
+	if(param_t > 1.1f)
+	{
+	  interp = false;
+	  param_t = 0.f;
+	}
+	else
+	{
+	  ships[0]->setTransformation(interp_from.interpolation(interp_to, param_t));
+	  //cout << "Interpolando: " << param_t * 10 << '\n' << ships[0]->transformation() << endl;
+	  param_t += 0.1f;
+	}
+  }
+*/
+  //if(!isClient)
+    for(int e = 0; e < ships.size(); ++e)
+      ships[e]->update();
+  //else
+  //{
+  //}
 
+/*
   for(int i = 0; i < ships.size(); ++i)
   {
     ships[i]->update();
@@ -147,19 +152,19 @@ NetWorld::update()
       //std::cout << "Ship " << i << " scored " << ++points[i] << " points!" << std::endl;
     }
   }
+*/
 
   // Network update
+  Ship* ship = ships[0];
+  const vector<float>& v = ship->getMessage();
+  if(v.size() > 0)
   {
-    if(isClient)
-    {
-      Ship* ship = ships[0];
-      const vector<int>& v = ship->getMessage();
-      if(v.size() > 1)
-      {
-        int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
-        ship->clearMessage();
-      }
-    }
+	if(isClient)
+      int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
+	else
+	  Server::send_to_all(v, v.size() * sizeof(int), 0);
+
+    ship->clearMessage();
   }
 
   return run;
