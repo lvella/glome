@@ -30,8 +30,8 @@
 using namespace std;
 using namespace boost::asio::ip;
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
+const int WIDTH = 1440;
+const int HEIGHT = 900;
 
 const float FOV = 45.0f;
 
@@ -82,7 +82,7 @@ int main(int argc, char **argv)
     return 1;
   }
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL /*| SDL_FULLSCREEN*/);
+  SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL | SDL_FULLSCREEN);
   SDL_WM_SetCaption("Navigna", NULL);
   SDL_ShowCursor(SDL_DISABLE);
   SDL_JoystickEventState(SDL_ENABLE);
