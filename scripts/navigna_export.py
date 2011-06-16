@@ -95,7 +95,7 @@ def export(obj, data):
 def export_mesh(bfile, data):
   bfile.write(struct.pack('<H', len(data.vertices)))
   for v in data.vertices:
-    out = vertex_conv(v.co, scale)# scale is hardcoded?
+    out = vertex_conv(v.co, scale)
     bfile.write(struct.pack('<f', out[0]))
     bfile.write(struct.pack('<f', out[1]))
     bfile.write(struct.pack('<f', out[2]))

@@ -33,7 +33,7 @@ void Ship::initialize()
  
   {
     stringstream dir;
-    dir << DATA_DIR << "/hunter.wire";
+    dir << DATA_DIR << "/destroyer.wire";
     fd = fopen(dir.str().c_str(), "rb");
     assert(fd != NULL);
   }
