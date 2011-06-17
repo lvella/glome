@@ -12,6 +12,8 @@ AM_INIT_AUTOMAKE([-Wall -Werror])
 
 AC_PROG_CXX
 
+AC_PATH_PROG(PKG_CONFIG, pkg-config)
+
 #http://www.gnu.org/software/autoconf-archive/ax_prog_doxygen.html
 m4_include([m4/ax_prog_doxygen.m4])
 DX_DOXYGEN_FEATURE(ON)
@@ -40,6 +42,11 @@ AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
 AM_PATH_SDL(1.2.11, :, AC_MSG_ERROR(SDL not found. Make sure sdl-config is in your PATH, or specify with --with-sdl-prefix))
 AC_LANG_RESTORE
+
+# Check for Guichan
+GUICHAN_LIBS=""
+AC_CHECK_LIB([guichan], [gcnGuichanVersion], GUICHAN_LIBS="-lguichan", AC_MSG_ERROR([Could not find lib Guichan (http://guichan.sourceforge.net/)]))
+AC_SUBST(GUICHAN_LIBS)
 
 # Check for Blender
 AC_CHECK_BLENDER([2.57])
