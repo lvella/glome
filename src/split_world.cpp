@@ -5,11 +5,12 @@
 #include "minimap.hpp"
 #include "meridian.hpp"
 #include "shader.hpp"
+#include "main.hpp"
 #include "input.hpp"
 #include "kbinput.hpp"
 #include "jsinput.hpp"
-#include "main.hpp"
-
+#include "ship.hpp"
+#include "mesh.hpp"
 #include "split_world.hpp"
 
 static GLuint program;

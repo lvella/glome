@@ -16,7 +16,7 @@
 #include "main.hpp"
 #include "net_input.hpp"
 #include "udp_server.hpp"
-
+#include "mesh.hpp"
 #include "net_world.hpp"
 
 static GLuint program;
@@ -34,7 +34,7 @@ void NetWorld::initialize()
 Ship*
 NetWorld::next_ship(const Matrix4& ref)
 {
-  ships.push_back(new Ship());
+  ships.push_back(new Ship(DESTROYER));
   ships[ships.size() - 1]->setTransformation(ref);
   return ships[ships.size() - 1];
 }
@@ -57,7 +57,7 @@ NetWorld::NetWorld(bool isc, string host, short int port):
 		interp(false),
 		param_t(0.0f)
 {
-  ships.push_back(new Ship());
+  ships.push_back(new Ship(HUNTER));
   Input::Kb::set_ship(ships[0]);
 
   cam_hist.resize(10, Matrix4::IDENTITY);

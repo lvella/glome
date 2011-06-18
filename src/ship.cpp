@@ -1,9 +1,9 @@
+#include <GL/glew.h>
 #include <map>
+#include <list>
 #include <algorithm>
 #include <cmath>
 #include <cassert>
-#include <stdio.h>
-#include <GL/glew.h>
 #include <stdint.h>
 #include <iostream>
 #include <sstream>
@@ -11,88 +11,10 @@
 #include "ship.hpp"
 #include "projectile.hpp"
 #include "protocol.hpp"
-#include "config.hpp"
 
 using namespace std;
 
-static int dlist;
-Matrix4 Ship::r_canon;
-Matrix4 Ship::l_canon;
-
-void Ship::initialize()
-{
-  int ret;
-  FILE *fd;
-  GLuint vbo;
-  GLuint ibo;
-  uint16_t ilen;
-  uint16_t vlen;
-  uint16_t nguns;
-
-  // Load file
- 
-  {
-    stringstream dir;
-    dir << DATA_DIR << "/destroyer.wire";
-    fd = fopen(dir.str().c_str(), "rb");
-    assert(fd != NULL);
-  }
-
-  {
-    // Reading Guns Matrix
-    ret = fread(&nguns, sizeof(nguns), 1, fd);
-    assert(ret == 1);
-
-    ret = fread(&l_canon[0][0], sizeof(float), 16, fd);
-    assert (ret == 16);
-
-    ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
-    assert (ret == 16);
-  }
-
-  {
-    // Reading 4-D coordinates
-    ret = fread(&vlen, sizeof(vlen), 1, fd);
-    assert(ret == 1);
-
-    // Create vertex buffer
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vlen * 4 * sizeof(float), NULL, GL_STATIC_DRAW);
-    float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    ret = fread(vdata, sizeof(float) * 4, vlen, fd);
-    assert(ret == vlen);
-    glUnmapBuffer(GL_ARRAY_BUFFER);
-  }
-
-  {
-    ret = fread(&ilen, sizeof(ilen), 1, fd);
-    assert(ret == 1);
-
-    // Create index buffer
-    glGenBuffers(1, &ibo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ilen * sizeof(uint16_t) * 2, NULL, GL_STATIC_DRAW);
-    uint16_t *idata = (uint16_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
-
-    ret = fread(idata, sizeof(uint16_t) * 2, ilen, fd);
-    assert(ret == ilen);
-
-    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
-  }
-
-  fclose(fd);
-
-  // Create the display list
-  dlist = glGenLists(1);
-  glNewList(dlist, GL_COMPILE);
-  glColor3ub(80, 80, 80);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glVertexPointer(4, GL_FLOAT, 0, NULL);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glDrawRangeElements(GL_LINES, 0, vlen-1, ilen*2, GL_UNSIGNED_SHORT, NULL);
-  glEndList();
-}
+extern std::list<Mesh *> mesh_list;
 
 Ship::Ship():
     Drawable(Matrix4::IDENTITY),
@@ -119,18 +41,49 @@ Ship::Ship():
     shot_count(0),
     rcanon_shot_last(false),
     msg_id(0)
-//    r_canon(xw_matrix(0.005) * zw_matrix(-0.015)),
-//    l_canon(xw_matrix(-0.005) * zw_matrix(-0.015))
 {
+  mesh = Mesh::get_mesh(HUNTER);
   //message.push_back(msg_id);
+}
+
+Ship::Ship(ShipMesh type):
+    Drawable(Matrix4::IDENTITY),
+    v_tilt(0.0f),
+    h_tilt(0.0f),
+    v_req(0.0f),
+    h_req(0.0f),
+    accel(0.0f),
+    speed(0.0f),
+    speed_v(0.0f),
+    speed_h(0.0f),
+    speed_s(0.0f),
+    forward(false),
+    backward(false),
+    up(false),
+    down(false),
+    left(false),
+    right(false),
+    spinl(false),
+    spinr(false),
+    sh(false),
+    q(false),
+    sps(15),
+    shot_count(0),
+    rcanon_shot_last(false),
+    msg_id(0)
+{
+  mesh = Mesh::get_mesh(type);
+  //message.push_back(msg_id);
+}
+
+Ship::~Ship()
+{
+  Mesh::release_mesh(mesh);
 }
 
 void Ship::draw()
 {
-  glPushMatrix();
-  t.multToGL();
-  glCallList(dlist);
-  glPopMatrix();
+  mesh->draw(t);
 }
 
 void Ship::update()
@@ -178,7 +131,7 @@ void Ship::update()
   shot_count -= sps;
   if(shot_count < 0) {
     if(sh) {
-      Projectile::shot(this, t * (rcanon_shot_last ? l_canon : r_canon), 0.02 - speed);
+      Projectile::shot(this, t * (rcanon_shot_last ? mesh->get_lcanon() : mesh->get_rcanon()), 0.02 - speed);
       shot_count += 60;
       rcanon_shot_last = !rcanon_shot_last;
     }
