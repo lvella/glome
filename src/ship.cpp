@@ -1,6 +1,4 @@
-#include <GL/glew.h>
 #include <map>
-#include <list>
 #include <algorithm>
 #include <cmath>
 #include <cassert>
@@ -13,8 +11,6 @@
 #include "protocol.hpp"
 
 using namespace std;
-
-extern std::list<Mesh *> mesh_list;
 
 Ship::Ship():
     Drawable(Matrix4::IDENTITY),
