@@ -49,7 +49,7 @@ AC_SUBST(SDL_IMAGE_LIBS)
 
 # Check for Guichan
 GUICHAN_LIBS=""
-AC_CHECK_LIB([guichan], [gcnGuichanVersion], GUICHAN_LIBS="-lguichan -lguichan_sdl", AC_MSG_ERROR([Could not find lib Guichan (http://guichan.sourceforge.net/)]))
+AC_CHECK_LIB([guichan], [gcnGuichanVersion], GUICHAN_LIBS="-lguichan -lguichan_sdl -lguichan_opengl", AC_MSG_ERROR([Could not find lib Guichan (http://guichan.sourceforge.net/)]))
 AC_SUBST(GUICHAN_LIBS)
 
 # Check for Blender
