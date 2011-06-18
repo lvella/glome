@@ -1,5 +1,5 @@
 Main topics:
-- Collision
+- Collision (maybe something with GJK algorithm)
 - Physics
 - Special effects
 - Multiplayer - Leo doing
@@ -9,8 +9,12 @@ Main topics:
 
 Visual:
 - Make the colors of the shots random and moving
-- Make shots fade to transparent as they age
 
 Optimization:
 - There are lots of unecessary allocations/deallocations, including in
 camera history (STL containers). Remove them.
+
+Game Mechanics:
+- Add a shild that is depleted when shot
+- Add a bar that measures canons heat, so fire rate is slower when hot,
+and halt when too hot;

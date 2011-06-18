@@ -30,4 +30,6 @@ private:
   Ship *owner;
   unsigned short ttl;
   unsigned short max_ttl;
+  unsigned short max_ttl_2;
+  unsigned char alpha;
 };

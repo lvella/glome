@@ -112,7 +112,9 @@ Projectile::Projectile(Ship *s, const Matrix4& from, float speed):
   ds(zw_matrix(-speed)),
   owner(s),
   ttl(0),
-  max_ttl((2 * M_PI) / speed)
+  max_ttl((2 * M_PI - 0.05) / speed),
+  max_ttl_2(max_ttl / 2),
+  alpha(255u)
 {
 }
 
@@ -122,16 +124,16 @@ void Projectile::draw()
   t.multToGL();
   glBegin(GL_QUADS);
 
-  glColor3ub(255, 200, 150);
+  glColor4ub(255, 200, 150, alpha);
   glVertex2i(1, 1);
 
-  glColor3ub(150, 255, 150);
+  glColor4ub(150, 255, 150, alpha);
   glVertex2i(-1, 1);
 
-  glColor3ub(130, 100, 250);
+  glColor4ub(130, 100, 250, alpha);
   glVertex2i(-1, -1);
 
-  glColor3ub(255, 150, 150);
+  glColor4ub(255, 150, 150, alpha);
   glVertex2i(1, -1);
 
   glEnd();
@@ -141,5 +143,7 @@ void Projectile::draw()
 void Projectile::update()
 {
   ++ttl;
+  alpha = ttl < (max_ttl_2) ? 255u : 255u - (ttl - max_ttl_2) * 200 / max_ttl_2;
+
   t = t * ds;
 }
