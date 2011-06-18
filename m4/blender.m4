@@ -46,4 +46,5 @@ if test "x$want_blender" = "xyes" ; then
     fi
   AC_SUBST(BLENDER)
 fi
+  AM_CONDITIONAL([HAVE_BLENDER], [test "x$want_blender" = "xyes"])
 ])
