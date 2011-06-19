@@ -65,7 +65,7 @@ void main_loop()
       Uint32 now = SDL_GetTicks();
       int delay = period - int(now - ticks);
       if(delay > 0)
-	      SDL_Delay(delay);
+        SDL_Delay(delay);
       ticks = now;
     }
     ++frame_count;
@@ -158,7 +158,6 @@ int main(int argc, char **argv)
     world = new NetWorld(isClient, host, port);
   }
   MiniMap::initialize();
-  Ship::initialize();
   Projectile::initialize();
 
   main_loop();

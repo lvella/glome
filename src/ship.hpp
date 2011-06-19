@@ -1,18 +1,18 @@
 #pragma once
 
 #include <cstring>
-
 #include <vector>
 
 #include "protocol.hpp"
 #include "drawable.hpp"
+#include "mesh.hpp"
 
 class Ship: public Drawable
 {
 public:
-  static void initialize();
-
-  Ship();
+  Ship();//TODO: change this!
+  Ship(ShipMesh type);
+  ~Ship();
   void draw();
   void update();
 
@@ -107,7 +107,7 @@ public:
 
   const std::vector<float>& getMessage() const { return message; }
 
-  void clearMessage()
+  inline void clearMessage()
   {
     message.clear();
     //message.push_back(++msg_id);
@@ -142,6 +142,6 @@ private:
 
   bool rcanon_shot_last;
 
-  static Matrix4 r_canon, l_canon;
+  Mesh* mesh;
 };
 
