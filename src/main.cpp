@@ -8,6 +8,7 @@
 #include <SDL.h>
 #include <GL/glew.h>
 #include <GL/glu.h>
+#include <guichan.hpp>
 
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
@@ -26,6 +27,7 @@
 #include "jsinput.hpp"
 
 #include "main.hpp"
+#include "menu.hpp"
 
 using namespace std;
 using namespace boost::asio::ip;
@@ -76,18 +78,27 @@ int main(int argc, char **argv)
 {
   srand(time(NULL));
 
-  // SDL startup
-  if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) != 0) {
-    cerr << "Unable to initialize SDL: " << SDL_GetError() << endl;
-    return 1;
-  }
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL /*| SDL_FULLSCREEN*/);
-  SDL_WM_SetCaption("Navigna", NULL);
-  SDL_ShowCursor(SDL_DISABLE);
-  SDL_JoystickEventState(SDL_ENABLE);
-
-  init_gl();
+	try
+	{
+		Menu::menu_initialize();
+		Menu::menu_run();
+	}
+	
+	catch (gcn::Exception e)
+	{
+ 		cout << e.getMessage() << endl;
+		return 1;
+	}	
+ 	catch (std::exception e)
+	{
+ 	  cout << "Std exception: " << e.what() << endl;
+		return 1;
+	}
+	catch (...)
+	{
+		cout << "Unknown exception" << endl;
+		return 1;
+	}
 
   // OpenGL nonchanging settings
   glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
