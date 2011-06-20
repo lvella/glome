@@ -10,6 +10,10 @@ Navigate through the surface of a hypersphere and kill your enemies.
   libsdl1.2-dev
   libboost-thread-dev >= 1.42
   libboost-system-dev >= 1.42
+  libguichan-0.8.1-1
+  libguichan-opengl-0.8.1-1
+  libguichan-sdl-0.8.1-1
+  libguichan-dev
 
 * Optional packages:
   Doxygen
@@ -17,7 +21,6 @@ Navigate through the surface of a hypersphere and kill your enemies.
 * Generate configuration files:
   $ autoreconf
   [ $ automake --add-missing ] (if necessary)
-  [ $ autoreconf ] (if command above executed)
   $ automake -a -c (generate Makefiles)
 
 * To change some macro (m4):
