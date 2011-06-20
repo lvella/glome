@@ -27,7 +27,7 @@ boost::array<float, 1024> recv_buf;
 boost::asio::deadline_timer* timer;
 map<string, Client*> end_cl_map;
 const int pkg_lim = 200000000;
-const int delta = 1000; // in ms
+const int delta = 5000; // in ms
 int pkg_count;
 
 void
@@ -80,27 +80,52 @@ send_to_client(Client* cl)
 }
 
 void
-sync_client_world(Client* cl, bool update)
+send_ships_client(Client* cl)
 {
+  int i, j, k, u;
   const vector<Ship*>& ships = world->ships_list();
+  vector<float> msg;
   Ship* cl_s = cl->get_ship();
-  unsigned int id = 0;
+  for(int i = 0; i < ships.size() - 1; ++i)
+  {
+	const Matrix4& t = ships[i]->transformation();
+    msg.push_back(i + 1);
+    msg.push_back(NEW_SHIP);
+    for(j = 0, u = 2; j < 4; ++j)
+      for(k = 0; k < 4; ++k, ++u)
+     msg.push_back(t[j][k]);
+     //copy(&t[0][0], &t[3][3], msg.begin() + 2);
+     send_to_client(msg, cl);
+     msg.clear();
+  }
+}
+
+void
+broadcast_new_ship(Client* cl)
+{
+  cl->make_new_ship_msg();
+  const vector<float>& msg = cl->get_message();
+  send_to_all(msg, msg.size() * sizeof(float), cl->get_id(), true);
+  cl->clear_message();
+}
+
+void
+broadcast_sync()
+{
+  int i, j, k;
+  const vector<Ship*>& ships = world->ships_list();
+  vector<float> msg;
   for(int i = 0; i < ships.size(); ++i)
   {
-    if(ships[i] == cl_s)
-    {
-      id = i;
-      cl->make_update_ship_msg(ships[i]->transformation(), true);
-    }
-    else
-    {
-      if(update)
-        cl->make_update_ship_msg(ships[i]->transformation());
-      else
-        cl->make_new_ship_msg(ships[i]->transformation());
-    }
+	const Matrix4& t = ships[i]->transformation();
+	msg.push_back(UPDATE_SHIP);
+	for(j = 0; j < 4; ++j)
+	  for(k = 0; k < 4; ++k)
+	 msg.push_back(t[j][k]);
+	 //copy(&t[0][0], &t[3][3], msg.begin() + 2);
+	 send_to_all(msg, msg.size() * sizeof(float), i, false);
+	 msg.clear();
   }
-  send_to_client(cl);
 }
 
 void
@@ -116,25 +141,16 @@ handle_socket(const boost::system::error_code& error, std::size_t bytes)
       udp::endpoint* new_end = new udp::endpoint(remote_endpoint);
       cl = new Client(new_end);
       end_cl_map[addr] = cl;
-      sync_client_world(cl, false);
+      send_ships_client(cl);
+      broadcast_new_ship(cl);
     }
     else
     {
       cl = it->second;
-      send_to_all(recv_buf, bytes, cl->get_id());
+      send_to_all(recv_buf, bytes, cl->get_id(), true);
       NetInput::set_ship(cl->get_ship());
       NetInput::parse_message(recv_buf, bytes, false);
     }
-
-    /*
-    if(++pkg_count == pkg_lim)
-    {
-      pkg_count = 0;
-      timer->cancel();
-      update_clients();
-      set_timer();
-    }
-    */
 
     start_receive();
   }
@@ -145,22 +161,12 @@ handle_timer(const boost::system::error_code& error)
 {
   if(!error)
   {
-    update_clients();
+	cout << "timer" << endl;
+    broadcast_sync();
     set_timer();
   }
   else
     ;//cout << "TIMER ERROR: " << error.message().data() << endl;
-}
-
-void
-update_clients()
-{
-  if(end_cl_map.size() == 0)
-    return;
-
-  map<string, Client*>::iterator it = end_cl_map.begin();
-  for(; it != end_cl_map.end(); ++it)
-    sync_client_world(it->second);
 }
 
 void
@@ -170,7 +176,7 @@ initialize(short int port, int threads)
   socket = new boost::asio::ip::udp::socket(gIOService, udp::endpoint(udp::v4(), port));
   timer = new boost::asio::deadline_timer(gIOService);
   start_receive();
-  //set_timer();
+  set_timer();
   for(int i = 0; i < threads; ++i)
     boost::thread service(boost::bind(&boost::asio::io_service::run, &gIOService));
 }

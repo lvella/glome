@@ -32,8 +32,8 @@ Client::Client(udp::endpoint* end)
       */
 		  Matrix4::IDENTITY);
   id = ((NetWorld*)world)->ships_list().size() - 1;
-  //make_init_pos_msg();
-  //Server::send_to_client(message, this);
+  make_init_pos_msg();
+  Server::send_to_client(message, this);
 }
 
 void
@@ -47,19 +47,19 @@ Client::make_update_ship_msg(const Matrix4& t, bool ithis)
 }
 
 void
-Client::make_new_ship_msg(const Matrix4& t)
+Client::make_new_ship_msg()
 {
-  message.push_back(id);
+  message.clear();
+  const Matrix4& t = ship->transformation();
   message.push_back(NEW_SHIP);
-  for(int i = 0; i < 4; ++i)
-    for(int j = 0; j < 4; ++j)
-      message.push_back(t[i][j]);
+  copy(&t[0][0], &t[3][3], message.begin());
 }
 
 void
 Client::make_init_pos_msg()
 {
   const Matrix4& t = ship->transformation();
+  message.push_back(0);
   message.push_back(INIT_POS);
   for(int i = 0; i < 4; ++i)
     for(int j = 0; j < 4; ++j)

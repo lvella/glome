@@ -17,7 +17,7 @@ public:
   const boost::asio::ip::udp::endpoint& target() const { return *remote_endpoint; }
   Ship* get_ship() { return ship; }
   void make_update_ship_msg(const Matrix4& t, bool ithis = false);
-  void make_new_ship_msg(const Matrix4& t);
+  void make_new_ship_msg();
   void make_init_pos_msg();
   const std::vector<float>& get_message() { return message; } ;
   void clear_message() { message.clear(); }

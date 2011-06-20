@@ -56,17 +56,18 @@ parse_message(const boost::array<float, 1024>& msg, unsigned int bytes, bool isC
   boost::array<float, 1024>::const_iterator it;
   unsigned int nums = bytes / sizeof(int);
   unsigned int i = 0;
+  int s_id = -1;
   Matrix4 t;
   int x, y;
-/*
+
   cout << "Received " << bytes << " bytes" << endl;
   for(int i = 0; i < nums; ++i)
     cout << int(msg[i]) << ' ';
   cout << endl;
-*/
+
   if(isClient)
   {
-    unsigned int s_id = int(msg[i++]);
+    s_id = int(msg[i++]);
     const vector<Ship*>& s_list = w->ships_list();
     if(s_id < s_list.size())
 	  NetInput::set_ship(s_list[s_id]);
@@ -116,11 +117,18 @@ parse_message(const boost::array<float, 1024>& msg, unsigned int bytes, bool isC
 	  i += 16;
 	  NetInput::set_ship(w->next_ship(t));
 	  break;
-    case UPDATE_SHIP:
-	  it = msg.begin() + i + 1;
+    case INIT_POS:
+      it = msg.begin() + i + 1;
 	  copy(it, it + 16, &t[0][0]);
 	  i += 16;
 	  ship->setTransformation(t);
+	  break;
+    case UPDATE_SHIP:
+      cout << "UPDATE CLIENT " << s_id << endl;
+	  it = msg.begin() + i + 1;
+	  copy(it, it + 16, &t[0][0]);
+	  i += 16;
+	  w->set_interpolation(s_id, ship->transformation(), t);
 	  break;
     default:
       std::cout << "Error: protocol doesn't know what to do with header '" << msg[i] << '.' << std::endl;

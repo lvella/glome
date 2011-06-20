@@ -25,6 +25,7 @@ public:
   Ship* next_ship(const Matrix4& ref = Matrix4::IDENTITY);
   void handle_socket(const boost::system::error_code& error, std::size_t bytes);
   const std::vector<Ship*>& ships_list() { return ships; }
+  void set_interpolation(unsigned int s_id, const Matrix4& from, const Matrix4& to);
 
 private:
   void handle_send(const boost::system::error_code& error, std::size_t bytes);
@@ -33,6 +34,24 @@ private:
   boost::asio::ip::udp::endpoint* receiver_endpoint;
   boost::asio::ip::udp::socket* cl_socket;
   std::vector<Ship*> ships;
+
+  struct Interpol
+  {
+	Interpol()
+	{
+	 interp = false;
+	 from = Matrix4::IDENTITY;
+	 to = Matrix4::IDENTITY;
+	 param_t = 0;
+	}
+
+	bool interp;
+    Matrix4 from;
+    Matrix4 to;
+    float param_t;
+  };
+  std::vector<Interpol> interpols;
+
   std::vector<unsigned int> points;
   RandomCube cube;
   boost::asio::ip::udp::endpoint remote_endpoint;

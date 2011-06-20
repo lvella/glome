@@ -35,6 +35,7 @@ Ship*
 NetWorld::next_ship(const Matrix4& ref)
 {
   ships.push_back(new Ship());
+  interpols.push_back(Interpol());
   ships[ships.size() - 1]->setTransformation(ref);
   return ships[ships.size() - 1];
 }
@@ -58,6 +59,7 @@ NetWorld::NetWorld(bool isc, string host, short int port):
 		param_t(0.0f)
 {
   ships.push_back(new Ship());
+  interpols.push_back(Interpol());
   Input::Kb::set_ship(ships[0]);
 
   cam_hist.resize(10, Matrix4::IDENTITY);
@@ -104,6 +106,16 @@ NetWorld::handle_send(const boost::system::error_code& error, std::size_t bytes)
   }
 }
 
+void
+NetWorld::set_interpolation(unsigned int s_id, const Matrix4& f, const Matrix4& t)
+{
+  interpols[s_id].interp = true;
+  interpols[s_id].from = f;
+  interpols[s_id].to = t;
+  interpols[s_id].param_t = 0.0f;
+}
+
+
 bool
 NetWorld::update()
 {
@@ -114,30 +126,27 @@ NetWorld::update()
   Projectile::update_all();
 
   Vector4 c = cube.transformation().position();
-/*
-  if(!interp)
-    ships[0]->update();
-  else
+
+  for(int e = 0; e < ships.size(); ++e)
   {
-	if(param_t > 1.1f)
-	{
-	  interp = false;
-	  param_t = 0.f;
-	}
-	else
-	{
-	  ships[0]->setTransformation(interp_from.interpolation(interp_to, param_t));
-	  //cout << "Interpolando: " << param_t * 10 << '\n' << ships[0]->transformation() << endl;
-	  param_t += 0.1f;
-	}
-  }
-*/
-  //if(!isClient)
-    for(int e = 0; e < ships.size(); ++e)
+	Interpol& i = interpols[e];
+    if(!i.interp)
       ships[e]->update();
-  //else
-  //{
-  //}
+    else
+    {
+	  if(i.param_t > 1.1f)
+	  {
+	    i.interp = false;
+	    i.param_t = 0.f;
+	  }
+	  else
+	  {
+	    ships[e]->setTransformation(i.from.interpolation(i.to, i.param_t));
+	    //cout << "Interpolando: " << param_t * 10 << '\n' << ships[0]->transformation() << endl;
+	    i.param_t += 0.01f;
+	  }
+    }
+  }
 
 /*
   for(int i = 0; i < ships.size(); ++i)
@@ -162,7 +171,7 @@ NetWorld::update()
 	if(isClient)
       int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
 	else
-	  Server::send_to_all(v, v.size() * sizeof(int), 0);
+	  Server::send_to_all(v, v.size() * sizeof(float), 0, true);
 
     ship->clearMessage();
   }
