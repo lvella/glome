@@ -18,3 +18,10 @@ Game Mechanics:
 - Add a shild that is depleted when shot
 - Add a bar that measures canons heat, so fire rate is slower when hot,
 and halt when too hot;
+
+Menu:
+
+- Create options to configure.
+- Stash options and load them at startup.
+- Enhance ugly guichan buttons.
+
