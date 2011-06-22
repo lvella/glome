@@ -14,6 +14,7 @@ public:
   void draw(const Matrix4& t);
   inline const Matrix4& get_rcanon() { return r_canon; }
   inline const Matrix4& get_lcanon() { return l_canon; }
+
   static Mesh* get_mesh(ShipMesh type);
   static void release_mesh(Mesh* m);
 
