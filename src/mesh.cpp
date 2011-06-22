@@ -10,33 +10,39 @@ using namespace std;
 using namespace boost;
 
 static Mesh* mesh_list[SHIPMESH_COUNT] = {NULL};
+static const char* mesh_filename[SHIPMESH_COUNT] =
+    {
+        "hunter",
+        "destroyer",
+        "ufo"
+    };
+
+Mesh::~Mesh()
+{
+  glDeleteLists(dlist, 1);
+  glDeleteBuffers(2, bufobjs);
+}
 
 Mesh::Mesh(ShipMesh type):
   ref_count(1)
 {
+  GLuint ibo;
+  GLuint vbo;
+
+  uint16_t ilen;
+  uint16_t vlen;
+
   int ret;
   FILE *fd;
 
-  switch(type)
-  {
-    case HUNTER:
-      name = "hunter";
-      break;
-    case DESTROYER:
-      name = "destroyer";
-      break;
-    case UFO:
-      name = "ufo";
-      break;
-  }
+  const char* name = mesh_filename[int(type)];
 
-  std::cout << "Create new ship named: " << name << " in constructor Mesh." << std::endl;
+  std::cout << "Loading new mesh named " << name << '.' << std::endl;
 
   // Load mesh file and put it into the list of shapes if was not exist
   {
     std::stringstream dir;
     dir << DATA_DIR << "/" << name << ".wire";
-    path = dir.str();
     fd = fopen(dir.str().c_str(), "rb");
     assert(fd != NULL);
   }
@@ -53,12 +59,15 @@ Mesh::Mesh(ShipMesh type):
     assert (ret == 16);
   }
 
+  glGenBuffers(2, bufobjs);
+  vbo = bufobjs[0];
+  ibo = bufobjs[1];
+
   {
     // Reading 4-D vertex coordinates
     ret = fread(&vlen, sizeof(vlen), 1, fd);
     assert(ret == 1);
     // Create vertex buffer
-    glGenBuffers(1, &vbo);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, vlen * 4 * sizeof(float), NULL, GL_STATIC_DRAW);
     float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
@@ -72,7 +81,6 @@ Mesh::Mesh(ShipMesh type):
     ret = fread(&ilen, sizeof(ilen), 1, fd);
     assert(ret == 1);
     // Create index buffer
-    glGenBuffers(1, &ibo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, ilen * sizeof(uint16_t) * 2, NULL, GL_STATIC_DRAW);
     uint16_t *idata = (uint16_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
