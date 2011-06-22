@@ -6,44 +6,37 @@
 
 #include "main.hpp"
 #include "menu.hpp"
+#include "parser.hpp"
 
 using namespace std;
 using namespace boost::asio::ip;
 
-const int WIDTH = 800;
-const int HEIGHT = 600;
+int WIDTH = 800;
+int HEIGHT = 600;
 const float FOV = 45.0f;
+bool FULLSCREEN = false;
+bool SLOW = false;
+bool isServer = false;
+bool isClient = false;
+bool isSplit = true;
+
+
 boost::asio::io_service gIOService;
-bool isServer;
-bool isClient;
 string host;
-short port;
+short port = 0;
 World* world;
-bool isSplit;
 
 int main(int argc, char **argv)
 {
+
+	if (Parser::parse_args(argc, argv))
+		return 1;
 	/*
 	 * TODO: Parser for variables.
 	 * TODO: Network in game archive.
 	 */
   srand(time(NULL));
-  
-	// Configure network
-	if(argc == 1)
-	{
-	  isServer = isClient = false;
-	  isSplit = true;
-	}
-	else if(argc == 4)
-	{
-		host = argv[2];
-	  port = atoi(argv[3]);
-	  isSplit = false;
-	  isServer = (atoi(argv[1]) == 0);
-	  isClient = !isServer;
-	}
-	
+
 	try
 	{
 		Menu::menu_initialize();

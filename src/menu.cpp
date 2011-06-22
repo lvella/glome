@@ -23,7 +23,6 @@ namespace Menu
 	gcn::ImageFont* font_normal;
 	gcn::ImageFont* font_highlight;
 	gcn::Label* label;
-	
 	bool running = true;
 	extern gcn::Button* Singleplay_button;
 	
