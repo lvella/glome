@@ -18,7 +18,7 @@ bool FULLSCREEN = false;
 bool SLOW = false;
 bool isServer = true;
 bool isClient = false;
-bool isSplit = false;
+bool isSplit = true;
 
 
 boost::asio::io_service gIOService;
