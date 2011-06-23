@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	if (Parser::parse_args(argc, argv))
 		return 1;
 	/*
-	 * TODO: Parser for variables.
+	 * TODO: Parser for variables (doing).
 	 * TODO: Network in game archive.
 	 */
   srand(time(NULL));
