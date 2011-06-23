@@ -40,7 +40,7 @@ bool SplitWorld::update()
   // Treat events
   run = Input::handle();
 
-  Projectile::update_all();
+  Projectile::update_all(Vector4(0.0f, 0.0f, 0.0f, -1.0f));
 
   Vector4 c = cube.transformation().position();
 

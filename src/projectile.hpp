@@ -12,18 +12,28 @@ public:
   static void shot(Ship *s, const Matrix4& from, float speed);
   static void draw_all();
   static void draw_in_minimap();
-  static void update_all();
+  static void update_all(const Vector4& camera_pos);
   static bool collide(const Vector4& position, float radius);
   static bool collide(Ship *s);
+
+  bool operator<(const Projectile& other) const
+  {
+    return order_dist < other.order_dist;
+  }
 
 private:
   Projectile(Ship *s, const Matrix4& from, float speed);
   void draw();
-  void update();
+  void update(const Vector4& camera_pos);
   inline bool dead()
   {
     // Maximum Time To Live
     return ttl >= max_ttl;
+  }
+
+  inline void die()
+  {
+    ttl = max_ttl;
   }
 
   Matrix4 ds;
@@ -32,4 +42,6 @@ private:
   unsigned short max_ttl;
   unsigned short max_ttl_2;
   unsigned char alpha;
+
+  float order_dist;
 };
