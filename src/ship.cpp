@@ -12,36 +12,6 @@
 
 using namespace std;
 
-Ship::Ship():
-    Drawable(Matrix4::IDENTITY),
-    v_tilt(0.0f),
-    h_tilt(0.0f),
-    v_req(0.0f),
-    h_req(0.0f),
-    accel(0.0f),
-    speed(0.0f),
-    speed_v(0.0f),
-    speed_h(0.0f),
-    speed_s(0.0f),
-    forward(false),
-    backward(false),
-    up(false),
-    down(false),
-    left(false),
-    right(false),
-    spinl(false),
-    spinr(false),
-    sh(false),
-    q(false),
-    sps(15),
-    shot_count(0),
-    rcanon_shot_last(false),
-    msg_id(0)
-{
-  mesh = Mesh::get_mesh(HUNTER);
-  //message.push_back(msg_id);
-}
-
 Ship::Ship(ShipMesh type):
     Drawable(Matrix4::IDENTITY),
     v_tilt(0.0f),
@@ -63,9 +33,9 @@ Ship::Ship(ShipMesh type):
     spinr(false),
     sh(false),
     q(false),
-    sps(15),
     shot_count(0),
     rcanon_shot_last(false),
+    heat(0),
     msg_id(0)
 {
   mesh = Mesh::get_mesh(type);
@@ -124,16 +94,23 @@ void Ship::update()
   accelerate(speed_s, accel_s, MAXS_S);
 
   /* Shooting */
+  if(heat > 0)
+    heat -= 7; // Cooldown rate
+
+  int sps = (1500 - heat) / 100; // Firerate at maximum
+
   shot_count -= sps;
   if(shot_count < 0) {
     if(sh) {
       Projectile::shot(this, t * (rcanon_shot_last ? mesh->get_lcanon() : mesh->get_rcanon()), 0.02 - speed);
       shot_count += 60;
+      heat += 82; // Shot heat, could be equivalent to damage
       rcanon_shot_last = !rcanon_shot_last;
     }
     else
       shot_count = 0;
   }
+
   t = t * zw_matrix(speed) * yw_matrix(speed_v) * xw_matrix(speed_h) * xy_matrix(speed_s) * yz_matrix(v_tilt) * rotation(-h_tilt, 0.0, M_SQRT2/2.0, M_SQRT2/2.0);
 }
 
