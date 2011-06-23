@@ -44,4 +44,5 @@ private:
 
   // Camera transform historic
   std::deque<Matrix4> cam_hist;
+  Vector4 cam_pos;
 };

@@ -55,7 +55,8 @@ NetWorld::handle_socket(const boost::system::error_code& error, std::size_t byte
 
 NetWorld::NetWorld(bool isc, string host, short int port):
 		interp(false),
-		param_t(0.0f)
+		param_t(0.0f),
+		cam_pos(Vector4(0.0f, 0.0f, 0.0f, -1.0f))
 {
   ships.push_back(new Ship(HUNTER));
   Input::Kb::set_ship(ships[0]);
@@ -111,7 +112,7 @@ NetWorld::update()
   // Treat events
   run = Input::handle();
 
-  Projectile::update_all();
+  Projectile::update_all(cam_pos);
 
   Vector4 c = cube.transformation().position();
 /*
@@ -180,7 +181,9 @@ NetWorld::draw()
   Matrix4 center = ships[0]->transformation().transpose();
 
   // Camera transform
-  (offset * cam_hist.front()).loadToGL();
+  Matrix4 camera = offset * cam_hist.front();
+  camera.loadToGL();
+  cam_pos = Vector4(-camera[3][0], -camera[3][1], -camera[3][2], -camera[3][3]);
   cam_hist.pop_front();
   cam_hist.push_back(center);
 

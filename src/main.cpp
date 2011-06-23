@@ -16,9 +16,9 @@ int HEIGHT = 600;
 const float FOV = 45.0f;
 bool FULLSCREEN = false;
 bool SLOW = false;
-bool isServer = false;
+bool isServer = true;
 bool isClient = false;
-bool isSplit = true;
+bool isSplit = false;
 
 
 boost::asio::io_service gIOService;
