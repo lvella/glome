@@ -5,8 +5,9 @@
 
 #include "world.hpp"
 
-extern const int WIDTH;
-extern const int HEIGHT;
+extern int WIDTH;
+extern int HEIGHT;
+extern bool FULLSCREEN;
 
 extern const float FOV;
 

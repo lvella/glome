@@ -1,12 +1,14 @@
+#include <time.h>
 #include <cmath>
-#include <list>
+#include <algorithm>
+#include <vector>
 
 #include "shader.hpp"
 #include "4dmath.hpp"
 
 #include "projectile.hpp"
 
-typedef std::list<Projectile> SList;
+typedef std::vector<Projectile> SList;
 static SList shots;
 
 static void
@@ -49,13 +51,24 @@ void Projectile::shot(Ship *s, const Matrix4& from, float speed)
   shots.push_back(Projectile(s, from, speed));
 }
 
-void Projectile::update_all()
+void Projectile::update_all(const Vector4& camera_pos)
 {
-  while(!shots.empty() && shots.front().dead())
-    shots.pop_front();
+  size_t dead_count = 0;
 
   for(SList::iterator i = shots.begin(); i != shots.end(); ++i)
-    i->update();
+    {
+      if(!i->dead())
+        i->update(camera_pos);
+      else
+        {
+          // Greater than the maximum possible squared distance (which is 4).
+          i->order_dist = 10.0f;
+          ++dead_count;
+        }
+    }
+
+  std::sort(shots.begin(), shots.end());
+  shots.erase(shots.end() - dead_count, shots.end());
 }
 
 void Projectile::draw_all()
@@ -64,7 +77,7 @@ void Projectile::draw_all()
     glEnable(GL_TEXTURE_2D);
     glUseProgram(program_bullet);
     glBindTexture(GL_TEXTURE_2D, texture);
-    for(SList::iterator i = shots.begin(); i != shots.end(); ++i)
+    for(SList::reverse_iterator i = shots.rbegin(); i != shots.rend(); ++i)
       i->draw();
     glDisable(GL_TEXTURE_2D);
   }
@@ -85,7 +98,7 @@ bool Projectile::collide(const Vector4& position, float radius)
 
   for(SList::iterator i = shots.begin(); i != shots.end(); ++i)
     if((position - i->transformation().position()).squared_length() < radius) {
-      shots.erase(i);
+      i->die();
       return true;
     }
 
@@ -99,7 +112,7 @@ bool Projectile::collide(Ship *s)
 
   for(SList::iterator i = shots.begin(); i != shots.end(); ++i) {
     if(s != i->owner && (p - i->transformation().position()).squared_length() < r) {
-      shots.erase(i);
+      i->die();
       return true;
     }
   }
@@ -140,10 +153,12 @@ void Projectile::draw()
   glPopMatrix();
 }
 
-void Projectile::update()
+void Projectile::update(const Vector4& camera_pos)
 {
   ++ttl;
   alpha = ttl < (max_ttl_2) ? 255u : 255u - (ttl - max_ttl_2) * 200 / max_ttl_2;
 
   t = t * ds;
+
+  order_dist = (camera_pos - t.position()).squared_length();
 }

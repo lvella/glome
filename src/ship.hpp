@@ -10,8 +10,7 @@
 class Ship: public Drawable
 {
 public:
-  Ship();//TODO: change this!
-  Ship(ShipMesh type);
+  Ship(ShipMesh type = HUNTER);
   ~Ship();
   void draw();
   void update();
@@ -136,11 +135,11 @@ private:
   bool spinr;
   bool sh;
   bool q;
-  int sps;
   int shot_count;
   std::vector<float> message;
 
   bool rcanon_shot_last;
+  int heat;
 
   Mesh* mesh;
 };
