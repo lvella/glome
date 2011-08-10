@@ -78,7 +78,6 @@ namespace Parser
 					isServer = true;
 					isClient = false;
           break;
-				case 'r':
 				case '?':
 					usage();
 					return 1;
@@ -86,13 +85,5 @@ namespace Parser
 		}
 		return 0;
 	}
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }
+

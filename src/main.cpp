@@ -58,6 +58,5 @@ int main(int argc, char **argv)
 		cout << "Unknown exception" << endl;
 		return 1;
 	}
-	
 }
 
