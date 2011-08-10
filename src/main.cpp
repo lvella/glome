@@ -16,7 +16,7 @@ int HEIGHT = 600;
 const float FOV = 45.0f;
 bool FULLSCREEN = false;
 bool SLOW = false;
-bool isServer = true;
+bool isServer = false;
 bool isClient = false;
 bool isSplit = false;
 

@@ -161,7 +161,6 @@ handle_timer(const boost::system::error_code& error)
 {
   if(!error)
   {
-	cout << "timer" << endl;
     broadcast_sync();
     set_timer();
   }
