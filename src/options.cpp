@@ -1,13 +1,24 @@
-#include <iostream>
+#include <cstdlib>
 #include <stdio.h>
 #include <getopt.h>
 
-#include "main.hpp"
+#include "options.hpp"
 
 using namespace std;
 
-namespace Parser
+namespace Options
 {
+  const float FOV = 45.0f;
+  int width = 800;
+  int height = 600;
+  std::string host;
+  short port = 0;
+
+  bool fullscreen = false;
+  bool isServer = false;
+  bool isClient = false;
+  bool isSplit = true;
+
 	void usage()
 	{
 		puts(
@@ -52,13 +63,13 @@ namespace Parser
 			{
 				printf ("option %s", long_options[option_index].name);
 				case 'f':
-					FULLSCREEN = true;
+					fullscreen = true;
 					break;
 				case 'x':
-					WIDTH = atoi(optarg);
+					width = atoi(optarg);
 					break;
 				case 'y':
-					HEIGHT = atoi(optarg);
+					height = atoi(optarg);
 					break;
 				case 'l':
 					isSplit = false;

@@ -1,7 +1,7 @@
 #include <algorithm>
 
 #include "protocol.hpp"
-#include "main.hpp"
+#include "options.hpp"
 #include "net_world.hpp"
 
 #include "net_input.hpp"
@@ -9,6 +9,7 @@
 extern World* world;
 
 using namespace std;
+using namespace Options;
 
 namespace NetInput
 {
@@ -43,10 +44,10 @@ move(bool f, bool state)
 void
 motion(int x, int y)
 {
-  x -= WIDTH / 2;
-  y -= HEIGHT / 2;
+  x -= width / 2;
+  y -= height / 2;
 
-  ship->rotate(float(x) / float(WIDTH / 2), -(float(y) / float(HEIGHT / 2)));
+  ship->rotate(float(x) / float(width / 2), -(float(y) / float(height / 2)));
 }
 
 void

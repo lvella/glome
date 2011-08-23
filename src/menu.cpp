@@ -7,9 +7,10 @@
 #include "button.hpp"
 #include "game.hpp"
 #include "init_gl.hpp"
-#include "main.hpp"
+#include "options.hpp"
 
 using namespace std;
+using namespace Options;
 
 class ButtonActionListener : public gcn::ActionListener
 	{
@@ -52,7 +53,7 @@ namespace Menu
 		  exit(1);
 		}
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    screen = SDL_SetVideoMode(WIDTH, HEIGHT, 0, SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL /*SDL_FULLSCREEN*/);
+    screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL /*SDL_FULLSCREEN*/);
     SDL_WM_SetCaption("Navigna", NULL);
 		SDL_ShowCursor(SDL_ENABLE);
 		SDL_EnableUNICODE(1);
@@ -61,8 +62,8 @@ namespace Menu
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);	
 		imageLoader = new gcn::OpenGLSDLImageLoader();
 		gcn::Image::setImageLoader(imageLoader);
-		graphics = new gcn::OpenGLGraphics(WIDTH, HEIGHT);
-		graphics->setTargetPlane(WIDTH, HEIGHT);
+		graphics = new gcn::OpenGLGraphics(width, height);
+		graphics->setTargetPlane(width, height);
 		font_normal = new gcn::ImageFont("normal.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 		font_highlight = new gcn::ImageFont("highlight.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 		
@@ -73,10 +74,10 @@ namespace Menu
 		gui->setGraphics(graphics);
 		gui->setInput(input);
 		top = new gcn::Container();
-		top->setDimension(gcn::Rectangle(0, 0, WIDTH, HEIGHT));
+		top->setDimension(gcn::Rectangle(0, 0, width, height));
 		gui->setTop(top);
 		label = new gcn::Label("Navigna");
-    label->setPosition(WIDTH/2-100, HEIGHT/2-300);
+    label->setPosition(width/2-100, height/2-300);
     top->add(label);
     
     ButtonActionListener* buttonActionListener = new ButtonActionListener();
@@ -91,7 +92,7 @@ namespace Menu
 		Menu::top->add(singleplay_button);
 		
 		
-		singleplay_button->setPosition(WIDTH/2 - 100, HEIGHT/2 - 100);
+		singleplay_button->setPosition(width/2 - 100, height/2 - 100);
 		//singleplay_button->adjustSize();
     
     

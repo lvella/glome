@@ -9,8 +9,8 @@
 
 #include "client.hpp"
 
-extern int WIDTH;
-extern int HEIGHT;
+extern int width;
+extern int height;
 
 extern World* world;
 

@@ -28,8 +28,10 @@
 #include "net_world.hpp"
 #include "split_world.hpp"
 #include "jsinput.hpp"
+#include "options.hpp"
 
 using namespace std;
+using namespace Options;
 
 namespace Game
 {

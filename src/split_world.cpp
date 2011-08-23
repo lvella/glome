@@ -5,13 +5,15 @@
 #include "minimap.hpp"
 #include "meridian.hpp"
 #include "shader.hpp"
-#include "main.hpp"
+#include "options.hpp"
 #include "input.hpp"
 #include "kbinput.hpp"
 #include "jsinput.hpp"
 #include "ship.hpp"
 #include "mesh.hpp"
 #include "split_world.hpp"
+
+using namespace Options;
 
 static GLuint program;
 
@@ -65,13 +67,13 @@ void SplitWorld::draw()
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   for(iter = 0; iter < 2; ++iter)
     {
-      int wstart = iter * WIDTH/2;
+      int wstart = iter * width/2;
 
       {
-        glViewport(wstart, 0, WIDTH/2, HEIGHT);
+        glViewport(wstart, 0, width/2, height);
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(FOV, 0.5*double(WIDTH) / double(HEIGHT), 0.001, 5);
+        gluPerspective(FOV, 0.5*double(width) / double(height), 0.001, 5);
         glMatrixMode(GL_MODELVIEW);
         glLoadIdentity();
       }

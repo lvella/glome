@@ -6,29 +6,18 @@
 
 #include "main.hpp"
 #include "menu.hpp"
-#include "parser.hpp"
+#include "options.hpp"
 
 using namespace std;
 using namespace boost::asio::ip;
 
-int WIDTH = 800;
-int HEIGHT = 600;
-const float FOV = 45.0f;
-bool FULLSCREEN = false;
-bool isServer = false;
-bool isClient = false;
-bool isSplit = true;
-
-
 boost::asio::io_service gIOService;
-string host;
-short port = 0;
 World* world;
 
 int main(int argc, char **argv)
 {
 
-	if (Parser::parse_args(argc, argv))
+	if (Options::parse_args(argc, argv))
 		return 1;
 	/*
 	 * TODO: Parser for variables (doing).

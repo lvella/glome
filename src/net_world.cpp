@@ -13,7 +13,7 @@
 #include "kbinput.hpp"
 #include "jsinput.hpp"
 #include "protocol.hpp"
-#include "main.hpp"
+#include "options.hpp"
 #include "net_input.hpp"
 #include "udp_server.hpp"
 #include "mesh.hpp"
@@ -24,6 +24,7 @@ extern boost::asio::io_service gIOService;
 
 using namespace std;
 using namespace boost::asio::ip;
+using namespace Options;
 
 void NetWorld::initialize()
 {
@@ -86,10 +87,10 @@ NetWorld::NetWorld(bool isc, string host, short int port):
   }
 
   // 3-D to 2-D projection
-  glViewport(0, 0, WIDTH, HEIGHT);
+  glViewport(0, 0, width, height);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  gluPerspective(FOV, double(WIDTH) / double(HEIGHT), 0.001, 5);
+  gluPerspective(FOV, double(width) / double(height), 0.001, 5);
   glMatrixMode(GL_MODELVIEW);
   glLoadIdentity();
 }

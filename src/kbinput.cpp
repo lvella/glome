@@ -1,11 +1,11 @@
 #include <cstdlib>
 
+#include "options.hpp"
+
 #include "kbinput.hpp"
 
 using namespace std;
-
-extern const int HEIGHT;
-extern const int WIDTH;
+using namespace Options;
 
 namespace Input {
 namespace Kb {
@@ -81,10 +81,10 @@ void
 mouse_motion(int x, int y)
 {
   ship->motion(x, y);
-  x -= WIDTH / 2;
-  y -= HEIGHT / 2;
+  x -= width / 2;
+  y -= height / 2;
 
-  ship->rotate(float(x) / float(WIDTH / 2), -(float(y) / float(HEIGHT / 2)));
+  ship->rotate(float(x) / float(width / 2), -(float(y) / float(height / 2)));
 }
 
 void
