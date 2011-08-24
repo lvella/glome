@@ -10,7 +10,7 @@ using namespace std;
 using namespace boost;
 
 static Mesh* mesh_list[SHIPMESH_COUNT] = {NULL};
-static const char* mesh_filename[SHIPMESH_COUNT] =
+const char* mesh_filename[SHIPMESH_COUNT] =
     {
         "hunter",
         "destroyer",
@@ -45,18 +45,6 @@ Mesh::Mesh(ShipMesh type):
     dir << DATA_DIR << "/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
     assert(fd != NULL);
-  }
-
-  {
-    // Reading Guns Matrix
-    ret = fread(&nguns, sizeof(nguns), 1, fd);
-    assert(ret == 1);
-
-    ret = fread(&l_canon[0][0], sizeof(float), 16, fd);
-    assert (ret == 16);
-
-    ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
-    assert (ret == 16);
   }
 
   glGenBuffers(2, bufobjs);

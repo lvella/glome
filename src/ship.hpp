@@ -14,6 +14,7 @@ public:
   ~Ship();
   void draw();
   void update();
+	void load_guns(ShipMesh type);
 
   inline void rotate(float rx, float ry)
   {
@@ -142,5 +143,7 @@ private:
   int heat;
 
   Mesh* mesh;
+  Matrix4 r_canon, l_canon;
+  uint16_t nguns;
 };
 

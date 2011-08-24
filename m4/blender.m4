@@ -34,7 +34,7 @@ if test "x$want_blender" = "xyes" ; then
     fi
   fi
     MIN_BLENDER_VERSION=$1
-    AC_MSG_CHECKING(for Blender - version >= $MIN_BLENDER_VERSION)
+    AC_MSG_CHECKING(for Blender - version == $MIN_BLENDER_VERSION)
     BLENDER_VERSION=`$BLENDER --version | awk 'NR > 1{exit};1' | cut -d' ' -f2`
 #    blender_major_version=`echo $BLENDER_VERSION | sed 's/^\([[0-9]]*\).*/\1/'`
 #    blender_minor_version=`echo $BLENDER_VERSION | sed 's/^\([[0-9]]*\)\.\([[0-9]]*\)\([[0-9]]*\).*/\2\3/'`

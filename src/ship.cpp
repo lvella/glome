@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include <map>
 #include <algorithm>
 #include <cmath>
@@ -9,8 +10,11 @@
 #include "ship.hpp"
 #include "projectile.hpp"
 #include "protocol.hpp"
+#include "config.hpp"
 
 using namespace std;
+
+extern const char* mesh_filename[SHIPMESH_COUNT];
 
 Ship::Ship(ShipMesh type):
     Drawable(Matrix4::IDENTITY),
@@ -39,6 +43,7 @@ Ship::Ship(ShipMesh type):
     msg_id(0)
 {
   mesh = Mesh::get_mesh(type);
+  load_guns(type);
   //message.push_back(msg_id);
 }
 
@@ -47,12 +52,43 @@ Ship::~Ship()
   Mesh::release_mesh(mesh);
 }
 
-void Ship::draw()
+void 
+Ship::load_guns(ShipMesh type)
+{
+  int ret;
+  FILE *fd;
+
+  const char* name = mesh_filename[int(type)];
+  // Load .gun file
+  {
+    std::stringstream dir;
+    dir << DATA_DIR << "/" << name << ".gun";
+    fd = fopen(dir.str().c_str(), "rb");
+    assert(fd != NULL);
+  }
+
+  {
+    // Reading Guns Matrix
+    ret = fread(&nguns, sizeof(nguns), 1, fd);
+    assert(ret == 1);
+
+    ret = fread(&l_canon[0][0], sizeof(float), 16, fd);
+    assert (ret == 16);
+
+    ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
+    assert (ret == 16);
+  }
+  fclose(fd);
+}
+
+void 
+Ship::draw()
 {
   mesh->draw(t);
 }
 
-void Ship::update()
+void 
+Ship::update()
 {
   /* Maximum turning delta per frame in radians. */
   const float MAXR = 0.03;
@@ -102,7 +138,7 @@ void Ship::update()
   shot_count -= sps;
   if(shot_count < 0) {
     if(sh) {
-      Projectile::shot(this, t * (rcanon_shot_last ? mesh->get_lcanon() : mesh->get_rcanon()), 0.02 - speed);
+      Projectile::shot(this, t * (rcanon_shot_last ? l_canon : r_canon), 0.02 - speed);
       shot_count += 60;
       heat += 82; // Shot heat, could be equivalent to damage
       rcanon_shot_last = !rcanon_shot_last;
