@@ -16,7 +16,7 @@ class ResolutionListModel : public gcn::ListModel
 public:
 	int getNumberOfElements()
 	{
-		return 2;
+		return 4;
 	}
 
 	std::string getElementAt(int i)
@@ -24,8 +24,12 @@ public:
 		switch(i)
 		{
 			case 0:
-				return std::string("1024x768");
+				return std::string("1366x768");
 			case 1:
+				return std::string("1360x768");
+			case 2:
+				return std::string("1280x720");
+			case 3:
 				return std::string("800x600");
 			default:
 				return std::string("");
@@ -36,7 +40,6 @@ public:
 
 namespace Menu
 {
-	extern gcn::Container* top;
 	void menu_initialize();
 	void menu_run();
 }

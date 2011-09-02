@@ -17,7 +17,7 @@ namespace Menu
 	gcn::Container* top;
 	gcn::Container* mainC;
 	gcn::Container* optionsC;
-	
+	bool res_changed = false;
 	class ButtonActionListener : public gcn::ActionListener
 	{
 		public:
@@ -39,6 +39,10 @@ namespace Menu
 				mainC->setVisible(true);
 				optionsC->setVisible(false);
 			}
+			else if (actionEvent.getId() == "resolution")
+			{
+				res_changed = true;
+			}
 		}
 	};
 	
@@ -49,10 +53,12 @@ namespace Menu
 	gcn::Gui* gui;
 	gcn::ImageFont* font_normal;
 	gcn::ImageFont* font_highlight;
+	gcn::ImageFont* font_menu;
 	gcn::Label* l_main;
 	bool running = true;
 	gcn::SDLInput* input = new gcn::SDLInput();
 	
+	gcn::DropDown* resolution;
 	void menu_initialize()
 	{
 		/*
@@ -77,8 +83,8 @@ namespace Menu
 		graphics->setTargetPlane(width, height);
 		font_normal = new gcn::ImageFont("normal.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 		font_highlight = new gcn::ImageFont("highlight.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-		
-		gcn::Widget::setGlobalFont(font_normal);
+		font_menu = new gcn::ImageFont("menu.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+		gcn::Widget::setGlobalFont(font_menu);
 		
 		input = new gcn::SDLInput();
 		gui = new gcn::Gui();
@@ -97,15 +103,26 @@ namespace Menu
 		top->setDimension(gcn::Rectangle(0, 0, width, height));
 		mainC->setDimension(gcn::Rectangle(0, 0, width, height));
 		optionsC->setDimension(gcn::Rectangle(0, 0, width, height));
-		
 		gui->setTop(top);
+		
+		/*
+		 * Labels
+		*/
 		l_main = new gcn::Label("Navigna");
     l_main->setPosition(width/2-100, height/2-300);
+    l_main->setFont(font_normal);
     mainC->add(l_main);
+    l_main->adjustSize();
     
     gcn::Label* l_options = new gcn::Label("Options");
     l_options->setPosition(width/2-100, height/2-300);
+    l_options->setFont(font_normal);
     optionsC->add(l_options);
+    l_options->adjustSize();
+    
+    gcn::Label* l_resolution = new gcn::Label("Resolution");
+    l_resolution->setPosition(width/2 -200, height/2 -70);
+    optionsC->add(l_resolution);
     
     ButtonActionListener* buttonActionListener = new ButtonActionListener();
     /*
@@ -116,32 +133,60 @@ namespace Menu
 		singleplay_button->setHL_font(font_highlight);
 		singleplay_button->setActionEventId("singleplay");
 		singleplay_button->addActionListener(buttonActionListener);
-		Menu::mainC->add(singleplay_button);
 		singleplay_button->setPosition(width/2 - 100, height/2 - 100);
+		singleplay_button->setFont(font_normal);
+		Menu::mainC->add(singleplay_button);
+		singleplay_button->adjustSize();
 		
 		//Options Button
 		NButton* options_button = options_button = new NButton("Options");
 		options_button->setHL_font(font_highlight);
 		options_button->setActionEventId("options");
 		options_button->addActionListener(buttonActionListener);
-		Menu::mainC->add(options_button);	
 		options_button->setPosition(width/2 - 60, height/2 - 30);
+		options_button->setFont(font_normal);
+		Menu::mainC->add(options_button);	
+		options_button->adjustSize();
 		
 		/*
      * Init Options Buttons
     */
-    
-    
+    //CheckList
+		ResolutionListModel* res_model = new ResolutionListModel();
+		gcn::ScrollArea* scroll_area = new gcn::ScrollArea();
+		scroll_area->setBackgroundColor(0x32f000);
+		scroll_area->setForegroundColor(0x32f000);
+		scroll_area->setSelectionColor(0x552020);
+		
+		gcn::ListBox* list_box = new gcn::ListBox();
+		list_box->setBackgroundColor(0x32f000);
+		list_box->setForegroundColor(0x32f000);
+		list_box->setSelectionColor(0x552020);
+		
+		list_box->adjustSize();
+    resolution = new gcn::DropDown(res_model,
+									scroll_area,
+									list_box);
+		resolution->setBackgroundColor(0x32f000);
+		resolution->setForegroundColor(0x32f000);
+		resolution->setSelectionColor(0x552020);
+    resolution->setWidth(200);
+    resolution->addActionListener(buttonActionListener);
+    resolution->setActionEventId("resolution");
+    resolution->setPosition(width/2 - 90, height/2 -70);
+    Menu::optionsC->add(resolution);
+
     //Back Button
 		NButton* back_main = singleplay_button = new NButton("Back");
 		back_main->setHL_font(font_highlight);
 		back_main->setActionEventId("back_main");
 		back_main->addActionListener(buttonActionListener);
-		Menu::optionsC->add(singleplay_button);
-		back_main->setPosition(width/2 - 60, height/2 - 100);
-		
-		//singleplay_button->adjustSize();
-    
+		back_main->setPosition(width/2 - 60, height/2 + 150);
+		back_main->setFont(font_normal);
+		Menu::optionsC->add(back_main);
+		back_main->adjustSize();
+		//TODO: Change to pick from configure
+		resolution->setSelected(3);
 	}
   
   /*
@@ -155,6 +200,14 @@ namespace Menu
 		//gui->setInput(input);
 		while (running)
 		{
+			
+			if (res_changed)
+			{cout << resolution->getSelected() << endl;
+				width = 1280;
+				height = 728;
+				screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL /*SDL_FULLSCREEN*/);
+				res_changed = false;
+			}
 			while(SDL_PollEvent(&event))
 			{
 				if (event.type == SDL_KEYDOWN)
