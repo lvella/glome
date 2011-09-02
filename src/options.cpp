@@ -44,8 +44,8 @@ namespace Options
 		{
 			{"full-screen",	no_argument,				0,	'f'},
 			{"network",			no_argument,				0,	'n'},
-			{"width",				required_argument,	0,	'x'},
-			{"height",			required_argument,	0,	'y'},
+			{"width",				required_argument,	0,	'w'},
+			{"height",			required_argument,	0,	'h'},
 			{"is-server",		no_argument,				0,	's'},
 			{"is-client",		no_argument,				0,	'c'},
 			{"host",				required_argument,	0,	'h'},
