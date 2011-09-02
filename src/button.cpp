@@ -31,7 +31,6 @@ void NButton::setHL_font(gcn::Font* font)
 
 void NButton::mouseEntered(gcn::MouseEvent& mouseEvent)
 {
-	cout << "sadada";
 	Button::mouseEntered(mouseEvent);
 	has_mouse = true;
 }
