@@ -83,7 +83,7 @@ namespace Menu
 		graphics->setTargetPlane(width, height);
 		font_normal = new gcn::ImageFont("normal.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 		font_highlight = new gcn::ImageFont("highlight.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-		font_menu = new gcn::ImageFont("menu.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+		font_menu = new gcn::ImageFont("menufont.png", " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 		gcn::Widget::setGlobalFont(font_menu);
 		
 		input = new gcn::SDLInput();
