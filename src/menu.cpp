@@ -12,7 +12,13 @@
 using namespace std;
 using namespace Options;
 
-class ButtonActionListener : public gcn::ActionListener
+namespace Menu
+{
+	gcn::Container* top;
+	gcn::Container* mainC;
+	gcn::Container* optionsC;
+	
+	class ButtonActionListener : public gcn::ActionListener
 	{
 		public:
 		void action(const gcn::ActionEvent& actionEvent)
@@ -23,23 +29,28 @@ class ButtonActionListener : public gcn::ActionListener
 				Game::init_game();
 				Game::main_loop();
 			}
+			else if (actionEvent.getId() == "options")
+			{
+				mainC->setVisible(false);
+				optionsC->setVisible(true);
+			}
+			else if (actionEvent.getId() == "back_main")
+			{
+				mainC->setVisible(true);
+				optionsC->setVisible(false);
+			}
 		}
 	};
-
-namespace Menu
-{
+	
 	gcn::OpenGLSDLImageLoader* imageLoader;
 	gcn::OpenGLGraphics* graphics;
 	SDL_Surface* screen;
 	SDL_Event event;
-	
-	gcn::Container* top;
 	gcn::Gui* gui;
 	gcn::ImageFont* font_normal;
 	gcn::ImageFont* font_highlight;
-	gcn::Label* label;
+	gcn::Label* l_main;
 	bool running = true;
-	extern gcn::Button* Singleplay_button;
 	gcn::SDLInput* input = new gcn::SDLInput();
 	
 	void menu_initialize()
@@ -73,28 +84,63 @@ namespace Menu
 		gui = new gcn::Gui();
 		gui->setGraphics(graphics);
 		gui->setInput(input);
+		
 		top = new gcn::Container();
+		mainC = new gcn::Container();
+		optionsC = new gcn::Container();
+		
+		mainC->setVisible(true);
+		optionsC->setVisible(false);
+		top->add(mainC);
+		top->add(optionsC);
+		
 		top->setDimension(gcn::Rectangle(0, 0, width, height));
+		mainC->setDimension(gcn::Rectangle(0, 0, width, height));
+		optionsC->setDimension(gcn::Rectangle(0, 0, width, height));
+		
 		gui->setTop(top);
-		label = new gcn::Label("Navigna");
-    label->setPosition(width/2-100, height/2-300);
-    top->add(label);
+		l_main = new gcn::Label("Navigna");
+    l_main->setPosition(width/2-100, height/2-300);
+    mainC->add(l_main);
+    
+    gcn::Label* l_options = new gcn::Label("Options");
+    l_options->setPosition(width/2-100, height/2-300);
+    optionsC->add(l_options);
     
     ButtonActionListener* buttonActionListener = new ButtonActionListener();
     /*
-     * Init Buttons
+     * Init Main Buttons
     */
+    //Single Player Button
     NButton* singleplay_button = singleplay_button = new NButton("Singleplayer");
 		singleplay_button->setHL_font(font_highlight);
 		singleplay_button->setActionEventId("singleplay");
 		singleplay_button->addActionListener(buttonActionListener);
-		
-		Menu::top->add(singleplay_button);
-		
-		
+		Menu::mainC->add(singleplay_button);
 		singleplay_button->setPosition(width/2 - 100, height/2 - 100);
-		//singleplay_button->adjustSize();
+		
+		//Options Button
+		NButton* options_button = options_button = new NButton("Options");
+		options_button->setHL_font(font_highlight);
+		options_button->setActionEventId("options");
+		options_button->addActionListener(buttonActionListener);
+		Menu::mainC->add(options_button);	
+		options_button->setPosition(width/2 - 60, height/2 - 30);
+		
+		/*
+     * Init Options Buttons
+    */
     
+    
+    //Back Button
+		NButton* back_main = singleplay_button = new NButton("Back");
+		back_main->setHL_font(font_highlight);
+		back_main->setActionEventId("back_main");
+		back_main->addActionListener(buttonActionListener);
+		Menu::optionsC->add(singleplay_button);
+		back_main->setPosition(width/2 - 60, height/2 - 100);
+		
+		//singleplay_button->adjustSize();
     
 	}
   
