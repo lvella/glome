@@ -57,7 +57,7 @@ namespace Options
 		char option;
 		int option_index = 0;
 		
-		while ((option = getopt_long(argc, argv, "fx:y:csh:p:l", long_options, &option_index)) != EOF)
+		while ((option = getopt_long(argc, argv, "fw:h:csh:p:l", long_options, &option_index)) != EOF)
 		{
 			switch (option) 
 			{
