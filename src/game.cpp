@@ -28,6 +28,7 @@
 #include "net_world.hpp"
 #include "split_world.hpp"
 #include "jsinput.hpp"
+#include "asteroid.hpp"
 #include "options.hpp"
 
 using namespace std;
@@ -45,21 +46,20 @@ namespace Game
 
 		while(running) 
 		{
-		  running = world->update();
-		  world->draw();
-		  SDL_GL_SwapBuffers();
-
-		  // Fix framerate
-		  {
-		    // TODO: maybe clk_div is useful here...
-		    const int period = 1000/60;
-		    Uint32 now = SDL_GetTicks();
-		    int delay = period - int(now - ticks);
-		    if(delay > 0)
-		      SDL_Delay(delay);
-		    ticks = now;
-		  }
-		  ++frame_count;
+			running = world->update();
+			world->draw();
+			SDL_GL_SwapBuffers();
+			// Fix framerate
+			{
+			  // TODO: maybe clk_div is useful here...
+			  const int period = 1000/60;
+			  Uint32 now = SDL_GetTicks();
+			  int delay = period - int(now - ticks);
+			  if(delay > 0)
+			    SDL_Delay(delay);
+			  ticks = now;
+			}
+			++frame_count;
 		}
 		cout << frame_count << " frames rendered." << endl;
 	}
@@ -111,6 +111,7 @@ namespace Game
 		}
 		MiniMap::initialize();
 		Projectile::initialize();
+		a.draw();
 	}
 	void halt()
 	{

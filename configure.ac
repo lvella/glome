@@ -53,7 +53,7 @@ AC_CHECK_LIB([guichan], [gcnGuichanVersion], GUICHAN_LIBS="-lguichan -lguichan_s
 AC_SUBST(GUICHAN_LIBS)
 
 # Check for Blender
-AC_CHECK_BLENDER([2.57])
+AC_CHECK_BLENDER([2.59])
 
 # Check for xxd
 AC_PATH_PROG([XXD], [xxd], , [$PATH])

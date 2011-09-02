@@ -9,12 +9,13 @@
 using namespace std;
 using namespace boost;
 
-static Mesh* mesh_list[SHIPMESH_COUNT] = {NULL};
-static const char* mesh_filename[SHIPMESH_COUNT] =
+static Mesh* mesh_list[MESH_COUNT] = {NULL};
+const char* mesh_filename[MESH_COUNT] =
     {
         "hunter",
         "destroyer",
-        "ufo"
+        "ufo",
+        "asteroid"
     };
 
 Mesh::~Mesh()
@@ -23,7 +24,7 @@ Mesh::~Mesh()
   glDeleteBuffers(2, bufobjs);
 }
 
-Mesh::Mesh(ShipMesh type):
+Mesh::Mesh(MeshTypes type):
   ref_count(1)
 {
   GLuint ibo;
@@ -39,24 +40,12 @@ Mesh::Mesh(ShipMesh type):
 
   std::cout << "Loading new mesh named " << name << '.' << std::endl;
 
-  // Load mesh file and put it into the list of shapes if was not exist
+  // Load mesh file and put it into the list of meshs if was not exist
   {
     std::stringstream dir;
     dir << DATA_DIR << "/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
     assert(fd != NULL);
-  }
-
-  {
-    // Reading Guns Matrix
-    ret = fread(&nguns, sizeof(nguns), 1, fd);
-    assert(ret == 1);
-
-    ret = fread(&l_canon[0][0], sizeof(float), 16, fd);
-    assert (ret == 16);
-
-    ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
-    assert (ret == 16);
   }
 
   glGenBuffers(2, bufobjs);
@@ -112,7 +101,7 @@ Mesh::draw(const Matrix4& t)
 }
 
 Mesh*
-Mesh::get_mesh(ShipMesh type)
+Mesh::get_mesh(MeshTypes type)
 {
   Mesh *&m = mesh_list[int(type)];
   if(m)
