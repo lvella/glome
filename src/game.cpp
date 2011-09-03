@@ -29,8 +29,10 @@
 #include "split_world.hpp"
 #include "jsinput.hpp"
 #include "asteroid.hpp"
+#include "options.hpp"
 
 using namespace std;
+using namespace Options;
 
 namespace Game
 {
@@ -109,7 +111,6 @@ namespace Game
 		}
 		MiniMap::initialize();
 		Projectile::initialize();
-		Asteroid a = Asteroid();
 		a.draw();
 	}
 	void halt()

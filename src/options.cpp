@@ -1,13 +1,24 @@
-#include <iostream>
+#include <cstdlib>
 #include <stdio.h>
 #include <getopt.h>
 
-#include "main.hpp"
+#include "options.hpp"
 
 using namespace std;
 
-namespace Parser
+namespace Options
 {
+  const float FOV = 45.0f;
+  int width = 800;
+  int height = 600;
+  std::string host;
+  short port = 0;
+
+  bool fullscreen = false;
+  bool isServer = false;
+  bool isClient = false;
+  bool isSplit = true;
+
 	void usage()
 	{
 		puts(
@@ -33,8 +44,8 @@ namespace Parser
 		{
 			{"full-screen",	no_argument,				0,	'f'},
 			{"network",			no_argument,				0,	'n'},
-			{"width",				required_argument,	0,	'x'},
-			{"height",			required_argument,	0,	'y'},
+			{"width",				required_argument,	0,	'w'},
+			{"height",			required_argument,	0,	'h'},
 			{"is-server",		no_argument,				0,	's'},
 			{"is-client",		no_argument,				0,	'c'},
 			{"host",				required_argument,	0,	'h'},
@@ -46,19 +57,19 @@ namespace Parser
 		char option;
 		int option_index = 0;
 		
-		while ((option = getopt_long(argc, argv, "fx:y:csh:p:l", long_options, &option_index)) != EOF)
+		while ((option = getopt_long(argc, argv, "fw:h:csh:p:l", long_options, &option_index)) != EOF)
 		{
 			switch (option) 
 			{
 				printf ("option %s", long_options[option_index].name);
 				case 'f':
-					FULLSCREEN = true;
+					fullscreen = true;
 					break;
 				case 'x':
-					WIDTH = atoi(optarg);
+					width = atoi(optarg);
 					break;
 				case 'y':
-					HEIGHT = atoi(optarg);
+					height = atoi(optarg);
 					break;
 				case 'l':
 					isSplit = false;

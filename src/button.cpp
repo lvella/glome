@@ -4,14 +4,15 @@
 
 
 NButton::NButton(const std::string& caption) :
-	Button(caption)
+	Button(caption),
+	has_mouse(false)
 {
-	has_mouse = false;
+	setFrameSize(0);
 }
 
 void NButton::draw(gcn::Graphics* graphics)
 {
-	if (mHasMouse)
+	if (has_mouse)
 	{
 		graphics->setFont(hl_font);
 		graphics->drawText(getCaption(),0,0);
@@ -28,13 +29,13 @@ void NButton::setHL_font(gcn::Font* font)
 	hl_font = font;
 }
 
-void NButton::mouse_entered(gcn::MouseEvent& mouseEvent)
+void NButton::mouseEntered(gcn::MouseEvent& mouseEvent)
 {
 	Button::mouseEntered(mouseEvent);
 	has_mouse = true;
 }
 
-void NButton::mouse_exited(gcn::MouseEvent& mouseEvent)
+void NButton::mouseExited(gcn::MouseEvent& mouseEvent)
 {
 	Button::mouseExited(mouseEvent);
 	has_mouse = false;

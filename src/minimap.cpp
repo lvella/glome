@@ -11,10 +11,12 @@
 #include "shader.hpp"
 #include "meridian.hpp"
 #include "world.hpp"
+#include "options.hpp"
 
 #include "minimap.hpp"
 
 using namespace std;
+using namespace Options;
 
 extern GLuint tex_ship;
 extern Ship ship;
@@ -26,10 +28,6 @@ static GLint proj_only_uniform;
 void
 MiniMap::draw(int wstart, World* world, const Matrix4& center)
 {
-  extern const int HEIGHT;
-  extern const int WIDTH;
-  extern const float FOV;
-
   // Calculate field of vision
   const float radius = 75.0;
   const int t = 160;
@@ -40,7 +38,7 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
   const float cx = 0;
   const float cy = 0;
 
-  const float angle = asin(0.5f * WIDTH * sin(FOV * M_PI / 360.0f) / HEIGHT);
+  const float angle = asin(0.5f * width * sin(FOV * M_PI / 360.0f) / height);
   const float dx = (radius * sin(angle));
   const float ppx0 = (cx - dx) / radius;
   const float ppy = ((cy + (radius * cos(angle))) / radius) * 0.9;
@@ -116,7 +114,7 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
   glDisable(GL_TEXTURE_2D);
   glEnable(GL_FOG);
   glMatrixMode(GL_PROJECTION);
-  glViewport(0, 0, WIDTH, HEIGHT);    
+  glViewport(0, 0, width, height);    
   glPopMatrix();
   glMatrixMode(GL_MODELVIEW);
 }
