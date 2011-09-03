@@ -43,6 +43,7 @@ namespace Menu
 	void menu_initialize();
 	void menu_run();
 	void menu_halt();
+	void SDL_initialize();
 }
 
 

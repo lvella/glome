@@ -31,7 +31,10 @@ namespace Menu
 				init_gl();
 				Game::init_game();
 				Game::main_loop();
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+				SDL_GL_SwapBuffers();
+				menu_halt();
+				menu_initialize();
 			}
 			else if (actionEvent.getId() == "options")
 			{
@@ -65,7 +68,7 @@ namespace Menu
 	gcn::Label* l_resolution;
 
 	bool running = true;
-	gcn::SDLInput* input = new gcn::SDLInput();
+	gcn::SDLInput* input;
 
 	ButtonActionListener* buttonActionListener;
 	NButton* singleplay_button;
@@ -76,7 +79,8 @@ namespace Menu
 	gcn::ListBox* list_box;
 	gcn::ScrollArea* scroll_area;
 	gcn::DropDown* resolution;
-	void menu_initialize()
+
+	void SDL_initialize()
 	{
 		/*
 		 * SDL Startup
@@ -86,14 +90,20 @@ namespace Menu
 		  cerr << "Unable to initialize SDL: " << SDL_GetError() << endl;
 		  exit(1);
 		}
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL /*SDL_FULLSCREEN*/);
-    SDL_WM_SetCaption("Navigna", NULL);
+		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL /*SDL_FULLSCREEN*/);
+		SDL_WM_SetCaption("Navigna", NULL);
 		SDL_ShowCursor(SDL_ENABLE);
 		SDL_EnableUNICODE(1);
 		SDL_JoystickEventState(SDL_ENABLE);
 		
 		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);	
+	}
+
+	void menu_initialize()
+	{
+		input = new gcn::SDLInput();
+
 		imageLoader = new gcn::OpenGLSDLImageLoader();
 		gcn::Image::setImageLoader(imageLoader);
 		graphics = new gcn::OpenGLGraphics(width, height);
@@ -272,6 +282,6 @@ namespace Menu
 		delete scroll_area;
 		delete list_box;
 		delete back_main;
-		SDL_Quit();
+//		SDL_Quit();
 	}
 }

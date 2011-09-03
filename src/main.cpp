@@ -27,6 +27,7 @@ int main(int argc, char **argv)
 
 	try
 	{
+		Menu::SDL_initialize();
 		Menu::menu_initialize();
 		Menu::menu_run();
 		Menu::menu_halt();
