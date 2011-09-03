@@ -20,6 +20,7 @@ namespace Menu
 	gcn::Container* mainC;
 	gcn::Container* optionsC;
 	bool res_changed = false;
+
 	class ButtonActionListener : public gcn::ActionListener
 	{
 		public:
@@ -54,13 +55,26 @@ namespace Menu
 	SDL_Surface* screen;
 	SDL_Event event;
 	gcn::Gui* gui;
+
 	gcn::ImageFont* font_normal;
 	gcn::ImageFont* font_highlight;
 	gcn::ImageFont* font_menu;
+
 	gcn::Label* l_main;
+	gcn::Label* l_options;
+	gcn::Label* l_resolution;
+
 	bool running = true;
 	gcn::SDLInput* input = new gcn::SDLInput();
-	
+
+	ButtonActionListener* buttonActionListener;
+	NButton* singleplay_button;
+	NButton* options_button;
+	NButton* back_main;
+
+	ResolutionListModel* res_model;
+	gcn::ListBox* list_box;
+	gcn::ScrollArea* scroll_area;
 	gcn::DropDown* resolution;
 	void menu_initialize()
 	{
@@ -123,22 +137,22 @@ namespace Menu
     mainC->add(l_main);
     l_main->adjustSize();
     
-    gcn::Label* l_options = new gcn::Label("Options");
+    l_options = new gcn::Label("Options");
     l_options->setPosition(width/2-100, height/2-300);
     l_options->setFont(font_normal);
     optionsC->add(l_options);
     l_options->adjustSize();
     
-    gcn::Label* l_resolution = new gcn::Label("Resolution");
+    l_resolution = new gcn::Label("Resolution");
     l_resolution->setPosition(width/2 -200, height/2 -70);
     optionsC->add(l_resolution);
     
-    ButtonActionListener* buttonActionListener = new ButtonActionListener();
+    buttonActionListener = new ButtonActionListener();
     /*
      * Init Main Buttons
     */
     //Single Player Button
-    NButton* singleplay_button = singleplay_button = new NButton("Singleplayer");
+    singleplay_button = new NButton("Singleplayer");
 		singleplay_button->setHL_font(font_highlight);
 		singleplay_button->setActionEventId("singleplay");
 		singleplay_button->addActionListener(buttonActionListener);
@@ -148,7 +162,7 @@ namespace Menu
 		singleplay_button->adjustSize();
 		
 		//Options Button
-		NButton* options_button = options_button = new NButton("Options");
+		options_button = new NButton("Options");
 		options_button->setHL_font(font_highlight);
 		options_button->setActionEventId("options");
 		options_button->addActionListener(buttonActionListener);
@@ -161,13 +175,13 @@ namespace Menu
      * Init Options Buttons
     */
     //CheckList
-		ResolutionListModel* res_model = new ResolutionListModel();
-		gcn::ScrollArea* scroll_area = new gcn::ScrollArea();
+		res_model = new ResolutionListModel();
+		scroll_area = new gcn::ScrollArea();
 		scroll_area->setBackgroundColor(0x32f000);
 		scroll_area->setForegroundColor(0x32f000);
 		scroll_area->setSelectionColor(0x552020);
 		
-		gcn::ListBox* list_box = new gcn::ListBox();
+		list_box = new gcn::ListBox();
 		list_box->setBackgroundColor(0x32f000);
 		list_box->setForegroundColor(0x32f000);
 		list_box->setSelectionColor(0x552020);
@@ -186,7 +200,7 @@ namespace Menu
     Menu::optionsC->add(resolution);
 
     //Back Button
-		NButton* back_main = singleplay_button = new NButton("Back");
+		back_main = new NButton("Back");
 		back_main->setHL_font(font_highlight);
 		back_main->setActionEventId("back_main");
 		back_main->addActionListener(buttonActionListener);
@@ -245,8 +259,19 @@ namespace Menu
 		delete gui;
 		delete font_normal;
 		delete font_highlight;
+		delete font_menu;
 		delete l_main;
+		delete l_options;
+		delete l_resolution;
 		delete input;
+		delete resolution;
+		delete buttonActionListener;
+		delete singleplay_button;
+		delete options_button;
+		delete res_model;
+		delete scroll_area;
+		delete list_box;
+		delete back_main;
 		SDL_Quit();
 	}
 }
