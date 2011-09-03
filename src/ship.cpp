@@ -14,9 +14,9 @@
 
 using namespace std;
 
-extern const char* mesh_filename[SHIPMESH_COUNT];
+extern const char* mesh_filename[MESH_COUNT];
 
-Ship::Ship(ShipMesh type):
+Ship::Ship(MeshTypes type):
     Drawable(Matrix4::IDENTITY),
     v_tilt(0.0f),
     h_tilt(0.0f),
@@ -53,7 +53,7 @@ Ship::~Ship()
 }
 
 void 
-Ship::load_guns(ShipMesh type)
+Ship::load_guns(MeshTypes type)
 {
   int ret;
   FILE *fd;

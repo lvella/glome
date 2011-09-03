@@ -3,6 +3,7 @@
 #include <SDL.h>
 
 #include "ship.hpp"
+#include "game.hpp"
 
 namespace Input
 {

@@ -10,11 +10,11 @@
 class Ship: public Drawable
 {
 public:
-  Ship(ShipMesh type = HUNTER);
+  Ship(MeshTypes type = UFO);
   ~Ship();
   void draw();
   void update();
-	void load_guns(ShipMesh type);
+	void load_guns(MeshTypes type);
 
   inline void rotate(float rx, float ry)
   {
