@@ -51,13 +51,13 @@ namespace Game
 			SDL_GL_SwapBuffers();
 			// Fix framerate
 			{
-			  // TODO: maybe clk_div is useful here...
-			  const int period = 1000/60;
-			  Uint32 now = SDL_GetTicks();
-			  int delay = period - int(now - ticks);
-			  if(delay > 0)
-			    SDL_Delay(delay);
-			  ticks = now;
+				// TODO: maybe clk_div is useful here...
+				const int period = 1000/60;
+				Uint32 now = SDL_GetTicks();
+				int delay = period - int(now - ticks);
+				if(delay > 0)
+				  SDL_Delay(delay);
+				ticks = now;
 			}
 			++frame_count;
 		}
@@ -111,7 +111,6 @@ namespace Game
 		}
 		MiniMap::initialize();
 		Projectile::initialize();
-		a.draw();
 	}
 	void halt()
 	{
