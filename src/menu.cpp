@@ -28,6 +28,7 @@ namespace Menu
 				init_gl();
 				Game::init_game();
 				Game::main_loop();
+				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 			}
 			else if (actionEvent.getId() == "options")
 			{
@@ -170,6 +171,21 @@ namespace Menu
 			gui->draw();
 			SDL_GL_SwapBuffers();
 			SDL_Flip(screen);
-    }
+		}
+	}
+
+	void menu_halt()
+	{
+		delete top;
+		delete mainC;
+		delete optionsC;
+		delete imageLoader;
+		delete graphics;
+		delete gui;
+		delete font_normal;
+		delete font_highlight;
+		delete l_main;
+		delete input;
+		SDL_Quit();
 	}
 }

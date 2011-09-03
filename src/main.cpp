@@ -29,6 +29,7 @@ int main(int argc, char **argv)
 	{
 		Menu::menu_initialize();
 		Menu::menu_run();
+		Menu::menu_halt();
 	}
 	
 	catch (gcn::Exception e)

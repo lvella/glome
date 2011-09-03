@@ -39,6 +39,7 @@ namespace Menu
 	extern gcn::Container* top;
 	void menu_initialize();
 	void menu_run();
+	void menu_halt();
 }
 
 

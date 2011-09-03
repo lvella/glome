@@ -56,7 +56,6 @@ bool SplitWorld::update()
       std::cout << "Ship " << i << " scored " << ++points[i] << " points!" << std::endl;
     }
   }
-
   return run;
 }
 
