@@ -113,9 +113,30 @@ public:
     //message.push_back(++msg_id);
   }
 
+protected:
+  // Tunable ship parameters:
+
+  float max_rot_per_frame; /* Maximum turning delta per frame */
+
+  /* Maximum speed, in radians per second. */
+  float max_speed_forward;
+  float max_speed_vertical;
+  float max_speed_horizontal;
+  float max_speed_spin;
+
+  float shot_speed; /* Speed of shot relative to the ship */
+  int shot_power; /* Damage done and heat generated */
+  int max_canon_heat; /* Maximum heat supported by canons */
+  int canon_cooldown_rate; /* Heat cooldown per frame */
+  int cold_fire_rate; /* Shots per second when cold */
+
+  // End of tunable parameters
+
 private:
   inline static void handle_commands(bool, bool, float &, float &, float);
   inline static void accelerate(float &, float &, float);
+
+  // Crappy networking shit:
 
   unsigned int msg_id;
   float v_req, h_req;
@@ -138,6 +159,7 @@ private:
   bool q;
   int shot_count;
   std::vector<float> message;
+  // End of crappy networking shit
 
   bool rcanon_shot_last;
   int heat;
