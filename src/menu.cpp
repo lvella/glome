@@ -91,7 +91,12 @@ namespace Menu
 		  exit(1);
 		}
 		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL /*SDL_FULLSCREEN*/);
+		{
+		  int video_flags = SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL;
+		  if(Options::fullscreen)
+		    video_flags |= SDL_FULLSCREEN;
+		  screen = SDL_SetVideoMode(width, height, 0, video_flags);
+		}
 		SDL_WM_SetCaption("Navigna", NULL);
 		SDL_ShowCursor(SDL_ENABLE);
 		SDL_EnableUNICODE(1);
@@ -238,7 +243,7 @@ namespace Menu
 			{cout << resolution->getSelected() << endl;
 				width = 1280;
 				height = 728;
-				screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL /*SDL_FULLSCREEN*/);
+				screen = SDL_SetVideoMode(width, height, 0, SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL | SDL_FULLSCREEN);
 				res_changed = false;
 			}
 			while(SDL_PollEvent(&event))
