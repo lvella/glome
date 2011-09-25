@@ -147,27 +147,27 @@ namespace Menu
 		 * Labels
 		*/
 		l_main = new gcn::Label("Navigna");
-    l_main->setPosition(width/2-100, height/2-300);
-    l_main->setFont(font_normal);
-    mainC->add(l_main);
-    l_main->adjustSize();
-    
-    l_options = new gcn::Label("Options");
-    l_options->setPosition(width/2-100, height/2-300);
-    l_options->setFont(font_normal);
-    optionsC->add(l_options);
-    l_options->adjustSize();
-    
-    l_resolution = new gcn::Label("Resolution");
-    l_resolution->setPosition(width/2 -200, height/2 -70);
-    optionsC->add(l_resolution);
-    
-    buttonActionListener = new ButtonActionListener();
-    /*
-     * Init Main Buttons
-    */
-    //Single Player Button
-    singleplay_button = new NButton("Singleplayer");
+		l_main->setPosition(width/2-100, height/2-300);
+		l_main->setFont(font_normal);
+		mainC->add(l_main);
+		l_main->adjustSize();
+		
+		l_options = new gcn::Label("Options");
+		l_options->setPosition(width/2-100, height/2-300);
+		l_options->setFont(font_normal);
+		optionsC->add(l_options);
+		l_options->adjustSize();
+		
+		l_resolution = new gcn::Label("Resolution");
+		l_resolution->setPosition(width/2 -200, height/2 -70);
+		optionsC->add(l_resolution);
+		
+		buttonActionListener = new ButtonActionListener();
+		/*
+		 * Init Main Buttons
+		*/
+		//Single Player Button
+		singleplay_button = new NButton("Singleplayer");
 		singleplay_button->setHL_font(font_highlight);
 		singleplay_button->setActionEventId("singleplay");
 		singleplay_button->addActionListener(buttonActionListener);
@@ -191,6 +191,7 @@ namespace Menu
     */
     //CheckList
 		res_model = new ResolutionListModel();
+		res_model->getModes();
 		scroll_area = new gcn::ScrollArea();
 		scroll_area->setBackgroundColor(0x32f000);
 		scroll_area->setForegroundColor(0x32f000);
@@ -202,17 +203,18 @@ namespace Menu
 		list_box->setSelectionColor(0x552020);
 		
 		list_box->adjustSize();
-    resolution = new gcn::DropDown(res_model,
+		
+		resolution = new gcn::DropDown(res_model,
 									scroll_area,
 									list_box);
 		resolution->setBackgroundColor(0x32f000);
 		resolution->setForegroundColor(0x32f000);
 		resolution->setSelectionColor(0x552020);
-    resolution->setWidth(200);
-    resolution->addActionListener(buttonActionListener);
-    resolution->setActionEventId("resolution");
-    resolution->setPosition(width/2 - 90, height/2 -70);
-    Menu::optionsC->add(resolution);
+		resolution->setWidth(200);
+		resolution->addActionListener(buttonActionListener);
+		resolution->setActionEventId("resolution");
+		resolution->setPosition(width/2 - 90, height/2 -70);
+		Menu::optionsC->add(resolution);
 
     //Back Button
 		back_main = new NButton("Back");
