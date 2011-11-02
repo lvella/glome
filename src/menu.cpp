@@ -31,10 +31,6 @@ namespace Menu
 				init_gl();
 				Game::init_game();
 				Game::main_loop();
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				SDL_GL_SwapBuffers();
-				menu_halt();
-				menu_initialize();
 			}
 			else if (actionEvent.getId() == "options")
 			{

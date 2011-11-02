@@ -83,7 +83,7 @@ Mesh::Mesh(MeshTypes type):
   // Create the display list
   dlist = glGenLists(1);
   glNewList(dlist, GL_COMPILE);
-  glColor3ub(80, 80, 80);
+  glColor3ub(200, 200, 200);
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glVertexPointer(4, GL_FLOAT, 0, NULL);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

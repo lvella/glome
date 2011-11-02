@@ -10,7 +10,7 @@
 class Ship: public Drawable
 {
 public:
-  Ship(MeshTypes type = UFO);
+  Ship(MeshTypes type = HUNTER);
   ~Ship();
   void draw();
   void update();

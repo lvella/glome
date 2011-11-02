@@ -93,10 +93,14 @@ void SplitWorld::draw()
       ship[0].draw();
       ship[1].draw();
       MiniMap::draw(wstart, this, center);
+
+      a.draw();
+
     }
 }
 
 void SplitWorld::fill_minimap() {
   cube.draw_in_minimap();
+  a.draw_in_minimap();
   ship[(iter+1) & 1].draw_in_minimap();
 }

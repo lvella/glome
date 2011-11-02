@@ -1,4 +1,4 @@
-AC_DEFUN([AC_CHECK_BLENDER],
+AC_DEFUN([AX_CHECK_BLENDER],
 [
 AC_ARG_WITH([blender],
   [AS_HELP_STRING([--with-blender@<:@=ARG@:>@],

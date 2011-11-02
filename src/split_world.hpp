@@ -2,6 +2,7 @@
 
 #include <deque>
 #include "ship.hpp"
+#include "asteroid.hpp"
 #include "randomcube.hpp"
 #include "matrix4.hpp"
 
@@ -23,6 +24,8 @@ private:
   Ship ship[2];
   unsigned int points[2];
   RandomCube cube;
+
+  Asteroid a;
 
   // Camera transform historic
   std::deque<Matrix4> cam_hist[2];

@@ -28,7 +28,6 @@
 #include "net_world.hpp"
 #include "split_world.hpp"
 #include "jsinput.hpp"
-#include "asteroid.hpp"
 #include "options.hpp"
 
 using namespace std;

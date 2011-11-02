@@ -8,11 +8,16 @@ AC_CONFIG_HEADERS([src/config.hpp])
 DATA_DIR=`${PWDCMD-pwd}`/data
 AC_DEFINE_UNQUOTED([DATA_DIR], ["$DATA_DIR"] , [Data directory])
 
-AM_INIT_AUTOMAKE([-Wall -Werror])
+AM_INIT_AUTOMAKE
 
 AC_PROG_CXX
 
+m4_pattern_allow([^AX_])
+
+# Packages configuration
 AC_PATH_PROG(PKG_CONFIG, pkg-config)
+
+
 
 #http://www.gnu.org/software/autoconf-archive/ax_prog_doxygen.html
 m4_include([m4/ax_prog_doxygen.m4])
@@ -33,7 +38,7 @@ AX_BOOST_BASE([1.42],,AC_MSG_FAILURE())
 
 #http://sources.redhat.com/automake/automake.html#Extending-aclocal
 # Check for OpenGL
-AC_CHECK_OPENGL
+AX_CHECK_OPENGL
 #check for libglew
 #PKG_CHECK_MODULES([GLEW],[glew >= 1.5])
 
@@ -53,7 +58,7 @@ AC_CHECK_LIB([guichan], [gcnGuichanVersion], GUICHAN_LIBS="-lguichan -lguichan_s
 AC_SUBST(GUICHAN_LIBS)
 
 # Check for Blender
-AC_CHECK_BLENDER([2.59])
+AX_CHECK_BLENDER([2.59])
 
 # Check for xxd
 AC_PATH_PROG([XXD], [xxd], , [$PATH])
