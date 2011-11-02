@@ -45,6 +45,18 @@ Ship::Ship(MeshTypes type):
   mesh = Mesh::get_mesh(type);
   load_guns(type);
   //message.push_back(msg_id);
+
+  max_rot_per_frame = 0.03;
+  max_speed_forward = 0.0015;
+  max_speed_vertical = 0.0004;
+  max_speed_horizontal = 0.0004;
+  max_speed_spin = 0.02;
+
+  shot_speed = 0.02;
+  shot_power = 82;
+  // max_canon_heat = ?; // TODO: Mathematical model for cooldown, that uses all heat parameters.
+  canon_cooldown_rate = 7;
+  cold_fire_rate = 15;
 }
 
 Ship::~Ship()
@@ -90,15 +102,6 @@ Ship::draw()
 void 
 Ship::update()
 {
-  /* Maximum turning delta per frame in radians. */
-  const float MAXR = 0.03;
-
-  /* Maximum speed, in radians per second. */
-  const float MAXS = 0.0015;
-  const float MAXS_V = 0.0004;
-  const float MAXS_H = 0.0004;
-  const float MAXS_S = 0.02;
-
   float accel_v = 0.f, accel_h = 0.f, accel_s = 0.f;
 
   /* Turning */
@@ -106,14 +109,14 @@ Ship::update()
   float v = v_tilt - v_req;
 
   /* Limit the turning speed to MAXD rads per frame. */
-  if(h > MAXR)
-    h = MAXR;
-  else if(h < -MAXR)
-    h = -MAXR;
-  if(v > MAXR)
-    v = MAXR;
-  else if(v < -MAXR)
-    v = -MAXR;
+  if(h > max_rot_per_frame)
+    h = max_rot_per_frame;
+  else if(h < -max_rot_per_frame)
+    h = -max_rot_per_frame;
+  if(v > max_rot_per_frame)
+    v = max_rot_per_frame;
+  else if(v < -max_rot_per_frame)
+    v = -max_rot_per_frame;
 
   h_tilt -= h;
   v_tilt -= v;
@@ -124,23 +127,23 @@ Ship::update()
   handle_commands(spinl, spinr, speed_s, accel_s, 0.002);
 
   /* Accelerating */
-  accelerate(speed, accel, MAXS);
-  accelerate(speed_v, accel_v, MAXS_V);
-  accelerate(speed_h, accel_h, MAXS_H);
-  accelerate(speed_s, accel_s, MAXS_S);
+  accelerate(speed, accel, max_speed_forward);
+  accelerate(speed_v, accel_v, max_speed_vertical);
+  accelerate(speed_h, accel_h, max_speed_horizontal);
+  accelerate(speed_s, accel_s, max_speed_spin);
 
   /* Shooting */
   if(heat > 0)
-    heat -= 7; // Cooldown rate
+    heat -= canon_cooldown_rate; // Cooldown rate
 
-  int sps = (1500 - heat) / 100; // Firerate at maximum
+  int sps = (cold_fire_rate * 100 - heat) / 100; // Firerate at maximum
 
   shot_count -= sps;
   if(shot_count < 0) {
     if(sh) {
-      Projectile::shot(this, t * (rcanon_shot_last ? l_canon : r_canon), 0.02 - speed);
+      Projectile::shot(this, t * (rcanon_shot_last ? l_canon : r_canon), shot_speed - speed);
       shot_count += 60;
-      heat += 82; // Shot heat, could be equivalent to damage
+      heat += shot_power; // Shot heat, could be equivalent to damage
       rcanon_shot_last = !rcanon_shot_last;
     }
     else

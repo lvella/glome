@@ -1,7 +1,9 @@
 #pragma once
 
+#include <SDL/SDL.h>
 #include <guichan.hpp>
 #include <guichan/sdl.hpp>
+#include <vector>
 
 #include "guichan/opengl/openglsdlimageloader.hpp"
 #include "guichan/opengl/openglgraphics.hpp"
@@ -13,27 +15,29 @@ using namespace std;
  */
 class ResolutionListModel : public gcn::ListModel
 {
+	
+	SDL_Rect** modes;
+	int nr_res;
+	
 public:
-	int getNumberOfElements()
+	void getModes()
 	{
-		return 4;
+		int i;
+		modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
+		while(modes[++i]);
+		nr_res = i;
 	}
 
-	std::string getElementAt(int i)
+	int getNumberOfElements()
 	{
-		switch(i)
-		{
-			case 0:
-				return std::string("1366x768");
-			case 1:
-				return std::string("1360x768");
-			case 2:
-				return std::string("1280x720");
-			case 3:
-				return std::string("800x600");
-			default:
-				return std::string("");
-		}
+		return nr_res;
+	}
+
+	string getElementAt(int i)
+	{
+		char str[10];
+		sprintf(str, "%dx%d\0",modes[i]->w, modes[i]->h);
+		return str;
 	}
 };
 
