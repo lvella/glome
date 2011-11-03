@@ -17,6 +17,7 @@
 #include "net_input.hpp"
 #include "udp_server.hpp"
 #include "mesh.hpp"
+
 #include "net_world.hpp"
 
 static GLuint program;
@@ -150,6 +151,8 @@ NetWorld::update()
     }
   }
 
+  spg.update();
+
 /*
   for(int i = 0; i < ships.size(); ++i)
   {
@@ -201,6 +204,7 @@ NetWorld::draw()
   draw_meridians();
 
   cube.draw();
+  spg.draw();
   Projectile::draw_all();
   glUseProgram(program);
   for(int i = 0; i < ships.size(); ++i)

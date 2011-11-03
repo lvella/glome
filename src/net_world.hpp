@@ -9,6 +9,7 @@
 
 #include "ship.hpp"
 #include "randomcube.hpp"
+#include "spaghetti.hpp"
 #include "matrix4.hpp"
 #include "world.hpp"
 
@@ -54,6 +55,7 @@ private:
 
   std::vector<unsigned int> points;
   RandomCube cube;
+  Spaghetti spg;
   boost::asio::ip::udp::endpoint remote_endpoint;
   boost::array<float, 1024> recv_buf;
   bool interp;
