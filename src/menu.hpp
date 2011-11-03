@@ -1,14 +1,13 @@
 #pragma once
 
+#include <string>
+#include <vector>
+#include <cstdio>
 #include <SDL/SDL.h>
 #include <guichan.hpp>
 #include <guichan/sdl.hpp>
-#include <vector>
-
-#include "guichan/opengl/openglsdlimageloader.hpp"
-#include "guichan/opengl/openglgraphics.hpp"
-
-using namespace std;
+#include <guichan/opengl/openglsdlimageloader.hpp>
+#include <guichan/opengl/openglgraphics.hpp>
 
 /*
  * This is a ListModel we will use for resultion.
@@ -22,7 +21,7 @@ class ResolutionListModel : public gcn::ListModel
 public:
 	void getModes()
 	{
-		int i;
+		int i = 0;
 		modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
 		while(modes[++i]);
 		nr_res = i;
@@ -33,11 +32,11 @@ public:
 		return nr_res;
 	}
 
-	string getElementAt(int i)
+	std::string getElementAt(int i)
 	{
 		char str[10];
-		sprintf(str, "%dx%d\0",modes[i]->w, modes[i]->h);
-		return str;
+		snprintf(str, 10, "%dx%d",modes[i]->w, modes[i]->h);
+		return std::string(str);
 	}
 };
 
