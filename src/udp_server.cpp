@@ -12,7 +12,7 @@
 #include "udp_server.hpp"
 
 extern boost::asio::io_service gIOService;
-extern NetWorld* world;
+extern World* world;
 
 using namespace std;
 using boost::asio::ip::udp;
@@ -20,6 +20,7 @@ using boost::asio::ip::udp;
 namespace Server
 {
 
+static NetWorld* world = (NetWorld*)::world;
 float buf[1025];
 boost::asio::ip::udp::socket* socket;
 udp::endpoint remote_endpoint;
