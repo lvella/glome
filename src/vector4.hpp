@@ -1,13 +1,21 @@
 #pragma once
 
-#include <GL/glew.h>
+#include <cstdlib>
 #include <cmath>
+#include <GL/glew.h>
 
 class Matrix4;
 
 class Vector4
 {
 public:
+  static const Vector4 CANONICAL;
+
+  static Vector4 random_direction();
+
+  Vector4()
+  {}
+
   inline Vector4(float xl, float yl, float zl, float wl)
   {
     x = xl;
@@ -19,6 +27,12 @@ public:
   Vector4 operator+(const Vector4& ref) const
   {
     return Vector4(x + ref.x, y + ref.y, z + ref.z, w + ref.w);
+  }
+
+  Vector4 operator+=(const Vector4& ref)
+  {
+    (*this) = *this + ref;
+    return *this;
   }
 
   Vector4 operator-(const Vector4& ref) const
@@ -35,34 +49,27 @@ public:
     return v[elem];
   }
 
-  float squared_length()
+  void normalize() {
+    *this = (*this) * (1.0 / length());
+  }
+
+  float squared_length() const
   {
     return x*x + y*y + z*z + w*w;
   }
 
-  float length()
+  float length() const
   {
     return sqrt(squared_length());
   }
 
-  void loadVertex()
+  void loadVertex() const
   {
     glVertex4fv(v);
   }
 
-  /** Function for writing to a stream.
-   */
-  inline friend std::ostream& operator <<
-  ( std::ostream& o, const Vector4& v )
-  {
-    o << v.v[0];
-    for(size_t j = 1; j < 4; ++j)
-      {
-        o << ", " << v.v[j];
-      }
-    o << '\n';
-    return o;
-  }
+  /** Function for writing to a stream. */
+  friend std::ostream& operator<<(std::ostream& o, const Vector4& v);
 
 private:
   friend class Matrix4;
