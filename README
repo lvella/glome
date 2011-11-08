@@ -1,5 +1,5 @@
 Navigate through the surface of a hypersphere and kill your enemies.
- 
+  
 * Necessary packages (used in Debian 6 and Ubuntu 11.04):
   build-essential
   automake (This and below only if you do not have "configure" script generated)
