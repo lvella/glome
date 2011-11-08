@@ -8,7 +8,7 @@ using namespace std;
 static GLuint program;
 
 Asteroid::Asteroid():
-    Drawable(Matrix4::IDENTITY)
+    Object(Matrix4::IDENTITY)
 {
   mesh = Mesh::get_mesh(ASTEROID);
 

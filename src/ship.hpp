@@ -4,10 +4,10 @@
 #include <vector>
 
 #include "protocol.hpp"
-#include "drawable.hpp"
+#include "object.hpp"
 #include "mesh.hpp"
 
-class Ship: public Drawable
+class Ship: public Object
 {
 public:
   Ship(MeshTypes type = HUNTER);

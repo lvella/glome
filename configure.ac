@@ -66,6 +66,7 @@ AC_PATH_PROG([XXD], [xxd], , [$PATH])
 AC_CONFIG_FILES([
 	Makefile
 	data/Makefile
-	src/Makefile
+	common/Makefile
+	sdl/Makefile
 ])
 AC_OUTPUT

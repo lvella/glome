@@ -1,8 +1,8 @@
 #pragma once
 
-#include "drawable.hpp"
+#include "object.hpp"
 
-class RandomCube: public Drawable
+class RandomCube: public Object
 {
 public:
   RandomCube();

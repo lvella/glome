@@ -86,14 +86,20 @@ NetWorld::NetWorld(bool isc, string host, short int port):
                                       boost::asio::placeholders::bytes_transferred));
 
   }
+}
 
-  // 3-D to 2-D projection
-  glViewport(0, 0, width, height);
-  glMatrixMode(GL_PROJECTION);
-  glLoadIdentity();
-  gluPerspective(FOV, double(width) / double(height), 0.001, 5);
-  glMatrixMode(GL_MODELVIEW);
-  glLoadIdentity();
+void
+NetWorld::setup_display()
+{
+	World::setup_display();
+
+	// Since the projection is not changing, it can be here.
+	glViewport(0, 0, width, height);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	gluPerspective(FOV, double(width) / double(height), 0.001, 5);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
 }
 
 void
@@ -216,7 +222,7 @@ NetWorld::draw()
 void
 NetWorld::fill_minimap()
 {
-  cube.draw_in_minimap();
-  for(int i = 1; i < ships.size(); ++i)
-    ships[i]->draw_in_minimap();
+	MiniMap::draw_dot(cube);
+	for(int i = 1; i < ships.size(); ++i)
+		MiniMap::draw_dot(*ships[i]);
 }

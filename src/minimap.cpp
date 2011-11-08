@@ -119,6 +119,21 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
   glMatrixMode(GL_MODELVIEW);
 }
 
+void MiniMap::draw_dot(const Object& obj)
+{
+	glPushMatrix();
+	obj.transformation().multToGL();
+	
+	glColor3ub(255, 0, 0);
+	glBegin(GL_QUADS);
+	glVertex2i(-1, -1);
+	glVertex2i(1, -1);
+	glVertex2i(1, 1);
+	glVertex2i(-1, 1);
+	glEnd();
+	glPopMatrix();
+}
+	
 void
 create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
 {
