@@ -1,9 +1,9 @@
 #pragma once
 
-#include "drawable.hpp"
+#include "object.hpp"
 #include "mesh.hpp"
 
-class Asteroid: public Drawable
+class Asteroid: public Object
 {
 public:
   Asteroid();

@@ -121,7 +121,7 @@ bool Projectile::collide(Ship *s)
 }
 
 Projectile::Projectile(Ship *s, const Matrix4& from, float speed):
-  Drawable(from),
+  Object(from),
   ds(zw_matrix(-speed)),
   owner(s),
   ttl(0),

@@ -1,10 +1,10 @@
 #pragma once
 
-#include "drawable.hpp"
+#include "object.hpp"
 
 #define SPAGHETTI_COUNT 100 // Number of cubic Bézier curves
 
-class Spaghetti: public Drawable
+class Spaghetti: public Object
 {
 public:
   Spaghetti();

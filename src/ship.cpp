@@ -17,7 +17,7 @@ using namespace std;
 extern const char* mesh_filename[MESH_COUNT];
 
 Ship::Ship(MeshTypes type):
-    Drawable(Matrix4::IDENTITY),
+    Object(Matrix4::IDENTITY),
     v_tilt(0.0f),
     h_tilt(0.0f),
     v_req(0.0f),

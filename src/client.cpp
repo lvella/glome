@@ -1,7 +1,7 @@
 #include <iostream>
 #include <list>
 
-#include "drawable.hpp"
+#include "object.hpp"
 #include "protocol.hpp"
 #include "udp_server.hpp"
 #include "net_world.hpp"
@@ -12,7 +12,9 @@
 extern int width;
 extern int height;
 
+namespace Game {
 extern World* world;
+}
 
 using namespace std;
 using boost::asio::ip::udp;
@@ -21,7 +23,7 @@ Client::Client(udp::endpoint* end)
 {
   last_msg = 0;
   remote_endpoint = end;
-  ship = ((NetWorld*)world)->next_ship(
+  ship = ((NetWorld*)Game::world)->next_ship(
 		  /*
         xy_matrix(rand()/10000.0f)
       * xz_matrix(rand()/10000.0f)
@@ -31,7 +33,7 @@ Client::Client(udp::endpoint* end)
       * zw_matrix(rand()/10000.0f)
       */
 		  Matrix4::IDENTITY);
-  id = ((NetWorld*)world)->ships_list().size() - 1;
+  id = ((NetWorld*)Game::world)->ships_list().size() - 1;
   make_init_pos_msg();
   Server::send_to_client(message, this);
 }

@@ -10,6 +10,8 @@ public:
   {}
   virtual ~Object() = 0;
 
+  virtual void draw() = 0;
+
   const Matrix4& transformation() const
   {
     return t;

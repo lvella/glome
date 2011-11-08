@@ -5,7 +5,7 @@
 using namespace std;
 
 Asteroid::Asteroid():
-    Drawable(Matrix4::IDENTITY)
+    Object(Matrix4::IDENTITY)
 {
   mesh = Mesh::get_mesh(ASTEROID);
 }

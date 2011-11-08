@@ -2,10 +2,10 @@
 
 #include "matrix4.hpp"
 #include "vector4.hpp"
-#include "drawable.hpp"
+#include "object.hpp"
 #include "ship.hpp"
 
-class Projectile: public Drawable
+class Projectile: public Object
 {
 public:
   static void initialize();

@@ -97,6 +97,6 @@ void SplitWorld::draw()
 }
 
 void SplitWorld::fill_minimap() {
-  cube.draw_in_minimap();
-  ship[(iter+1) & 1].draw_in_minimap();
+  MiniMap::draw_dot(cube);
+  MiniMap::draw_dot(ship[(iter+1) & 1]);
 }

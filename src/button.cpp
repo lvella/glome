@@ -1,6 +1,6 @@
 #include "button.hpp"
 #include "menu.hpp"
-#include "main.hpp"
+#include "native.hpp"
 
 
 NButton::NButton(const std::string& caption) :
@@ -40,5 +40,3 @@ void NButton::mouseExited(gcn::MouseEvent& mouseEvent)
 	Button::mouseExited(mouseEvent);
 	has_mouse = false;
 }
-
-

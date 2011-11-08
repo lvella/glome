@@ -20,6 +20,7 @@ public:
 
   NetWorld(bool, std::string, short int);
 
+  virtual void setup_display();
   virtual bool update();
   virtual void draw();
   virtual void fill_minimap();

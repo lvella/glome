@@ -3,6 +3,7 @@
 #include "protocol.hpp"
 #include "options.hpp"
 #include "net_world.hpp"
+#include "game.hpp"
 
 #include "net_input.hpp"
 
@@ -53,7 +54,7 @@ motion(int x, int y)
 void
 parse_message(const boost::array<float, 1024>& msg, unsigned int bytes, bool isClient)
 {
-  NetWorld* w = (NetWorld*)world;
+  NetWorld* w = (NetWorld*)Game::world;
   boost::array<float, 1024>::const_iterator it;
   unsigned int nums = bytes / sizeof(int);
   unsigned int i = 0;

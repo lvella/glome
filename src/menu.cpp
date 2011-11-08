@@ -1,15 +1,19 @@
 #include <iostream>
 #include <sstream>
-#include <SDL/SDL.h>
 #include <GL/gl.h>
 #include <GL/glu.h>
+#include <SDL.h>
+#include <guichan.hpp>
+#include <guichan/opengl/openglgraphics.hpp>
 
-#include "menu.hpp"
+#include "native.hpp"
 #include "button.hpp"
 #include "game.hpp"
-#include "init_gl.hpp"
 #include "options.hpp"
 #include "config.hpp"
+#include "game.hpp"
+
+#include "menu.hpp"
 
 using namespace std;
 using namespace Options;
@@ -28,13 +32,7 @@ namespace Menu
 		{
 			if (actionEvent.getId() == "singleplay")
 			{
-				init_gl();
-				Game::init_game();
-				Game::main_loop();
-				glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-				SDL_GL_SwapBuffers();
-				menu_halt();
-				menu_initialize();
+				Game::switch_state(Game::WORLD);
 			}
 			else if (actionEvent.getId() == "options")
 			{
@@ -52,11 +50,38 @@ namespace Menu
 			}
 		}
 	};
-	
-	gcn::OpenGLSDLImageLoader* imageLoader;
+
+	/*
+	* This is a ListModel we will use for resultion.
+	*/
+	class ResolutionListModel : public gcn::ListModel
+	{
+		SDL_Rect** modes;
+		int nr_res;
+	public:
+		void getModes()
+		{
+			int i = 0;
+			modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
+			while(modes[++i]);
+			nr_res = i;
+		}
+
+		int getNumberOfElements()
+		{
+			return nr_res;
+		}
+
+		std::string getElementAt(int i)
+		{
+			char str[10];
+			snprintf(str, 10, "%dx%d",modes[i]->w, modes[i]->h);
+			return std::string(str);
+		}
+	};
+
+	gcn::ImageLoader* imageLoader;
 	gcn::OpenGLGraphics* graphics;
-	SDL_Surface* screen;
-	SDL_Event event;
 	gcn::Gui* gui;
 
 	gcn::ImageFont* font_normal;
@@ -68,7 +93,7 @@ namespace Menu
 	gcn::Label* l_resolution;
 
 	bool running = true;
-	gcn::SDLInput* input;
+	gcn::Input* input;
 
 	ButtonActionListener* buttonActionListener;
 	NButton* singleplay_button;
@@ -80,36 +105,10 @@ namespace Menu
 	gcn::ScrollArea* scroll_area;
 	gcn::DropDown* resolution;
 
-	void SDL_initialize()
+	void initialize()
 	{
-		/*
-		 * SDL Startup
-		 */
-		if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) != 0) 
-		{
-		  cerr << "Unable to initialize SDL: " << SDL_GetError() << endl;
-		  exit(1);
-		}
-		SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-		{
-		  int video_flags = SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL;
-		  if(Options::fullscreen)
-		    video_flags |= SDL_FULLSCREEN;
-		  screen = SDL_SetVideoMode(width, height, 0, video_flags);
-		}
-		SDL_WM_SetCaption("Navigna", NULL);
-		SDL_ShowCursor(SDL_ENABLE);
-		SDL_EnableUNICODE(1);
-		SDL_JoystickEventState(SDL_ENABLE);
-		
-		SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);	
-	}
-
-	void menu_initialize()
-	{
-		input = new gcn::SDLInput();
-
-		imageLoader = new gcn::OpenGLSDLImageLoader();
+		input = gcn_input();
+		imageLoader = gcn_imageLoader();
 		gcn::Image::setImageLoader(imageLoader);
 		graphics = new gcn::OpenGLGraphics(width, height);
 		graphics->setTargetPlane(width, height);
@@ -123,8 +122,7 @@ namespace Menu
 		font_highlight = new gcn::ImageFont(highlight.str().c_str(), " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 		font_menu = new gcn::ImageFont(menufont.str().c_str(), " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 		gcn::Widget::setGlobalFont(font_menu);
-		
-		input = new gcn::SDLInput();
+
 		gui = new gcn::Gui();
 		gui->setGraphics(graphics);
 		gui->setInput(input);
@@ -142,30 +140,30 @@ namespace Menu
 		mainC->setDimension(gcn::Rectangle(0, 0, width, height));
 		optionsC->setDimension(gcn::Rectangle(0, 0, width, height));
 		gui->setTop(top);
-		
+
 		/*
 		 * Labels
-		*/
+		 */
 		l_main = new gcn::Label("Navigna");
 		l_main->setPosition(width/2-100, height/2-300);
 		l_main->setFont(font_normal);
 		mainC->add(l_main);
 		l_main->adjustSize();
-		
+
 		l_options = new gcn::Label("Options");
 		l_options->setPosition(width/2-100, height/2-300);
 		l_options->setFont(font_normal);
 		optionsC->add(l_options);
 		l_options->adjustSize();
-		
+
 		l_resolution = new gcn::Label("Resolution");
 		l_resolution->setPosition(width/2 -200, height/2 -70);
 		optionsC->add(l_resolution);
-		
+
 		buttonActionListener = new ButtonActionListener();
 		/*
 		 * Init Main Buttons
-		*/
+		 */
 		//Single Player Button
 		singleplay_button = new NButton("Singleplayer");
 		singleplay_button->setHL_font(font_highlight);
@@ -175,7 +173,7 @@ namespace Menu
 		singleplay_button->setFont(font_normal);
 		Menu::mainC->add(singleplay_button);
 		singleplay_button->adjustSize();
-		
+
 		//Options Button
 		options_button = new NButton("Options");
 		options_button->setHL_font(font_highlight);
@@ -185,28 +183,28 @@ namespace Menu
 		options_button->setFont(font_normal);
 		Menu::mainC->add(options_button);	
 		options_button->adjustSize();
-		
+
 		/*
-     * Init Options Buttons
-    */
-    //CheckList
+		 * Init Options Buttons
+		 */
+		//CheckList
 		res_model = new ResolutionListModel();
 		res_model->getModes();
 		scroll_area = new gcn::ScrollArea();
 		scroll_area->setBackgroundColor(0x32f000);
 		scroll_area->setForegroundColor(0x32f000);
 		scroll_area->setSelectionColor(0x552020);
-		
+
 		list_box = new gcn::ListBox();
 		list_box->setBackgroundColor(0x32f000);
 		list_box->setForegroundColor(0x32f000);
 		list_box->setSelectionColor(0x552020);
-		
+
 		list_box->adjustSize();
-		
+
 		resolution = new gcn::DropDown(res_model,
-									scroll_area,
-									list_box);
+						scroll_area,
+						list_box);
 		resolution->setBackgroundColor(0x32f000);
 		resolution->setForegroundColor(0x32f000);
 		resolution->setSelectionColor(0x552020);
@@ -216,7 +214,7 @@ namespace Menu
 		resolution->setPosition(width/2 - 90, height/2 -70);
 		Menu::optionsC->add(resolution);
 
-    //Back Button
+		//Back Button
 		back_main = new NButton("Back");
 		back_main->setHL_font(font_highlight);
 		back_main->setActionEventId("back_main");
@@ -234,13 +232,12 @@ namespace Menu
    * the input from the menu and the actual game are doing different
    * stuff... So I guess that's ok.
    */
-  void menu_run()
+/*  void menu_run()
 	{
 		bool running = true;
 		//gui->setInput(input);
 		while (running)
 		{
-			
 			if (res_changed)
 			{cout << resolution->getSelected() << endl;
 				width = 1280;
@@ -290,5 +287,5 @@ namespace Menu
 		delete list_box;
 		delete back_main;
 //		SDL_Quit();
-	}
+	}*/
 }

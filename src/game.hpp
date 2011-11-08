@@ -1,9 +1,16 @@
 #pragma once
 
+#include "world.hpp"
+
 namespace Game
 {
-	void main_loop();
-	void init_game();
-	void init_network();
-	void halt();
+	extern World* world;
+	enum state {EXIT, MENU, WORLD};
+
+	/** Process and renders a game frame. */
+	bool frame();
+	void initialize();
+
+	/** Switches between game states. */
+	void switch_state(state s);
 }
