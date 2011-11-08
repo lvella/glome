@@ -125,71 +125,66 @@ NetWorld::set_interpolation(unsigned int s_id, const Matrix4& f, const Matrix4& 
 }
 
 
-bool
+void
 NetWorld::update()
 {
-  bool run;
-  // Treat events
-  run = Input::handle();
-
-  Projectile::update_all(cam_pos);
-
-  Vector4 c = cube.transformation().position();
-
-  for(int e = 0; e < ships.size(); ++e)
-  {
-	Interpol& i = interpols[e];
-    if(!i.interp)
-      ships[e]->update();
-    else
-    {
-	  if(i.param_t > 1.1f)
-	  {
-	    i.interp = false;
-	    i.param_t = 0.f;
-	  }
-	  else
-	  {
-	    ships[e]->setTransformation(i.from.interpolation(i.to, i.param_t));
-	    //cout << "Interpolando: " << param_t * 10 << '\n' << ships[0]->transformation() << endl;
-	    i.param_t += 0.001f;
-	  }
-    }
-  }
-
-  spg.update();
-
-/*
-  for(int i = 0; i < ships.size(); ++i)
-  {
-    ships[i]->update();
-    if(Projectile::collide(ships[i]))
-      ships[i]->setTransformation(cube.transformation() * yw_matrix(M_PI));
-
-    if((c - ships[i]->transformation().position()).squared_length() < (0.03f * 0.03f))
-    {
-      cube.randomize();
-      //std::cout << "Ship " << i << " scored " << ++points[i] << " points!" << std::endl;
-    }
-  }
-*/
-
-  // Network update
-  Ship* ship = ships[0];
-  const vector<float>& v = ship->getMessage();
-  if(v.size() > 0)
-  {
-	if(isClient)
-      int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
-	else
-	  Server::send_to_all(v, v.size() * sizeof(float), 0, true);
-
-    ship->clearMessage();
-  }
-
-  return run;
+	// Treat events
+	Projectile::update_all(cam_pos);
+	
+	Vector4 c = cube.transformation().position();
+	
+	for(int e = 0; e < ships.size(); ++e)
+	{
+		Interpol& i = interpols[e];
+		if(!i.interp)
+			ships[e]->update();
+		else
+		{
+			if(i.param_t > 1.1f)
+			{
+				i.interp = false;
+				i.param_t = 0.f;
+			}
+			else
+			{
+				ships[e]->setTransformation(i.from.interpolation(i.to, i.param_t));
+				//cout << "Interpolando: " << param_t * 10 << '\n' << ships[0]->transformation() << endl;
+				i.param_t += 0.001f;
+			}
+		}
+	}
+	
+	spg.update();
+	
+	/*
+	 *  for(int i = 0; i < ships.size(); ++i)
+	 *  {
+	 *    ships[i]->update();
+	 *    if(Projectile::collide(ships[i]))
+	 *      ships[i]->setTransformation(cube.transformation() * yw_matrix(M_PI));
+	 * 
+	 *    if((c - ships[i]->transformation().position()).squared_length() < (0.03f * 0.03f))
+	 *    {
+	 *      cube.randomize();
+	 *      //std::cout << "Ship " << i << " scored " << ++points[i] << " points!" << std::endl;
+	 }
+	 }
+	 */
+	
+	// Network update
+	Ship* ship = ships[0];
+	const vector<float>& v = ship->getMessage();
+	if(v.size() > 0)
+	{
+		if(isClient)
+			int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
+		else
+			Server::send_to_all(v, v.size() * sizeof(float), 0, true);
+		
+		ship->clearMessage();
+	}
 }
-
+	 
 void
 NetWorld::draw()
 {

@@ -14,6 +14,7 @@
 #include <guichan/sdl.hpp>
 #include <guichan/opengl/openglsdlimageloader.hpp>
 
+#include "input.hpp"
 #include "menu.hpp"
 #include "options.hpp"
 #include "game.hpp"
@@ -23,12 +24,25 @@
 
 using namespace std;
 
-gcn::Input *gcn_input() {
+gcn::Input* gcn_input()
+{
 	return new gcn::SDLInput();
 }
 
-gcn::ImageLoader* gcn_imageLoader() {
+gcn::ImageLoader* gcn_image_loader()
+{
 	return new gcn::OpenGLSDLImageLoader();
+}
+
+void list_video_modes(vector<string> &out)
+{
+	SDL_Rect** modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
+	while(*modes) {
+		char str[15];
+		snprintf(str, 15, "%dx%d", (*modes)->w, (*modes)->h);
+		out.push_back(string(str));
+		++modes;
+	}
 }
 
 static void initialize_SDL()
@@ -97,7 +111,8 @@ static void main_loop()
 	
 	while(running) 
 	{
-		running = Game::frame();
+		running = Input::handle();
+		Game::frame();
 		SDL_GL_SwapBuffers();
 		// Fix framerate
 		{
