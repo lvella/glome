@@ -7,36 +7,39 @@
 
 #include "spaghetti.hpp"
 
+static inline float randr()
+{
+	return float(rand()) / RAND_MAX;
+}
+
 Spaghetti::Spaghetti()
 {
-  static const float R = 1.0 / 50.0; // Approximated radius of the spaghetti
-
-  for(int i = 0; i < SPAGHETTI_COUNT; ++i) {
-      Vector4 &p0 = p[i*3];
-      Vector4 &m  = p[i*3 + 1];
-      Vector4 &p1 = p[i*3 + 2];
-
-      Vector4 dir3d((float)rand(), (float)rand(), (float)rand(), 0);
-      dir3d.normalize();
-      m = // Random rotation:
-          rotation((float(rand()) / RAND_MAX) * 2 * M_PI, dir3d[0], dir3d[1], dir3d[2])
-          // Random displacement along radius:
-          * xw_matrix((float(rand()) / RAND_MAX) * R)
-          // Canonical starting position:
-          * Vector4::CANONICAL;
-
-      Vector4 d = Vector4::random_direction();
-      // Those points are outside the glome's surface, lets see how it renders.
-      p0 = m + d * (R * float(rand()) / RAND_MAX);
-      p1 = m - d * (R * float(rand()) / RAND_MAX);
-  }
-
-  p[SPAGHETTI_COUNT*3] = p[0];
-  p[SPAGHETTI_COUNT*3 + 1] = p[1];
-
-  Vector4 dir3d((float)rand(), (float)rand(), (float)rand(), 0);
-  dir3d.normalize();
-  velo = rotation(0.04f, dir3d[0], dir3d[1], dir3d[2]);
+	const float R = 1.0 / 50.0; // Approximated radius of the spaghetti
+	const Matrix4 R_DISP = xw_matrix(R); // Displacement along radius
+	
+	for(int i = 0; i < SPAGHETTI_COUNT; ++i) {
+		Vector4 &p0 = p[i*3];
+		Vector4 &m  = p[i*3 + 1];
+		Vector4 &p1 = p[i*3 + 2];
+		
+		m =
+		xy_matrix((float(rand()) / RAND_MAX) * 2 * M_PI) *
+		xz_matrix((float(rand()) / RAND_MAX) * 2 * M_PI) *
+		yz_matrix((float(rand()) / RAND_MAX) * 2 * M_PI) *
+		R_DISP * Vector4::CANONICAL; 
+		
+		Vector4 d = Vector4::random_direction();
+		// Those points are outside the glome's surface, lets see how it renders.
+		p0 = m + d * (R / 2.0 * randr());
+		p1 = m - d * (R / 2.0 * randr());
+	}
+	
+	p[SPAGHETTI_COUNT*3] = p[0];
+	p[SPAGHETTI_COUNT*3 + 1] = p[1];
+	
+	Vector4 dir3d(rand() - (RAND_MAX / 2), rand() - (RAND_MAX / 2), rand() - (RAND_MAX / 2), 0);
+	dir3d.normalize();
+	velo = rotation(0.04f, dir3d[0], dir3d[1], dir3d[2]);
 }
 
 // From http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
