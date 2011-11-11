@@ -8,7 +8,7 @@ namespace Game
 	enum state {EXIT, MENU, WORLD};
 
 	/** Process and renders a game frame. */
-	bool frame();
+	void frame();
 	void initialize();
 
 	/** Switches between game states. */

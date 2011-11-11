@@ -36,27 +36,23 @@ SplitWorld::SplitWorld()
   cam_hist[1].resize(10, Matrix4::IDENTITY);
 }
 
-bool SplitWorld::update()
+void SplitWorld::update()
 {
-  bool run;
-  // Treat events
-  run = Input::handle();
+	// Treat events
+	Projectile::update_all(Vector4(0.0f, 0.0f, 0.0f, -1.0f));
+	
+	Vector4 c = cube.transformation().position();
+	
+	for(int i = 0; i < 2; ++i) {
+		ship[i].update();
+		if(Projectile::collide(&ship[i]))
+			ship[i].setTransformation(cube.transformation() * yw_matrix(M_PI));
 
-  Projectile::update_all(Vector4(0.0f, 0.0f, 0.0f, -1.0f));
-
-  Vector4 c = cube.transformation().position();
-
-  for(int i = 0; i < 2; ++i) {
-    ship[i].update();
-    if(Projectile::collide(&ship[i]))
-      ship[i].setTransformation(cube.transformation() * yw_matrix(M_PI));
-
-    if((c - ship[i].transformation().position()).squared_length() < (0.03f * 0.03f)) {
-      cube.randomize();
-      std::cout << "Ship " << i << " scored " << ++points[i] << " points!" << std::endl;
-    }
-  }
-  return run;
+		if((c - ship[i].transformation().position()).squared_length() < (0.03f * 0.03f)) {
+			cube.randomize();
+			std::cout << "Ship " << i << " scored " << ++points[i] << " points!" << std::endl;
+		}
+	}
 }
 
 void SplitWorld::draw()

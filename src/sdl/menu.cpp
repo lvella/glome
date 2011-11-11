@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <string>
 #include <sstream>
 #include <GL/gl.h>
 #include <GL/glu.h>
@@ -55,27 +57,21 @@ namespace Menu
 	*/
 	class ResolutionListModel : public gcn::ListModel
 	{
-		SDL_Rect** modes;
-		int nr_res;
+		vector<string> modes;
 	public:
-		void getModes()
+		ResolutionListModel()
 		{
-			int i = 0;
-			modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
-			while(modes[++i]);
-			nr_res = i;
+			list_video_modes(modes);
 		}
 
 		int getNumberOfElements()
 		{
-			return nr_res;
+			return modes.size();
 		}
 
 		std::string getElementAt(int i)
 		{
-			char str[10];
-			snprintf(str, 10, "%dx%d",modes[i]->w, modes[i]->h);
-			return std::string(str);
+			return modes[i];
 		}
 	};
 
@@ -107,7 +103,7 @@ namespace Menu
 	void initialize()
 	{
 		input = gcn_input();
-		imageLoader = gcn_imageLoader();
+		imageLoader = gcn_image_loader();
 		gcn::Image::setImageLoader(imageLoader);
 		graphics = new gcn::OpenGLGraphics(width, height);
 		graphics->setTargetPlane(width, height);
@@ -188,7 +184,6 @@ namespace Menu
 		 */
 		//CheckList
 		res_model = new ResolutionListModel();
-		res_model->getModes();
 		scroll_area = new gcn::ScrollArea();
 		scroll_area->setBackgroundColor(0x32f000);
 		scroll_area->setForegroundColor(0x32f000);

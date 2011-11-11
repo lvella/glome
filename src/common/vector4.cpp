@@ -8,7 +8,7 @@ Vector4 Vector4::random_direction() {
     Vector4 ret;
 
     for(int i = 0; i < 4; ++i)
-        ret.v[i] = float(rand());
+        ret.v[i] = rand() - (RAND_MAX / 2);
 
     ret.normalize();
 

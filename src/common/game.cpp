@@ -19,13 +19,10 @@ namespace Game
 {
 	World* world;
 
-	static bool running = true;
-
-	bool frame()
+	void frame()
 	{
 		world->update();
 		world->draw();
-		return running;
 	}
 
 	void initialize()
@@ -59,7 +56,7 @@ namespace Game
 	{
 		switch(s) {
 		case EXIT:
-			running = true;
+			//running = true;
 			break;
 		case MENU:
 			// TODO...

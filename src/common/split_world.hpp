@@ -15,7 +15,7 @@ public:
 
   SplitWorld();
 
-  virtual bool update();
+  virtual void update();
   virtual void draw();
   void fill_minimap();
 
