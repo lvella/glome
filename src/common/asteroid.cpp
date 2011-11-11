@@ -19,6 +19,7 @@ Asteroid::Asteroid():
 
 Asteroid::~Asteroid()
 {
+  //TODO:use spaghetti class instead of mesh
   Mesh::release_mesh(mesh);
 }
 

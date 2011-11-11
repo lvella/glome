@@ -13,13 +13,16 @@ if test ! -d build-aux ; then
 	/bin/mkdir ./build-aux
 fi
 
+#echo "running libtoolize"
+#libtoolize -c -f -i
+
 echo "running aclocal"
 aclocal -I ./m4
 rc=$?
 
 if test $rc -eq 0; then
-	echo "running autoconf"
-	autoconf
+	echo "running autoreconf"
+	autoreconf -i
 	rc=$?
 else
 	echo "An error occured, autogen.sh stopping."

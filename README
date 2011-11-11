@@ -19,14 +19,7 @@ Navigate through the surface of a hypersphere and kill your enemies.
   Doxygen
 
 * Generate configuration files:
-  $ autoreconf
-  [ $ automake --add-missing ] (if necessary)
-  $ automake -a -c (generate Makefiles)
-
-* To change some macro (m4):
-  $ aclocal
-  -> generate configuration files again
-  -> standard procedure
+  $ ./autogen.sh
 
 * Compile:
   $ ./configure
@@ -36,5 +29,5 @@ Navigate through the surface of a hypersphere and kill your enemies.
   $ make doxygen-doc
 
 * Play:
-  $ cd src
-  $ ./navigna
+  $ cd src/sdl
+  $ ./glome

@@ -1,23 +1,24 @@
 AC_PREREQ([2.60])
 
-AC_INIT([Navigna], [1.0], [support@fractal.com])
+AC_INIT([Glome], [1.0], [support@fractal.com])
 
 AC_CONFIG_AUX_DIR([build-aux])
 
-AC_CONFIG_HEADERS([src/config.hpp])
+AC_CONFIG_HEADERS([src/common/config.hpp])
 DATA_DIR=`${PWDCMD-pwd}`/data
 AC_DEFINE_UNQUOTED([DATA_DIR], ["$DATA_DIR"] , [Data directory])
+
+m4_pattern_allow([^AX_])
+AC_CONFIG_MACRO_DIR([m4])
 
 AM_INIT_AUTOMAKE
 
 AC_PROG_CXX
+AC_PROG_RANLIB
 
-m4_pattern_allow([^AX_])
 
 # Packages configuration
 AC_PATH_PROG(PKG_CONFIG, pkg-config)
-
-
 
 #http://www.gnu.org/software/autoconf-archive/ax_prog_doxygen.html
 m4_include([m4/ax_prog_doxygen.m4])
@@ -66,7 +67,20 @@ AC_PATH_PROG([XXD], [xxd], , [$PATH])
 AC_CONFIG_FILES([
 	Makefile
 	data/Makefile
-	common/Makefile
-	sdl/Makefile
+	src/Makefile
+	src/common/Makefile
+	src/sdl/Makefile
 ])
 AC_OUTPUT
+
+echo \
+"-------------------------------------------------
+
+ ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
+
+ Prefix: '${prefix}'.
+ Compiler: '${CC} ${CFLAGS} ${CPPFLAGS}'
+ Libraries: '${LIBS}'
+
+ Now type 'make'
+--------------------------------------------------"

@@ -103,8 +103,8 @@ AX_CHECK_GL( [AX_CHECK_GLU(have_opengl=yes) AX_CHECK_GLEW(have_opengl=yes)] )
 
 
 if test "$have_opengl" = yes ; then
-  OPENGL_CFLAGS="$LIBGL_CFLAGS $LIBGLU_CFLAGS"
-  OPENGL_LIBS="$LIBGL_LIBS $LIBGLU_LIBS"
+  OPENGL_CFLAGS="$LIBGL_CFLAGS $LIBGLU_CFLAGS $LIBGLEW_CFLAGS"
+  OPENGL_LIBS="$LIBGL_LIBS $LIBGLU_LIBS $LIBGLEW_LIBS"
 
   if test "$no_x" != yes ; then
     AX_CHECK_GLX(, have_opengl=no)

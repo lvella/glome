@@ -23,7 +23,7 @@ namespace Options
 	{
 		puts(
 		"\n"
-		"Usage: navigna [options]\n\n"
+		"Usage: glome [options]\n\n"
 		"\t-w/--width [number] \t: set window's width\n"
 		"\t-h/--height [number] \t: set window's height\n"
 		"\t-f/--fullscreen\t\t: be fullscreen\n"
@@ -33,7 +33,7 @@ namespace Options
 		"\t-c/--is-client\t\t: run as a client\n"
 		"\t-p/--port [number]\t: host port\n\n"
 		"NOTICE: This arguments can be changed/stored in the game later\n"
-		"Navigna is free software.  See COPYING for details.\n"
+		"Glome is free software.  See COPYING for details.\n"
 		);
 	}
 	

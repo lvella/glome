@@ -11,7 +11,6 @@
 #include "game.hpp"
 #include "options.hpp"
 #include "config.hpp"
-#include "game.hpp"
 
 #include "menu.hpp"
 

@@ -1,6 +1,6 @@
+#include "../sdl/menu.hpp"
 #include "options.hpp"
 #include "meridian.hpp"
-#include "menu.hpp"
 #include "split_world.hpp"
 #include "net_world.hpp"
 #include "udp_server.hpp"
