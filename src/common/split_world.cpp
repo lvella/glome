@@ -89,9 +89,6 @@ void SplitWorld::draw()
       ship[0].draw();
       ship[1].draw();
       MiniMap::draw(wstart, this, center);
-
-      a.draw();
-
     }
 }
 

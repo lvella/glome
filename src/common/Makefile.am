@@ -17,7 +17,6 @@ libcommon_a_SOURCES = \
 	minimap.cpp \
 	mesh.cpp \
 	ship.cpp \
-	asteroid.cpp \
 	client.cpp \
 	randomcube.cpp \
 	spaghetti.cpp \
@@ -32,9 +31,7 @@ libcommon_a_SOURCES = \
 BUILT_SOURCES = \
 	minimap_proj.glsl.hpp \
 	world_proj.glsl.hpp \
-	projectile.glsl.hpp \
-	asteroid-vert.glsl.hpp \
-	asteroid-frag.glsl.hpp
+	projectile.glsl.hpp 
 
 minimap_proj.glsl.hpp: minimap_proj.glsl
 	${XXD} -i minimap_proj.glsl > minimap_proj.glsl.hpp
@@ -44,11 +41,5 @@ world_proj.glsl.hpp: world_proj.glsl
 
 projectile.glsl.hpp: projectile.glsl
 	${XXD} -i projectile.glsl > projectile.glsl.hpp
-
-asteroid-vert.glsl.hpp: asteroid-vert.glsl
-	${XXD} -i asteroid-vert.glsl > asteroid-vert.glsl.hpp
-
-asteroid-frag.glsl.hpp: asteroid-frag.glsl
-	${XXD} -i asteroid-frag.glsl > asteroid-frag.glsl.hpp
 
 CLEANFILES = ${BUILT_SOURCES}
