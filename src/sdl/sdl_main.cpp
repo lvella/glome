@@ -117,7 +117,7 @@ static void main_loop()
 		// Fix framerate
 		{
 			// TODO: maybe clk_div is useful here...
-			const int period = 1000/60;
+			const int period = 1000 / FPS;
 			Uint32 now = SDL_GetTicks();
 			int delay = period - int(now - ticks);
 			if(delay > 0)

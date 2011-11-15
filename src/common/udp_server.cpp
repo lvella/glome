@@ -72,7 +72,7 @@ send_to_client(Client* cl)
 {
   const vector<float>& v = cl->get_message();
   boost::system::error_code ignored_error;
-  socket->send_to(boost::asio::buffer(cl->get_message()),
+  socket->send_to(boost::asio::buffer(v),
                  cl->target(),
                  0,
                  ignored_error);
@@ -82,11 +82,11 @@ send_to_client(Client* cl)
 void
 send_ships_client(Client* cl)
 {
-  int i, j, k, u;
+  int j, k, u;
   const vector<Ship*>& ships = world->ships_list();
   vector<float> msg;
-  Ship* cl_s = cl->get_ship();
-  for(int i = 0; i < ships.size() - 1; ++i)
+
+  for(size_t i = 0; i < ships.size() - 1; ++i)
   {
 	const Matrix4& t = ships[i]->transformation();
     msg.push_back(i + 1);
@@ -112,10 +112,10 @@ broadcast_new_ship(Client* cl)
 void
 broadcast_sync()
 {
-  int i, j, k;
+  int j, k;
   const vector<Ship*>& ships = world->ships_list();
   vector<float> msg;
-  for(int i = 0; i < ships.size(); ++i)
+  for(size_t i = 0; i < ships.size(); ++i)
   {
 	const Matrix4& t = ships[i]->transformation();
 	msg.push_back(UPDATE_SHIP);

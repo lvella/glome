@@ -39,7 +39,6 @@ namespace Options
 	
 	int parse_args(int argc, char** argv)
 	{
-		bool net = 0;
 		 static struct option long_options[] =
 		{
 			{"full-screen",	no_argument,				0,	'f'},

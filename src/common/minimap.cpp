@@ -48,7 +48,7 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
   glMatrixMode(GL_PROJECTION);
   glPushMatrix();
   glLoadIdentity();
-  glViewport(wstart + 10, 10, 160, 160);
+  glViewport(wstart + l, b, r, t);
   glOrtho(-1, 1, -1, 1, -1, 1);
   glMatrixMode(GL_MODELVIEW);
 
@@ -138,7 +138,7 @@ void
 create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
 {
   int i, j;
-  float cx, cy, d, tex_r, tex_r_lim, x;
+  float cx, cy, d, tex_r, tex_r_lim;
   unsigned char* texture = (unsigned char*)malloc(w * w * sizeof(unsigned char));
   cx = cy = (w - 1) / 2.;
   tex_r = w / 2.;
@@ -148,8 +148,9 @@ create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
   {
     for(j = 0; j < w; ++j)
     {
+			float x;
       d = sqrt(((i - cx) * (i - cx)) + ((j - cy) * (j - cy)));
-      texture[(i * w) + j] = (d > tex_r) ? a0 : ((d < tex_r_lim) ? a1 : ((x *= (x = ((tex_r - d) / (tex_r - tex_r_lim)))) * a1));
+      texture[(i * w) + j] = (d > tex_r) ? a0 : ((d < tex_r_lim) ? a1 : ( (x = (tex_r - d) / (tex_r - tex_r_lim), x*x) * a1 ));
     }
   }
 

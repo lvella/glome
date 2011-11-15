@@ -58,18 +58,18 @@ parse_message(const boost::array<float, 1024>& msg, unsigned int bytes, bool isC
   boost::array<float, 1024>::const_iterator it;
   unsigned int nums = bytes / sizeof(int);
   unsigned int i = 0;
-  int s_id = -1;
+  size_t s_id;
   Matrix4 t;
   int x, y;
 
   cout << "Received " << bytes << " bytes" << endl;
-  for(int i = 0; i < nums; ++i)
+  for(size_t i = 0; i < nums; ++i)
     cout << int(msg[i]) << ' ';
   cout << endl;
 
   if(isClient)
   {
-    s_id = int(msg[i++]);
+    s_id = size_t(msg[i++]);
     const vector<Ship*>& s_list = w->ships_list();
     if(s_id < s_list.size())
 	  NetInput::set_ship(s_list[s_id]);

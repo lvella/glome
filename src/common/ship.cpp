@@ -18,10 +18,11 @@ extern const char* mesh_filename[MESH_COUNT];
 
 Ship::Ship(MeshTypes type):
     Object(Matrix4::IDENTITY),
-    v_tilt(0.0f),
-    h_tilt(0.0f),
+    msg_id(0),
     v_req(0.0f),
     h_req(0.0f),
+    v_tilt(0.0f),
+    h_tilt(0.0f),
     accel(0.0f),
     speed(0.0f),
     speed_v(0.0f),
@@ -39,8 +40,7 @@ Ship::Ship(MeshTypes type):
     q(false),
     shot_count(0),
     rcanon_shot_last(false),
-    heat(0),
-    msg_id(0)
+    heat(0)
 {
   mesh = Mesh::get_mesh(type);
   load_guns(type);

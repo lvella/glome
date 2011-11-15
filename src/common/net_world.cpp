@@ -76,7 +76,7 @@ NetWorld::NetWorld(bool isc, string host, short int port):
     cl_socket = new udp::socket(gIOService);
     cl_socket->open(udp::v4());
 
-    boost::array<int, 1> v = {JOIN_GAME};
+    boost::array<int, 1> v = {{JOIN_GAME}};
     cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
     boost::thread service(boost::bind(&boost::asio::io_service::run, &gIOService));
 
@@ -131,9 +131,7 @@ NetWorld::update()
 	// Treat events
 	Projectile::update_all(cam_pos);
 	
-	Vector4 c = cube.transformation().position();
-	
-	for(int e = 0; e < ships.size(); ++e)
+	for(size_t e = 0; e < ships.size(); ++e)
 	{
 		Interpol& i = interpols[e];
 		if(!i.interp)
@@ -177,7 +175,7 @@ NetWorld::update()
 	if(v.size() > 0)
 	{
 		if(isClient)
-			int re = cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
+			cl_socket->send_to(boost::asio::buffer(v), *receiver_endpoint);
 		else
 			Server::send_to_all(v, v.size() * sizeof(float), 0, true);
 		
@@ -208,7 +206,7 @@ NetWorld::draw()
   spg.draw();
   Projectile::draw_all();
   glUseProgram(program);
-  for(int i = 0; i < ships.size(); ++i)
+  for(size_t i = 0; i < ships.size(); ++i)
     ships[i]->draw();
 
   MiniMap::draw(0, this, center);
@@ -218,6 +216,6 @@ void
 NetWorld::fill_minimap()
 {
 	MiniMap::draw_dot(cube);
-	for(int i = 1; i < ships.size(); ++i)
+	for(size_t i = 1; i < ships.size(); ++i)
 		MiniMap::draw_dot(*ships[i]);
 }
