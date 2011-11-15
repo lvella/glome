@@ -45,6 +45,8 @@ void list_video_modes(vector<string> &out)
 	}
 }
 
+static bool v_sync_enabled = true;
+
 static void initialize_SDL()
 {
 	/* SDL Startup */
@@ -92,14 +94,14 @@ static void initialize_opengl()
 
 	// Enable V-Sync
 	#ifdef WIN32
-	if(WGLEW_EXT_swap_control){
+	if(WGLEW_EXT_swap_control)
 		wglSwapIntervalEXT(1);
-	}
 	#else
-	if(GLXEW_SGI_swap_control){
+	if(GLXEW_SGI_swap_control)
 		glXSwapIntervalSGI(1);
-	}
-	#endif 
+	#endif
+	else
+		v_sync_enabled = false;
 }
 
 static void main_loop()
@@ -107,15 +109,18 @@ static void main_loop()
 	const int FPS = 60;
 	uint64_t frame_count = 0;
 	bool running = true;
-	Uint32 ticks = SDL_GetTicks();
-	
+	Uint32 start;
+	Uint32 ticks;
+
+	start = ticks = SDL_GetTicks();
 	while(running) 
 	{
 		running = Input::handle();
 		Game::frame();
 		SDL_GL_SwapBuffers();
 		// Fix framerate
-		{
+		// TODO: deal with refresh rate different from 60 Hz
+		if(!v_sync_enabled) {
 			// TODO: maybe clk_div is useful here...
 			const int period = 1000 / FPS;
 			Uint32 now = SDL_GetTicks();
@@ -126,7 +131,7 @@ static void main_loop()
 		}
 		++frame_count;
 	}
-	cout << frame_count << " frames rendered." << endl;
+	cout << frame_count << " frames rendered at " << frame_count / ((SDL_GetTicks() - start) / 1000.0) << " FPS.\n";
 }
 
 int main(int argc, char **argv)
