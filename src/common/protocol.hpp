@@ -54,7 +54,6 @@ struct protocol
 			bool spinl :1;
 			bool spinr :1;
 			bool shoot :1;
-			:6;
 			ushort motionx;
 			ushort motiony;
 		} input;
