@@ -20,18 +20,11 @@
 
 #include "net_world.hpp"
 
-static GLuint program;
 extern boost::asio::io_service gIOService;
 
 using namespace std;
 using namespace boost::asio::ip;
 using namespace Options;
-
-void NetWorld::initialize()
-{
-#include "world_proj.glsl.hpp"
-  program = setup_vshader(world_proj_glsl, world_proj_glsl_len);
-}
 
 Ship*
 NetWorld::next_ship(const Matrix4& ref)

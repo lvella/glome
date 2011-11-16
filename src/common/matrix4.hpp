@@ -30,8 +30,8 @@
 #include <cassert>
 #include <algorithm>
 #include <iostream>
-#include <GL/glew.h>
 
+#include "gl.hpp"
 #include "vector4.hpp"
 
 typedef float Real;

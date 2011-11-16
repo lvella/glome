@@ -2,5 +2,4 @@
 
 #include <GL/glew.h>
 
-GLuint setup_vshader(unsigned char *vcode, GLint len);
-GLuint setup_vfshader(unsigned char *vcode, unsigned char *fcode, GLint vlen, GLint flen);
+extern GLuint setup_shader(unsigned char *vcode, GLint vlen, unsigned char *fcode = NULL, GLint flen = 0);

@@ -18,9 +18,6 @@
 using namespace std;
 using namespace Options;
 
-extern GLuint tex_ship;
-extern Ship ship;
-
 static GLuint tex_minimap, program_map;
 static GLuint tex_object;
 static GLint proj_only_uniform;
@@ -172,7 +169,7 @@ MiniMap::initialize()
   create_circle_texture(16, 0.8, 0, 255, tex_object);
 
 #include "minimap_proj.glsl.hpp"
-  program_map = setup_vshader(minimap_proj_glsl, minimap_proj_glsl_len);
+  program_map = setup_shader(minimap_proj_glsl, minimap_proj_glsl_len);
   proj_only_uniform = glGetUniformLocation(program_map, "proj_only");
 }
 

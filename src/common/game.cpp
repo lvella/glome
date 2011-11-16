@@ -1,4 +1,4 @@
-#include "../sdl/menu.hpp"
+//#include "../sdl/menu.hpp"
 #include "options.hpp"
 #include "meridian.hpp"
 #include "split_world.hpp"
@@ -32,14 +32,14 @@ namespace Game
 		glClearDepth(1.0f);
 		glEnableClientState(GL_VERTEX_ARRAY);
 
+		World::initialize();
+
 		if(isSplit)
 		{
-			SplitWorld::initialize();
 			world = new SplitWorld();
 		}
 		else
 		{
-			NetWorld::initialize();
 			if(isServer)
 				Server::initialize(port);
 			world = new NetWorld(isClient, host, port);
@@ -48,7 +48,7 @@ namespace Game
 
 		MiniMap::initialize();
 		Projectile::initialize();
-		Menu::initialize();
+		//Menu::initialize();
 		initialize_meridians();
 	}
 

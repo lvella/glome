@@ -15,14 +15,6 @@
 
 using namespace Options;
 
-static GLuint program;
-
-void SplitWorld::initialize()
-{
-#include "world_proj.glsl.hpp"
-  program = setup_vshader(world_proj_glsl, world_proj_glsl_len);
-}
-
 SplitWorld::SplitWorld()
 {
   points[0] = points[1] = 0;

@@ -1,5 +1,5 @@
 INCLUDES = \
-	-I$(top_srcdir)/sdl \
+	-I$(top_srcdir)/src/sdl \
  	$(SDL_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
@@ -30,14 +30,18 @@ libcommon_a_SOURCES = \
 
 BUILT_SOURCES = \
 	minimap_proj.glsl.hpp \
-	world_proj.glsl.hpp \
+	world.vertex.glsl.hpp \
+	world.fragment.glsl.hpp \
 	projectile.glsl.hpp 
 
 minimap_proj.glsl.hpp: minimap_proj.glsl
 	${XXD} -i minimap_proj.glsl > minimap_proj.glsl.hpp
 
-world_proj.glsl.hpp: world_proj.glsl
-	${XXD} -i world_proj.glsl > world_proj.glsl.hpp
+world.vertex.glsl.hpp: world.vertex.glsl
+	${XXD} -i world.vertex.glsl > world.vertex.glsl.hpp
+
+world.fragment.glsl.hpp: world.fragment.glsl
+	${XXD} -i world.fragment.glsl > world.fragment.glsl.hpp
 
 projectile.glsl.hpp: projectile.glsl
 	${XXD} -i projectile.glsl > projectile.glsl.hpp

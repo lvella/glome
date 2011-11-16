@@ -1,6 +1,14 @@
-#include <GL/gl.h>
-
+#include "gl.hpp"
+#include "shader.hpp"
 #include "world.hpp"
+
+void World::initialize()
+{
+#include "world.vertex.glsl.hpp"
+#include "world.fragment.glsl.hpp"
+
+	program = setup_shader(world_vertex_glsl, world_vertex_glsl_len, world_fragment_glsl, world_fragment_glsl_len);
+}
 
 World::~World()
 {}
@@ -16,14 +24,6 @@ void World::setup_display()
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glLineWidth(1.5f);
 	glAlphaFunc(GL_NOTEQUAL, 0.0f);
-	
-	// Fancy OpenGL fog
-	const float fcolor[] = {0.0f, 0.0f, 0.0f, 1.0f};
-	glFogfv(GL_FOG_COLOR, fcolor);
-	glFogi(GL_FOG_MODE, GL_EXP);
-	glFogf(GL_FOG_DENSITY, 0.9f);
-	glHint(GL_FOG_HINT, GL_NICEST);
-	glFogf(GL_FOG_END, 3.0f);
-	glFogf(GL_FOG_START, 2.0f);
-	glEnable(GL_FOG);
 }
+
+GLuint World::program;

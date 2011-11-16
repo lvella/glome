@@ -43,7 +43,7 @@ void Projectile::initialize()
   create_spherical_texture(64, texture);
 
 #include "projectile.glsl.hpp"
-  program_bullet = setup_vshader(projectile_glsl, projectile_glsl_len);
+  program_bullet = setup_shader(projectile_glsl, projectile_glsl_len);
 }
 
 void Projectile::shot(Ship *s, const Matrix4& from, float speed)
