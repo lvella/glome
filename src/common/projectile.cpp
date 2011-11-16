@@ -61,7 +61,7 @@ void Projectile::update_all(const Vector4& camera_pos)
         i->update(camera_pos);
       else
         {
-          // Greater than the maximum possible squared distance (which is 4).
+          // Greater than the maximum possible squared distance (which is 9.87).
           i->order_dist = 10.0f;
           ++dead_count;
         }

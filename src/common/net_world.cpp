@@ -117,7 +117,6 @@ NetWorld::set_interpolation(unsigned int s_id, const Matrix4& f, const Matrix4& 
   interpols[s_id].param_t = 0.0f;
 }
 
-
 void
 NetWorld::update()
 {

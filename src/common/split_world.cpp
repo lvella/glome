@@ -32,9 +32,9 @@ void SplitWorld::update()
 {
 	// Treat events
 	Projectile::update_all(Vector4(0.0f, 0.0f, 0.0f, -1.0f));
-	
+
 	Vector4 c = cube.transformation().position();
-	
+
 	for(int i = 0; i < 2; ++i) {
 		ship[i].update();
 		if(Projectile::collide(&ship[i]))

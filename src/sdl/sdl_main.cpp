@@ -71,7 +71,7 @@ static void initialize_SDL()
 	SDL_ShowCursor(SDL_DISABLE);
 }
 
-static void initialize_opengl()
+static void initialize_gl_context()
 {
 	// Using GLEW to get the OpenGL functions
 	GLenum err = glewInit();
@@ -143,7 +143,7 @@ int main(int argc, char **argv)
 	srand(time(NULL));
 
 	initialize_SDL();
-	initialize_opengl();
+	initialize_gl_context();
 	Input::Js::initialize(0);
 	Game::initialize();
 
