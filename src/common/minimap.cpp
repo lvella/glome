@@ -95,12 +95,13 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
 
   // Draw objects
   glUseProgram(program_map);
-  (yz_matrix(M_PI / 2) * center).loadToGL();
+  Matrix4 cam = yz_matrix(M_PI / 2) * center;
+  cam.loadToGL();
 
   // Draw shots
   glUniform1i(proj_only_uniform, 1);
   Projectile::draw_in_minimap();
-  draw_meridians();
+  draw_meridians(cam);
 
   glUniform1i(proj_only_uniform, 0);
   glBindTexture(GL_TEXTURE_2D, tex_object);

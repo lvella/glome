@@ -20,8 +20,13 @@ private:
   // a reference counter for shapes
   unsigned int ref_count;
 
-  GLuint ibo, vbo;
-  uint16_t ilen, vlen;
+  union {
+  	struct {
+  		GLuint ibo, vbo;
+  	};
+  	GLuint bufobjs[2];
+  };
+  size_t len;
 
   Mesh(MeshTypes type);
 };

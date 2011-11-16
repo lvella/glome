@@ -20,16 +20,13 @@ const char* mesh_filename[MESH_COUNT] =
 
 Mesh::~Mesh()
 {
-  GLuint bufobjs[2];
-  bufobjs[0] = vbo;
-  bufobjs[1] = ibo;
   glDeleteBuffers(2, bufobjs);
 }
 
 Mesh::Mesh(MeshTypes type):
   ref_count(1)
 {
-  GLuint bufobjs[2];
+	uint16_t ilen, vlen;
 
   int ret;
   FILE *fd;
@@ -47,9 +44,6 @@ Mesh::Mesh(MeshTypes type):
   }
 
   glGenBuffers(2, bufobjs);
-  vbo = bufobjs[0];
-  ibo = bufobjs[1];
-
   {
     // Reading 4-D vertex coordinates
     ret = fread(&vlen, sizeof(vlen), 1, fd);
@@ -76,14 +70,26 @@ Mesh::Mesh(MeshTypes type):
     glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
   }
 
+  len = ilen * 2;
+
   fclose(fd);
 }
 
 void
 Mesh::draw(const Matrix4& t)
 {
-  glColor3ub(200, 200, 200);
-  World::draw_primitives(vbo, ibo, ilen*2, t);
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+
+  t.loadTo(World::shader_uniform_modelview);
+	glVertexAttrib4f(World::shader_attr_color, 0.8f, 0.8f, 0.8f, 1.0f);
+
+  glEnableVertexAttribArray(World::shader_attr_position);
+  glVertexAttribPointer(World::shader_attr_position, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+
+  glDrawElements(GL_LINES, len, GL_UNSIGNED_SHORT, NULL);
+
+  glDisableVertexAttribArray(World::shader_attr_position);
 }
 
 Mesh*
