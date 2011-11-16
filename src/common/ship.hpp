@@ -12,7 +12,7 @@ class Ship: public Object
 public:
   Ship(MeshTypes type = HUNTER);
   ~Ship();
-  void draw();
+  void draw(const Matrix4& cam);
   void update();
 	void load_guns(MeshTypes type);
 

@@ -9,10 +9,16 @@ class Spaghetti: public Object
 public:
   Spaghetti();
 
-  void draw();
+  void draw(const Matrix4& cam);
   void update();
 private:
   Matrix4 velo;
 
-  Vector4 p[(SPAGHETTI_COUNT * 3)+2];
+  Vector4 bezier[(SPAGHETTI_COUNT * 3)+2];
+  union {
+    struct {
+      GLuint ibo, vbo;
+    };
+    GLuint bufobjs[2];
+  };
 };

@@ -10,7 +10,7 @@ public:
   {}
   virtual ~Object() = 0;
 
-  virtual void draw() = 0;
+  virtual void draw(const Matrix4& cam) = 0;
 
   const Matrix4& transformation() const
   {

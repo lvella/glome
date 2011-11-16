@@ -329,6 +329,10 @@ public:
     return o;
   }
 
+  void loadTo(GLint var) const {
+    glUniformMatrix4fv(var, 1, GL_TRUE, _m);
+  }
+
   void loadToGL() const {
     glLoadTransposeMatrixf(_m);
   }

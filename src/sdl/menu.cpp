@@ -2,12 +2,11 @@
 #include <vector>
 #include <string>
 #include <sstream>
-#include <GL/gl.h>
-#include <GL/glu.h>
 #include <SDL.h>
 #include <guichan.hpp>
 #include <guichan/opengl/openglgraphics.hpp>
 
+#include "gl.hpp"
 #include "native.hpp"
 #include "button.hpp"
 #include "game.hpp"

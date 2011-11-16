@@ -11,13 +11,13 @@ RandomCube::RandomCube()
   randomize();
 }
 
-void RandomCube::draw()
+void RandomCube::draw(const Matrix4& cam)
 {
   float a = 0.02;
   float w = -sqrt(1 - a*a);
 
   glPushMatrix();
-  t.multToGL();
+  (cam * t).loadToGL();
   glBegin(GL_QUADS);
 
   glColor3ub(255, 0, 0);

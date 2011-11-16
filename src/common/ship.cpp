@@ -94,9 +94,10 @@ Ship::load_guns(MeshTypes type)
 }
 
 void 
-Ship::draw()
+Ship::draw(const Matrix4& cam)
 {
-  mesh->draw(t);
+  Matrix4 final = cam * t;
+  mesh->draw(final);
 }
 
 void 

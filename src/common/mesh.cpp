@@ -3,6 +3,7 @@
 #include <iostream>
 #include <sstream>
 
+#include "world.hpp"
 #include "mesh.hpp"
 #include "config.hpp"
 
@@ -14,24 +15,21 @@ const char* mesh_filename[MESH_COUNT] =
     {
         "hunter",
         "destroyer",
-        "ufo",
-        "asteroid"
+        "ufo"
     };
 
 Mesh::~Mesh()
 {
-  glDeleteLists(dlist, 1);
+  GLuint bufobjs[2];
+  bufobjs[0] = vbo;
+  bufobjs[1] = ibo;
   glDeleteBuffers(2, bufobjs);
 }
 
 Mesh::Mesh(MeshTypes type):
   ref_count(1)
 {
-  GLuint ibo;
-  GLuint vbo;
-
-  uint16_t ilen;
-  uint16_t vlen;
+  GLuint bufobjs[2];
 
   int ret;
   FILE *fd;
@@ -79,25 +77,13 @@ Mesh::Mesh(MeshTypes type):
   }
 
   fclose(fd);
-
-  // Create the display list
-  dlist = glGenLists(1);
-  glNewList(dlist, GL_COMPILE);
-  glColor3ub(200, 200, 200);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glVertexPointer(4, GL_FLOAT, 0, NULL);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glDrawRangeElements(GL_LINES, 0, vlen-1, ilen*2, GL_UNSIGNED_SHORT, NULL);
-  glEndList();
 }
 
 void
 Mesh::draw(const Matrix4& t)
 {
-  glPushMatrix();
-  t.multToGL();
-  glCallList(dlist);
-  glPopMatrix();
+  glColor3ub(200, 200, 200);
+  World::draw_primitives(vbo, ibo, ilen*2, t);
 }
 
 Mesh*

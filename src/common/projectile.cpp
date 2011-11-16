@@ -71,14 +71,14 @@ void Projectile::update_all(const Vector4& camera_pos)
   shots.erase(shots.end() - dead_count, shots.end());
 }
 
-void Projectile::draw_all()
+void Projectile::draw_all(const Matrix4& cam)
 {
   if(shots.size() != 0) {
     glEnable(GL_TEXTURE_2D);
     glUseProgram(program_bullet);
     glBindTexture(GL_TEXTURE_2D, texture);
     for(SList::reverse_iterator i = shots.rbegin(); i != shots.rend(); ++i)
-      i->draw();
+      i->draw(cam);
     glDisable(GL_TEXTURE_2D);
   }
 }
@@ -131,10 +131,10 @@ Projectile::Projectile(Ship *s, const Matrix4& from, float speed):
 {
 }
 
-void Projectile::draw()
+void Projectile::draw(const Matrix4& cam)
 {
   glPushMatrix();
-  t.multToGL();
+  (cam * t).loadToGL();
   glBegin(GL_QUADS);
 
   glColor4ub(255, 200, 150, alpha);

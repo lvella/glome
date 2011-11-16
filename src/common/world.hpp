@@ -1,9 +1,12 @@
 #pragma once
 
+#include "matrix4.hpp"
+
 class World
 {
 public:
 	static void initialize();
+	static void draw_primitives(GLuint vbo, GLuint ibo, size_t len, const Matrix4& t);
 
 	virtual ~World();
 
@@ -14,5 +17,7 @@ public:
 	virtual void fill_minimap() = 0;
 
 protected:
-	static GLuint program;
+	static GLuint shader_program;
+	static GLint shader_attr_position;
+        static GLint shader_uniform_modelview;
 };

@@ -186,20 +186,19 @@ NetWorld::draw()
 
   // Camera transform
   Matrix4 camera = offset * cam_hist.front();
-  camera.loadToGL();
   cam_pos = Vector4(-camera[3][0], -camera[3][1], -camera[3][2], -camera[3][3]);
   cam_hist.pop_front();
   cam_hist.push_back(center);
 
-  glUseProgram(program);
+  glUseProgram(shader_program);
   draw_meridians();
 
-  cube.draw();
-  spg.draw();
-  Projectile::draw_all();
-  glUseProgram(program);
+  cube.draw(camera);
+  spg.draw(camera);
+  Projectile::draw_all(camera);
+  glUseProgram(shader_program);
   for(size_t i = 0; i < ships.size(); ++i)
-    ships[i]->draw();
+    ships[i]->draw(camera);
 
   MiniMap::draw(0, this, center);
 }
