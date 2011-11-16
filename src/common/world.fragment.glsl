@@ -10,5 +10,5 @@ void main()
 	const float FOG_FACTOR = -1.15; // aprox. the same as -(0.8 / log(2))
 
 	float f = exp2(FOG_FACTOR * fog_coord);
-	gl_FragColor = f * color + (1.0 - f) * FOG_COLOR;
+	gl_FragColor = mix(FOG_COLOR, color, f);
 }
