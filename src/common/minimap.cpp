@@ -5,7 +5,7 @@
 #include <GL/glew.h>
 #include <GL/glu.h>
 
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "projectile.hpp"
 #include "ship.hpp"
 #include "shader.hpp"

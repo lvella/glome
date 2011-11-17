@@ -12,6 +12,7 @@ public:
 	static GLint shader_attr_position;
 	static GLint shader_attr_color;
 	static GLint shader_uniform_modelview;
+	static GLint shader_uniform_projection;
 
 	virtual ~World();
 

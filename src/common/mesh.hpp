@@ -2,7 +2,7 @@
 
 #include <boost/ref.hpp>
 
-#include "4dmath.hpp"
+#include "math.hpp"
 
 enum MeshTypes {HUNTER, DESTROYER, UFO, ASTEROID, MESH_COUNT};
 

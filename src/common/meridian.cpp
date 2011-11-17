@@ -1,6 +1,6 @@
 #include <math.h>
 #include <GL/glew.h>
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "world.hpp"
 
 #include "meridian.hpp"

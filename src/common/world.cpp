@@ -13,6 +13,7 @@ void World::initialize()
 	shader_attr_color = glGetAttribLocation(shader_program, "color");
 
 	shader_uniform_modelview = glGetUniformLocation(shader_program, "modelview");
+	shader_uniform_projection = glGetUniformLocation(shader_program, "projection");
 }
 
 World::~World()
@@ -35,3 +36,4 @@ GLuint World::shader_program;
 GLint World::shader_attr_position;
 GLint World::shader_attr_color;
 GLint World::shader_uniform_modelview;
+GLint World::shader_uniform_projection;

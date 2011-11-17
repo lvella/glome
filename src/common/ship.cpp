@@ -6,7 +6,7 @@
 #include <stdint.h>
 #include <iostream>
 #include <sstream>
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "ship.hpp"
 #include "projectile.hpp"
 #include "protocol.hpp"

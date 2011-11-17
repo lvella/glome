@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "object.hpp"
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "projectile.hpp"
 
 #include "randomcube.hpp"

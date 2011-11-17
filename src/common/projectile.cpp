@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "shader.hpp"
-#include "4dmath.hpp"
+#include "math.hpp"
 
 #include "projectile.hpp"
 

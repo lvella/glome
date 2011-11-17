@@ -8,7 +8,7 @@ INCLUDES = \
 noinst_LIBRARIES = libcommon.a
 
 libcommon_a_SOURCES = \
-	4dmath.cpp \
+	math.cpp \
 	meridian.cpp \
 	matrix4.cpp \
 	projectile.cpp \

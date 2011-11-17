@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cmath>
 #include "object.hpp"
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "vector4.hpp"
 
 #include "spaghetti.hpp"

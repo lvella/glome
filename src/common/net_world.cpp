@@ -4,7 +4,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "projectile.hpp"
 #include "minimap.hpp"
 #include "meridian.hpp"
@@ -86,13 +86,8 @@ NetWorld::setup_display()
 {
 	World::setup_display();
 
-	// Since the projection is not changing, it can be here.
+	// Since the viewport is not changing, this can be here.
 	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(FOV, double(width) / double(height), 0.001, 5);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 }
 
 void
@@ -179,6 +174,7 @@ void
 NetWorld::draw()
 {
   const Matrix4 offset(yz_matrix(0.2) * zw_matrix(-0.015) * yw_matrix(-0.01));
+	const Matrix4 p = perspective(FOV, float(width) / float(height), 0.001f, 5.0f);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -193,6 +189,7 @@ NetWorld::draw()
   Projectile::draw_all(camera);
 
   glUseProgram(shader_program);
+	p.loadTo(shader_uniform_projection);
 
   draw_meridians(camera);
   cube.draw(camera);

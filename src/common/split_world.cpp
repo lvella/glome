@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "projectile.hpp"
 #include "minimap.hpp"
 #include "meridian.hpp"

@@ -7,6 +7,9 @@
 // This one is almost like glRotate, but in radians, and the vector must be normalized.
 Matrix4 rotation(float angle, float x, float y, float z);
 
+// Almost like gluPerspective, but in radians...
+Matrix4 perspective(float fovy, float aspect, float zNear, float zFar);
+
 Matrix4 xy_matrix(float angle);
 Matrix4 xz_matrix(float angle);
 Matrix4 yz_matrix(float angle);
