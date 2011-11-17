@@ -1,17 +1,23 @@
 AC_PREREQ([2.60])
 
-AC_INIT([Navigna], [1.0], [support@fractal.com])
+AC_INIT([Glome], [1.0], [support@fractal.com])
 
 AC_CONFIG_AUX_DIR([build-aux])
 
-AC_CONFIG_HEADERS([src/config.hpp])
+AC_CONFIG_HEADERS([src/common/config.hpp])
 DATA_DIR=`${PWDCMD-pwd}`/data
 AC_DEFINE_UNQUOTED([DATA_DIR], ["$DATA_DIR"] , [Data directory])
 
-AM_INIT_AUTOMAKE([-Wall -Werror])
+m4_pattern_allow([^AX_])
+AC_CONFIG_MACRO_DIR([m4])
+
+AM_INIT_AUTOMAKE
 
 AC_PROG_CXX
+AC_PROG_RANLIB
 
+
+# Packages configuration
 AC_PATH_PROG(PKG_CONFIG, pkg-config)
 
 #http://www.gnu.org/software/autoconf-archive/ax_prog_doxygen.html
@@ -33,7 +39,7 @@ AX_BOOST_BASE([1.42],,AC_MSG_FAILURE())
 
 #http://sources.redhat.com/automake/automake.html#Extending-aclocal
 # Check for OpenGL
-AC_CHECK_OPENGL
+AX_CHECK_OPENGL
 #check for libglew
 #PKG_CHECK_MODULES([GLEW],[glew >= 1.5])
 
@@ -53,7 +59,7 @@ AC_CHECK_LIB([guichan], [gcnGuichanVersion], GUICHAN_LIBS="-lguichan -lguichan_s
 AC_SUBST(GUICHAN_LIBS)
 
 # Check for Blender
-AC_CHECK_BLENDER([2.59])
+AX_CHECK_BLENDER([2.59])
 
 # Check for xxd
 AC_PATH_PROG([XXD], [xxd], , [$PATH])
@@ -62,5 +68,19 @@ AC_CONFIG_FILES([
 	Makefile
 	data/Makefile
 	src/Makefile
+	src/common/Makefile
+	src/sdl/Makefile
 ])
 AC_OUTPUT
+
+echo \
+"-------------------------------------------------
+
+ ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
+
+ Prefix: '${prefix}'.
+ Compiler: '${CC} ${CFLAGS} ${CPPFLAGS}'
+ Libraries: '${LIBS}'
+
+ Now type 'make'
+--------------------------------------------------"

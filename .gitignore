@@ -1,4 +1,8 @@
 *~
 *.o
 *.glsl.hpp
-navigna
+*.a
+aclocal.m4
+autom4te.cache/
+build-aux/
+.deps/

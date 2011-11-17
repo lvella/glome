@@ -2,4 +2,8 @@ ACLOCAL_AMFLAGS = -I m4
 
 include $(top_srcdir)/aminclude.am
 
-SUBDIRS = src data
+SUBDIRS = \
+	data \
+	src
+
+dist_noinst_SCRIPTS = autogen.sh
