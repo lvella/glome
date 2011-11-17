@@ -49,6 +49,9 @@ GLuint setup_shader(unsigned char *vcode, GLint vlen, unsigned char *fcode, GLin
 		glAttachShader(program, fshader);
 	}
 
+	// We expect every shader to have a "position" attribute, to be the reference attribute
+	glBindAttribLocation(program, 0, "position");
+
 	glLinkProgram(program);
 	return program;
 }
