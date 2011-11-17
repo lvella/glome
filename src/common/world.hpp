@@ -6,7 +6,12 @@ class World
 {
 public:
 	static void initialize();
-	static void draw_primitives(GLuint vbo, GLuint ibo, size_t len, const Matrix4& t);
+	static void load_attr_format();
+
+	static GLuint shader_program;
+	static GLint shader_attr_position;
+	static GLint shader_attr_color;
+	static GLint shader_uniform_modelview;
 
 	virtual ~World();
 
@@ -15,9 +20,4 @@ public:
 	virtual void update() = 0;
 	virtual void draw() = 0;
 	virtual void fill_minimap() = 0;
-
-protected:
-	static GLuint shader_program;
-	static GLint shader_attr_position;
-        static GLint shader_uniform_modelview;
 };

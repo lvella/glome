@@ -172,6 +172,12 @@ public:
     return concatenate( m2 );
   }
 
+  inline Matrix4& operator *= ( const Matrix4 &m2 )
+  {
+    *this = concatenate( m2 );
+    return *this;
+  }
+
   inline Vector4 operator * (const Vector4& v) const
   {
     return Vector4(

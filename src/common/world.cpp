@@ -8,21 +8,11 @@ void World::initialize()
 #include "world.fragment.glsl.hpp"
 
 	shader_program = setup_shader(world_vertex_glsl, world_vertex_glsl_len, world_fragment_glsl, world_fragment_glsl_len);
+
 	shader_attr_position = glGetAttribLocation(shader_program, "position");
+	shader_attr_color = glGetAttribLocation(shader_program, "color");
+
 	shader_uniform_modelview = glGetUniformLocation(shader_program, "modelview");
-}
-
-void World::draw_primitives(GLuint vbo, GLuint ibo, size_t len, const Matrix4& t)
-{
-  t.loadTo(shader_uniform_modelview);
-  glEnableVertexAttribArray(shader_attr_position);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glVertexAttribPointer(shader_attr_position, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-
-  glDrawElements(GL_LINES, len, GL_UNSIGNED_SHORT, NULL);
-
-  glDisableVertexAttribArray(shader_attr_position);
 }
 
 World::~World()
@@ -43,4 +33,5 @@ void World::setup_display()
 
 GLuint World::shader_program;
 GLint World::shader_attr_position;
+GLint World::shader_attr_color;
 GLint World::shader_uniform_modelview;

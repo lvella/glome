@@ -190,16 +190,18 @@ NetWorld::draw()
   cam_hist.pop_front();
   cam_hist.push_back(center);
 
-  glUseProgram(shader_program);
-  draw_meridians();
+  Projectile::draw_all(camera);
 
+  glUseProgram(shader_program);
+
+  draw_meridians(camera);
   cube.draw(camera);
   spg.draw(camera);
-  Projectile::draw_all(camera);
-  glUseProgram(shader_program);
+
   for(size_t i = 0; i < ships.size(); ++i)
     ships[i]->draw(camera);
 
+  Projectile::draw_all(camera);
   MiniMap::draw(0, this, center);
 }
 

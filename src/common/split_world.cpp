@@ -73,7 +73,7 @@ void SplitWorld::draw()
       cam_hist[iter].push_back(center);
 
       glUseProgram(shader_program);
-      draw_meridians();
+      //draw_meridians();
 
       //cube.draw();
       //Projectile::draw_all();

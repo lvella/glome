@@ -1,4 +1,4 @@
-varying vec4 color;
+varying vec4 frag_color;
 varying float fog_coord;
 
 void main()
@@ -10,5 +10,5 @@ void main()
 	const float FOG_FACTOR = -1.20; // aprox. the same as -(0.83 / log(2))
 
 	float f = exp2(FOG_FACTOR * fog_coord);
-	gl_FragColor = mix(FOG_COLOR, color, f);
+	gl_FragColor = mix(FOG_COLOR, frag_color, f);
 }
