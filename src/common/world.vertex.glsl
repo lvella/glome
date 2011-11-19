@@ -1,5 +1,6 @@
 // Input
-uniform mat4 modelview;
+uniform mat4 transform;
+uniform mat4 camera;
 uniform mat4 projection;
 
 attribute vec4 position;
@@ -11,7 +12,7 @@ varying float fog_coord;
 
 void main()
 {
-  vec4 tmp = modelview * position;
+  vec4 tmp = camera * (transform * position);
   
   // Ortographic projection to 3-D
   tmp.xyz = tmp.xyz / (1.0 - tmp.w);

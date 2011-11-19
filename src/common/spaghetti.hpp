@@ -9,7 +9,7 @@ class Spaghetti: public Object
 public:
   Spaghetti();
 
-  void draw(const Matrix4& cam);
+  void draw(const Shader& s);
   void update();
 private:
   Matrix4 velo;

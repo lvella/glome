@@ -18,9 +18,16 @@
 using namespace std;
 using namespace Options;
 
-static GLuint tex_minimap, program_map;
+static Shader map_projection;
+//static Shader hud;
+
+static GLuint tex_minimap;
 static GLuint tex_object;
-static GLint proj_only_uniform;
+
+static GLint uniform_is_dot;
+static GLint uniform_camera;
+
+static GLuint square_vbo;
 
 void
 MiniMap::draw(int wstart, World* world, const Matrix4& center)
@@ -51,7 +58,6 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
 
   // Draw 2D green background.
   glUseProgram(0);
-  glDisable(GL_FOG);
   glEnable(GL_TEXTURE_2D);
   glDisable(GL_DEPTH_TEST);
   glLoadIdentity();
@@ -94,23 +100,22 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
   glEnd();
 
   // Draw objects
-  glUseProgram(program_map);
+  map_projection.enable();
   Matrix4 cam = yz_matrix(M_PI / 2) * center;
-  cam.loadToGL();
+  cam.loadTo(uniform_camera);
 
   // Draw shots
-  glUniform1i(proj_only_uniform, 1);
+  glUniform1i(uniform_is_dot, 0);
   Projectile::draw_in_minimap();
-  draw_meridians(cam);
+  draw_meridians(map_projection);
 
-  glUniform1i(proj_only_uniform, 0);
+  glUniform1i(uniform_is_dot, 1);
   glBindTexture(GL_TEXTURE_2D, tex_object);
   world->fill_minimap();
   glBindTexture(GL_TEXTURE_2D, 0);
 
   // Disable 2D
   glDisable(GL_TEXTURE_2D);
-  glEnable(GL_FOG);
   glMatrixMode(GL_PROJECTION);
   glViewport(0, 0, width, height);    
   glPopMatrix();
@@ -119,17 +124,12 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
 
 void MiniMap::draw_dot(const Object& obj)
 {
-	glPushMatrix();
-	obj.transformation().multToGL();
-	
-	glColor3ub(255, 0, 0);
-	glBegin(GL_QUADS);
-	glVertex2i(-1, -1);
-	glVertex2i(1, -1);
-	glVertex2i(1, 1);
-	glVertex2i(-1, 1);
-	glEnd();
-	glPopMatrix();
+	map_projection.setTransform(obj.transformation());
+
+	glVertexAttrib3f(map_projection.colorAttr(), 1.0f, 0.0f, 0.0f);
+  glBindBuffer(GL_ARRAY_BUFFER, square_vbo);
+  glVertexAttribPointer(map_projection.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 	
 void
@@ -169,8 +169,23 @@ MiniMap::initialize()
   create_circle_texture(256, 0.9, 0, 142, tex_minimap);
   create_circle_texture(16, 0.8, 0, 255, tex_object);
 
-#include "minimap_proj.glsl.hpp"
-  program_map = setup_shader(minimap_proj_glsl, minimap_proj_glsl_len);
-  proj_only_uniform = glGetUniformLocation(program_map, "proj_only");
+  glGenBuffers(1, &square_vbo);
+  {
+  	float v[] = {
+  			-1.0f, -1.0f,
+  			1.0f, -1.0f,
+  			-1.0f, 1.0f,
+  			1.0f, 1.0f
+  	};
+    glBindBuffer(GL_ARRAY_BUFFER, square_vbo);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
+  }
+
+#include "minimap.vertex.glsl.hpp"
+#include "minimap.fragment.glsl.hpp"
+  map_projection.setup_shader(minimap_vertex_glsl, minimap_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
+
+	uniform_is_dot = glGetUniformLocation(map_projection.program(), "is_dot");
+	uniform_camera = glGetUniformLocation(map_projection.program(), "camera");
 }
 

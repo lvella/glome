@@ -1,6 +1,6 @@
 #pragma once
 
-#include "matrix4.hpp"
+#include "shader.hpp"
 
 void initialize_meridians();
-void draw_meridians(const Matrix4& cam);
+void draw_meridians(const Shader& s);

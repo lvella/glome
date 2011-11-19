@@ -7,13 +7,10 @@ void World::initialize()
 #include "world.vertex.glsl.hpp"
 #include "world.fragment.glsl.hpp"
 
-	shader_program = setup_shader(world_vertex_glsl, world_vertex_glsl_len, world_fragment_glsl, world_fragment_glsl_len);
+	shader.setup_shader(world_vertex_glsl, world_vertex_glsl_len, world_fragment_glsl, world_fragment_glsl_len);
 
-	shader_attr_position = glGetAttribLocation(shader_program, "position");
-	shader_attr_color = glGetAttribLocation(shader_program, "color");
-
-	shader_uniform_modelview = glGetUniformLocation(shader_program, "modelview");
-	shader_uniform_projection = glGetUniformLocation(shader_program, "projection");
+	shader_uniform_projection = glGetUniformLocation(shader.program(), "projection");
+	shader_uniform_camera = glGetUniformLocation(shader.program(), "camera");
 }
 
 World::~World()
@@ -32,8 +29,6 @@ void World::setup_display()
 	glAlphaFunc(GL_NOTEQUAL, 0.0f);
 }
 
-GLuint World::shader_program;
-GLint World::shader_attr_position;
-GLint World::shader_attr_color;
-GLint World::shader_uniform_modelview;
+Shader World::shader;
+GLint World::shader_uniform_camera;
 GLint World::shader_uniform_projection;

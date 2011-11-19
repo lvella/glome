@@ -12,7 +12,7 @@ class Ship: public Object
 public:
   Ship(MeshTypes type = HUNTER);
   ~Ship();
-  void draw(const Matrix4& cam);
+  void draw(const Shader& s);
   void update();
 	void load_guns(MeshTypes type);
 
@@ -168,4 +168,3 @@ private:
   Matrix4 r_canon, l_canon;
   uint16_t nguns;
 };
-
