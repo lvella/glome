@@ -4,7 +4,7 @@
 
 #include "shader.hpp"
 
-enum MeshTypes {HUNTER, DESTROYER, UFO, ASTEROID, MESH_COUNT};
+enum MeshTypes {HUNTER, DESTROYER, UFO, MESH_COUNT};
 
 class Mesh
 {

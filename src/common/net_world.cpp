@@ -54,7 +54,7 @@ NetWorld::NetWorld(bool isc, string host, short int port):
 		param_t(0.0f),
 		cam_pos(Vector4(0.0f, 0.0f, 0.0f, -1.0f))
 {
-  ships.push_back(new Ship(HUNTER));
+  ships.push_back(new Ship(UFO));
   interpols.push_back(Interpol());
   Input::Kb::set_ship(ships[0]);
 

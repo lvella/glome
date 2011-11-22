@@ -10,7 +10,7 @@
 class Ship: public Object
 {
 public:
-  Ship(MeshTypes type = HUNTER);
+  Ship(MeshTypes type = UFO);
   ~Ship();
   void draw(const Shader& s);
   void update();
