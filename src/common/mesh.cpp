@@ -8,7 +8,6 @@
 #include "config.hpp"
 
 using namespace std;
-using namespace boost;
 
 static Mesh* mesh_list[MESH_COUNT] = {NULL};
 const char* mesh_filename[MESH_COUNT] =
