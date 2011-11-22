@@ -163,7 +163,6 @@ private:
 
   bool rcanon_shot_last;
   int heat;
-
   Mesh* mesh;
   Matrix4 r_canon, l_canon;
   uint16_t nguns;
