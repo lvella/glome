@@ -11,6 +11,7 @@
 #include "projectile.hpp"
 #include "protocol.hpp"
 #include "config.hpp"
+#include "Effect.h"
 
 using namespace std;
 
@@ -140,9 +141,12 @@ Ship::update()
   int sps = (cold_fire_rate * 100 - heat) / 100; // Firerate at maximum
 
   shot_count -= sps;
-  if(shot_count < 0) {
-    if(sh) {
+  if(shot_count < 0) 
+  {
+    if(sh)
+    {
       Projectile::shot(this, t * (rcanon_shot_last ? l_canon : r_canon), shot_speed - speed);
+      
       shot_count += 60;
       heat += shot_power; // Shot heat, could be equivalent to damage
       rcanon_shot_last = !rcanon_shot_last;
