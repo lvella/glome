@@ -1,7 +1,5 @@
 #pragma once
 
-#include <boost/ref.hpp>
-
 #include "4dmath.hpp"
 
 enum MeshTypes {HUNTER, DESTROYER, UFO, ASTEROID, MESH_COUNT};
