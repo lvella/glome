@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <cmath>
 #include <stdio.h>
 #include <getopt.h>
 
@@ -8,7 +9,7 @@ using namespace std;
 
 namespace Options
 {
-  const float FOV = 45.0f;
+  const float FOV = M_PI / 4.0f;
   int width = 800;
   int height = 600;
   std::string host;

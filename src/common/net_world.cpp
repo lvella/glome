@@ -4,7 +4,7 @@
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "projectile.hpp"
 #include "minimap.hpp"
 #include "meridian.hpp"
@@ -86,13 +86,8 @@ NetWorld::setup_display()
 {
 	World::setup_display();
 
-	// Since the projection is not changing, it can be here.
+	// Since the viewport is not changing, this can be here.
 	glViewport(0, 0, width, height);
-	glMatrixMode(GL_PROJECTION);
-	glLoadIdentity();
-	gluPerspective(FOV, double(width) / double(height), 0.001, 5);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
 }
 
 void
@@ -179,6 +174,7 @@ void
 NetWorld::draw()
 {
   const Matrix4 offset(yz_matrix(0.2) * zw_matrix(-0.015) * yw_matrix(-0.01));
+	const Matrix4 p = perspective(FOV, float(width) / float(height), 0.001f, 5.0f);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -190,18 +186,20 @@ NetWorld::draw()
   cam_hist.pop_front();
   cam_hist.push_back(center);
 
-  Projectile::draw_all(camera);
+  Projectile::draw_all(shader);
 
-  glUseProgram(shader_program);
+  shader.enable();
+	p.loadTo(shader_uniform_projection);
+	camera.loadTo(shader_uniform_camera);
 
-  draw_meridians(camera);
-  cube.draw(camera);
-  spg.draw(camera);
+  draw_meridians(shader);
+  cube.draw(shader);
+  spg.draw(shader);
 
   for(size_t i = 0; i < ships.size(); ++i)
-    ships[i]->draw(camera);
+    ships[i]->draw(shader);
 
-  Projectile::draw_all(camera);
+  Projectile::draw_all(shader);
   MiniMap::draw(0, this, center);
 }
 

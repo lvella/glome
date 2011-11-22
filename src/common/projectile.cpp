@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "shader.hpp"
-#include "4dmath.hpp"
+#include "math.hpp"
 
 #include "projectile.hpp"
 
@@ -36,14 +36,15 @@ create_spherical_texture(int size, GLuint& tex)
   free(buffer);
 }
 
-static GLuint texture, program_bullet;
+static GLuint texture;
+static Shader program_bullet;
 
 void Projectile::initialize()
 {
   create_spherical_texture(64, texture);
 
 #include "projectile.glsl.hpp"
-  program_bullet = setup_shader(projectile_glsl, projectile_glsl_len);
+  program_bullet.setup_shader(projectile_glsl, projectile_glsl_len);
 }
 
 void Projectile::shot(Ship *s, const Matrix4& from, float speed)
@@ -71,14 +72,14 @@ void Projectile::update_all(const Vector4& camera_pos)
   shots.erase(shots.end() - dead_count, shots.end());
 }
 
-void Projectile::draw_all(const Matrix4& cam)
+void Projectile::draw_all(const Shader& s)
 {
   if(shots.size() != 0) {
+    program_bullet.enable();
     glEnable(GL_TEXTURE_2D);
-    glUseProgram(program_bullet);
     glBindTexture(GL_TEXTURE_2D, texture);
     for(SList::reverse_iterator i = shots.rbegin(); i != shots.rend(); ++i)
-      i->draw(cam);
+      i->draw(s);
     glDisable(GL_TEXTURE_2D);
   }
 }
@@ -131,10 +132,10 @@ Projectile::Projectile(Ship *s, const Matrix4& from, float speed):
 {
 }
 
-void Projectile::draw(const Matrix4& cam)
+void Projectile::draw(const Shader& s)
 {
   glPushMatrix();
-  (cam * t).loadToGL();
+  s.setTransform(t);
   glBegin(GL_QUADS);
 
   glColor4ub(255, 200, 150, alpha);

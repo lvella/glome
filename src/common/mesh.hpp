@@ -1,6 +1,7 @@
 #pragma once
 
 #include "4dmath.hpp"
+#include "shader.hpp"
 
 enum MeshTypes {HUNTER, DESTROYER, UFO, ASTEROID, MESH_COUNT};
 
@@ -9,7 +10,7 @@ class Mesh
 public:
   ~Mesh();
 
-  void draw(const Matrix4& t);
+  void draw(const Shader& s);
 
   static Mesh* get_mesh(MeshTypes type);
   static void release_mesh(Mesh* m);

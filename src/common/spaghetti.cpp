@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <cmath>
 #include "object.hpp"
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "vector4.hpp"
 
 #include "spaghetti.hpp"
@@ -69,10 +69,10 @@ CalculateBezierPoint(float t, Vector4 *p)
     return v;
 }
 
-void Spaghetti::draw(const Matrix4& cam)
+void Spaghetti::draw(const Shader& s)
 {
   glPushMatrix();
-  (cam * t).loadToGL();
+  s.setTransform(t);
   glBegin(GL_LINE_LOOP);
 
   for(int i = 0; i < SPAGHETTI_COUNT; ++i) {

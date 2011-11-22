@@ -1,6 +1,7 @@
 #pragma once
 
 #include "matrix4.hpp"
+#include "shader.hpp"
 
 class Object
 {
@@ -10,7 +11,7 @@ public:
   {}
   virtual ~Object() = 0;
 
-  virtual void draw(const Matrix4& cam) = 0;
+  virtual void draw(const Shader& cam) = 0;
 
   const Matrix4& transformation() const
   {

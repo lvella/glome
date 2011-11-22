@@ -1,7 +1,7 @@
 #include <stdlib.h>
 #include <math.h>
 #include "object.hpp"
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "projectile.hpp"
 
 #include "randomcube.hpp"
@@ -11,13 +11,12 @@ RandomCube::RandomCube()
   randomize();
 }
 
-void RandomCube::draw(const Matrix4& cam)
+void RandomCube::draw(const Shader& s)
 {
   float a = 0.02;
   float w = -sqrt(1 - a*a);
 
-  glPushMatrix();
-  (cam * t).loadToGL();
+  s.setTransform(t);
   glBegin(GL_QUADS);
 
   glColor3ub(255, 0, 0);
@@ -57,7 +56,6 @@ void RandomCube::draw(const Matrix4& cam)
   glVertex4f(-a, a, -a, w);
 
   glEnd();
-  glPopMatrix();
 }
 
 void RandomCube::randomize() {

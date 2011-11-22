@@ -4,16 +4,30 @@
 
 using namespace std;
 
-GLuint setup_shader(unsigned char *vcode, GLint vlen, unsigned char *fcode, GLint flen)
+Shader::Shader():
+		prog(0)
+{}
+
+Shader::Shader(unsigned char *vcode, GLint vlen, unsigned char *fcode, GLint flen)
 {
-	GLuint program;
+	setup_shader(vcode, vlen, fcode, flen);
+}
+
+Shader::~Shader()
+{
+	glDeleteProgram(prog);
+}
+
+void
+Shader::setup_shader(unsigned char *vcode, GLint vlen, unsigned char *fcode, GLint flen)
+{
 	GLuint vshader;
 	GLuint fshader;
 
 	const char *ptr;
 	char err[10000];
 
-	program = glCreateProgram();
+	prog = glCreateProgram();
 
 	if(vcode) {
 		vshader = glCreateShader(GL_VERTEX_SHADER);
@@ -29,7 +43,8 @@ GLuint setup_shader(unsigned char *vcode, GLint vlen, unsigned char *fcode, GLin
 				cout << "Vertex shader compilation log:\n" << err << '\n';
 		}
 
-		glAttachShader(program, vshader);
+		glAttachShader(prog, vshader);
+		glDeleteShader(vshader);
 	}
 
 	if(fcode) {
@@ -46,12 +61,17 @@ GLuint setup_shader(unsigned char *vcode, GLint vlen, unsigned char *fcode, GLin
 				cout << "Fragment shader compilation log:\n" << err << '\n';
 		}
 
-		glAttachShader(program, fshader);
+		glAttachShader(prog, fshader);
+		glDeleteShader(fshader);
 	}
 
 	// We expect every shader to have a "position" attribute, to be the reference attribute
-	glBindAttribLocation(program, 0, "position");
+	glBindAttribLocation(prog, 0, "position");
 
-	glLinkProgram(program);
-	return program;
+	glLinkProgram(prog);
+
+	uniform_transform = glGetUniformLocation(prog, "transform");
+
+	attr_color = glGetAttribLocation(prog, "color");
+	attr_texcoord = glGetAttribLocation(prog, "texcoord");
 }

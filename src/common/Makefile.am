@@ -8,7 +8,7 @@ INCLUDES = \
 noinst_LIBRARIES = libcommon.a
 
 libcommon_a_SOURCES = \
-	4dmath.cpp \
+	math.cpp \
 	meridian.cpp \
 	matrix4.cpp \
 	projectile.cpp \
@@ -26,16 +26,21 @@ libcommon_a_SOURCES = \
 	world.cpp \
 	split_world.cpp \
 	net_world.cpp \
-	udp_server.cpp 
+	udp_server.cpp \
+	shader.cpp
 
 BUILT_SOURCES = \
-	minimap_proj.glsl.hpp \
+	minimap.vertex.glsl.hpp \
+	minimap.fragment.glsl.hpp \
 	world.vertex.glsl.hpp \
 	world.fragment.glsl.hpp \
 	projectile.glsl.hpp 
 
-minimap_proj.glsl.hpp: minimap_proj.glsl
-	${XXD} -i minimap_proj.glsl > minimap_proj.glsl.hpp
+minimap.vertex.glsl.hpp: minimap.vertex.glsl
+	${XXD} -i minimap.vertex.glsl > minimap.vertex.glsl.hpp
+
+minimap.fragment.glsl.hpp: minimap.fragment.glsl
+	${XXD} -i minimap.fragment.glsl > minimap.fragment.glsl.hpp
 
 world.vertex.glsl.hpp: world.vertex.glsl
 	${XXD} -i world.vertex.glsl > world.vertex.glsl.hpp

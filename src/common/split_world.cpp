@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "4dmath.hpp"
+#include "math.hpp"
 #include "projectile.hpp"
 #include "minimap.hpp"
 #include "meridian.hpp"
@@ -72,12 +72,12 @@ void SplitWorld::draw()
       cam_hist[iter].pop_front();
       cam_hist[iter].push_back(center);
 
-      glUseProgram(shader_program);
+      shader.enable();
       //draw_meridians();
 
       //cube.draw();
       //Projectile::draw_all();
-      glUseProgram(shader_program);
+      shader.enable();
       //ship[0].draw();
       //ship[1].draw();
       MiniMap::draw(wstart, this, center);

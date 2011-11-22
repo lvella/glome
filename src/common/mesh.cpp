@@ -76,20 +76,15 @@ Mesh::Mesh(MeshTypes type):
 }
 
 void
-Mesh::draw(const Matrix4& t)
+Mesh::draw(const Shader& s)
 {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-  t.loadTo(World::shader_uniform_modelview);
-	glVertexAttrib4f(World::shader_attr_color, 0.8f, 0.8f, 0.8f, 1.0f);
-
-  glEnableVertexAttribArray(World::shader_attr_position);
-  glVertexAttribPointer(World::shader_attr_position, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttrib4f(s.colorAttr(), 0.8f, 0.8f, 0.8f, 1.0f);
+  glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
   glDrawElements(GL_LINES, len, GL_UNSIGNED_SHORT, NULL);
-
-  glDisableVertexAttribArray(World::shader_attr_position);
 }
 
 Mesh*

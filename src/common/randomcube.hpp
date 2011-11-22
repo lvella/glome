@@ -7,6 +7,6 @@ class RandomCube: public Object
 public:
   RandomCube();
 
-  void draw(const Matrix4& cam);
+  void draw(const Shader& s);
   void randomize();
 };

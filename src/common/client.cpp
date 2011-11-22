@@ -5,7 +5,7 @@
 #include "protocol.hpp"
 #include "udp_server.hpp"
 #include "net_world.hpp"
-#include "4dmath.hpp"
+#include "math.hpp"
 
 #include "client.hpp"
 
