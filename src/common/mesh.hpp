@@ -1,6 +1,5 @@
 #pragma once
 
-#include "4dmath.hpp"
 #include "shader.hpp"
 
 enum MeshTypes {HUNTER, DESTROYER, UFO, ASTEROID, MESH_COUNT};
