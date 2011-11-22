@@ -11,7 +11,7 @@
 #include "projectile.hpp"
 #include "protocol.hpp"
 #include "config.hpp"
-#include "Effect.h"
+#include "Effect.hpp"
 
 using namespace std;
 
