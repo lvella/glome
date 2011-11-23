@@ -3,10 +3,10 @@
 #
 
 """
-Name: 'Navigna Mesh Exporter'
+Name: 'Glome Mesh Exporter'
 Blender: 259
 Group: 'Export'
-Tooltip: 'Export meshes to Binary file format for Navigna Game Renega Desruga'
+Tooltip: 'Export meshes to Binary file format for Glome Game Renega Desruga'
 """
 
 # Copyright (C) 2011 Fractal Corp.
@@ -29,9 +29,9 @@ Tooltip: 'Export meshes to Binary file format for Navigna Game Renega Desruga'
 #: (< list > represents a list of values (coordenates) - float)
 #[BEGIN]
 # nvertices
-# nvertices * <4-D vertex coordinates>
+# nvertices lines contaning vertex coordenates and colors attributes: <x, y, z, w> <r, g, b, a>
 # nedges
-# nedges * <4-D vertex coordinates>
+# nedges lines contaning 2 vertex index per line: <v_in0 , v_in1>
 #[END]
 
 try:
@@ -101,6 +101,11 @@ class Mesh:
   def __init__(self, objMesh, currentScene):
     self.data = objMesh.to_mesh(currentScene,True,'PREVIEW')
     self.name = objMesh.name + '.wire'
+    # Material vertex colour data
+    #TODO: work for only one material
+    self.diffuse_color = self.data.materials[0].diffuse_color
+    self.alpha =  self.data.materials[0].alpha
+    #specular_color = self.data.materials[0].specular_color
 
   def export(self):
     bfile = open(self.name, 'wb')
@@ -111,6 +116,10 @@ class Mesh:
       bfile.write(struct.pack('<f', out[1]))
       bfile.write(struct.pack('<f', out[2]))
       bfile.write(struct.pack('<f', out[3]))
+      bfile.write(struct.pack('<f', self.diffuse_color[0]))
+      bfile.write(struct.pack('<f', self.diffuse_color[1]))
+      bfile.write(struct.pack('<f', self.diffuse_color[2]))
+      bfile.write(struct.pack('<f', self.alpha))
     bfile.write(struct.pack('<H', len(self.data.edges)))
     for e in self.data.edges.values():
       bfile.write(struct.pack('<H', e.key[0]))
@@ -127,7 +136,11 @@ class Mesh:
       y = bfile.read(fsize)
       z = bfile.read(fsize)
       w = bfile.read(fsize)
-      print(struct.unpack('<f', x)[0], struct.unpack('<f', y)[0], struct.unpack('<f', z)[0], struct.unpack('<f', w)[0])
+      r = bfile.read(fsize)
+      g = bfile.read(fsize)
+      b = bfile.read(fsize)
+      a = bfile.read(fsize)
+      print(struct.unpack('<f', x)[0], struct.unpack('<f', y)[0], struct.unpack('<f', z)[0], struct.unpack('<f', w)[0], struct.unpack('<f', r)[0], struct.unpack('<f', g)[0], struct.unpack('<f', b)[0], struct.unpack('<f', a)[0])
     ne = bfile.read(isize)
     print(struct.unpack('<H', ne)[0])
     for e in self.data.edges:

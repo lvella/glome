@@ -21,6 +21,5 @@ void main()
   gl_Position = projection * tmp;
   fog_coord = gl_Position.z;
 
-  frag_color = vec4(0.0, 1.0, 0.5, 1.0);
   frag_color = color;
 }

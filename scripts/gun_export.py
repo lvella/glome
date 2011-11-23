@@ -3,10 +3,10 @@
 #
 
 """
-Name: 'Navigna Mesh Exporter'
+Name: 'Glome Mesh Exporter'
 Blender: 259
 Group: 'Export'
-Tooltip: 'Export Guns positions to Binary file format for Navigna Game Renega Desruga'
+Tooltip: 'Export Guns positions to Binary file format for Glome Game Renega Desruga'
 """
 
 # Copyright (C) 2011 Fractal Corp.

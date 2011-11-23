@@ -30,7 +30,7 @@ void main()
 
   if(is_dot) {
   	v = project_vertex(camera * (transform * center));
-    v.xy = v.xy + position.xy * 0.065;
+    v.xy = v.xy + position.xy * 0.045;
     v_texcoord = (1.0 + position.xy) * 0.5;
   } else {
     v = project_vertex(camera * (transform * position));
@@ -39,6 +39,7 @@ void main()
 
   v_color = mix(pale_color, color, (v.z + 1.0) * 0.5);
 
-  gl_Position.xyz = v;
+  gl_Position.xy = v.xy;
+  gl_Position.z = -v.z;
   gl_Position.w = 1.0;
 }

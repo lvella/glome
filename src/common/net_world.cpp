@@ -174,7 +174,7 @@ void
 NetWorld::draw()
 {
   const Matrix4 offset(yz_matrix(0.2) * zw_matrix(-0.015) * yw_matrix(-0.01));
-	const Matrix4 p = perspective(FOV, float(width) / float(height), 0.001f, 5.0f);
+  const Matrix4 p = perspective(FOV, float(width) / float(height), 0.001f, 5.0f);
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -189,8 +189,8 @@ NetWorld::draw()
   Projectile::draw_all(shader);
 
   shader.enable();
-	p.loadTo(shader_uniform_projection);
-	camera.loadTo(shader_uniform_camera);
+  p.loadTo(shader_uniform_projection);
+  camera.loadTo(shader_uniform_camera);
 
   draw_meridians(shader);
   cube.draw(shader);
