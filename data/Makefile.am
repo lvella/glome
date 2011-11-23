@@ -7,7 +7,7 @@ BUILT_SOURCES = hunter.wire destroyer.wire ufo.wire hunter.gun destroyer.gun ufo
 
 #MESHS
 hunter.wire: hunter.blend
-	${BLENDER} -b hunter.blend -P ${MESH_SCRIPT} -noaudio
+	${BLENDER} -b hunter.blend -P ${MESH_SCRIPT} -noaudio 
 
 destroyer.wire: destroyer.blend
 	${BLENDER} -b destroyer.blend -P ${MESH_SCRIPT} -noaudio

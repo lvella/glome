@@ -45,14 +45,15 @@ Mesh::Mesh(MeshTypes type):
 
   glGenBuffers(2, bufobjs);
   {
-    // Reading 4-D vertex coordinates
+    // Reading 4-D vertex coordinates(16bytes) and colorRGBA values(16bytes)
     ret = fread(&vlen, sizeof(vlen), 1, fd);
     assert(ret == 1);
     // Create vertex buffer
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vlen * 4 * sizeof(float), NULL, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vlen * (4 * sizeof(float) + 16), NULL, GL_STATIC_DRAW);
+    //FIXME: glMapBuffer not exist in OpenGL ES
     float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    ret = fread(vdata, sizeof(float) * 4, vlen, fd);
+    ret = fread(vdata, sizeof(float) * 4 + 16, vlen, fd);
     assert(ret == vlen);
     glUnmapBuffer(GL_ARRAY_BUFFER);
   }
@@ -81,8 +82,9 @@ Mesh::draw(const Shader& s)
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-	glVertexAttrib4f(s.colorAttr(), 0.8f, 0.8f, 0.8f, 1.0f);
-  glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, 0, NULL);
+  glVertexAttrib4f(s.colorAttr(), 0.8f, 0.8f, 0.8f, 1.0f);
+  glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, 16, NULL);
+//  glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, 16, NULL);
 
   glDrawElements(GL_LINES, len, GL_UNSIGNED_SHORT, NULL);
 }
