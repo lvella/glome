@@ -30,11 +30,15 @@ libcommon_a_SOURCES = \
 	shader.cpp
 
 BUILT_SOURCES = \
+	hud.vertex.glsl.hpp \
 	minimap.vertex.glsl.hpp \
 	minimap.fragment.glsl.hpp \
 	world.vertex.glsl.hpp \
 	world.fragment.glsl.hpp \
 	projectile.glsl.hpp 
+
+hud.vertex.glsl.hpp: hud.vertex.glsl
+	${XXD} -i hud.vertex.glsl > hud.vertex.glsl.hpp
 
 minimap.vertex.glsl.hpp: minimap.vertex.glsl
 	${XXD} -i minimap.vertex.glsl > minimap.vertex.glsl.hpp
