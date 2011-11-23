@@ -46,29 +46,30 @@ Mesh::Mesh(MeshTypes type):
   glGenBuffers(2, bufobjs);
   {
     // Reading 4-D vertex coordinates(16bytes) and colorRGBA values(16bytes)
+    // format: <x, y, z, w> <r, g, b, a>
     ret = fread(&vlen, sizeof(vlen), 1, fd);
     assert(ret == 1);
     // Create vertex buffer
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vlen * (4 * sizeof(float) + 16), NULL, GL_STATIC_DRAW);
-    //FIXME: glMapBuffer not exist in OpenGL ES
-    float *vdata = (float*)glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    ret = fread(vdata, sizeof(float) * 4 + 16, vlen, fd);
+    uint16_t vbolen = vlen * 2 * 4 * sizeof(float);
+    float vdata[vbolen];
+    ret = fread(vdata, 2 * 4 * sizeof(float), vlen, fd);
     assert(ret == vlen);
-    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo);
+    glBufferData(GL_ARRAY_BUFFER, vbolen, vdata, GL_STATIC_DRAW);
   }
 
   {
-    // Reading 4-D edges coordinates
+    // Reading 4-D edges coordinates (8bytes)
+    // format:  <v_index0 , v_index1>
     ret = fread(&ilen, sizeof(ilen), 1, fd);
     assert(ret == 1);
     // Create index buffer
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ilen * sizeof(uint16_t) * 2, NULL, GL_STATIC_DRAW);
-    uint16_t *idata = (uint16_t*)glMapBuffer(GL_ELEMENT_ARRAY_BUFFER, GL_WRITE_ONLY);
-    ret = fread(idata, sizeof(uint16_t) * 2, ilen, fd);
+    uint16_t ibolen = ilen * 2 * sizeof(uint16_t);
+    uint16_t idata[ibolen];
+    ret = fread(idata, 2 * sizeof(uint16_t), ilen, fd);
     assert(ret == ilen);
-    glUnmapBuffer(GL_ELEMENT_ARRAY_BUFFER);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ibolen, idata, GL_STATIC_DRAW);
   }
 
   len = ilen * 2;
@@ -84,7 +85,7 @@ Mesh::draw(const Shader& s)
 
   glVertexAttrib4f(s.colorAttr(), 0.8f, 0.8f, 0.8f, 1.0f);
   glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, 16, NULL);
-//  glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, 16, NULL);
+  //glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, 16, (void*) (4 * sizeof(float)));
 
   glDrawElements(GL_LINES, len, GL_UNSIGNED_SHORT, NULL);
 }
