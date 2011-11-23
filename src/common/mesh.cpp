@@ -82,12 +82,13 @@ Mesh::draw(const Shader& s)
 {
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+  glEnableVertexAttribArray(s.colorAttr());
 
-  glVertexAttrib4f(s.colorAttr(), 0.8f, 0.8f, 0.8f, 1.0f);
-  glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, 16, NULL);
-  //glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, 16, (void*) (4 * sizeof(float)));
+  glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, 32, NULL);
+  glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, 32, (void*) (4 * sizeof(float)));
 
   glDrawElements(GL_LINES, len, GL_UNSIGNED_SHORT, NULL);
+  glDisableVertexAttribArray(s.colorAttr());
 }
 
 Mesh*
