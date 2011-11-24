@@ -14,26 +14,31 @@ static SList shots;
 static void
 create_spherical_texture(int size, GLuint& tex)
 {
-  unsigned char* buffer = (unsigned char *) malloc(size * size);
-  float r = (float)size / 2.0;
+	struct elem {
+		unsigned char l;
+		unsigned char a;
+	};
 
-  for(int i = 0; i < size; ++i)
-  {
-    for(int j = 0; j < size; ++j)
-    {
-      float d = hypotf(i - r, j - r);
-      buffer[(i * size) + j] = d > r ? 0u : (unsigned char)nearbyint(sqrtf(r*r - d*d) / r * 255.0);
-    }
-  }
+	elem* buffer = (elem *) malloc(size * size * sizeof(elem));
+	float r = (float)size / 2.0;
 
-  glGenTextures(1, &tex);
-  glBindTexture(GL_TEXTURE_2D, tex);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_ALPHA, size, size, 0,
-  GL_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glBindTexture(GL_TEXTURE_2D, 0);
+	for(int i = 0; i < size; ++i)
+	{
+		for(int j = 0; j < size; ++j)
+		{
+			float d = hypotf(i - r, j - r);
+			buffer[(i * size) + j].l = 255u;
+			buffer[(i * size) + j].a = d > r ? 0u : (unsigned char)nearbyint(sqrtf(r*r - d*d) / r * 255.0);
+		}
+	}
 
-  free(buffer);
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, size, size, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	free(buffer);
 }
 
 static GLuint texture;
@@ -43,8 +48,8 @@ void Projectile::initialize()
 {
   create_spherical_texture(64, texture);
 
-#include "projectile.glsl.hpp"
-  program_bullet.setup_shader(projectile_glsl, projectile_glsl_len);
+#include "projectile.vertex.glsl.hpp"
+  program_bullet.setup_shader(projectile_vertex_glsl, projectile_vertex_glsl_len);
 }
 
 void Projectile::shot(Ship *s, const Matrix4& from, float speed)

@@ -35,7 +35,7 @@ BUILT_SOURCES = \
 	minimap.fragment.glsl.hpp \
 	world.vertex.glsl.hpp \
 	world.fragment.glsl.hpp \
-	projectile.glsl.hpp 
+	projectile.vertex.glsl.hpp 
 
 hud.vertex.glsl.hpp: hud.vertex.glsl
 	${XXD} -i hud.vertex.glsl > hud.vertex.glsl.hpp
@@ -52,7 +52,7 @@ world.vertex.glsl.hpp: world.vertex.glsl
 world.fragment.glsl.hpp: world.fragment.glsl
 	${XXD} -i world.fragment.glsl > world.fragment.glsl.hpp
 
-projectile.glsl.hpp: projectile.glsl
-	${XXD} -i projectile.glsl > projectile.glsl.hpp
+projectile.vertex.glsl.hpp: projectile.vertex.glsl
+	${XXD} -i projectile.vertex.glsl > projectile.glsl.vertex.hpp
 
 CLEANFILES = ${BUILT_SOURCES}
