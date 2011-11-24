@@ -24,8 +24,9 @@ static Shader hud;
 static GLuint tex_minimap;
 static GLuint tex_object;
 
-static GLint uniform_is_dot;
 static GLint uniform_camera;
+static GLint proj_has_tex;
+static GLint hud_has_tex;
 
 static GLuint vbo;
 
@@ -37,17 +38,15 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
   const int l = 10;
   const int r = 160;
 
-  // Change to HUD display mode.
   glViewport(wstart + l, b, r, t);
-  hud.enable();
 
   // Draw 2D green background.
+  hud.enable();
   glDisable(GL_DEPTH_TEST);
 
-  glEnable(GL_TEXTURE_2D);
+  glUniform1i(hud_has_tex, 1);
   glBindTexture(GL_TEXTURE_2D, tex_minimap);
-
-  glVertexAttrib3f(hud.colorAttr(), 0.06f, 0.64f, 0.12f);
+  glVertexAttrib4f(hud.colorAttr(), 0.06f, 0.64f, 0.12f, 0.55f);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
@@ -55,11 +54,11 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
   glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
   // Draw field of vision
-  glDisable(GL_TEXTURE_2D);
   glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, (void*)(16*sizeof(float)));
   glDrawArrays(GL_LINE_STRIP, 0, 3);
 
   // Draw ship object
+  glUniform1i(hud_has_tex, 0);
   glEnable(GL_DEPTH_TEST);
   glClear(GL_DEPTH_BUFFER_BIT);
 
@@ -69,25 +68,23 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
 
   // Draw objects
   map_projection.enable();
+
   Matrix4 cam = yz_matrix(M_PI / 2) * center;
   cam.loadTo(uniform_camera);
 
   // Draw shots
-  glUniform1i(uniform_is_dot, 0);
+  glUniform1i(proj_has_tex, 0);
   Projectile::draw_in_minimap();
   draw_meridians(map_projection);
 
-  glUniform1i(uniform_is_dot, 1);
+  // Draw map object
+  glUniform1i(proj_has_tex, 1);
   glBindTexture(GL_TEXTURE_2D, tex_object);
   world->fill_minimap();
   glBindTexture(GL_TEXTURE_2D, 0);
 
   // Disable 2D
-  glDisable(GL_TEXTURE_2D);
-  glMatrixMode(GL_PROJECTION);
-  glViewport(0, 0, width, height);    
-  glPopMatrix();
-  glMatrixMode(GL_MODELVIEW);
+  glViewport(0, 0, width, height);
 }
 
 void MiniMap::draw_dot(const Object& obj)
@@ -140,7 +137,7 @@ create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
 void
 MiniMap::initialize()
 {
-	create_circle_texture(256, 0.9, 0, 142, tex_minimap);
+	create_circle_texture(256, 0.9, 0, 255, tex_minimap);
 	create_circle_texture(16, 0.8, 0, 255, tex_object);
 
 	{
@@ -185,10 +182,11 @@ MiniMap::initialize()
 #include "minimap.fragment.glsl.hpp"
 	map_projection.setup_shader(minimap_vertex_glsl, minimap_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
 
-	uniform_is_dot = glGetUniformLocation(map_projection.program(), "is_dot");
 	uniform_camera = glGetUniformLocation(map_projection.program(), "camera");
+	proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
 
 #include "hud.vertex.glsl.hpp"
 	hud.setup_shader(hud_vertex_glsl, hud_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
+	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
 }
 
