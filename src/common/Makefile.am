@@ -1,6 +1,6 @@
 INCLUDES = \
 	-I$(top_srcdir)/src/sdl \
- 	$(SDL_CFLAGS) \
+	$(SDL_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
 	-I$(includedir)
@@ -53,6 +53,6 @@ world.fragment.glsl.hpp: world.fragment.glsl
 	${XXD} -i world.fragment.glsl > world.fragment.glsl.hpp
 
 projectile.vertex.glsl.hpp: projectile.vertex.glsl
-	${XXD} -i projectile.vertex.glsl > projectile.glsl.vertex.hpp
+	${XXD} -i projectile.vertex.glsl > projectile.vertex.glsl.hpp
 
 CLEANFILES = ${BUILT_SOURCES}
