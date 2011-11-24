@@ -28,7 +28,9 @@ libcommon_a_SOURCES = \
 	net_world.cpp \
 	udp_server.cpp \
 	shader.cpp
-
+	sound.cpp\
+	source.cpp\
+	effect.cpp\
 BUILT_SOURCES = \
 	hud.vertex.glsl.hpp \
 	minimap.vertex.glsl.hpp \
