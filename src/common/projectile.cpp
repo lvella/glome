@@ -36,12 +36,12 @@ create_spherical_texture(int size, GLuint& tex)
 	glBindTexture(GL_TEXTURE_2D, tex);
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, size, size, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-	glBindTexture(GL_TEXTURE_2D, 0);
 
 	free(buffer);
 }
 
 static GLuint texture;
+static GLuint uniform_has_tex;
 static Shader program_bullet;
 
 void Projectile::initialize()
@@ -49,7 +49,9 @@ void Projectile::initialize()
   create_spherical_texture(64, texture);
 
 #include "projectile.vertex.glsl.hpp"
-  program_bullet.setup_shader(projectile_vertex_glsl, projectile_vertex_glsl_len);
+#include "minimap.fragment.glsl.hpp"
+  program_bullet.setup_shader(projectile_vertex_glsl, projectile_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
+	uniform_has_tex = glGetUniformLocation(program_bullet.program(), "has_tex");
 }
 
 void Projectile::shot(Ship *s, const Matrix4& from, float speed)
@@ -81,11 +83,11 @@ void Projectile::draw_all(const Shader& s)
 {
   if(shots.size() != 0) {
     program_bullet.enable();
-    glEnable(GL_TEXTURE_2D);
+    glUniform1i(uniform_has_tex, 1);
     glBindTexture(GL_TEXTURE_2D, texture);
+
     for(SList::reverse_iterator i = shots.rbegin(); i != shots.rend(); ++i)
       i->draw(s);
-    glDisable(GL_TEXTURE_2D);
   }
 }
 
@@ -94,6 +96,7 @@ void Projectile::draw_in_minimap()
   glBegin(GL_POINTS);
   for(SList::iterator i = shots.begin(); i != shots.end(); ++i) {
     i->transformation().position().loadVertex();
+    std::cout << i->transformation().position() << std::endl;
   }
   glEnd();
 }

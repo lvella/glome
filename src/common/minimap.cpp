@@ -66,15 +66,16 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
   glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, (void*)(8*sizeof(float)));
   glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
-  // Draw objects
   map_projection.enable();
-
   Matrix4 cam = yz_matrix(M_PI / 2) * center;
   cam.loadTo(uniform_camera);
+  map_projection.setTransform(Matrix4::IDENTITY);
 
   // Draw shots
   glUniform1i(proj_has_tex, 0);
   Projectile::draw_in_minimap();
+
+  // Draw meridians
   draw_meridians(map_projection);
 
   // Draw map object
