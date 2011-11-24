@@ -1,6 +1,22 @@
+// Input
+uniform mat4 transform;
+uniform mat4 camera;
+uniform mat4 projection;
+
+attribute vec4 position;
+attribute vec4 color;
+
+// Output
+varying vec4 v_color;
+varying vec2 v_texcoord;
+varying float fog_coord;
+
+// Simple globals
+mat4 modelview = camera * transform;
+
 void proj(inout vec4 v)
 {
-  v = gl_ModelViewMatrix * v;
+  v = modelview * v;
   v = vec4(v.xyz / (1.0 - v.w), 1.0);
 }
 
@@ -8,10 +24,10 @@ void main()
 {
   vec4 origin = vec4(0.0, 0.0, 0.0, -1.0);
 
-  float z = 0.004 * gl_Vertex.y;
+  float z = 0.004 * position.y;
   vec4 front = vec4(0.0, 0.0, z, -sqrt(1.0 - z*z));
 
-  float x = 0.001 * gl_Vertex.x;
+  float x = 0.001 * position.x;
   vec4 side = vec4(x, 0.0, 0.0, -sqrt(1.0 - x*x));
 
   proj(origin);
@@ -33,20 +49,18 @@ void main()
 
   dup = normalize(cross(dside, dfront));
 
-  if(dfront.z * gl_Vertex.y < 0.0)
+  if(dfront.z * position.y < 0.0)
     dup = -dup;
 
-  float displace_size = side_len * gl_Vertex.y;
+  float displace_size = side_len * position.y;
 
-  dside *= displace_size * gl_Vertex.x;
+  dside *= displace_size * position.x;
   dup *= displace_size;
 
   origin.xyz += dfront + dside + dup;
-  gl_Position = gl_ProjectionMatrix * origin;
-  gl_FogFragCoord = gl_Position.z;
+  gl_Position = projection * origin;
+  fog_coord = gl_Position.z;
 
-  gl_TexCoord[0] = gl_MultiTexCoord0;
-  gl_TexCoord[0].st = (gl_Vertex.xy + 1.0) * 0.5;
-
-  gl_FrontColor = gl_Color;
+  v_texcoord = (position.xy + 1.0) * 0.5;
+  v_color = color;
 }
