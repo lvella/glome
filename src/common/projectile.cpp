@@ -81,14 +81,36 @@ void Projectile::update_all(const Vector4& camera_pos)
 
 void Projectile::draw_all(const Shader& s)
 {
-  if(shots.size() != 0) {
-    program_bullet.enable();
-    glUniform1i(uniform_has_tex, 1);
-    glBindTexture(GL_TEXTURE_2D, texture);
+	if(shots.size() != 0) {
+		char buf[] = {
+				255, 200, 150,
+				1, 1,
 
-    for(SList::reverse_iterator i = shots.rbegin(); i != shots.rend(); ++i)
-      i->draw(s);
-  }
+				150, 255, 150,
+				-1, 1,
+
+				130, 100, 250,
+				-1, -1,
+
+				255, 150, 150,
+				1, -1
+		};
+
+		program_bullet.enable();
+	  glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glUniform1i(uniform_has_tex, 1);
+		glBindTexture(GL_TEXTURE_2D, texture);
+
+		glEnableVertexAttribArray(program_bullet.colorAttr());
+
+		glVertexAttribPointer(program_bullet.posAttr(), 2, GL_BYTE, GL_FALSE, 5, &buf[3]);
+		glVertexAttribPointer(program_bullet.colorAttr(), 3, GL_BYTE, GL_FALSE, 5, &buf[0]);
+
+		for(SList::reverse_iterator i = shots.rbegin(); i != shots.rend(); ++i)
+			i->draw(s);
+
+		glDisableVertexAttribArray(program_bullet.colorAttr());
+	}
 }
 
 void Projectile::draw_in_minimap()
@@ -96,7 +118,6 @@ void Projectile::draw_in_minimap()
   glBegin(GL_POINTS);
   for(SList::iterator i = shots.begin(); i != shots.end(); ++i) {
     i->transformation().position().loadVertex();
-    std::cout << i->transformation().position() << std::endl;
   }
   glEnd();
 }
@@ -142,24 +163,8 @@ Projectile::Projectile(Ship *s, const Matrix4& from, float speed):
 
 void Projectile::draw(const Shader& s)
 {
-  glPushMatrix();
-  s.setTransform(t);
-  glBegin(GL_QUADS);
-
-  glColor4ub(255, 200, 150, alpha);
-  glVertex2i(1, 1);
-
-  glColor4ub(150, 255, 150, alpha);
-  glVertex2i(-1, 1);
-
-  glColor4ub(130, 100, 250, alpha);
-  glVertex2i(-1, -1);
-
-  glColor4ub(255, 150, 150, alpha);
-  glVertex2i(1, -1);
-
-  glEnd();
-  glPopMatrix();
+	program_bullet.setTransform(t);
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
 void Projectile::update(const Vector4& camera_pos)
