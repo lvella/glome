@@ -186,8 +186,6 @@ NetWorld::draw()
   cam_hist.pop_front();
   cam_hist.push_back(center);
 
-  Projectile::draw_all(shader);
-
   shader.enable();
   p.loadTo(shader_uniform_projection);
   camera.loadTo(shader_uniform_camera);
@@ -199,7 +197,7 @@ NetWorld::draw()
   for(size_t i = 0; i < ships.size(); ++i)
     ships[i]->draw(shader);
 
-  Projectile::draw_all(shader);
+  Projectile::draw_all(p, camera);
   MiniMap::draw(0, this, center);
 }
 

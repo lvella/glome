@@ -40,18 +40,43 @@ create_spherical_texture(int size, GLuint& tex)
 	free(buffer);
 }
 
+static GLuint vbo;
 static GLuint texture;
-static GLuint uniform_has_tex;
+static GLint uniform_has_tex;
+static GLint uniform_camera;
+static GLint uniform_projection;
 static Shader program_bullet;
 
 void Projectile::initialize()
 {
-  create_spherical_texture(64, texture);
+	{
+		const float data[] = {
+				1.0f, 0.78f, 0.59f,
+				1.0f, 1.0f,
+
+				0.59f, 1.0f, 0.59f,
+				-1.0f, 1.0f,
+
+				0.51f, 0.39f, 0.98f,
+				-1.0f, -1.0f,
+
+				1.0f, 0.59f, 0.59f,
+				1.0f, -1.0f
+		};
+
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+	}
+
+	create_spherical_texture(64, texture);
 
 #include "projectile.vertex.glsl.hpp"
-#include "minimap.fragment.glsl.hpp"
-  program_bullet.setup_shader(projectile_vertex_glsl, projectile_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
+#include "world.fragment.glsl.hpp"
+	program_bullet.setup_shader(projectile_vertex_glsl, projectile_vertex_glsl_len, world_fragment_glsl, world_fragment_glsl_len);
 	uniform_has_tex = glGetUniformLocation(program_bullet.program(), "has_tex");
+	uniform_camera = glGetUniformLocation(program_bullet.program(), "camera");
+	uniform_projection = glGetUniformLocation(program_bullet.program(), "projection");
 }
 
 void Projectile::shot(Ship *s, const Matrix4& from, float speed)
@@ -79,35 +104,23 @@ void Projectile::update_all(const Vector4& camera_pos)
   shots.erase(shots.end() - dead_count, shots.end());
 }
 
-void Projectile::draw_all(const Shader& s)
+void Projectile::draw_all(const Matrix4& projection, const Matrix4& camera)
 {
 	if(shots.size() != 0) {
-		char buf[] = {
-				255, 200, 150,
-				1, 1,
-
-				150, 255, 150,
-				-1, 1,
-
-				130, 100, 250,
-				-1, -1,
-
-				255, 150, 150,
-				1, -1
-		};
-
 		program_bullet.enable();
-	  glBindBuffer(GL_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glUniform1i(uniform_has_tex, 1);
+		camera.loadTo(uniform_camera);
+		projection.loadTo(uniform_projection);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		glEnableVertexAttribArray(program_bullet.colorAttr());
 
-		glVertexAttribPointer(program_bullet.posAttr(), 2, GL_BYTE, GL_FALSE, 5, &buf[3]);
-		glVertexAttribPointer(program_bullet.colorAttr(), 3, GL_BYTE, GL_FALSE, 5, &buf[0]);
+		glVertexAttribPointer(program_bullet.posAttr(), 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (float*)0 + 3);
+		glVertexAttribPointer(program_bullet.colorAttr(), 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (float*)0);
 
 		for(SList::reverse_iterator i = shots.rbegin(); i != shots.rend(); ++i)
-			i->draw(s);
+			i->draw(program_bullet);
 
 		glDisableVertexAttribArray(program_bullet.colorAttr());
 	}
@@ -163,7 +176,7 @@ Projectile::Projectile(Ship *s, const Matrix4& from, float speed):
 
 void Projectile::draw(const Shader& s)
 {
-	program_bullet.setTransform(t);
+	s.setTransform(t);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
