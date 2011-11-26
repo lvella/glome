@@ -47,6 +47,10 @@ static GLint uniform_camera;
 static GLint uniform_projection;
 static Shader program_bullet;
 
+static GLuint minimap_vbo;
+static Vector4* minimap_buf = NULL;
+static size_t minimap_buf_size = 0;
+
 void Projectile::initialize()
 {
 	{
@@ -64,9 +68,14 @@ void Projectile::initialize()
 				1.0f, -1.0f
 		};
 
-		glGenBuffers(1, &vbo);
+		GLuint vbos[2];
+
+		glGenBuffers(2, vbos);
+		vbo = vbos[0];
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(data), data, GL_STATIC_DRAW);
+
+		minimap_vbo = vbos[1];
 	}
 
 	create_spherical_texture(64, texture);
@@ -86,22 +95,48 @@ void Projectile::shot(Ship *s, const Matrix4& from, float speed)
 
 void Projectile::update_all(const Vector4& camera_pos)
 {
-  size_t dead_count = 0;
+	size_t dead_count = 0;
 
-  for(SList::iterator i = shots.begin(); i != shots.end(); ++i)
-    {
-      if(!i->dead())
-        i->update(camera_pos);
-      else
-        {
-          // Greater than the maximum possible squared distance (which is 9.87).
-          i->order_dist = 10.0f;
-          ++dead_count;
-        }
-    }
+	for(SList::iterator i = shots.begin(); i != shots.end(); ++i)
+	{
+		if(!i->dead())
+			i->update(camera_pos);
+		else
+		{
+			// Greater than the maximum possible squared distance (which is 9.87).
+			i->order_dist = 10.0f;
+			++dead_count;
+		}
+	}
 
-  std::sort(shots.begin(), shots.end());
-  shots.erase(shots.end() - dead_count, shots.end());
+	std::sort(shots.begin(), shots.end());
+	shots.erase(shots.end() - dead_count, shots.end());
+
+	// Updates the buffer that will be drawn in minimap
+	{
+		bool resized = false;
+
+		// If not big enough, increase the buffer size
+		if(minimap_buf_size < (shots.size() * sizeof(Vector4))) {
+			// Increase the buffer for at least 20 Vector4 elements...
+			// (Why 20? It is a good number...)
+			minimap_buf_size = std::max(shots.size(), minimap_buf_size + 20) * sizeof(Vector4);
+			free(minimap_buf);
+			minimap_buf = (Vector4*)malloc(minimap_buf_size);
+			resized = true;
+		}
+
+		for(size_t i = 0; i < shots.size(); ++i)
+		{
+			minimap_buf[i] = shots[i].transformation().position();
+		}
+
+		glBindBuffer(GL_ARRAY_BUFFER, minimap_vbo);
+		if(resized)
+			glBufferData(GL_ARRAY_BUFFER, minimap_buf_size, minimap_buf, GL_STREAM_DRAW);
+		else
+			glBufferSubData(GL_ARRAY_BUFFER, 0, shots.size()*sizeof(Vector4), minimap_buf);
+	}
 }
 
 void Projectile::draw_all(const Matrix4& projection, const Matrix4& camera)
@@ -128,11 +163,9 @@ void Projectile::draw_all(const Matrix4& projection, const Matrix4& camera)
 
 void Projectile::draw_in_minimap()
 {
-  glBegin(GL_POINTS);
-  for(SList::iterator i = shots.begin(); i != shots.end(); ++i) {
-    i->transformation().position().loadVertex();
-  }
-  glEnd();
+	glBindBuffer(GL_ARRAY_BUFFER, minimap_vbo);
+	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+	glDrawArrays(GL_POINTS, 0, shots.size());
 }
 
 bool Projectile::collide(const Vector4& position, float radius)
