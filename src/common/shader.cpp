@@ -69,6 +69,12 @@ Shader::setup_shader(unsigned char *vcode, GLint vlen, unsigned char *fcode, GLi
 	glBindAttribLocation(prog, 0, "position");
 
 	glLinkProgram(prog);
+	{
+		GLsizei length;
+		glGetProgramInfoLog(prog, 10000, &length, err);
+		if(length)
+			cout << "Program linkage log:\n" << err << '\n';
+	}
 
 	uniform_transform = glGetUniformLocation(prog, "transform");
 

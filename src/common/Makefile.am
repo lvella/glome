@@ -35,7 +35,7 @@ BUILT_SOURCES = \
 	minimap.fragment.glsl.hpp \
 	world.vertex.glsl.hpp \
 	world.fragment.glsl.hpp \
-	projectile.vertex.glsl.hpp 
+	projectile.vertex.glsl.hpp
 
 hud.vertex.glsl.hpp: hud.vertex.glsl
 	${XXD} -i hud.vertex.glsl > hud.vertex.glsl.hpp

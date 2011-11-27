@@ -3,14 +3,25 @@ varying vec2 v_texcoord;
 varying float fog_coord;
 
 uniform sampler2D texbase;
+uniform bool has_tex;
+
+// TODO: put this function in a separated place
+void get_texel(inout vec4 color)
+{
+	if(has_tex) {
+		vec4 texel = texture2D(texbase, v_texcoord);
+		if(texel.a < 0.004)
+			discard;
+
+		color = color * texel;
+	}
+}
 
 void main()
-{/*
-	vec4 tex_color = texture2D(texbase, v_texcoord);
-	if(tex_color.a < 0.004)
-		discard;
-*/
-	vec4 color = v_color; // * tex_color;
+{
+	vec4 color = v_color;
+
+	get_texel(color);
 
 	// Fog will interpolate with this color
 	const vec4 FOG_COLOR = vec4(0.0, 0.0, 0.0, 1.0);
