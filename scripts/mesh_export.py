@@ -32,6 +32,10 @@ Tooltip: 'Export meshes to Binary file format for Glome Game Renega Desruga'
 # nvertices lines contaning vertex coordenates and colors attributes: <x, y, z, w> <r, g, b, a>
 # nedges
 # nedges lines contaning 2 vertex index per line: <v_in0 , v_in1>
+# nguns
+# nguns * <guns Matrix4d positions>
+# nengines
+# nengines * <engines Matrix4d positions>
 #[END]
 
 try:
@@ -157,8 +161,6 @@ class SpaceShip:
           a = bfile.read(fsize)
           print(struct.unpack('<f', a)[0])
       c = c + 1
-
-
     bfile.close()
 
 
@@ -241,4 +243,4 @@ if __name__ == "__main__":
   #FIXME: spaceship name(ssname) is global
   ss = SpaceShip(objs, listAllScenes)
   ss.export()
-  ss.read()
+#  ss.read()
