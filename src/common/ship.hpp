@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 #include <cstring>
 #include <vector>
 
@@ -14,7 +16,7 @@ public:
   ~Ship();
   void draw(const Shader& s);
   void update();
-	void load_guns(MeshTypes type);
+  void load_guns(MeshTypes type, fpos_t gun_position_infile);
 
   inline void rotate(float rx, float ry)
   {

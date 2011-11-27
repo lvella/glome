@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <GL/glew.h>
 #include <iostream>
 #include <sstream>
@@ -73,6 +72,8 @@ Mesh::Mesh(MeshTypes type):
   }
 
   len = ilen * 2;
+
+  fgetpos(fd, &position_file);
 
   fclose(fd);
 }

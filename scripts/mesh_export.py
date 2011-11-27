@@ -97,38 +97,24 @@ def vertex_conv(i, scale):
 # Objects #
 ###########
 
-class Mesh:
-  def __init__(self, objMesh, currentScene):
-    self.data = objMesh.to_mesh(currentScene,True,'PREVIEW')
-    self.name = objMesh.name + '.wire'
-    # Material vertex colour data
-    #TODO: work for only one material
-    self.diffuse_color = self.data.materials[0].diffuse_color
-    self.alpha =  self.data.materials[0].alpha
-    #specular_color = self.data.materials[0].specular_color
+class SpaceShip:
+  def __init__(self, objs, listAllScenes):
+    self.data = objs.get(ssname).to_mesh(listAllScenes.get('mesh'),True,'PREVIEW')
+    self.ssMesh = Mesh(self.data)
+    #TODO: work for n guns and engines
+    self.lguns = listAllScenes.get('gun').objects.values()
+    self.ssGuns = Guns(objs.get(ssname),self.lguns)
+    self.lengines = listAllScenes.get('engine').objects.values()
+    self.ssEngines = Engines(objs.get(ssname),self.lengines)
 
   def export(self):
-    bfile = open(self.name, 'wb')
-    bfile.write(struct.pack('<H', len(self.data.vertices)))
-    for v in self.data.vertices:
-      out = vertex_conv(v.co, scale)
-      bfile.write(struct.pack('<f', out[0]))
-      bfile.write(struct.pack('<f', out[1]))
-      bfile.write(struct.pack('<f', out[2]))
-      bfile.write(struct.pack('<f', out[3]))
-      bfile.write(struct.pack('<f', self.diffuse_color[0]))
-      bfile.write(struct.pack('<f', self.diffuse_color[1]))
-      bfile.write(struct.pack('<f', self.diffuse_color[2]))
-      bfile.write(struct.pack('<f', self.alpha))
-    bfile.write(struct.pack('<H', len(self.data.edges)))
-    for e in self.data.edges.values():
-      bfile.write(struct.pack('<H', e.key[0]))
-      bfile.write(struct.pack('<H', e.key[1]))
-    bfile.close()
+     self.ssMesh.export()
+     self.ssGuns.export()
+     self.ssEngines.export()
 
   def read(self):
-    print('Mesh of ' + self.name + ':')
-    bfile = open(self.name, 'rb')
+    print('Mesh of ' + ssname + ':')
+    bfile = open(filename, 'rb')
     nv = bfile.read(isize)
     print(struct.unpack('<H', nv)[0])
     for v in self.data.vertices:
@@ -147,22 +133,112 @@ class Mesh:
       e0 = bfile.read(isize)
       e1 = bfile.read(isize)
       print(struct.unpack('<H', e0)[0], struct.unpack('<H', e1)[0])
+
+    print('Guns of ' + ssname + ':')
+    ng = bfile.read(isize)
+    print(struct.unpack('<H', ng)[0])
+    c = 1
+    for g in self.lguns:
+      print('gun' + str(c) + ':')
+      for i in range(0, 4):
+        for j in range(0, 4):
+          a = bfile.read(fsize)
+          print(struct.unpack('<f', a)[0])
+      c = c + 1
+
+    print('Engines of ' + ssname + ':')
+    ne = bfile.read(isize)
+    print(struct.unpack('<H', ne)[0])
+    c = 1
+    for e in self.lengines:
+      print('engine' + str(c) + ':')
+      for i in range(0, 4):
+        for j in range(0, 4):
+          a = bfile.read(fsize)
+          print(struct.unpack('<f', a)[0])
+      c = c + 1
+
+
     bfile.close()
+
+
+#Export SpaceShip coordenates
+class Mesh:
+  def __init__(self, data):
+    self.data = data
+    # Material vertex colour data
+    #TODO: work for more than one material
+    self.diffuse_color = self.data.materials[0].diffuse_color
+    self.alpha =  self.data.materials[0].alpha
+    #specular_color = self.data.materials[0].specular_color
+
+  def export(self):
+    bfile = open(filename, 'ab')
+    bfile.write(struct.pack('<H', len(self.data.vertices)))
+    for v in self.data.vertices:
+      out = vertex_conv(v.co, scale)
+      bfile.write(struct.pack('<f', out[0]))
+      bfile.write(struct.pack('<f', out[1]))
+      bfile.write(struct.pack('<f', out[2]))
+      bfile.write(struct.pack('<f', out[3]))
+      bfile.write(struct.pack('<f', self.diffuse_color[0]))
+      bfile.write(struct.pack('<f', self.diffuse_color[1]))
+      bfile.write(struct.pack('<f', self.diffuse_color[2]))
+      bfile.write(struct.pack('<f', self.alpha))
+    bfile.write(struct.pack('<H', len(self.data.edges)))
+    for e in self.data.edges.values():
+      bfile.write(struct.pack('<H', e.key[0]))
+      bfile.write(struct.pack('<H', e.key[1]))
+    bfile.close()
+
+#Export guns positions
+class Guns:
+  def __init__(self, objMesh, lguns):
+    self.lguns = lguns
+    self.objMesh = objMesh
+
+  def export(self):
+    bfile = open(filename, 'ab')
+    bfile.write(struct.pack('<H', len(self.lguns)))
+    for g in self.lguns:
+      t = matrix_gen(g.location - self.objMesh.location)
+      for i in range(0, t.row_size):
+        for j in range(0, t.col_size):
+          bfile.write(struct.pack('<f', t[i][j]))
+    bfile.close()
+
+#Export Engines positions
+class Engines:
+  def __init__(self, objMesh, lengines):
+    self.lengines = lengines
+    self.objMesh = objMesh
+
+  def export(self):
+    bfile = open(filename, 'ab')
+    bfile.write(struct.pack('<H', len(self.lengines)))
+    for e in self.lengines:
+      t = matrix_gen(e.location - self.objMesh.location)
+      for i in range(0, t.row_size):
+        for j in range(0, t.col_size):
+          bfile.write(struct.pack('<f', t[i][j]))
+    bfile.close()
+
 
 #########
 # Begin #
 #########
-
-def ExportNMesh():
+filename = ''
+ssname = ''
+if __name__ == "__main__":
+  # objects in blender need be separeted per scenes
+  #FIXME: In scenes engine and gun, cameras and lamps objects should be deleted
   listAllScenes = bpy.data.scenes
-  currentScene = listAllScenes.get('mesh')
-  objs = currentScene.objects.values()
+  objs = bpy.data.objects
   for o in objs:
     if(o.type == 'MESH'):
-      objMesh = o
-  m = Mesh(objMesh,currentScene)
-  m.export()
-#  m.read()
-
-if __name__ == "__main__":
-  ExportNMesh()
+      filename = o.name + '.wire'
+      ssname = o.name
+  #FIXME: spaceship name(ssname) is global
+  ss = SpaceShip(objs, listAllScenes)
+  ss.export()
+  ss.read()

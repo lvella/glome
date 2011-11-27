@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <map>
 #include <algorithm>
 #include <cmath>
@@ -43,7 +42,7 @@ Ship::Ship(MeshTypes type):
     heat(0)
 {
   mesh = Mesh::get_mesh(type);
-  load_guns(type);
+  load_guns(type, mesh->position_file);
   //message.push_back(msg_id);
 
   max_rot_per_frame = 0.03;
@@ -65,7 +64,7 @@ Ship::~Ship()
 }
 
 void 
-Ship::load_guns(MeshTypes type)
+Ship::load_guns(MeshTypes type, fpos_t gun_position_infile)
 {
   int ret;
   FILE *fd;
@@ -74,8 +73,9 @@ Ship::load_guns(MeshTypes type)
   // Load .gun file
   {
     std::stringstream dir;
-    dir << DATA_DIR << "/" << name << ".gun";
+    dir << DATA_DIR << "/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
+    fsetpos(fd, &gun_position_infile);
     assert(fd != NULL);
   }
 

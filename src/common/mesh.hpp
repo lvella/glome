@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdio.h>
+
 #include <boost/ref.hpp>
 
 #include "shader.hpp"
@@ -15,6 +17,9 @@ public:
 
   static Mesh* get_mesh(MeshTypes type);
   static void release_mesh(Mesh* m);
+
+
+  fpos_t position_file;
 
 private:
   // a reference counter for shapes
