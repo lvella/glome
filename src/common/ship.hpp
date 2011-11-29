@@ -6,10 +6,12 @@
 #include "protocol.hpp"
 #include "object.hpp"
 #include "mesh.hpp"
+#include "fire.hpp"
 
 class Ship: public Object
 {
 public:
+	Fire f;
   Ship(MeshTypes type = HUNTER);
   ~Ship();
   void draw(const Shader& s);
@@ -167,3 +169,4 @@ private:
   Matrix4 r_canon, l_canon;
   uint16_t nguns;
 };
+

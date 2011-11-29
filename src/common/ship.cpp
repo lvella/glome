@@ -41,8 +41,10 @@ Ship::Ship(MeshTypes type):
     q(false),
     shot_count(0),
     rcanon_shot_last(false),
-    heat(0)
+    heat(0),
+    f(100)
 {
+	Fire::initialize();
   mesh = Mesh::get_mesh(type);
   load_guns(type);
   //message.push_back(msg_id);
