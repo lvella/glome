@@ -1,21 +1,7 @@
 varying vec4 v_color;
-varying vec2 v_texcoord;
 varying float fog_coord;
 
-uniform sampler2D texbase;
-uniform bool has_tex;
-
-// TODO: put this function in a separated place
-void get_texel(inout vec4 color)
-{
-	if(has_tex) {
-		vec4 texel = texture2D(texbase, v_texcoord);
-		if(texel.a < 0.004)
-			discard;
-
-		color = color * texel;
-	}
-}
+void get_texel(inout vec4 color);
 
 void main()
 {

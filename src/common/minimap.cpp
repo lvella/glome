@@ -102,8 +102,8 @@ void MiniMap::draw_dot(const Object& obj)
 void
 MiniMap::initialize()
 {
-	const char* sources[] = {"minimap.vert","minimap.frag", NULL};
-	const char* sources2[] = {"hud.vert", "minimap.frag", NULL};
+	const char* sources[] = {"minimap.vert","minimap.frag", "texture.frag", NULL};
+	const char* sources2[] = {"hud.vert", "minimap.frag", "texture.frag", NULL};
 
 	create_circle_texture(256, 0.9, 0, 255, tex_minimap);
 	create_circle_texture(16, 0.8, 0, 255, tex_object);

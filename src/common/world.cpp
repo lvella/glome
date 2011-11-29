@@ -6,7 +6,7 @@
 void World::initialize()
 {
 
-const char *sources[] = { "world.vert", "world.frag", NULL };
+const char *sources[] = { "world.vert", "world.frag", "no_texture.frag", NULL };
 
 
 	shader.setup_shader(sources);

@@ -1,5 +1,5 @@
 #include <math.h>
-#include <GL/glew.h>
+#include "gl.hpp"
 #include "math.hpp"
 #include "world.hpp"
 

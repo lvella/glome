@@ -9,7 +9,14 @@
 
 using namespace std;
 
-static std::map<const char*, GLuint> load_shaders;
+struct ltstr
+{
+  bool operator()(const char* s1, const char* s2) const
+  {
+    return strcmp(s1, s2) < 0;
+  }
+};
+static std::map<const char*, GLuint, ltstr> loaded_shaders;
 
 Shader::Shader():
 	prog(0)
@@ -27,9 +34,9 @@ Shader::~Shader()
 
 void Shader::setup_shader(const char *sources[])
 {
-
 	char *ptr;
 	char err[10000];
+	const char **iter;
 	const char *name;
 	int ret;
 
@@ -42,10 +49,11 @@ void Shader::setup_shader(const char *sources[])
 	assert(*sources);
 	prog = glCreateProgram();
 
-	while(*sources != NULL)
+	iter = sources;
+	while(*iter != NULL)
 	{
-		name = *sources;
-		if(load_shaders.find(name) == load_shaders.end())
+		name = *iter;
+		if(loaded_shaders.find(name) == loaded_shaders.end())
 		{
 			if(strrchr(name, '.')[1] == 'v')
 			{
@@ -57,7 +65,7 @@ void Shader::setup_shader(const char *sources[])
 			}
 
 			string path(DATA_DIR);
-			path += '/';
+			path += "/shaders/";
 			path += name;
 
 			fl = fopen(path.c_str(), "r");
@@ -87,15 +95,15 @@ void Shader::setup_shader(const char *sources[])
 					cout << "Shader "<<name<<" compilation log:\n" << err << endl;
 			}
 			delete [] ptr;
-			load_shaders.insert(std::pair<const char*, GLuint>(name, shader));
+			loaded_shaders.insert(std::pair<const char*, GLuint>(name, shader));
 		}
 		else
 		{
-			shader = load_shaders[name];
+			shader = loaded_shaders[name];
 		}
 
 		glAttachShader(prog, shader);
-		++sources;
+		++iter;
 
 	}
 	// We expect every shader to have a "position" attribute, to be the reference attribute
@@ -104,8 +112,12 @@ void Shader::setup_shader(const char *sources[])
 	{
 		GLsizei length;
 		glGetProgramInfoLog(prog, 10000, &length, err);
-		if(length)
-			cout << "Program linkage log:\n" << err << '\n';
+		if(length) {
+			cout << "Linkage log of [" << *sources;
+			for(iter = sources + 1; *iter; ++iter)
+				cout << ", " << *iter;
+			cout << "]:\n" << err << '\n';
+		}
 	}
 
 	uniform_transform = glGetUniformLocation(prog, "transform");
