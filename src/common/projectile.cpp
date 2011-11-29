@@ -42,9 +42,9 @@ static Shader program_bullet;
 void Projectile::initialize()
 {
   create_spherical_texture(64, texture);
+  const char *source[] = {"projectile.vert", NULL};
 
-#include "projectile.glsl.hpp"
-  program_bullet.setup_shader(projectile_glsl, projectile_glsl_len);
+  program_bullet.setup_shader(source);
 }
 
 void Projectile::shot(Ship *s, const Matrix4& from, float speed)

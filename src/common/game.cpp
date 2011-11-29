@@ -30,7 +30,7 @@ namespace Game
 		// OpenGL nonchanging settings
 		glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 		glClearDepth(1.0f);
-	  glEnableVertexAttribArray(0);
+	        glEnableVertexAttribArray(0);
 
 		World::initialize();
 

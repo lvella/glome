@@ -170,6 +170,9 @@ create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
 void
 MiniMap::initialize()
 {
+	const char* sources[] = {"minimap.vert","minimap.frag", NULL};
+	const char* sources2[] = {"hud.vert", NULL};
+
 	create_circle_texture(256, 0.9, 0, 142, tex_minimap);
 	create_circle_texture(16, 0.8, 0, 255, tex_object);
 
@@ -185,14 +188,12 @@ MiniMap::initialize()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 	}
 
-#include "minimap.vertex.glsl.hpp"
-#include "minimap.fragment.glsl.hpp"
-	map_projection.setup_shader(minimap_vertex_glsl, minimap_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
+
+	map_projection.setup_shader(sources);
 
 	uniform_is_dot = glGetUniformLocation(map_projection.program(), "is_dot");
 	uniform_camera = glGetUniformLocation(map_projection.program(), "camera");
 
-#include "hud.vertex.glsl.hpp"
-	hud.setup_shader(hud_vertex_glsl, hud_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
+	hud.setup_shader(sources2);
 }
 
