@@ -101,6 +101,13 @@ void Shader::setup_shader(const char *sources[])
 	// We expect every shader to have a "position" attribute, to be the reference attribute
 	glBindAttribLocation(prog, 0, "position");
 	glLinkProgram(prog);
+	{
+		GLsizei length;
+		glGetProgramInfoLog(prog, 10000, &length, err);
+		if(length)
+			cout << "Program linkage log:\n" << err << '\n';
+	}
+
 	uniform_transform = glGetUniformLocation(prog, "transform");
 	attr_color = glGetAttribLocation(prog, "color");
 	attr_texcoord = glGetAttribLocation(prog, "texcoord");

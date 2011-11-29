@@ -4,7 +4,7 @@ attribute vec4 color;
 
 uniform mat4 camera;
 uniform mat4 transform;
-uniform bool is_dot;
+uniform bool has_tex;
 
 varying vec2 v_texcoord;
 varying vec4 v_color;
@@ -28,7 +28,7 @@ void main()
   const vec4 pale_color = vec4(0.25, 0.65, 0.25, 1.0);
   vec3 v;
 
-  if(is_dot) {
+  if(has_tex) {
   	v = project_vertex(camera * (transform * center));
     v.xy = v.xy + position.xy * 0.045;
     v_texcoord = (1.0 + position.xy) * 0.5;
@@ -39,7 +39,5 @@ void main()
 
   v_color = mix(pale_color, color, (v.z + 1.0) * 0.5);
 
-  gl_Position.xy = v.xy;
-  gl_Position.z = -v.z;
-  gl_Position.w = 1.0;
+  gl_Position = vec4(v.xy, -v.z, 1.0);
 }

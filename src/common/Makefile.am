@@ -1,6 +1,6 @@
 INCLUDES = \
 	-I$(top_srcdir)/src/sdl \
- 	$(SDL_CFLAGS) \
+	$(SDL_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
 	-I$(includedir)
@@ -28,3 +28,4 @@ libcommon_a_SOURCES = \
 	net_world.cpp \
 	udp_server.cpp \
 	shader.cpp
+
