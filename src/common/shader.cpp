@@ -9,7 +9,14 @@
 
 using namespace std;
 
-static std::map<const char*, GLuint> load_shaders;
+struct ltstr
+{
+  bool operator()(const char* s1, const char* s2) const
+  {
+    return strcmp(s1, s2) < 0;
+  }
+};
+static std::map<const char*, GLuint, ltstr> loaded_shaders;
 
 Shader::Shader():
 	prog(0)
@@ -46,7 +53,7 @@ void Shader::setup_shader(const char *sources[])
 	while(*iter != NULL)
 	{
 		name = *iter;
-		if(load_shaders.find(name) == load_shaders.end())
+		if(loaded_shaders.find(name) == loaded_shaders.end())
 		{
 			if(strrchr(name, '.')[1] == 'v')
 			{
@@ -88,11 +95,11 @@ void Shader::setup_shader(const char *sources[])
 					cout << "Shader "<<name<<" compilation log:\n" << err << endl;
 			}
 			delete [] ptr;
-			load_shaders.insert(std::pair<const char*, GLuint>(name, shader));
+			loaded_shaders.insert(std::pair<const char*, GLuint>(name, shader));
 		}
 		else
 		{
-			shader = load_shaders[name];
+			shader = loaded_shaders[name];
 		}
 
 		glAttachShader(prog, shader);
