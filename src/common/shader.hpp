@@ -2,15 +2,16 @@
 
 #include "gl.hpp"
 #include "matrix4.hpp"
+#include <map>
 
 class Shader
 {
 public:
 	Shader();
-	Shader(unsigned char *vcode, GLint vlen, unsigned char *fcode = NULL, GLint flen = 0);
+	Shader(const char *sources[]);
 	~Shader();
 
-	void setup_shader(unsigned char *vcode, GLint vlen, unsigned char *fcode = NULL, GLint flen = 0);
+	void setup_shader(const char *sources[]);
 
 	void enable() const {
 		glUseProgram(prog);
@@ -37,6 +38,8 @@ public:
 	}
 
 private:
+
+
 	GLuint prog;
 
 	GLint uniform_transform;

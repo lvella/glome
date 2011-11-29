@@ -28,6 +28,7 @@ libcommon_a_SOURCES = \
 	net_world.cpp \
 	udp_server.cpp \
 	shader.cpp
+<<<<<<< HEAD
 	sound.cpp\
 	source.cpp\
 	effect.cpp\
@@ -58,3 +59,6 @@ projectile.vertex.glsl.hpp: projectile.vertex.glsl
 	${XXD} -i projectile.vertex.glsl > projectile.vertex.glsl.hpp
 
 CLEANFILES = ${BUILT_SOURCES}
+=======
+
+>>>>>>> ea533aa05349c97916d817809b3fd7c4c85bc266

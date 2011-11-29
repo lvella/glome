@@ -66,6 +66,7 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
 	glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, (void*)(8*sizeof(float)));
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
+<<<<<<< HEAD
 	// Draw objects
 	map_projection.enable();
 
@@ -76,6 +77,19 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
 	glUniform1i(proj_has_tex, 0);
 	Projectile::draw_in_minimap();
 	draw_meridians(map_projection);
+=======
+  map_projection.enable();
+  Matrix4 cam = yz_matrix(M_PI / 2) * center;
+  cam.loadTo(uniform_camera);
+  map_projection.setTransform(Matrix4::IDENTITY);
+
+  // Draw shots
+  glUniform1i(proj_has_tex, 0);
+  Projectile::draw_in_minimap();
+
+  // Draw meridians
+  draw_meridians(map_projection);
+>>>>>>> ea533aa05349c97916d817809b3fd7c4c85bc266
 
 	// Draw map object
 	glUniform1i(proj_has_tex, 1);
@@ -100,6 +114,9 @@ void MiniMap::draw_dot(const Object& obj)
 void
 MiniMap::initialize()
 {
+	const char* sources[] = {"minimap.vert","minimap.frag", NULL};
+	const char* sources2[] = {"hud.vert", "minimap.frag", NULL};
+
 	create_circle_texture(256, 0.9, 0, 255, tex_minimap);
 	create_circle_texture(16, 0.8, 0, 255, tex_object);
 
@@ -141,15 +158,13 @@ MiniMap::initialize()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 	}
 
-#include "minimap.vertex.glsl.hpp"
-#include "minimap.fragment.glsl.hpp"
-	map_projection.setup_shader(minimap_vertex_glsl, minimap_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
+
+	map_projection.setup_shader(sources);
 
 	uniform_camera = glGetUniformLocation(map_projection.program(), "camera");
 	proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
 
-#include "hud.vertex.glsl.hpp"
-	hud.setup_shader(hud_vertex_glsl, hud_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
+	hud.setup_shader(sources2);
 	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
 }
 

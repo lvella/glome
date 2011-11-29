@@ -1,28 +1,26 @@
 // Input
+attribute vec4 position;
+attribute vec4 color;
+
 uniform mat4 transform;
 uniform mat4 camera;
 uniform mat4 projection;
-
-attribute vec4 position;
-attribute vec4 color;
 
 // Output
 varying vec4 v_color;
 varying vec2 v_texcoord;
 varying float fog_coord;
 
-// Simple globals
-mat4 modelview = camera * transform;
-
-void proj(inout vec4 v)
+void proj(in mat4 m, inout vec4 v)
 {
-  v = modelview * v;
+  v = m * v;
   v = vec4(v.xyz / (1.0 - v.w), 1.0);
 }
 
 void main()
 {
   vec4 origin = vec4(0.0, 0.0, 0.0, -1.0);
+  mat4 m = camera * transform;
 
   float z = 0.004 * position.y;
   vec4 front = vec4(0.0, 0.0, z, -sqrt(1.0 - z*z));
@@ -30,9 +28,9 @@ void main()
   float x = 0.001 * position.x;
   vec4 side = vec4(x, 0.0, 0.0, -sqrt(1.0 - x*x));
 
-  proj(origin);
-  proj(front);
-  proj(side);
+  proj(m, origin);
+  proj(m, front);
+  proj(m, side);
   float side_len = length(side.xyz - origin.xyz);
 
   vec3 dfront = front.xyz - origin.xyz;
@@ -44,7 +42,7 @@ void main()
   if(vec_len > 0.000000001) {
     dside /= vec_len;
   } else {
-    dside = vec3(0.0, gl_Vertex.x, 0.0);
+    dside = vec3(0.0, position.x, 0.0);
   }
 
   dup = normalize(cross(dside, dfront));
