@@ -25,7 +25,7 @@ Mesh::~Mesh()
 Mesh::Mesh(MeshTypes type):
   ref_count(1)
 {
-	uint16_t ilen, vlen;
+  uint16_t ilen, vlen;
 
   int ret;
   FILE *fd;
@@ -73,6 +73,8 @@ Mesh::Mesh(MeshTypes type):
 
   len = ilen * 2;
 
+  // Get the file position indicator associated with stream to be used to load guns, engines, etc.
+  // Will be used in the new class Ship
   fgetpos(fd, &position_file);
 
   fclose(fd);
