@@ -193,12 +193,16 @@ NetWorld::draw()
   draw_meridians(shader);
   cube.draw(shader);
   spg.draw(shader);
-
   for(size_t i = 0; i < ships.size(); ++i)
+  {
     ships[i]->draw(shader);
+    ships[i]->f.draw(p, camera);
+	}
 
   Projectile::draw_all(p, camera);
+  
   MiniMap::draw(0, this, center);
+	
 }
 
 void

@@ -10,6 +10,7 @@
 #include "projectile.hpp"
 #include "protocol.hpp"
 #include "config.hpp"
+#include "effect.hpp"
 
 using namespace std;
 
@@ -39,8 +40,10 @@ Ship::Ship(MeshTypes type):
     q(false),
     shot_count(0),
     rcanon_shot_last(false),
-    heat(0)
+    heat(0),
+    f(100)
 {
+	Fire::initialize();
   mesh = Mesh::get_mesh(type);
   load_guns(type, mesh->position_file);
   //TODO: create a class gun and engine
@@ -142,9 +145,12 @@ Ship::update()
   int sps = (cold_fire_rate * 100 - heat) / 100; // Firerate at maximum
 
   shot_count -= sps;
-  if(shot_count < 0) {
-    if(sh) {
+  if(shot_count < 0) 
+  {
+    if(sh)
+    {
       Projectile::shot(this, t * (rcanon_shot_last ? l_canon : r_canon), shot_speed - speed);
+      
       shot_count += 60;
       heat += shot_power; // Shot heat, could be equivalent to damage
       rcanon_shot_last = !rcanon_shot_last;

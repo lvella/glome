@@ -12,7 +12,7 @@
 #include "meridian.hpp"
 #include "world.hpp"
 #include "options.hpp"
-
+#include "textures.hpp"
 #include "minimap.hpp"
 
 using namespace std;
@@ -32,40 +32,41 @@ static GLuint vbo;
 
 void
 MiniMap::draw(int wstart, World* world, const Matrix4& center)
-{
-  const int t = 160;
-  const int b = 10;
-  const int l = 10;
-  const int r = 160;
+	{
+	const int t = 160;
+	const int b = 10;
+	const int l = 10;
+	const int r = 160;
 
-  glViewport(wstart + l, b, r, t);
+	glViewport(wstart + l, b, r, t);
 
-  // Draw 2D green background.
-  hud.enable();
-  glDisable(GL_DEPTH_TEST);
+	// Draw 2D green background.
+	hud.enable();
+	glDisable(GL_DEPTH_TEST);
 
-  glUniform1i(hud_has_tex, 1);
-  glBindTexture(GL_TEXTURE_2D, tex_minimap);
-  glVertexAttrib4f(hud.colorAttr(), 0.06f, 0.64f, 0.12f, 0.55f);
+	glUniform1i(hud_has_tex, 1);
+	glBindTexture(GL_TEXTURE_2D, tex_minimap);
+	glVertexAttrib4f(hud.colorAttr(), 0.06f, 0.64f, 0.12f, 0.55f);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
-  glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-  // Draw field of vision
-  glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, (void*)(16*sizeof(float)));
-  glDrawArrays(GL_LINE_STRIP, 0, 3);
+	// Draw field of vision
+	glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, (void*)(16*sizeof(float)));
+	glDrawArrays(GL_LINE_STRIP, 0, 3);
 
-  // Draw ship object
-  glUniform1i(hud_has_tex, 0);
-  glEnable(GL_DEPTH_TEST);
-  glClear(GL_DEPTH_BUFFER_BIT);
+	// Draw ship object
+	glUniform1i(hud_has_tex, 0);
+	glEnable(GL_DEPTH_TEST);
+	glClear(GL_DEPTH_BUFFER_BIT);
 
-  glVertexAttrib3f(hud.colorAttr(), 1.0f, 1.0f, 1.0f);
-  glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, (void*)(8*sizeof(float)));
-  glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	glVertexAttrib3f(hud.colorAttr(), 1.0f, 1.0f, 1.0f);
+	glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, (void*)(8*sizeof(float)));
+	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
+	// Draw objects
   map_projection.enable();
   Matrix4 cam = yz_matrix(M_PI / 2) * center;
   cam.loadTo(uniform_camera);
@@ -78,14 +79,14 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
   // Draw meridians
   draw_meridians(map_projection);
 
-  // Draw map object
-  glUniform1i(proj_has_tex, 1);
-  glBindTexture(GL_TEXTURE_2D, tex_object);
-  world->fill_minimap();
-  glBindTexture(GL_TEXTURE_2D, 0);
+	// Draw map object
+	glUniform1i(proj_has_tex, 1);
+	glBindTexture(GL_TEXTURE_2D, tex_object);
+	world->fill_minimap();
+	glBindTexture(GL_TEXTURE_2D, 0);
 
-  // Disable 2D
-  glViewport(0, 0, width, height);
+	// Disable 2D
+	glViewport(0, 0, width, height);
 }
 
 void MiniMap::draw_dot(const Object& obj)
@@ -97,47 +98,13 @@ void MiniMap::draw_dot(const Object& obj)
   glVertexAttribPointer(map_projection.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
-	
-void
-create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
-{
-	struct elem {
-		unsigned char l;
-		unsigned char a;
-	};
-	int i, j;
-	float cx, cy, d, tex_r, tex_r_lim;
-
-	elem* texture = (elem*)malloc(w * w * sizeof(elem));
-
-	cx = cy = (w - 1) / 2.;
-	tex_r = w / 2.;
-	tex_r_lim = tex_r * p;
-
-	for(i = 0; i < w; ++i)
-	{
-		for(j = 0; j < w; ++j)
-		{
-			float x;
-			d = sqrtf(((i - cx) * (i - cx)) + ((j - cy) * (j - cy)));
-			texture[(i * w) + j].l = 255u;
-			texture[(i * w) + j + 1].a = (d > tex_r) ? a0 : ((d < tex_r_lim) ? a1 : ( (x = (tex_r - d) / (tex_r - tex_r_lim), x*x) * a1 ));
-		}
-	}
-
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, w, w, 0,
-			GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-
-	free(texture);
-}
 
 void
 MiniMap::initialize()
 {
+	const char* sources[] = {"minimap.vert","minimap.frag", "texture.frag", NULL};
+	const char* sources2[] = {"hud.vert", "minimap.frag", "texture.frag", NULL};
+
 	create_circle_texture(256, 0.9, 0, 255, tex_minimap);
 	create_circle_texture(16, 0.8, 0, 255, tex_object);
 
@@ -179,15 +146,13 @@ MiniMap::initialize()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 	}
 
-#include "minimap.vertex.glsl.hpp"
-#include "minimap.fragment.glsl.hpp"
-	map_projection.setup_shader(minimap_vertex_glsl, minimap_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
+
+	map_projection.setup_shader(sources);
 
 	uniform_camera = glGetUniformLocation(map_projection.program(), "camera");
 	proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
 
-#include "hud.vertex.glsl.hpp"
-	hud.setup_shader(hud_vertex_glsl, hud_vertex_glsl_len, minimap_fragment_glsl, minimap_fragment_glsl_len);
+	hud.setup_shader(sources2);
 	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
 }
 

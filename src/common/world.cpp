@@ -2,12 +2,14 @@
 #include "shader.hpp"
 #include "world.hpp"
 
+
 void World::initialize()
 {
-#include "world.vertex.glsl.hpp"
-#include "world.fragment.glsl.hpp"
 
-	shader.setup_shader(world_vertex_glsl, world_vertex_glsl_len, world_fragment_glsl, world_fragment_glsl_len);
+const char *sources[] = { "world.vert", "world.frag", "no_texture.frag", NULL };
+
+
+	shader.setup_shader(sources);
 
 	shader_uniform_projection = glGetUniformLocation(shader.program(), "projection");
 	shader_uniform_camera = glGetUniformLocation(shader.program(), "camera");

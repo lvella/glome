@@ -27,32 +27,10 @@ libcommon_a_SOURCES = \
 	split_world.cpp \
 	net_world.cpp \
 	udp_server.cpp \
-	shader.cpp
-
-BUILT_SOURCES = \
-	hud.vertex.glsl.hpp \
-	minimap.vertex.glsl.hpp \
-	minimap.fragment.glsl.hpp \
-	world.vertex.glsl.hpp \
-	world.fragment.glsl.hpp \
-	projectile.vertex.glsl.hpp
-
-hud.vertex.glsl.hpp: hud.vertex.glsl
-	${XXD} -i hud.vertex.glsl > hud.vertex.glsl.hpp
-
-minimap.vertex.glsl.hpp: minimap.vertex.glsl
-	${XXD} -i minimap.vertex.glsl > minimap.vertex.glsl.hpp
-
-minimap.fragment.glsl.hpp: minimap.fragment.glsl
-	${XXD} -i minimap.fragment.glsl > minimap.fragment.glsl.hpp
-
-world.vertex.glsl.hpp: world.vertex.glsl
-	${XXD} -i world.vertex.glsl > world.vertex.glsl.hpp
-
-world.fragment.glsl.hpp: world.fragment.glsl
-	${XXD} -i world.fragment.glsl > world.fragment.glsl.hpp
-
-projectile.vertex.glsl.hpp: projectile.vertex.glsl
-	${XXD} -i projectile.vertex.glsl > projectile.vertex.glsl.hpp
-
-CLEANFILES = ${BUILT_SOURCES}
+	shader.cpp \
+	textures.cpp \
+	particle_system.cpp \
+	fire.cpp \
+	sound.cpp \
+	source.cpp \
+	effect.cpp

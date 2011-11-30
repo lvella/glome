@@ -67,7 +67,8 @@ public:
   {
     glVertex4fv(v);
   }
-
+  
+	const float* getVertex() const {return v;}
   /** Function for writing to a stream. */
   friend std::ostream& operator<<(std::ostream& o, const Vector4& v);
 

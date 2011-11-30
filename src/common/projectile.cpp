@@ -5,40 +5,14 @@
 
 #include "shader.hpp"
 #include "math.hpp"
+#include "textures.hpp"
 
 #include "projectile.hpp"
 
 typedef std::vector<Projectile> SList;
 static SList shots;
 
-static void
-create_spherical_texture(int size, GLuint& tex)
-{
-	struct elem {
-		unsigned char l;
-		unsigned char a;
-	};
-
-	elem* buffer = (elem *) malloc(size * size * sizeof(elem));
-	float r = (float)size / 2.0;
-
-	for(int i = 0; i < size; ++i)
-	{
-		for(int j = 0; j < size; ++j)
-		{
-			float d = hypotf(i - r, j - r);
-			buffer[(i * size) + j].l = 255u;
-			buffer[(i * size) + j].a = d > r ? 0u : (unsigned char)nearbyint(sqrtf(r*r - d*d) / r * 255.0);
-		}
-	}
-
-	glGenTextures(1, &tex);
-	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, size, size, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-
-	free(buffer);
-}
+static GLuint tex_projectile;
 
 static GLuint vbo;
 static GLuint texture;
@@ -53,6 +27,8 @@ static size_t minimap_buf_size = 0;
 
 void Projectile::initialize()
 {
+	const char *source[] = {"projectile.vert", "world.frag", "texture.frag", NULL};
+
 	{
 		const float data[] = {
 				1.0f, 0.78f, 0.59f,
@@ -80,9 +56,7 @@ void Projectile::initialize()
 
 	create_spherical_texture(64, texture);
 
-#include "projectile.vertex.glsl.hpp"
-#include "world.fragment.glsl.hpp"
-	program_bullet.setup_shader(projectile_vertex_glsl, projectile_vertex_glsl_len, world_fragment_glsl, world_fragment_glsl_len);
+	program_bullet.setup_shader(source);
 	uniform_has_tex = glGetUniformLocation(program_bullet.program(), "has_tex");
 	uniform_camera = glGetUniformLocation(program_bullet.program(), "camera");
 	uniform_projection = glGetUniformLocation(program_bullet.program(), "projection");
