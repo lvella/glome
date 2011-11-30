@@ -20,6 +20,7 @@ void main()
 	
 	//TODO: Correct 4D perspective
 	tmp += position*size;
+
   gl_Position = projection * tmp;
   fog_coord = gl_Position.z;
 

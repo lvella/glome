@@ -37,6 +37,10 @@ void Fire::initialize()
 	uniform_projection = glGetUniformLocation(program_fire.program(), "projection");
 	uniform_coord = glGetUniformLocation(program_fire.program(), "coord");
 	uniform_camera = glGetUniformLocation(program_fire.program(), "camera");
+	
+	program_fire.enable();
+	glUniform1i(glGetUniformLocation(program_fire.program(), "has_tex"), 1);
+
 	glGenBuffers(1,&vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(shape), shape, GL_STATIC_DRAW);
@@ -55,6 +59,7 @@ void Fire::draw(Matrix4 cam, Matrix4 proj)
 	cam.loadTo(uniform_camera);
 	proj.loadTo(uniform_projection);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+
 	//TODO: Pass parameters to shader in a better way
 	for(int i = 0; i < particle_vector.size(); ++i)
 	{
@@ -64,7 +69,8 @@ void Fire::draw(Matrix4 cam, Matrix4 proj)
 			glUniform1f(uniform_size, particle_vector[i].size);
 			glUniform4fv(uniform_coord, 4, particle_vector[i].position.getVertex());
 			glVertexAttrib4fv(program_fire.colorAttr(),particle_vector[i].color.getVertex());
-			glVertexAttribPointer(program_fire.posAttr(), 4, GL_FLOAT, GL_FALSE,  0, NULL);
+			glVertexAttribPointer(program_fire.posAttr(), 2, GL_FLOAT, GL_FALSE,  0, NULL);
+			glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 		}
 	}
 }
