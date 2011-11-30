@@ -43,6 +43,8 @@ Ship::Ship(MeshTypes type):
 {
   mesh = Mesh::get_mesh(type);
   load_guns(type, mesh->position_file);
+  //TODO: create a class gun and engine
+
   //message.push_back(msg_id);
 
   max_rot_per_frame = 0.03;
