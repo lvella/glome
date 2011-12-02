@@ -195,9 +195,8 @@ NetWorld::draw()
   spg.draw(shader);
   for(size_t i = 0; i < ships.size(); ++i)
   {
-    ships[i]->draw(shader);
-    ships[i]->f.draw(camera, p);
-	}
+    ships[i]->draw(shader,camera,p);
+  }
 
   Projectile::draw_all(p, camera);
   

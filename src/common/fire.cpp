@@ -5,7 +5,7 @@ static Shader program_fire;
 static GLuint vbo;
 static GLint attrib_size, uniform_projection, uniform_camera, uniform_coord;
 
-Fire::Fire(int number_of_particles):
+Fire::Fire(int number_of_particles, Matrix4 velocity):
 	ParticleSystem(number_of_particles)
 {
 	create_circle_texture(56, 0.9, 0, 255, tex_particle);
@@ -18,7 +18,7 @@ Fire::Fire(int number_of_particles):
 		particle_vector[i].size = 100;
 		particle_vector[i].color = Vector4(1,1,1,0.5);
 		particle_vector[i].position = t.position();
-		particle_vector[i].velocity = Matrix4::IDENTITY;
+		particle_vector[i].velocity = velocity;
 	}
 }
 
@@ -41,7 +41,7 @@ void Fire::initialize()
 	glGenBuffers(1,&vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(shape), shape, GL_STATIC_DRAW);
-	
+
 	glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
@@ -53,7 +53,7 @@ void Fire::draw(Matrix4 cam, Matrix4 proj)
 {
 	program_fire.enable();
 	glEnable(GL_TEXTURE_2D);
-	
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, tex_particle);
 	cam.loadTo(uniform_camera);

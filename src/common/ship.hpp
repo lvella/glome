@@ -8,15 +8,15 @@
 #include "protocol.hpp"
 #include "object.hpp"
 #include "mesh.hpp"
-#include "fire.hpp"
+#include "engine.hpp"
 
 class Ship: public Object
 {
 public:
-	Fire f;
   Ship(MeshTypes type = HUNTER);
   ~Ship();
   void draw(const Shader& s);
+  void draw(const Shader& s,Matrix4 cam, Matrix4 proj);
   void update();
   void load_guns(MeshTypes type, fpos_t gun_position_infile);
 
@@ -170,5 +170,6 @@ private:
   Mesh* mesh;
   Matrix4 r_canon, l_canon;
   uint16_t nguns;
+  Engine* engine;
 };
 

@@ -40,13 +40,12 @@ Ship::Ship(MeshTypes type):
     q(false),
     shot_count(0),
     rcanon_shot_last(false),
-    heat(0),
-    f(100)
+    heat(0)
 {
-	Fire::initialize();
   mesh = Mesh::get_mesh(type);
-  load_guns(type, mesh->position_file);
-  //TODO: create a class gun and engine
+  //TODO: create a class gun
+  load_guns(type, mesh->get_current_pos());
+  engine = new Engine(type, mesh->get_current_pos()); 
 
   //message.push_back(msg_id);
 
@@ -58,7 +57,8 @@ Ship::Ship(MeshTypes type):
 
   shot_speed = 0.02;
   shot_power = 82;
-  // max_canon_heat = ?; // TODO: Mathematical model for cooldown, that uses all heat parameters.
+  // max_canon_heat = ?; 
+  //TODO: Mathematical model for cooldown, that uses all heat parameters.
   canon_cooldown_rate = 7;
   cold_fire_rate = 15;
 }
@@ -80,6 +80,7 @@ Ship::load_guns(MeshTypes type, fpos_t gun_position_infile)
     std::stringstream dir;
     dir << DATA_DIR << "/art/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
+    /* Poiter file to gun position */
     fsetpos(fd, &gun_position_infile);
     assert(fd != NULL);
   }
@@ -95,6 +96,12 @@ Ship::load_guns(MeshTypes type, fpos_t gun_position_infile)
     ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
     assert (ret == 16);
   }
+
+  /* Update current pointer position of fd */
+  fpos_t cpos;
+  fgetpos(fd, &cpos);
+  mesh->set_current_pos(cpos);
+
   fclose(fd);
 }
 
@@ -104,6 +111,15 @@ Ship::draw(const Shader& s)
   s.setTransform(t);
   mesh->draw(s);
 }
+
+void
+Ship::draw(const Shader& s,Matrix4 cam, Matrix4 proj)
+{
+  s.setTransform(t);
+  mesh->draw(s);
+  engine->draw(cam,proj);
+}
+
 
 void 
 Ship::update()

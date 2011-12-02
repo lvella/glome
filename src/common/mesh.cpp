@@ -9,12 +9,13 @@
 using namespace std;
 
 static Mesh* mesh_list[MESH_COUNT] = {NULL};
+
 const char* mesh_filename[MESH_COUNT] =
-    {
-        "hunter",
-        "destroyer",
-        "ufo"
-    };
+  {
+    "hunter",
+    "destroyer",
+    "ufo"
+  };
 
 Mesh::~Mesh()
 {
@@ -72,10 +73,9 @@ Mesh::Mesh(MeshTypes type):
 
   len = ilen * 2;
 
-  // Get the file position indicator associated with stream to be used to load guns, engines, etc.
-  // Will be used in the new class Ship
-  fgetpos(fd, &position_file);
-
+  //get current position in fd
+  fgetpos(fd, &current_pos_instream);
+  
   fclose(fd);
 }
 

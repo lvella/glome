@@ -31,6 +31,7 @@ libcommon_a_SOURCES = \
 	textures.cpp \
 	particle_system.cpp \
 	fire.cpp \
+  engine.cpp \
 	sound.cpp \
 	source.cpp \
 	effect.cpp

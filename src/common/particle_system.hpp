@@ -10,14 +10,14 @@
 
 class ParticleSystem : public Object
 {
-	public:
+public:
 	ParticleSystem(int np);
 	ParticleSystem(){}
-	~ParticleSystem(){}
+  virtual	~ParticleSystem() = 0;
 	void draw(Matrix4 camera, Matrix4 projection);
 	void draw(const Shader& cam);
 	static void initialize();
-	protected:
+protected:
 	struct Particle
 	{
 		bool active;	/* Particle is alive or not */
