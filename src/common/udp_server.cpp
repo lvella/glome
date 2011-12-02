@@ -7,7 +7,7 @@
 #include "client.hpp"
 #include "net_world.hpp"
 #include "protocol.hpp"
-#include "../sdl/net_input.hpp"
+#include "net_input.hpp"
 #include "game.hpp"
 
 #include "udp_server.hpp"

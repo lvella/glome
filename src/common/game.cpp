@@ -1,4 +1,4 @@
-//#include "../sdl/menu.hpp"
+//#include "menu.hpp"
 #include "options.hpp"
 #include "meridian.hpp"
 #include "split_world.hpp"
