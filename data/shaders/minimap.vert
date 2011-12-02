@@ -40,4 +40,5 @@ void main()
   v_color = mix(pale_color, color, (v.z + 1.0) * 0.5);
 
   gl_Position = vec4(v.xy, -v.z, 1.0);
+  gl_PointSize = 1.0;
 }
