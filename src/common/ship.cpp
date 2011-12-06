@@ -110,6 +110,7 @@ Ship::draw(const Shader& s)
 {
   s.setTransform(t);
   mesh->draw(s);
+	assert(3 == 4);
 }
 
 void

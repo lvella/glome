@@ -1,3 +1,5 @@
+#include "fire.hpp"
+
 #include "particle_system.hpp"
 
 static Shader program_particle_system;
@@ -11,9 +13,7 @@ ParticleSystem::ParticleSystem(int np):
 ParticleSystem::~ParticleSystem()
 {}
 
-void
-ParticleSystem::draw(Matrix4 camera, Matrix4 projection)
-{}
-
 void ParticleSystem::initialize()
-{}
+{
+	Fire::initialize();
+}

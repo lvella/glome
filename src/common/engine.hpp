@@ -9,7 +9,6 @@
 class Engine: public Object
 {
 public:
-  Engine();
   Engine(MeshTypes type, fpos_t engine_position_infile);
   ~Engine();
   void draw(const Shader& cam);

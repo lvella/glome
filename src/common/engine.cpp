@@ -6,18 +6,16 @@
 
 extern const char* mesh_filename[MESH_COUNT];
 
-Engine::Engine()
-{}
-
 Engine::Engine(MeshTypes type, fpos_t engine_position_infile)
 {
   load_position(type, engine_position_infile);
-  FX_engine = new Fire(100,velocity);
-  Fire::initialize();
+  FX_engine = new Fire(100, velocity);
 }
 
 Engine::~Engine()
-{}
+{
+	delete FX_engine;
+}
 
 //TODO: make load_origin_matrix generic to get engine position
 void 

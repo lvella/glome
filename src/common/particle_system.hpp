@@ -13,8 +13,9 @@ class ParticleSystem : public Object
 public:
 	ParticleSystem(int np);
 	ParticleSystem(){}
-  virtual	~ParticleSystem() = 0;
-	void draw(Matrix4 camera, Matrix4 projection);
+	virtual	~ParticleSystem() = 0;
+
+	virtual void draw(Matrix4 camera, Matrix4 projection) = 0;
 	void draw(const Shader& cam);
 	static void initialize();
 protected:
