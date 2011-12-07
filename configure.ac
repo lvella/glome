@@ -63,7 +63,7 @@ AX_CHECK_BLENDER([2.59])
 
 AC_CONFIG_FILES([
 	Makefile
-	data/art/Makefile
+	data/models/Makefile
 	src/Makefile
 	src/common/Makefile
 	src/sdl/Makefile

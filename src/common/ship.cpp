@@ -78,7 +78,7 @@ Ship::load_guns(MeshTypes type, fpos_t gun_position_infile)
   // Load .gun file
   {
     std::stringstream dir;
-    dir << DATA_DIR << "/art/" << name << ".wire";
+    dir << DATA_DIR << "/models/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
     /* Poiter file to gun position */
     fsetpos(fd, &gun_position_infile);

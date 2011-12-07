@@ -37,7 +37,7 @@ Mesh::Mesh(MeshTypes type):
   // Load mesh file and put it into the list of meshs if was not exist
   {
     std::stringstream dir;
-    dir << DATA_DIR << "/art/" << name << ".wire";
+    dir << DATA_DIR << "/models/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
     assert(fd != NULL);
   }

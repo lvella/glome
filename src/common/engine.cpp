@@ -30,7 +30,7 @@ Engine::load_position(MeshTypes type, fpos_t pos_infile)
   // Load .gun file
   {
     std::stringstream dir;
-    dir << DATA_DIR << "/art/" << name << ".wire";
+    dir << DATA_DIR << "/models/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
     /* Poiter file to engine position */
     fsetpos(fd, &pos_infile);
