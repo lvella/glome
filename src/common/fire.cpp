@@ -17,8 +17,8 @@ Fire::Fire(int number_of_particles, Matrix4 velocity):
 		particle_vector[i].fade = 1;
 		particle_vector[i].size = 100;
 		particle_vector[i].color = Vector4(1,1,1,0.5);
-		particle_vector[i].position = t.position();
-		particle_vector[i].velocity = velocity;
+		particle_vector[i].position = Vector4::CANONICAL;//t.position();
+		particle_vector[i].velocity = Matrix4::IDENTITY;//velocity;
 	}
 }
 
@@ -42,7 +42,9 @@ void Fire::initialize()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(shape), shape, GL_STATIC_DRAW);
 
+	// Without this in GLES
 	glEnable(GL_PROGRAM_POINT_SIZE);
+	glEnable(GL_POINT_SPRITE);
 }
 
 void Fire::ParticleSystem::draw(const Shader& cam)
@@ -52,12 +54,9 @@ void Fire::ParticleSystem::draw(const Shader& cam)
 void Fire::draw(Matrix4 cam, Matrix4 proj)
 {
 	program_fire.enable();
-
-  // Blend particles
-  glEnable(GL_BLEND);
-  glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-  // Bind the texture
-	glActiveTexture(GL_TEXTURE0);
+	
+  glActiveTexture(GL_TEXTURE0);
+	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex_particle);
 	glEnable(GL_TEXTURE_2D);
 
@@ -77,5 +76,6 @@ void Fire::draw(Matrix4 cam, Matrix4 proj)
 			glDrawArrays(GL_POINTS, 0, 1);
 		}
 	}
+	glDisable(GL_TEXTURE_2D);
 }
 

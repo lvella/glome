@@ -1,3 +1,5 @@
+#version 120
+
 uniform sampler2D texbase;
 uniform bool has_tex;
 
