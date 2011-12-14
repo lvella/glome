@@ -2,16 +2,6 @@
 
 #include "vector4.hpp"
 
-struct ship_engine
-{
-	float max_rot_per_frame; /* Maximum turning delta per frame */
-	float max_speed_forward;
-	float max_accel_forward;
-	float max_speed_vertical;
-	float max_speed_horizontal;
-	float max_speed_spin;
-};
-
 struct ship_gun
 {
 	float shot_speed; /* Speed of shot relative to the ship */
@@ -24,9 +14,13 @@ struct ship_gun
 class ship_controller
 {
 public:
-	ship_controller(ship_engine& engine, int nguns, ship_gun& gunl, ship_gun& gunr);
+	ship_controller();
 
 	void update(Matrix4& t);
+
+	inline void set_engine(Engine* pEng) { engine = pEng; }
+
+	inline void set_guns(ship_gun* pL, ship_fun* pR) { gun_l = pL; gun_r = pR; }
 
 	inline void rotate(float rx, float ry)
 	{
@@ -60,7 +54,7 @@ public:
 	}
 
 private:
-	ship_engine* engine;
+	Engine* engine;
 	int nguns;
 	ship_gun* gun_l;
 	ship_gun* gun_r;
