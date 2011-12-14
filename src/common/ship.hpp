@@ -3,8 +3,6 @@
 #include "mesh.hpp"
 #include "ship_controller.hpp"
 
-class ship_controller;
-
 class ship : public updatable, public drawable
 {
 public:

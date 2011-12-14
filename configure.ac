@@ -61,26 +61,29 @@ AC_SUBST(GUICHAN_LIBS)
 # Check for Blender
 AX_CHECK_BLENDER([2.59])
 
-# Check for xxd
-AC_PATH_PROG([XXD], [xxd], , [$PATH])
-
 AC_CONFIG_FILES([
 	Makefile
-	data/Makefile
+	data/art/Makefile
 	src/Makefile
 	src/common/Makefile
 	src/sdl/Makefile
 ])
 AC_OUTPUT
 
-echo \
-"-------------------------------------------------
+echo ["\
+-------------------------------------------------
 
  ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
 
  Prefix: '${prefix}'.
  Compiler: '${CC} ${CFLAGS} ${CPPFLAGS}'
- Libraries: '${LIBS}'
-
- Now type 'make'
---------------------------------------------------"
+ Libraries: '${SDL_LIBS} ${SDL_IMAGE_LIBS} ${GUICHAN_LIBS} ${OPENGL_LIBS} ${BOOST_LIBS}'
+"]
+if test "$BLENDER" != ""; then
+echo ["
+ Blender : '${BLENDER}'
+"]
+fi
+echo ["\
+--------------------------------------------------
+"]

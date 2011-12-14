@@ -1,4 +1,4 @@
-//#include "../sdl/menu.hpp"
+//#include "menu.hpp"
 #include "options.hpp"
 #include "meridian.hpp"
 #include "split_world.hpp"
@@ -6,6 +6,7 @@
 #include "udp_server.hpp"
 #include "minimap.hpp"
 #include "projectile.hpp"
+#include "particle_system.hpp"
 
 #include "game.hpp"
 
@@ -49,6 +50,7 @@ namespace Game
 
 		MiniMap::initialize();
 		Projectile::initialize();
+		ParticleSystem::initialize();
 		//Menu::initialize();
 		initialize_meridians();
 	}

@@ -1,4 +1,3 @@
-#include <stdio.h>
 #include <GL/glew.h>
 #include <iostream>
 #include <sstream>
@@ -10,12 +9,13 @@
 using namespace std;
 
 static Mesh* mesh_list[MESH_COUNT] = {NULL};
+
 const char* mesh_filename[MESH_COUNT] =
-    {
-        "hunter",
-        "destroyer",
-        "ufo"
-    };
+  {
+    "hunter",
+    "destroyer",
+    "ufo"
+  };
 
 Mesh::~Mesh()
 {
@@ -25,7 +25,7 @@ Mesh::~Mesh()
 Mesh::Mesh(MeshTypes type):
   ref_count(1)
 {
-	uint16_t ilen, vlen;
+  uint16_t ilen, vlen;
 
   int ret;
   FILE *fd;
@@ -37,7 +37,7 @@ Mesh::Mesh(MeshTypes type):
   // Load mesh file and put it into the list of meshs if was not exist
   {
     std::stringstream dir;
-    dir << DATA_DIR << "/" << name << ".wire";
+    dir << DATA_DIR << "/art/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
     assert(fd != NULL);
   }
@@ -73,6 +73,9 @@ Mesh::Mesh(MeshTypes type):
 
   len = ilen * 2;
 
+  //get current position in fd
+  fgetpos(fd, &current_pos_instream);
+  
   fclose(fd);
 }
 
