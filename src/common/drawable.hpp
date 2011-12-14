@@ -3,7 +3,7 @@
 #include "matrix4.hpp"
 #include "shader.hpp"
 
-class drawable : public object
+class drawable : virtual public object
 {
 public:
 	drawable() {}

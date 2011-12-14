@@ -1,13 +1,9 @@
 #include "gl.hpp"
-#include "shader.hpp"
 #include "world.hpp"
 
-
-void World::initialize()
+void world::initialize()
 {
-
-const char *sources[] = { "world.vert", "world.frag", "no_texture.frag", NULL };
-
+	const char *sources[] = { "world.vert", "world.frag", "no_texture.frag", NULL };
 
 	shader.setup_shader(sources);
 
@@ -15,10 +11,8 @@ const char *sources[] = { "world.vert", "world.frag", "no_texture.frag", NULL };
 	shader_uniform_camera = glGetUniformLocation(shader.program(), "camera");
 }
 
-World::~World()
-{}
-
-void World::setup_display()
+void
+world::setup_display()
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_LINE_SMOOTH);
@@ -34,3 +28,4 @@ void World::setup_display()
 Shader World::shader;
 GLint World::shader_uniform_camera;
 GLint World::shader_uniform_projection;
+

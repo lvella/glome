@@ -30,22 +30,22 @@ public:
 
 	inline void move_v(float y)
 	{
-		speed_v = y * engine.max_speed_vertical;
+		speed_v = y * engine->max_speed_vertical;
 	}
 
 	inline void move_h(float x)
 	{
-		speed_h = x * engine.max_speed_horizontal;
+		speed_h = x * engine->max_speed_horizontal;
 	}
 
 	inline void move(float a)
 	{
-		accel = a * engine.max_accel_forward;
+		accel = a * engine->max_accel_forward;
 	}
 
 	inline void move_s(float a)
 	{
-		speed_s = a * engine.max_speed_spin;
+		speed_s = a * engine->max_speed_spin;
 	}
 
 	inline void shot(bool s)
@@ -70,6 +70,5 @@ private:
 	float v_tilt, h_tilt;
 	float accel;
 	float speed, speed_v, speed_h, speed_s;
-
 };
 

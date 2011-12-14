@@ -1,6 +1,8 @@
 #pragma once
 
-class updatable
+#include "object.hpp"
+
+class updatable : virtual public object
 {
 public:
 	virtual void update() = 0;

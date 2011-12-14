@@ -1,12 +1,12 @@
 #pragma once
 
-#include <stdio.h>
+#include <cstdio>
 
-#include "object.hpp"
+#include "drawable.hpp"
 #include "mesh.hpp"
 #include "particle_system.hpp"
 
-class Engine: public Object
+class Engine: public drawable
 {
 public:
 	Engine(MeshTypes type, fpos_t engine_position_infile);
@@ -20,6 +20,7 @@ private:
 	Matrix4 velocity;
 	uint16_t nengines;
 
+public:
 	float max_rot_per_frame; /* Maximum turning delta per frame */
 	float max_speed_forward;
 	float max_accel_forward;

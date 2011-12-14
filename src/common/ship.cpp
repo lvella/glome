@@ -28,6 +28,7 @@ ship::ship(MeshTypes type):
 	mesh = Mesh::get_mesh(type);
 	load_guns(type, mesh->get_current_pos());
 	engine = new Engine(type, mesh->get_current_pos(), 0.03, 0.0015, 0.0015, 0.0004, 0.0004, 0.02);
+	ctrl = NULL;
 
 	gun_l.shot_speed = gun_r.shot_speed = 0.02;
 	gun_l.shot_power = gun_r.shot_power = 82;
@@ -78,18 +79,17 @@ ship::draw(const Shader& s)
 {
 	s.setTransform(t);
 	mesh->draw(s);
-	assert(3 == 4);
 }
 
 void
-ship::draw(const Shader& s,Matrix4 cam, Matrix4 proj)
+ship::draw(const Shader& s, Matrix4 cam, Matrix4 proj)
 {
 	s.setTransform(t);
 	mesh->draw(s);
 	engine->draw(cam,proj);
 }
 
-void 
+void
 ship::update()
 {
 	ctrl->update(_t);

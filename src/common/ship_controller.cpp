@@ -3,11 +3,7 @@
 
 #include "ship_controller.hpp"
 
-ship_controller::ship_controller(ship_engine& eng, int guns, ship_gun& gunl, ship_gun& gunr):
-	engine(eng),
-	nguns(guns),
-	gun_l(gunl),
-	gun_r(gunr)
+ship_controller::ship_controller():
 {
 }
 
@@ -19,29 +15,29 @@ ship_controller::update(Matrix4& t)
 	float v = v_tilt - v_req;
 
 	/* Limit the turning speed to MAXD rads per frame. */
-	if(h > engine.max_rot_per_frame)
-		h = engine.max_rot_per_frame;
-	else if(h < -engine.max_rot_per_frame)
-		h = -engine.max_rot_per_frame;
-	if(v > engine.max_rot_per_frame)
-		v = engine.max_rot_per_frame;
-	else if(v < -engine.max_rot_per_frame)
-		v = -engine.max_rot_per_frame;
+	if(h > engine->max_rot_per_frame)
+		h = engine->max_rot_per_frame;
+	else if(h < -engine->max_rot_per_frame)
+		h = -engine->max_rot_per_frame;
+	if(v > engine->max_rot_per_frame)
+		v = engine->max_rot_per_frame;
+	else if(v < -engine->max_rot_per_frame)
+		v = -engine->max_rot_per_frame;
 
 	h_tilt -= h;
 	v_tilt -= v;
 
 	speed += accel;
-	if(speed > engine.max_speed_forward)
-		speed = engine.max_speed_forward;
-	else if(speed < -engine.max_speed_forward)
-	speed = -engine.max_speed_forward;
+	if(speed > engine->max_speed_forward)
+		speed = engine->max_speed_forward;
+	else if(speed < -engine->max_speed_forward)
+	speed = -engine->max_speed_forward;
 
 	/* Shooting */
 	if(heat > 0)
-		heat -= gun.canon_cooldown_rate; // Cooldown rate
+		heat -= gun_l.canon_cooldown_rate; // Cooldown rate
 
-	int sps = (gun.cold_fire_rate * 100 - heat) / 100; // Firerate at maximum
+	int sps = (gun_l.cold_fire_rate * 100 - heat) / 100; // Firerate at maximum
 
 	shot_count -= sps;
 	if(shot_count < 0)
