@@ -3,26 +3,18 @@
 #include "matrix4.hpp"
 #include "shader.hpp"
 
-class Object
+class object
 {
 public:
-  Object(const Matrix4& init = Matrix4::IDENTITY):
-    t(init)
-  {}
-  virtual ~Object() = 0;
+	object(const Matrix4& init = Matrix4::IDENTITY): _t(init) {}
 
-  virtual void draw(const Shader& cam) = 0;
+	virtual ~object() = 0;
 
-  const Matrix4& transformation() const
-  {
-    return t;
-  }
+	const Matrix4 transformation() const { return _t; }
 
-  void setTransformation(const Matrix4& ref)
-  {
-    t = ref;
-  }
+	void set_transformation(const Matrix4& ref) { _t = ref; }
 
 protected:
-  Matrix4 t;
+	Matrix4 _t;
 };
+

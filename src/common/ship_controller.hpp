@@ -2,7 +2,7 @@
 
 #include "vector4.hpp"
 
-struct _ship_engine
+struct ship_engine
 {
 	float max_rot_per_frame; /* Maximum turning delta per frame */
 	float max_speed_forward;
@@ -12,9 +12,7 @@ struct _ship_engine
 	float max_speed_spin;
 };
 
-typedef struct _ship_engine ship_engine;
-
-struct _ship_gun
+struct ship_gun
 {
 	float shot_speed; /* Speed of shot relative to the ship */
 	int shot_power; /* Damage done and heat generated */
@@ -22,8 +20,6 @@ struct _ship_gun
 	int canon_cooldown_rate; /* Heat cooldown per frame */
 	int cold_fire_rate; /* Shots per second when cold */
 };
-
-typedef struct _ship_gun ship_gun;
 
 class ship_controller
 {
@@ -64,10 +60,10 @@ public:
 	}
 
 private:
-	ship_engine& engine;
+	ship_engine* engine;
 	int nguns;
-	ship_gun& gun_l;
-	ship_gun& gun_r;
+	ship_gun* gun_l;
+	ship_gun* gun_r;
 
 	/** Shot */
 	int shot_count;
