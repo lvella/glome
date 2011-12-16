@@ -276,4 +276,4 @@ if __name__ == "__main__":
   ss = SpaceShip(objs, listAllScenes)
   ss.create_header()
   ss.export()
-  ss.read()
+#  ss.read()
