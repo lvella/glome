@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdio.h>
-
 #include "object.hpp"
 #include "mesh.hpp"
 #include "particle_system.hpp"
@@ -9,11 +7,11 @@
 class Engine: public Object
 {
 public:
-  Engine(MeshTypes type, fpos_t engine_position_infile);
+  Engine(MeshTypes type);
   ~Engine();
   void draw(const Shader& cam);
   void draw(Matrix4 cam, Matrix4 proj);
-  void load_position(MeshTypes type, fpos_t pos_infile);
+  void load_location(MeshTypes type);
 
 private:
   ParticleSystem* FX_engine;

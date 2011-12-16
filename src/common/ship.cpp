@@ -44,8 +44,8 @@ Ship::Ship(MeshTypes type):
 {
   mesh = Mesh::get_mesh(type);
   //TODO: create a class gun
-  load_guns(type, mesh->get_current_pos());
-  engine = new Engine(type, mesh->get_current_pos()); 
+  load_guns(type);
+  engine = new Engine(type); 
 
   //message.push_back(msg_id);
 
@@ -69,20 +69,23 @@ Ship::~Ship()
 }
 
 void 
-Ship::load_guns(MeshTypes type, fpos_t gun_position_infile)
+Ship::load_guns(MeshTypes type)
 {
   int ret;
   FILE *fd;
 
   const char* name = mesh_filename[int(type)];
-  // Load .gun file
   {
+	  unsigned int gun_pos;
     std::stringstream dir;
     dir << DATA_DIR << "/models/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
-    /* Poiter file to gun position */
-    fsetpos(fd, &gun_position_infile);
-    assert(fd != NULL);
+    /* Read header of file */
+		fseek(fd, 4, SEEK_SET);
+		fread(&gun_pos, sizeof(unsigned int), 1, fd);
+		/* Poiter file to gun position */
+    fseek(fd, gun_pos, SEEK_SET);
+		assert(fd != NULL);
   }
 
   {
@@ -96,12 +99,6 @@ Ship::load_guns(MeshTypes type, fpos_t gun_position_infile)
     ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
     assert (ret == 16);
   }
-
-  /* Update current pointer position of fd */
-  fpos_t cpos;
-  fgetpos(fd, &cpos);
-  mesh->set_current_pos(cpos);
-
   fclose(fd);
 }
 
@@ -110,7 +107,6 @@ Ship::draw(const Shader& s)
 {
   s.setTransform(t);
   mesh->draw(s);
-	assert(3 == 4);
 }
 
 void

@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <sstream>
 
 #include "engine.hpp"
@@ -6,9 +7,9 @@
 
 extern const char* mesh_filename[MESH_COUNT];
 
-Engine::Engine(MeshTypes type, fpos_t engine_position_infile)
+Engine::Engine(MeshTypes type)
 {
-  load_position(type, engine_position_infile);
+  load_location(type);
   FX_engine = new Fire(100, velocity);
 }
 
@@ -17,9 +18,8 @@ Engine::~Engine()
 	delete FX_engine;
 }
 
-//TODO: make load_origin_matrix generic to get engine position
 void 
-Engine::load_position(MeshTypes type, fpos_t pos_infile)
+Engine::load_location(MeshTypes type)
 {
   int ret;
   FILE *fd;
@@ -27,11 +27,15 @@ Engine::load_position(MeshTypes type, fpos_t pos_infile)
   const char* name = mesh_filename[int(type)];
   // Load .gun file
   {
+		unsigned int engine_pos;
     std::stringstream dir;
     dir << DATA_DIR << "/models/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
-    /* Poiter file to engine position */
-    fsetpos(fd, &pos_infile);
+    /* Read header of file */
+		fseek(fd, 8, SEEK_SET);
+		fread(&engine_pos, sizeof(unsigned int), 1, fd);
+		/* Poiter file to engine position */
+    fseek(fd, engine_pos, SEEK_SET);
     assert(fd != NULL);
   }
 

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <stdio.h>
+#include <cstdio>
 
 #include <cstring>
 #include <vector>
@@ -18,7 +18,7 @@ public:
   void draw(const Shader& s);
   void draw(const Shader& s,Matrix4 cam, Matrix4 proj);
   void update();
-  void load_guns(MeshTypes type, fpos_t gun_position_infile);
+  void load_guns(MeshTypes type);
 
   inline void rotate(float rx, float ry)
   {
