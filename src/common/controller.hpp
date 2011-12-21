@@ -7,6 +7,7 @@
 class controller : public updatable
 {
 public:
+	virtual void update();
 	controller(std::vector<ship*>* pp);
 
 protected:
