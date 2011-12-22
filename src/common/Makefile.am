@@ -35,5 +35,4 @@ libcommon_a_SOURCES = \
 	spaghetti.cpp \
 	textures.cpp \
 	vector4.cpp \
-	world.cpp \
 	world_dummy.cpp

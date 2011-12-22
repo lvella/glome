@@ -13,6 +13,9 @@
 
 #include "ship.hpp"
 
+#include <iostream>
+using namespace std;
+
 extern const char* mesh_filename[MESH_COUNT];
 
 void
@@ -86,12 +89,13 @@ Ship::draw(const Shader& s, Matrix4 cam, Matrix4 proj)
 {
 	s.setTransform(_t);
 	mesh->draw(s);
-	engine->draw(cam, proj);
+	//engine->draw(cam, proj);
 }
 
 void
 Ship::update()
 {
-	ctrl->update(_t);
+	if(ctrl != NULL)
+		ctrl->update(_t);
 }
 
