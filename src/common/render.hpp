@@ -16,7 +16,7 @@ public:
 	Render(std::vector<Ship*>* pp);
 
 protected:
-	std::vectorSship*>* players;
+	std::vector<Ship*>* players;
 
 	std::deque<Matrix4> cam_hist;
 	Vector4 cam_pos;

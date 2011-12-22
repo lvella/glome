@@ -67,17 +67,17 @@ MiniMap::draw(int wstart, render* rend, const Matrix4& center)
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	// Draw objects
-  map_projection.enable();
-  Matrix4 cam = yz_matrix(M_PI / 2) * center;
-  cam.loadTo(uniform_camera);
-  map_projection.setTransform(Matrix4::IDENTITY);
+	map_projection.enable();
+	Matrix4 cam = yz_matrix(M_PI / 2) * center;
+	cam.loadTo(uniform_camera);
+	map_projection.setTransform(Matrix4::IDENTITY);
 
-  // Draw shots
-  glUniform1i(proj_has_tex, 0);
-  Projectile::draw_in_minimap();
+	// Draw shots
+	glUniform1i(proj_has_tex, 0);
+	Projectile::draw_in_minimap();
 
-  // Draw meridians
-  draw_meridians(map_projection);
+	// Draw meridians
+	draw_meridians(map_projection);
 
 	// Draw map object
 	glUniform1i(proj_has_tex, 1);
@@ -111,41 +111,40 @@ MiniMap::initialize()
 	{
 		glGenBuffers(1, &vbo);
 
-	  // Coordinates of the lines representing the field of vision
-	  const float cx = 0.0f;
-	  const float cy = 0.0f;
+		// Coordinates of the lines representing the field of vision
+		const float cx = 0.0f;
+		const float cy = 0.0f;
 
-	  const float dx = 0.5f * width * sinf(FOV) / height;
+		const float dx = 0.5f * width * sinf(FOV) / height;
 
-	  const float ppx0 = cx - dx;
-	  const float ppy = cy + cosf(asinf(dx));
-	  const float ppx1 = cx + dx;
+		const float ppx0 = cx - dx;
+		const float ppy = cy + cosf(asinf(dx));
+		const float ppx1 = cx + dx;
 
-	  // Scale of the little arrow in the middle of the minimap
+		// Scale of the little arrow in the middle of the minimap
 		const float a = 0.07f;
 
 		const float v[] = {
-				// Position 0: square
-				-1.0f, -1.0f,
-				1.0f, -1.0f,
-				-1.0f, 1.0f,
-				1.0f, 1.0f,
+			// Position 0: square
+			-1.0f, -1.0f,
+			1.0f, -1.0f,
+			-1.0f, 1.0f,
+			1.0f, 1.0f,
 
-				// Position 8: ship arrow
-				0, a,
-				a, -a,
-				0, (-a * 0.5f),
-				-a, -a,
+			// Position 8: ship arrow
+			0, a,
+			a, -a,
+			0, (-a * 0.5f),
+			-a, -a,
 
-				// Position 16: FOV
-				ppx0, ppy,
-				cy, cy,
-				ppx1, ppy
+			// Position 16: FOV
+			ppx0, ppy,
+			cy, cy,
+			ppx1, ppy
 		};
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 	}
-
 
 	map_projection.setup_shader(sources);
 

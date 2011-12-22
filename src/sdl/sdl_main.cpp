@@ -115,7 +115,7 @@ static void main_loop()
 	start = ticks = SDL_GetTicks();
 	while(running) 
 	{
-		running = Input::handle();
+		//running = Input::handle();
 		Game::frame();
 		SDL_GL_SwapBuffers();
 		// Fix framerate
@@ -149,3 +149,4 @@ int main(int argc, char **argv)
 
 	main_loop();
 }
+

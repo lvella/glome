@@ -8,30 +8,33 @@ INCLUDES = \
 noinst_LIBRARIES = libcommon.a
 
 libcommon_a_SOURCES = \
-	math.cpp \
-	meridian.cpp \
-	matrix4.cpp \
-	projectile.cpp \
-	shader.cpp \
-	object.cpp \
-	minimap.cpp \
-	mesh.cpp \
-	ship.cpp \
-	client.cpp \
-	randomcube.cpp \
-	spaghetti.cpp \
-	options.cpp \
-	game.cpp \
-	vector4.cpp \
-	world.cpp \
-	split_world.cpp \
-	net_world.cpp \
-	udp_server.cpp \
-	shader.cpp \
-	textures.cpp \
-	particle_system.cpp \
+	controller.cpp \
+	controller_local.cpp \
+	controller_remote.cpp \
+	effect.cpp \
+	engine.cpp \
 	fire.cpp \
-  engine.cpp \
+	game.cpp \
+	math.cpp \
+	matrix4.cpp \
+	meridian.cpp \
+	mesh.cpp \
+	minimap.cpp \
+	object.cpp \
+	options.cpp \
+	particle_system.cpp \
+	projectile.cpp \
+	randomcube.cpp \
+	render.cpp \
+	shader.cpp \
+	ship_ai.cpp \
+	ship_controller.cpp \
+	ship.cpp \
 	sound.cpp \
 	source.cpp \
-	effect.cpp
+	spaghetti.cpp \
+	textures.cpp \
+	udp_comm.cpp \
+	vector4.cpp \
+	world.cpp \
+	world_dummy.cpp

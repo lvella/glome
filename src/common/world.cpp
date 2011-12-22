@@ -2,7 +2,7 @@
 #include "world.hpp"
 
 void
-world::initialize()
+World::initialize()
 {
 	const char *sources[] = { "world.vert", "world.frag", "no_texture.frag", NULL };
 
