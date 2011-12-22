@@ -11,16 +11,16 @@ struct ship_gun
 	int cold_fire_rate; /* Shots per second when cold */
 };
 
-class ship_controller
+class ShipController
 {
 public:
-	ship_controller();
+	ShipController();
 
 	void update(Matrix4& t);
 
 	inline void set_engine(Engine* pEng) { engine = pEng; }
 
-	inline void set_guns(ship_gun* pL, ship_fun* pR) { gun_l = pL; gun_r = pR; }
+	inline void set_guns(ship_gun* pL, ship_gun* pR) { gun_l = pL; gun_r = pR; }
 
 	inline void rotate(float rx, float ry)
 	{

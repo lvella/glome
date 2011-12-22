@@ -3,12 +3,12 @@
 #include "matrix4.hpp"
 #include "shader.hpp"
 
-class object
+class Object
 {
 public:
-	object(const Matrix4& init = Matrix4::IDENTITY): _t(init) {}
+	Object(const Matrix4& init = Matrix4::IDENTITY): _t(init) {}
 
-	virtual ~object() = 0;
+	virtual ~Object() = 0;
 
 	const Matrix4 transformation() const { return _t; }
 

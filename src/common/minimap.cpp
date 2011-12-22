@@ -10,7 +10,7 @@
 #include "ship.hpp"
 #include "shader.hpp"
 #include "meridian.hpp"
-#include "world.hpp"
+#include "render.hpp"
 #include "options.hpp"
 #include "textures.hpp"
 #include "minimap.hpp"
@@ -31,8 +31,8 @@ static GLint hud_has_tex;
 static GLuint vbo;
 
 void
-MiniMap::draw(int wstart, World* world, const Matrix4& center)
-	{
+MiniMap::draw(int wstart, render* rend, const Matrix4& center)
+{
 	const int t = 160;
 	const int b = 10;
 	const int l = 10;
@@ -82,7 +82,7 @@ MiniMap::draw(int wstart, World* world, const Matrix4& center)
 	// Draw map object
 	glUniform1i(proj_has_tex, 1);
 	glBindTexture(GL_TEXTURE_2D, tex_object);
-	world->fill_minimap();
+	render->fill_minimap();
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Disable 2D
@@ -94,8 +94,8 @@ void MiniMap::draw_dot(const Object& obj)
 	map_projection.setTransform(obj.transformation());
 
 	glVertexAttrib3f(map_projection.colorAttr(), 1.0f, 0.0f, 0.0f);
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glVertexAttribPointer(map_projection.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glVertexAttribPointer(map_projection.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 

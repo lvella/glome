@@ -4,9 +4,9 @@
 
 #include "world_remote.hpp"
 
-class world_remote : public world_local
+class WorldRemote : public WorldLocal
 {
 protected:
-	std::unordered_map<ship*> remote_players;
+	std::unordered_map<Ship*> remote_players;
 };
 

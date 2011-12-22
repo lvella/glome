@@ -2,7 +2,7 @@
 
 #include "object.hpp"
 
-class updatable : virtual public object
+class Updatable : virtual public Object
 {
 public:
 	virtual void update() = 0;

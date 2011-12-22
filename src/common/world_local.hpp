@@ -5,9 +5,9 @@
 #include "world.hpp"
 #include "ship_ai.hpp"
 
-class world_local : public world
+class WorldLocal : public World
 {
 protected:
-	std::vector<ship_ai*> bots;
+	std::vector<ShipAI*> bots;
 };
 

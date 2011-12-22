@@ -3,12 +3,12 @@
 #include "matrix4.hpp"
 #include "shader.hpp"
 
-class drawable : virtual public object
+class Drawable : virtual public Object
 {
 public:
-	drawable() {}
+	Drawable() {}
 
-	virtual ~drawable() = 0;
+	virtual ~Drawable() = 0;
 
 	virtual void draw(const Shader& cam) = 0;
 

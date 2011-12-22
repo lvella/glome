@@ -4,13 +4,13 @@
 
 #include "ship.hpp"
 
-class controller : public updatable
+class Controller : public Updatable
 {
 public:
 	virtual void update();
-	controller(std::vector<ship*>* pp);
+	Controller(std::vector<Ship*>* pp);
 
 protected:
-	std::vector<ship*>* players;
+	std::vector<Ship*>* players;
 };
 

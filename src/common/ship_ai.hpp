@@ -1,6 +1,6 @@
 #pragma once
 
-class ship_ai : ship
+class ShipAI : Ship
 {
 public:
 	void act();

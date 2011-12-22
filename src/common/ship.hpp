@@ -4,7 +4,7 @@
 #include "mesh.hpp"
 #include "ship_controller.hpp"
 
-class ship : public updatable, public drawable
+class Ship : public Updatable, public Drawable
 {
 public:
 	Ship(MeshTypes type = HUNTER);
@@ -17,7 +17,7 @@ public:
 
 protected:
 	Mesh* mesh;
-	ship_controller* ctrl;
+	ShipController* ctrl;
 	Matrix4 r_canon, l_canon;
 	ship_gun gun_l;
 	ship_gun gun_r;

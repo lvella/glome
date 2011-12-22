@@ -2,13 +2,13 @@
 
 #include "controller_local.hpp"
 
-class controller_remote : public controller_local
+class ControllerRemote : public ControllerLocal
 {
 public:
 	void update();
-	controller_remote(std::vector<ship*> pp, std::unordered_map<ship*>* prp);
+	ControllerRemote(std::vector<Ship*> pp, std::unordered_map<Ship*>* prp);
 
 protected:
-	std::unordered_map<ship*>* remote_players;
+	std::unordered_map<Ship*>* remote_players;
 };
 

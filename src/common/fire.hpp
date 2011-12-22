@@ -14,6 +14,3 @@ public:
 	static void initialize();
 };
 
-
-
-

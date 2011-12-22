@@ -5,14 +5,14 @@
 #include "controller.hpp"
 #include "ship_ai.hpp"
 
-class controller_local : public controller
+class ControllerLocal : public Controller
 {
 public:
 	virtual void update();
-	controller_local(std::vector<ship*>* pp, std::vector<ship_ai*>* pvb);
+	ControllerLocal(std::vector<Ship*>* pp, std::vector<ShipAI*>* pvb);
 
 protected:
-	std::vector<ship_ai*>* bots;
+	std::vector<ShipAI*>* bots;
 
 public:
 	/** Events callbacks */
