@@ -3,7 +3,6 @@
 #include "options.hpp"
 #include "meridian.hpp"
 #include "minimap.hpp"
-#include "randomcube.hpp"
 
 using namespace std;
 using namespace Options;
@@ -62,7 +61,7 @@ Render::draw()
 	camera.loadTo(shader_uniform_camera);
 
 	draw_meridians(shader);
-	//cube.draw(shader);
+	cube.draw(shader);
 	spg.draw(shader);
 
 	for(size_t i = 0; i < players->size(); ++i)
@@ -71,13 +70,13 @@ Render::draw()
 	}
 
 	//Projectile::draw_all(p, camera);
-	//MiniMap::draw(0, this, center);
+	MiniMap::draw(0, this, center);
 }
 	
 void
 Render::fill_minimap()
 {
-	//MiniMap::draw_dot(cube);
+	MiniMap::draw_dot(cube);
 	for(size_t i = 1; i < players->size(); ++i)
 		MiniMap::draw_dot(*(players->at(i)));
 }
