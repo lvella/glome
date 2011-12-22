@@ -10,7 +10,7 @@ public:
 	Controller() {}
 	virtual ~Controller() {};
 
-	virtual void update();
+	virtual void update() = 0;
 	Controller(std::vector<Ship*>* pp);
 
 protected:

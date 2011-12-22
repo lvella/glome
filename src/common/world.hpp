@@ -8,11 +8,14 @@
 class World
 {
 public:
+	World() {};
+	virtual ~World() {};
+
 	static void initialize();
 	void setup_display() { _render->setup_display(); }
 
-	virtual void draw();
-	virtual void update();
+	virtual void draw() = 0;
+	virtual void update() = 0;
 
 protected:
 	Controller* _ctrl;

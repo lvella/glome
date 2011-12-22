@@ -6,6 +6,10 @@
 
 class WorldRemote : public WorldLocal
 {
+public
+	WorldRemote() {};
+	virtual ~WorldRemote() {};
+
 protected:
 	std::unordered_map<int, Ship*> remote_players;
 };

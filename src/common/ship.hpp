@@ -11,7 +11,7 @@ class Ship : public Updatable, public WillBeDrawnOnTheFuckingScreenX11Cuzao
 {
 public:
 	Ship(MeshTypes type = HUNTER);
-	~Ship();
+	~Ship() {};
 	void draw(const Shader& s);
 	void draw(const Shader& s,Matrix4 cam, Matrix4 proj);
 	void update();

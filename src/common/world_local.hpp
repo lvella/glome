@@ -7,6 +7,10 @@
 
 class WorldLocal : public World
 {
+public:
+	WorldLocal() {};
+	virtual ~WorldLocal() {};
+
 protected:
 	std::vector<ShipAI*> bots;
 };
