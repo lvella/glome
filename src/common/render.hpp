@@ -8,6 +8,7 @@
 #include "matrix4.hpp"
 #include "math.hpp"
 #include "ship.hpp"
+#include "spaghetti.hpp"
 
 class Render
 {
@@ -22,6 +23,7 @@ public:
 
 protected:
 	std::vector<Ship*>* players;
+	Spaghetti spg;
 
 	std::deque<Matrix4> cam_hist;
 	Vector4 cam_pos;
