@@ -62,8 +62,8 @@ Render::draw()
 
 	draw_meridians(shader);
 	//cube.draw(shader);
-	//spg.draw(shader);
-	
+	spg.draw(shader);
+
 	for(size_t i = 0; i < players->size(); ++i)
 	{
 		players->at(i)->draw(shader, camera, p);
