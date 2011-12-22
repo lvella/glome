@@ -31,8 +31,7 @@ Render::setup_display()
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 	glLineWidth(1.5f);
 	glAlphaFunc(GL_NOTEQUAL, 0.0f);
-
-    glViewport(0, 0, width, height);
+	glViewport(0, 0, width, height);
 }
 
 Render::Render(vector<Ship*>* pp):
@@ -64,7 +63,7 @@ Render::draw()
 	draw_meridians(shader);
 	//cube.draw(shader);
 	//spg.draw(shader);
-
+	
 	for(size_t i = 0; i < players->size(); ++i)
 	{
 		players->at(i)->draw(shader, camera, p);

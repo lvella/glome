@@ -1,6 +1,6 @@
 AC_PREREQ([2.60])
 
-AC_INIT([Glome], [1.0], [support@fractal.com])
+AC_INIT([Glome], [0.1], [support@fractal.com])
 
 AC_CONFIG_AUX_DIR([build-aux])
 
@@ -61,6 +61,8 @@ AC_SUBST(GUICHAN_LIBS)
 # Check for Blender
 AX_CHECK_BLENDER([2.59])
 
+CXXFLAGS="-std=c++0x"
+
 AC_CONFIG_FILES([
 	Makefile
 	data/art/Makefile
@@ -76,7 +78,7 @@ echo ["\
  ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
 
  Prefix: '${prefix}'.
- Compiler: '${CC} ${CFLAGS} ${CPPFLAGS}'
+ Compiler: '${CXX} ${CXXFLAGS} ${CPPFLAGS}'
  Libraries: '${SDL_LIBS} ${SDL_IMAGE_LIBS} ${GUICHAN_LIBS} ${OPENGL_LIBS} ${BOOST_LIBS}'
 "]
 if test "$BLENDER" != ""; then
