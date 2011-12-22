@@ -4,6 +4,7 @@
 #include "minimap.hpp"
 #include "projectile.hpp"
 #include "particle_system.hpp"
+#include "world_dummy.hpp"
 
 #include "game.hpp"
 

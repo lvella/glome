@@ -2,7 +2,7 @@
 
 using namespace std;
 
-ControllerRemote::ControllerRemote(vector<Ship*>* pp, unordered_map<Ship*>* prp) : Controller(pp)
+ControllerRemote::ControllerRemote(vector<Ship*>* pp, unordered_map<int, Ship*>* prp) : ControllerLocal(pp)
 {
 	remote_players = prp;
 }

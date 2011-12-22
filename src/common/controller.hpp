@@ -7,6 +7,9 @@
 class Controller : public Updatable
 {
 public:
+	Controller() {}
+	virtual ~Controller() {};
+
 	virtual void update();
 	Controller(std::vector<Ship*>* pp);
 

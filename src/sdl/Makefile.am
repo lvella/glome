@@ -22,10 +22,4 @@ glome_LDADD = $(top_srcdir)/src/common/libcommon.a \
 	$(BOOST_LIBS)
 
 glome_SOURCES = \
-	kbinput.cpp \
-	net_input.cpp \
-	input.cpp \
-	jsinput.cpp \
-	menu.cpp \
-	button.cpp \
 	sdl_main.cpp

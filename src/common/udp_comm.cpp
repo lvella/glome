@@ -1,5 +1,5 @@
 #include <iostream>
-#include <string.h>
+#include <cstring>
 #include <thread>
 
 #include "udp_comm.hpp"

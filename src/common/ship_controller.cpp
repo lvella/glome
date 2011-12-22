@@ -1,14 +1,15 @@
 #include "projectile.hpp"
 #include "matrix4.hpp"
+#include "math.hpp"
 
 #include "ship_controller.hpp"
 
-ship_controller::ship_controller():
+ShipController::ShipController()
 {
 }
 
 void
-ship_controller::update(Matrix4& t)
+ShipController::update(Matrix4& t)
 {
 	/* Turning */
 	float h = h_tilt - h_req;
@@ -35,18 +36,18 @@ ship_controller::update(Matrix4& t)
 
 	/* Shooting */
 	if(heat > 0)
-		heat -= gun_l.canon_cooldown_rate; // Cooldown rate
+		heat -= gun_l->canon_cooldown_rate; // Cooldown rate
 
-	int sps = (gun_l.cold_fire_rate * 100 - heat) / 100; // Firerate at maximum
+	int sps = (gun_l->cold_fire_rate * 100 - heat) / 100; // Firerate at maximum
 
 	shot_count -= sps;
 	if(shot_count < 0)
 	{
 		if(shot)
 		{
-			Projectile::shot(this, t * (canon_shot_last ? gun_l.transformation() : gul_r.transformation()), shot_speed - speed);
+			//Projectile::shot(this, t * (canon_shot_last ? gun_l->transformation() : gun_r->transformation()), gun_l->shot_speed - speed);
 			shot_count += 60;
-			heat += shot_power; // Shot heat, could be equivalent to damage
+			heat += gun_l->shot_power; // Shot heat, could be equivalent to damage
 			canon_shot_last = !canon_shot_last;
 		}
 		else

@@ -16,14 +16,14 @@
 extern const char* mesh_filename[MESH_COUNT];
 
 void
-ship::set_controller(ship_controller* pctrl)
+Ship::set_controller(ShipController* pctrl)
 {
 	ctrl = pctrl;
 	ctrl->set_engine(engine);
 	ctrl->set_guns(&gun_l, &gun_r);
 }
 
-ship::ship(MeshTypes type):
+Ship::Ship(MeshTypes type)
 {
 	mesh = Mesh::get_mesh(type);
 	load_guns(type, mesh->get_current_pos());
@@ -38,7 +38,7 @@ ship::ship(MeshTypes type):
 }
 
 void 
-ship::load_guns(MeshTypes type, fpos_t gun_position_infile)
+Ship::load_guns(MeshTypes type, fpos_t gun_position_infile)
 {
 	int ret;
 	FILE *fd;
@@ -75,22 +75,22 @@ ship::load_guns(MeshTypes type, fpos_t gun_position_infile)
 }
 
 void 
-ship::draw(const Shader& s)
+Ship::draw(const Shader& s)
 {
-	s.setTransform(t);
+	s.setTransform(_t);
 	mesh->draw(s);
 }
 
 void
-ship::draw(const Shader& s, Matrix4 cam, Matrix4 proj)
+Ship::draw(const Shader& s, Matrix4 cam, Matrix4 proj)
 {
-	s.setTransform(t);
+	s.setTransform(_t);
 	mesh->draw(s);
-	engine->draw(cam,proj);
+	engine->draw(cam, proj);
 }
 
 void
-ship::update()
+Ship::update()
 {
 	ctrl->update(_t);
 }

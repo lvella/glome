@@ -2,13 +2,12 @@
 
 #include "matrix4.hpp"
 #include "shader.hpp"
+#include "object.hpp"
 
-class Drawable : virtual public Object
+class WillBeDrawnOnTheFuckingScreenX11Cuzao : virtual public Object
 {
 public:
-	Drawable() {}
-
-	virtual ~Drawable() = 0;
+	WillBeDrawnOnTheFuckingScreenX11Cuzao() {}
 
 	virtual void draw(const Shader& cam) = 0;
 

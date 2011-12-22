@@ -34,7 +34,6 @@ libcommon_a_SOURCES = \
 	source.cpp \
 	spaghetti.cpp \
 	textures.cpp \
-	udp_comm.cpp \
 	vector4.cpp \
 	world.cpp \
 	world_dummy.cpp

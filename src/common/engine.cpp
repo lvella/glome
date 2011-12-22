@@ -8,7 +8,7 @@ extern const char* mesh_filename[MESH_COUNT];
 
 Engine::Engine(MeshTypes type, fpos_t engine_position_infile,
 	float rot_per_frame, float speed_forward, float accel_forward,
-	float speed_vertical, float speed_horizontal, float max_speed_spin)
+	float speed_vertical, float speed_horizontal, float speed_spin)
 {
 	max_rot_per_frame = rot_per_frame;
 	max_speed_forward = speed_forward;

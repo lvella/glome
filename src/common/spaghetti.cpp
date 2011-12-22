@@ -72,7 +72,7 @@ CalculateBezierPoint(float t, Vector4 *p)
 void Spaghetti::draw(const Shader& s)
 {
   glPushMatrix();
-  s.setTransform(t);
+  s.setTransform(_t);
   glBegin(GL_LINE_LOOP);
 
   for(int i = 0; i < SPAGHETTI_COUNT; ++i) {
@@ -89,5 +89,5 @@ void Spaghetti::draw(const Shader& s)
 }
 
 void Spaghetti::update() {
-  t = velo * t;
+  _t = velo * _t;
 }

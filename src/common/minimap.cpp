@@ -31,7 +31,7 @@ static GLint hud_has_tex;
 static GLuint vbo;
 
 void
-MiniMap::draw(int wstart, render* rend, const Matrix4& center)
+MiniMap::draw(int wstart, Render* rend, const Matrix4& center)
 {
 	const int t = 160;
 	const int b = 10;
@@ -82,7 +82,7 @@ MiniMap::draw(int wstart, render* rend, const Matrix4& center)
 	// Draw map object
 	glUniform1i(proj_has_tex, 1);
 	glBindTexture(GL_TEXTURE_2D, tex_object);
-	render->fill_minimap();
+	rend->fill_minimap();
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	// Disable 2D

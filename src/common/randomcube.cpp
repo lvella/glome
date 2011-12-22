@@ -16,7 +16,7 @@ void RandomCube::draw(const Shader& s)
   float a = 0.02;
   float w = -sqrt(1 - a*a);
 
-  s.setTransform(t);
+  s.setTransform(_t);
   glBegin(GL_QUADS);
 
   glColor3ub(255, 0, 0);
@@ -59,7 +59,7 @@ void RandomCube::draw(const Shader& s)
 }
 
 void RandomCube::randomize() {
-  t = xy_matrix(rand()/10000.0f)
+  _t = xy_matrix(rand()/10000.0f)
       * xz_matrix(rand()/10000.0f)
       * yz_matrix(rand()/10000.0f)
       * xw_matrix(rand()/10000.0f)

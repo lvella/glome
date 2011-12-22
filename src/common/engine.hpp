@@ -6,10 +6,13 @@
 #include "mesh.hpp"
 #include "particle_system.hpp"
 
-class Engine: public Drawable
+class Engine: public WillBeDrawnOnTheFuckingScreenX11Cuzao
 {
 public:
 	Engine(MeshTypes type, fpos_t engine_position_infile);
+	Engine(MeshTypes type, fpos_t engine_position_infile, float rot_per_frame, 
+			float speed_forward, float accel_forward, float speed_vertical, 
+			float speed_horizontal, float max_speed_spin);
 	~Engine();
 	void draw(const Shader& cam);
 	void draw(Matrix4 cam, Matrix4 proj);

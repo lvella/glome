@@ -2,7 +2,11 @@
 
 using namespace std;
 
-ControllerLocal::ControllerLocal(vector<Ship*>* pp, vector<Ship_ai*>* pb) : Controller(pp)
+ControllerLocal::ControllerLocal(vector<Ship*>* pp) : Controller(pp)
+{
+}
+
+ControllerLocal::ControllerLocal(vector<Ship*>* pp, vector<ShipAI*>* pvb) : Controller(pp)
 {
 	bots = pvb;
 
@@ -13,10 +17,10 @@ ControllerLocal::ControllerLocal(vector<Ship*>* pp, vector<Ship_ai*>* pb) : Cont
 }
 
 void
-update()
+ControllerLocal::update()
 {
 	int i;
-	for(i = 0; i < players.size(); ++i)
+	for(i = 0; i < players->size(); ++i)
 		players->at(i)->update();
 }
 

@@ -5,11 +5,14 @@
 #include "ship.hpp"
 
 /** Every game mode should derive this class. */
-class World : public Updatable, public Drawable
+class World
 {
 public:
 	static void initialize();
 	void setup_display() { _render->setup_display(); }
+
+	virtual void draw();
+	virtual void update();
 
 protected:
 	Controller* _ctrl;

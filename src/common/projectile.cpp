@@ -183,7 +183,7 @@ Projectile::Projectile(Ship *s, const Matrix4& from, float speed):
 
 void Projectile::draw(const Shader& s)
 {
-	s.setTransform(t);
+	s.setTransform(_t);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 }
 
@@ -192,7 +192,7 @@ void Projectile::update(const Vector4& camera_pos)
   ++ttl;
   alpha = ttl < (max_ttl_2) ? 255u : 255u - (ttl - max_ttl_2) * 200 / max_ttl_2;
 
-  t = t * ds;
+  _t = _t * ds;
 
-  order_dist = (camera_pos - t.position()).squared_length();
+  order_dist = (camera_pos - _t.position()).squared_length();
 }

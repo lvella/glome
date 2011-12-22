@@ -1,10 +1,13 @@
 #pragma once
 
+#include "updatable.hpp"
+#include "drawable.hpp"
+
 #include "engine.hpp"
 #include "mesh.hpp"
 #include "ship_controller.hpp"
 
-class Ship : public Updatable, public Drawable
+class Ship : public Updatable, public WillBeDrawnOnTheFuckingScreenX11Cuzao
 {
 public:
 	Ship(MeshTypes type = HUNTER);
@@ -13,7 +16,7 @@ public:
 	void draw(const Shader& s,Matrix4 cam, Matrix4 proj);
 	void update();
 	void load_guns(MeshTypes type, fpos_t gun_position_infile);
-	void set_controller(ship_controller* pctrl);
+	void set_controller(ShipController* pctrl);
 
 protected:
 	Mesh* mesh;

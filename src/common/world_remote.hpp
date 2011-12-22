@@ -7,6 +7,6 @@
 class WorldRemote : public WorldLocal
 {
 protected:
-	std::unordered_map<Ship*> remote_players;
+	std::unordered_map<int, Ship*> remote_players;
 };
 

@@ -6,13 +6,18 @@
 #include "drawable.hpp"
 #include "shader.hpp"
 #include "matrix4.hpp"
+#include "math.hpp"
 #include "ship.hpp"
 
-class Render : public Drawable
+class Render
 {
 public:
+	static void initialize();
+
 	virtual void draw();
-	virtual static void setup_display();
+	virtual void setup_display();
+	virtual void fill_minimap();
+
 	Render(std::vector<Ship*>* pp);
 
 protected:

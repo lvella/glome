@@ -48,7 +48,7 @@ public:
 		speed_s = a * engine->max_speed_spin;
 	}
 
-	inline void shot(bool s)
+	inline void shoot(bool s)
 	{
 		shot = s;
 	}
