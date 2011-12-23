@@ -36,7 +36,7 @@ initialize()
 	world = new WorldDummy();
 	world->setup_display();
 
-	//MiniMap::initialize();
+	MiniMap::initialize();
 	//Projectile::initialize();
 	//ParticleSystem::initialize();
 	//Menu::initialize();

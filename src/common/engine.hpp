@@ -6,7 +6,7 @@
 #include "mesh.hpp"
 #include "particle_system.hpp"
 
-class Engine: public WillBeDrawnOnTheFuckingScreenX11Cuzao
+class Engine: public drawable::Drawable
 {
 public:
 	Engine(MeshTypes type, fpos_t engine_position_infile);

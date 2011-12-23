@@ -14,7 +14,9 @@
 #include "ship.hpp"
 
 #include <iostream>
+
 using namespace std;
+using namespace drawable;
 
 extern const char* mesh_filename[MESH_COUNT];
 

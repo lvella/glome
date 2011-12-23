@@ -6,6 +6,8 @@
 
 #include "randomcube.hpp"
 
+using namespace drawable;
+
 RandomCube::RandomCube()
 {
   randomize();

@@ -7,6 +7,8 @@
 
 #include "spaghetti.hpp"
 
+using namespace drawable;
+
 static inline float randr()
 {
 	return float(rand()) / RAND_MAX;

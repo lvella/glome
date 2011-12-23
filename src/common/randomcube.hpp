@@ -1,8 +1,9 @@
 #pragma once
 
-#include "object.hpp"
+#include "updatable.hpp"
+#include "drawable.hpp"
 
-class RandomCube: public Object
+class RandomCube: public Updatable, public drawable::Drawable 
 {
 public:
   RandomCube();

@@ -4,14 +4,13 @@
 #include "shader.hpp"
 #include "object.hpp"
 
-class WillBeDrawnOnTheFuckingScreenX11Cuzao : virtual public Object
+namespace drawable
 {
-public:
-	WillBeDrawnOnTheFuckingScreenX11Cuzao() {}
-
-	virtual void draw(const Shader& cam) = 0;
-
-protected:
-	Matrix4 _t;
-};
-
+	class Drawable : virtual public Object
+	{
+	public:
+		Drawable() {};
+		virtual ~Drawable() {};
+		virtual void draw(const Shader& cam) = 0;
+	};
+}

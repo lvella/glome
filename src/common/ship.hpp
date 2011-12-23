@@ -7,7 +7,7 @@
 #include "mesh.hpp"
 #include "ship_controller.hpp"
 
-class Ship : public Updatable, public WillBeDrawnOnTheFuckingScreenX11Cuzao
+class Ship : public Updatable, public drawable::Drawable 
 {
 public:
 	Ship(MeshTypes type = HUNTER);

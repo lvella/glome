@@ -4,6 +4,8 @@
 #include "config.hpp"
 #include "fire.hpp"
 
+using namespace drawable;
+
 extern const char* mesh_filename[MESH_COUNT];
 
 Engine::Engine(MeshTypes type, fpos_t engine_position_infile,

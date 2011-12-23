@@ -70,7 +70,7 @@ Render::draw()
 	}
 
 	//Projectile::draw_all(p, camera);
-	//MiniMap::draw(0, this, center);
+	MiniMap::draw(0, this, center);
 }
 	
 void
