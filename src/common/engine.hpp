@@ -9,7 +9,6 @@
 class Engine: public drawable::Drawable
 {
 public:
-<<<<<<< HEAD
 	Engine(MeshTypes type);
 	Engine(MeshTypes type, float rot_per_frame,
 	float speed_forward, float accel_forward, float speed_vertical,
