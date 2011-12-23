@@ -9,6 +9,7 @@
 #include "math.hpp"
 #include "ship.hpp"
 #include "spaghetti.hpp"
+#include "randomcube.hpp"
 
 class Render
 {
@@ -24,6 +25,7 @@ public:
 protected:
 	std::vector<Ship*>* players;
 	Spaghetti spg;
+	RandomCube cube;
 
 	std::deque<Matrix4> cam_hist;
 	Vector4 cam_pos;
