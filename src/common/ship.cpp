@@ -31,8 +31,8 @@ Ship::set_controller(ShipController* pctrl)
 Ship::Ship(MeshTypes type)
 {
 	mesh = Mesh::get_mesh(type);
-	load_guns(type, mesh->get_current_pos());
-	engine = new Engine(type, mesh->get_current_pos(), 0.03, 0.0015, 0.0015, 0.0004, 0.0004, 0.02);
+	load_guns(type);
+	engine = new Engine(type, 0.03, 0.0015, 0.0015, 0.0004, 0.0004, 0.02);
 	ctrl = NULL;
 
 	gun_l.shot_speed = gun_r.shot_speed = 0.02;
@@ -43,40 +43,37 @@ Ship::Ship(MeshTypes type)
 }
 
 void 
-Ship::load_guns(MeshTypes type, fpos_t gun_position_infile)
+Ship::load_guns(MeshTypes type)
 {
 	int ret;
-	FILE *fd;
+  FILE *fd;
 
-	const char* name = mesh_filename[int(type)];
-	// Load .gun file
-	{
-		std::stringstream dir;
-		dir << DATA_DIR << "/art/" << name << ".wire";
-		fd = fopen(dir.str().c_str(), "rb");
+  const char* name = mesh_filename[int(type)];
+  {
+	  unsigned int gun_pos;
+    std::stringstream dir;
+    dir << DATA_DIR << "/models/" << name << ".wire";
+    fd = fopen(dir.str().c_str(), "rb");
+    /* Read header of file */
+		fseek(fd, 4, SEEK_SET);
+		fread(&gun_pos, sizeof(unsigned int), 1, fd);
 		/* Poiter file to gun position */
-		fsetpos(fd, &gun_position_infile);
+    fseek(fd, gun_pos, SEEK_SET);
 		assert(fd != NULL);
-	}
+  }
 
-	{
-		// Reading Guns Matrix
-		ret = fread(&nguns, sizeof(nguns), 1, fd);
-		assert(ret == 1);
+  {
+    // Reading Guns Matrix
+    ret = fread(&nguns, sizeof(nguns), 1, fd);
+    assert(ret == 1);
 
-		ret = fread(&l_canon[0][0], sizeof(float), 16, fd);
-		assert (ret == 16);
+    ret = fread(&l_canon[0][0], sizeof(float), 16, fd);
+    assert (ret == 16);
 
-		ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
-		assert (ret == 16);
-	}
-
-	/* Update current pointer position of fd */
-	fpos_t cpos;
-	fgetpos(fd, &cpos);
-	mesh->set_current_pos(cpos);
-
-	fclose(fd);
+    ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
+    assert (ret == 16);
+  }
+  fclose(fd);
 }
 
 void 

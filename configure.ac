@@ -59,13 +59,13 @@ AC_CHECK_LIB([guichan], [gcnGuichanVersion], GUICHAN_LIBS="-lguichan -lguichan_s
 AC_SUBST(GUICHAN_LIBS)
 
 # Check for Blender
-AX_CHECK_BLENDER([2.59])
+AX_CHECK_BLENDER([2.58])
 
 CXXFLAGS="-std=c++0x"
 
 AC_CONFIG_FILES([
 	Makefile
-	data/art/Makefile
+	data/models/Makefile
 	src/Makefile
 	src/common/Makefile
 	src/sdl/Makefile

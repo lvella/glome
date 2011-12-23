@@ -19,8 +19,8 @@ void main()
   gl_Position = projection * tmp;
   fog_coord = gl_Position.z;
 
-	//TODO: Correct 4D perspective
-	gl_PointSize = size;
+  //TODO: Correct 4D perspective
+  gl_PointSize = size;
 
   v_color = color;
 }

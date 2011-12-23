@@ -36,9 +36,14 @@ Mesh::Mesh(MeshTypes type):
 
   // Load mesh file and put it into the list of meshs if was not exist
   {
+		unsigned int mesh_pos;
     std::stringstream dir;
-    dir << DATA_DIR << "/art/" << name << ".wire";
+    dir << DATA_DIR << "/models/" << name << ".wire";
     fd = fopen(dir.str().c_str(), "rb");
+    /* Read header of file */
+		fread(&mesh_pos, sizeof(unsigned int), 1, fd);
+		/* Poiter file to mesh position */
+    fseek(fd, mesh_pos, SEEK_SET);
     assert(fd != NULL);
   }
 
@@ -73,9 +78,6 @@ Mesh::Mesh(MeshTypes type):
 
   len = ilen * 2;
 
-  //get current position in fd
-  fgetpos(fd, &current_pos_instream);
-  
   fclose(fd);
 }
 

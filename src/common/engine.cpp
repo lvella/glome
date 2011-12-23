@@ -1,3 +1,4 @@
+#include <cstdio>
 #include <sstream>
 
 #include "engine.hpp"
@@ -8,9 +9,9 @@ using namespace drawable;
 
 extern const char* mesh_filename[MESH_COUNT];
 
-Engine::Engine(MeshTypes type, fpos_t engine_position_infile,
-	float rot_per_frame, float speed_forward, float accel_forward,
-	float speed_vertical, float speed_horizontal, float speed_spin)
+Engine::Engine(MeshTypes type, float rot_per_frame,
+	float speed_forward, float accel_forward, float speed_vertical,
+	float speed_horizontal, float speed_spin)
 {
 	max_rot_per_frame = rot_per_frame;
 	max_speed_forward = speed_forward;
@@ -19,8 +20,8 @@ Engine::Engine(MeshTypes type, fpos_t engine_position_infile,
 	max_speed_horizontal = speed_horizontal;
 	max_speed_spin = speed_spin;
 
-	load_position(type, engine_position_infile);
-	FX_engine = new Fire(100, velocity);
+  load_location(type);
+  FX_engine = new Fire(100, velocity);
 }
 
 Engine::~Engine()
@@ -28,33 +29,36 @@ Engine::~Engine()
 	delete FX_engine;
 }
 
-//TODO: make load_origin_matrix generic to get engine position
 void 
-Engine::load_position(MeshTypes type, fpos_t pos_infile)
+Engine::load_location(MeshTypes type)
 {
-	int ret;
-	FILE *fd;
+  int ret;
+  FILE *fd;
 
-	const char* name = mesh_filename[int(type)];
-	// Load .gun file
-	{
-		std::stringstream dir;
-		dir << DATA_DIR << "/art/" << name << ".wire";
-		fd = fopen(dir.str().c_str(), "rb");
+  const char* name = mesh_filename[int(type)];
+  // Load .gun file
+  {
+		unsigned int engine_pos;
+    std::stringstream dir;
+    dir << DATA_DIR << "/models/" << name << ".wire";
+    fd = fopen(dir.str().c_str(), "rb");
+    /* Read header of file */
+		fseek(fd, 8, SEEK_SET);
+		fread(&engine_pos, sizeof(unsigned int), 1, fd);
 		/* Poiter file to engine position */
-		fsetpos(fd, &pos_infile);
-		assert(fd != NULL);
-	}
+    fseek(fd, engine_pos, SEEK_SET);
+    assert(fd != NULL);
+  }
 
-	{
-		// Reading Engine Matrix
-		ret = fread(&nengines, sizeof(nengines), 1, fd);
-		assert(ret == 1);
+  {
+    // Reading Engine Matrix
+    ret = fread(&nengines, sizeof(nengines), 1, fd);
+    assert(ret == 1);
 
-		ret = fread(&velocity[0][0], sizeof(float), 16, fd);
-		assert (ret == 16);
-	}
-	fclose(fd);
+    ret = fread(&velocity[0][0], sizeof(float), 16, fd);
+    assert (ret == 16);
+  }
+  fclose(fd);
 }
 
 void Engine::draw(const Shader& cam)

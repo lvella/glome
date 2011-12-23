@@ -24,18 +24,28 @@ Tooltip: 'Export meshes to Binary file format for Glome Game Renega Desruga'
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
 # FILE FORMAT:
-#: (# represents the amount of items - integer)
-#: (< list > represents a list of values (coordenates) - float)
+# (The header elements - unsigned integer(I) (4 bytes))
+# (The amount of items - unsigned short(H) (2 bytes))
+# (< list > represents a list of values (coordenates) - float(f) (4 bytes))
+#
 #[BEGIN]
-# nvertices
-# nvertices lines contaning vertex coordenates and colors attributes: <x, y, z, w> <r, g, b, a>
-# nedges
-# nedges lines contaning 2 vertex index per line: <v_in0 , v_in1>
-# nguns
-# nguns * <guns Matrix4d positions>
-# nengines
-# nengines * <engines Matrix4d positions>
+# ##########
+# # HEADER #
+# ##########
+# mesh guns engines (uint ea)
+# ########
+# # BODY #
+# ########
+# nvertices (ushort)
+# nvertices lines contaning vertex coordenates and colors attributes: <x, y, z, w> <r, g, b, a> (8*float ea)
+# nedges (ushort)
+# nedges lines contaning 2 vertex index per line: <v_in0 , v_in1> (2*ushort ea)
+# nguns (ushort)
+# nguns * <guns Matrix4d positions> (16*float ea)
+# nengines (ushort)
+# nengines * <engines Matrix4d positions> (16*float ea)
 #[END]
 
 try:
@@ -48,11 +58,13 @@ except ImportError:
 import os
 import re
 import struct
+from struct import calcsize
 import math
 from math import *
 
 fsize = struct.calcsize('f')
-isize = struct.calcsize('H')
+usize = struct.calcsize('H')
+isize = struct.calcsize('I')
 
 # Object scale
 scale = 0.0005
@@ -112,14 +124,35 @@ class SpaceShip:
     self.ssEngines = Engines(objs.get(ssname),self.lengines)
 
   def export(self):
-     self.ssMesh.export()
-     self.ssGuns.export()
-     self.ssEngines.export()
+    self.ssMesh.export()
+    self.ssGuns.export()
+    self.ssEngines.export()
+
+  def create_header(self):
+    bfile = open(filename, 'ab')
+    # calc initial positions
+    self.mesh_pos = header_size = 3 * isize
+    mesh_size = (len(self.data.vertices) * 8 * fsize) + (len(self.data.edges) * 2 * usize) + (2 * usize)
+    self.gun_pos = header_size + mesh_size
+    gun_size = (len(self.lguns) * 16 * fsize) + usize
+    self.engine_pos = header_size + mesh_size + gun_size
+    engine_size = (len(self.lengines) * 16 * fsize) + usize
+    # write header
+    bfile.write(struct.pack('<I', self.mesh_pos))
+    bfile.write(struct.pack('<I', self.gun_pos))
+    bfile.write(struct.pack('<I', self.engine_pos))
+    bfile.close()
 
   def read(self):
-    print('Mesh of ' + ssname + ':')
     bfile = open(filename, 'rb')
-    nv = bfile.read(isize)
+    print('Reading mesh of ' + ssname)
+    print('### HEADER ###')
+    m = bfile.read(isize)
+    g = bfile.read(isize)
+    e = bfile.read(isize)
+    print('Mesh position: ' + str(struct.unpack('<I', m)[0]) + ' Gun position: ' + str(struct.unpack('<I', g)[0]) + ' Engine position: ' + str(struct.unpack('<I', e)[0]))
+    print('### BODY ###')
+    nv = bfile.read(usize)
     print(struct.unpack('<H', nv)[0])
     for v in self.data.vertices:
       x = bfile.read(fsize)
@@ -131,15 +164,15 @@ class SpaceShip:
       b = bfile.read(fsize)
       a = bfile.read(fsize)
       print(struct.unpack('<f', x)[0], struct.unpack('<f', y)[0], struct.unpack('<f', z)[0], struct.unpack('<f', w)[0], struct.unpack('<f', r)[0], struct.unpack('<f', g)[0], struct.unpack('<f', b)[0], struct.unpack('<f', a)[0])
-    ne = bfile.read(isize)
+    ne = bfile.read(usize)
     print(struct.unpack('<H', ne)[0])
     for e in self.data.edges:
-      e0 = bfile.read(isize)
-      e1 = bfile.read(isize)
+      e0 = bfile.read(usize)
+      e1 = bfile.read(usize)
       print(struct.unpack('<H', e0)[0], struct.unpack('<H', e1)[0])
 
     print('Guns of ' + ssname + ':')
-    ng = bfile.read(isize)
+    ng = bfile.read(usize)
     print(struct.unpack('<H', ng)[0])
     c = 1
     for g in self.lguns:
@@ -151,7 +184,7 @@ class SpaceShip:
       c = c + 1
 
     print('Engines of ' + ssname + ':')
-    ne = bfile.read(isize)
+    ne = bfile.read(usize)
     print(struct.unpack('<H', ne)[0])
     c = 1
     for e in self.lengines:
@@ -225,10 +258,9 @@ class Engines:
           bfile.write(struct.pack('<f', t[i][j]))
     bfile.close()
 
-
-#########
-# Begin #
-#########
+########
+# Main #
+########
 filename = ''
 ssname = ''
 if __name__ == "__main__":
@@ -242,5 +274,6 @@ if __name__ == "__main__":
       ssname = o.name
   #FIXME: spaceship name(ssname) is global
   ss = SpaceShip(objs, listAllScenes)
+  ss.create_header()
   ss.export()
 #  ss.read()

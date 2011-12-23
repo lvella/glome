@@ -2,7 +2,7 @@
 
 #include <cstdlib>
 #include <cmath>
-#include <GL/glew.h>
+#include "gl.hpp"
 
 class Matrix4;
 

@@ -3,7 +3,7 @@
 
 static Shader program_fire;
 static GLuint vbo;
-static GLint attrib_size, uniform_projection, uniform_camera, uniform_coord;
+static GLint attrib_size, uniform_projection, uniform_camera;
 
 Fire::Fire(int number_of_particles, Matrix4 velocity):
 	ParticleSystem(number_of_particles)
@@ -54,9 +54,12 @@ void Fire::ParticleSystem::draw(const Shader& cam)
 void Fire::draw(Matrix4 cam, Matrix4 proj)
 {
 	program_fire.enable();
-	glActiveTexture(GL_TEXTURE0);
+	
+  glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex_particle);
+	glEnable(GL_TEXTURE_2D);
+
 	cam.loadTo(uniform_camera);
 	proj.loadTo(uniform_projection);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
