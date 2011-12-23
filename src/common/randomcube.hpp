@@ -6,8 +6,10 @@
 class RandomCube: public Updatable, public drawable::Drawable 
 {
 public:
-  RandomCube();
+	RandomCube();
+	~RandomCube();
 
-  void draw(const Shader& s);
-  void randomize();
+	void update();
+	void draw(const Shader& s);
+	void randomize();
 };

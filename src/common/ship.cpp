@@ -46,34 +46,34 @@ void
 Ship::load_guns(MeshTypes type)
 {
 	int ret;
-  FILE *fd;
+	FILE *fd;
 
-  const char* name = mesh_filename[int(type)];
-  {
-	  unsigned int gun_pos;
-    std::stringstream dir;
-    dir << DATA_DIR << "/models/" << name << ".wire";
-    fd = fopen(dir.str().c_str(), "rb");
-    /* Read header of file */
+	const char* name = mesh_filename[int(type)];
+	{
+		unsigned int gun_pos;
+		std::stringstream dir;
+		dir << DATA_DIR << "/models/" << name << ".wire";
+		fd = fopen(dir.str().c_str(), "rb");
+		/* Read header of file */
 		fseek(fd, 4, SEEK_SET);
 		fread(&gun_pos, sizeof(unsigned int), 1, fd);
 		/* Poiter file to gun position */
-    fseek(fd, gun_pos, SEEK_SET);
+		fseek(fd, gun_pos, SEEK_SET);
 		assert(fd != NULL);
-  }
+	}
 
-  {
-    // Reading Guns Matrix
-    ret = fread(&nguns, sizeof(nguns), 1, fd);
-    assert(ret == 1);
+	{
+		// Reading Guns Matrix
+		ret = fread(&nguns, sizeof(nguns), 1, fd);
+		assert(ret == 1);
 
-    ret = fread(&l_canon[0][0], sizeof(float), 16, fd);
-    assert (ret == 16);
+		ret = fread(&l_canon[0][0], sizeof(float), 16, fd);
+		assert (ret == 16);
 
-    ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
-    assert (ret == 16);
-  }
-  fclose(fd);
+		ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
+		assert (ret == 16);
+	}
+	fclose(fd);
 }
 
 void 

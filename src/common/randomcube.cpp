@@ -13,6 +13,15 @@ RandomCube::RandomCube()
   randomize();
 }
 
+RandomCube::~RandomCube()
+{
+}
+
+void
+RandomCube::update()
+{
+}
+
 void RandomCube::draw(const Shader& s)
 {
   float a = 0.02;
