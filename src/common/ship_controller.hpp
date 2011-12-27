@@ -22,9 +22,13 @@ public:
 
 	inline void set_guns(ship_gun* pL, ship_gun* pR) { gun_l = pL; gun_r = pR; }
 
-	inline void rotate(float rx, float ry)
+	inline void rotate_h(float rx)
 	{
 		h_req = rx / 100.0;
+	}
+
+	inline void rotate_v(float ry)
+	{
 		v_req = -ry / 100.0;
 	}
 
