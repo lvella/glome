@@ -18,7 +18,7 @@
 #include "menu.hpp"
 #include "options.hpp"
 #include "game.hpp"
-#include "jsinput.hpp"
+//#include "jsinput.hpp"
 
 #include "native.hpp"
 
@@ -111,11 +111,11 @@ static void main_loop()
 	bool running = true;
 	Uint32 start;
 	Uint32 ticks;
-
+	Input::initialize();
 	start = ticks = SDL_GetTicks();
 	while(running) 
 	{
-		//running = Input::handle();
+		running = Input::handle();
 		Game::frame();
 		SDL_GL_SwapBuffers();
 		// Fix framerate

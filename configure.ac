@@ -4,7 +4,7 @@ AC_INIT([Glome], [0.1], [support@fractal.com])
 
 AC_CONFIG_AUX_DIR([build-aux])
 
-AC_CONFIG_HEADERS([src/common/config.hpp])
+AC_CONFIG_HEADERS([src/config.hpp])
 DATA_DIR=`${PWDCMD-pwd}`/data
 AC_DEFINE_UNQUOTED([DATA_DIR], ["$DATA_DIR"] , [Data directory])
 
@@ -61,7 +61,7 @@ AC_SUBST(GUICHAN_LIBS)
 # Check for Blender
 AX_CHECK_BLENDER([2.58])
 
-CXXFLAGS="-std=c++0x"
+CXXFLAGS+=" -std=c++0x"
 
 AC_CONFIG_FILES([
 	Makefile

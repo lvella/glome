@@ -14,6 +14,6 @@ destroyer.wire: destroyer.blend
 ufo.wire: ufo.blend
 	${BLENDER} -b ufo.blend -P ${MESH_SCRIPT} -noaudio
 
-CLEANFILES = ${BUILT_SOURCES}
+DISTCLEANFILES = ${BUILT_SOURCES}
 
 endif

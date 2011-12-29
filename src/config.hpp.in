@@ -1,4 +1,4 @@
-/* src/common/config.hpp.in.  Generated from configure.ac by autoheader.  */
+/* src/config.hpp.in.  Generated from configure.ac by autoheader.  */
 
 /* Data directory */
 #undef DATA_DIR

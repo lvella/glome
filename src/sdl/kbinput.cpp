@@ -1,4 +1,5 @@
 #include <cstdlib>
+#include <unordered_map>
 
 #include "options.hpp"
 
@@ -7,20 +8,46 @@
 using namespace std;
 using namespace Options;
 
-namespace Input {
-namespace Kb {
+namespace Input
+{
 
-static Ship* ship;
+namespace Kb
+{
+/* 
+* Map: < SDLKEY , PAIR(controller_id, callback_function) > 
+*/
+std::unordered_map<int , std::pair<int, pfunction> > inputs;
 
 void
-set_ship(Ship* s)
+register_input(int keycode, std::pair<int, Input::pfunction> id_fcallback)
 {
-  ship = s;
+	inputs.insert(std::make_pair(keycode, id_fcallback));
 }
 
 bool
 key_event(SDL_Event e)
 {
+	std::unordered_map<int , std::pair<int, Input::pfunction> >::iterator it;
+	//SDL_Keycode: http://wiki.libsdl.org/moin.cgi/SDLKeycodeLookup
+	int k = e.key.keysym.sym;
+  it = inputs.find(k);
+	std::cout << "key=" << k << std::endl;
+
+	std::pair<int, Input::pfunction> temp =	it->second;
+	Input::pfunction func = temp.second;
+	//TODO: Apply normalize
+	if(e.type == SDL_KEYDOWN)
+		func(temp.first, 1.0); 
+	else if(e.type == SDL_KEYUP)
+		func(temp.first, 0.0);
+	std::cout << "key=" << k << " controller_id=" << temp.first << std::endl;
+
+	return true;
+}
+/*bool
+key_event(SDL_Event e)
+{
+	// SDL_Keycode 
   int k = e.key.keysym.sym;
   switch(k)
   {
@@ -76,15 +103,15 @@ key_event(SDL_Event e)
 
   return true;
 }
-
+*/
 void
 mouse_motion(int x, int y)
 {
-  ship->motion(x, y);
+ // ship->motion(x, y);
   x -= width / 2;
   y -= height / 2;
 
-  ship->rotate(float(x) / float(width / 2), -(float(y) / float(height / 2)));
+ // ship->rotate(float(x) / float(width / 2), -(float(y) / float(height / 2)));
 }
 
 void
@@ -95,18 +122,20 @@ mouse_button(int button, int state)
   bool a = (state == SDL_PRESSED);
   if(button == SDL_BUTTON_LEFT)
   {
+		std::cout << "button-left: " << button << std::endl;
     accel = a ? -0.00002 : 0.0;
-    ship->move_forward(a);
+    //ship->move_forward(a);
   }
   else if(button == SDL_BUTTON_RIGHT)
   {
+		std::cout << "button-right: " << button << std::endl;
     accel = a ? 0.00002 : 0.0;
-    ship->move_backward(a);
+    //ship->move_backward(a);
   }
   else
     return;
 
-  ship->move(accel);
+ // ship->move(accel);
 }
 
 }

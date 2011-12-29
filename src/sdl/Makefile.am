@@ -8,7 +8,7 @@ INCLUDES = \
 	$(OPENGL_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
 	-I$(includedir) \
-	-I$(top_srcdir)/common
+	-I$(top_srcdir)/src/common
 
 BOOST_LIBS = -lboost_system -lboost_thread
 
@@ -22,4 +22,6 @@ glome_LDADD = $(top_srcdir)/src/common/libcommon.a \
 	$(BOOST_LIBS)
 
 glome_SOURCES = \
+	input.cpp \
+	kbinput.cpp \
 	sdl_main.cpp
