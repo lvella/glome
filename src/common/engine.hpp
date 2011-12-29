@@ -13,10 +13,10 @@ public:
 	Engine(MeshTypes type, float rot_per_frame,
 	float speed_forward, float accel_forward, float speed_vertical,
 	float speed_horizontal, float max_speed_spin);
-  ~Engine();
-  void draw(const Shader& cam);
-  void draw(Matrix4 cam, Matrix4 proj);
-  void load_location(MeshTypes type);
+	~Engine();
+	void draw(const Shader& cam);
+	void draw(Matrix4 cam, Matrix4 proj);
+	void load_location(MeshTypes type);
 
 private:
 	ParticleSystem* FX_engine;

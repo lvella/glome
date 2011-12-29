@@ -32,7 +32,7 @@ Ship::Ship(MeshTypes type)
 {
 	mesh = Mesh::get_mesh(type);
 	load_guns(type);
-	engine = new Engine(type, 0.03, 0.0015, 0.0015, 0.0004, 0.0004, 0.02);
+	engine = new Engine(type, 0.03, 0.0015, 0.0002, 0.0004, 0.0004, 0.02);
 	ctrl = NULL;
 
 	gun_l.shot_speed = gun_r.shot_speed = 0.02;
