@@ -111,7 +111,7 @@ static void main_loop()
 	bool running = true;
 	Uint32 start;
 	Uint32 ticks;
-	Input::initialize();
+
 	start = ticks = SDL_GetTicks();
 	while(running) 
 	{
@@ -145,6 +145,7 @@ int main(int argc, char **argv)
 	initialize_SDL();
 	initialize_gl_context();
 	//Input::Js::initialize(0);
+	Input::initialize();
 	Game::initialize();
 
 	main_loop();

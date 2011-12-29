@@ -15,7 +15,7 @@ namespace Input
 {
 
 /*
-* Map functions poiters to function names in controller settings file
+* Map function names to functions poiters in controller settings file
 */
 std::unordered_map<std::string, Input::pfunction> pfunctions_to_inputs;
 
@@ -24,9 +24,9 @@ std::unordered_map<std::string, Input::pfunction> pfunctions_to_inputs;
 */
 std::unordered_map<int, ShipController*> ship_controllers;
 
-ShipController* set_input_controller()
+ShipController* create_ship_controller(int controller_id)
 {
-
+	return ship_controllers[controller_id];	
 }
 
 /*
@@ -43,7 +43,6 @@ void read_controllers_settings()
 	ifs.open(dir.str().c_str(), std::ifstream::in);
 	assert(ifs.is_open());
 	ifs >> number_of_controllers >> number_of_functions;
-	std::cout << number_of_controllers << " " << number_of_functions << std::endl;
 	for(int i = 0; i < number_of_controllers; ++i)
 	{
 		ifs >> input_type >> controller_id;
@@ -53,11 +52,9 @@ void read_controllers_settings()
 		temp.second = new ShipController();
 		ship_controllers.insert(temp);
 		
-		std::cout << input_type << " " << controller_id << std::endl;
 		for(int j = 0; j < number_of_functions; ++j)
 		{
 			ifs >> key >> func_key;
-			std::cout << key << " " << func_key << std::endl;
 			std::pair<int, Input::pfunction> pfunction_pair = std::make_pair(controller_id, pfunctions_to_inputs.find(func_key)->second);
 			switch(input_type)
 			{
@@ -105,7 +102,7 @@ handle()
         run = false;
         break;
       case SDL_MOUSEMOTION:
-        Kb::mouse_motion(e.motion.x, e.motion.y);
+        //Kb::mouse_motion(e.motion.x, e.motion.y);
         break;
       case SDL_MOUSEBUTTONDOWN:
       case SDL_MOUSEBUTTONUP:

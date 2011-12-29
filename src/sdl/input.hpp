@@ -15,7 +15,7 @@ namespace Input {
 	
 	extern std::unordered_map<int, ShipController*> ship_controllers;
 		
-	ShipController* set_input_controller();
+	ShipController* create_ship_controller(int);
 
 	void read_controllers_settings();
 
@@ -35,30 +35,27 @@ namespace Input {
 
 	inline void move_forward(int controller_id, float a)
 	{
-		std::cout << "move_foward - controller_id: " << controller_id << " force: " << a << std::endl;
 		ship_controllers[controller_id]->move(a);
 	}
 
   inline void move_backward(int controller_id, float a)
   {
-		ship_controllers[controller_id]->move(-a);
+		ship_controllers[controller_id]->move(a);
   }
 
   inline void move_up(int controller_id, float a)
   {
-		std::cout << "move_up - controller_id: " << controller_id << " force: " << a << std::endl;
 		ship_controllers[controller_id]->move_v(a);
   }
 
   inline void move_down(int controller_id, float a)
   {
-		std::cout << "move_down - controller_id: " << controller_id << " force: " << a << std::endl;
-		ship_controllers[controller_id]->move_v(-a);
+		ship_controllers[controller_id]->move_v(a);
   }
 
   inline void move_left(int controller_id, float a)
   {
-		ship_controllers[controller_id]->move_h(-a);
+		ship_controllers[controller_id]->move_h(a);
   }
 
   inline void move_right(int controller_id, float a)
@@ -68,7 +65,7 @@ namespace Input {
 
   inline void move_spinl(int controller_id, float a)
   {
-		ship_controllers[controller_id]->move_s(-a);
+		ship_controllers[controller_id]->move_s(a);
 	}
 
   inline void move_spinr(int controller_id, float a)
