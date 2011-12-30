@@ -37,7 +37,7 @@ initialize()
 	world->setup_display();
 
 	MiniMap::initialize();
-	//Projectile::initialize();
+	Projectile::initialize();
 	//ParticleSystem::initialize();
 	//Menu::initialize();
 	initialize_meridians();

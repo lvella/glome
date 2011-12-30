@@ -1,5 +1,6 @@
 #pragma once
 
+#include <fstream>
 #include <cstdlib>
 #include <cmath>
 #include "gl.hpp"

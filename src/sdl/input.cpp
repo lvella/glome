@@ -9,7 +9,7 @@
 #include "config.hpp"
 #include "input.hpp"
 #include "kbinput.hpp"
-//#include "jsinput.hpp"
+#include "jsinput.hpp"
 #include "events.hpp"
 
 namespace Input
@@ -42,10 +42,10 @@ void read_controllers_settings()
 	dir << DATA_DIR << "/controllers/input.config";
 	ifs.open(dir.str().c_str(), std::ifstream::in);
 	assert(ifs.is_open());
-	ifs >> number_of_controllers >> number_of_functions;
+	ifs >> number_of_controllers;
 	for(int i = 0; i < number_of_controllers; ++i)
 	{
-		ifs >> input_type >> controller_id;
+		ifs >> input_type >> controller_id >> number_of_functions;
 
 		std::pair <int, ShipController* > temp;
 		temp.first = controller_id;
@@ -70,8 +70,8 @@ void read_controllers_settings()
 				for(int j = 0; j < number_of_functions; ++j)
 				{
 					ifs >> key >> func_key;
-					input_callback* ic = new input_callback(controller_id, pfunctions_to_inputs.find(func_key)->second, (int)func_key);
-					//Js::register_button(key, ic);
+					input_callback* ic = new input_callback(controller_id, pfunctions_to_inputs.find(func_key)->second, func_key);
+					Js::register_button(key, ic);
 				}
 				break;
 		}
@@ -117,11 +117,11 @@ handle()
 			run = Kb::button_event(e);
 			break;
 		case SDL_JOYAXISMOTION:
-			//Js::axis_event(e.jaxis);
+			Js::axis_event(e.jaxis);
 			break;
 		case SDL_JOYBUTTONDOWN:
 		case SDL_JOYBUTTONUP:
-			//Js::button_event(e.jbutton);
+			Js::button_event(e.jbutton);
 			break;
 		}
 	}

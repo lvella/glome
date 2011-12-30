@@ -23,6 +23,8 @@ public:
 
 	inline void set_guns(ship_gun* pL, ship_gun* pR) { gun_l = pL; gun_r = pR; }
 
+	inline void set_guns_matrices(Matrix4& l, Matrix4& r) { l_canon = l; r_canon = r; }
+
 	inline void rotate_h(float rx)
 	{
 		h_req = rx / 100.0;
@@ -58,11 +60,16 @@ public:
 		shot = s;
 	}
 
+	inline const Matrix4& transformation() { return _t; }
+
 private:
+	Matrix4 _t;
 	Engine* engine;
 	int nguns;
 	ship_gun* gun_l;
 	ship_gun* gun_r;
+	Matrix4 l_canon;
+	Matrix4 r_canon;
 
 	/** Shot */
 	int shot_count;

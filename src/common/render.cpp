@@ -3,6 +3,7 @@
 #include "options.hpp"
 #include "meridian.hpp"
 #include "minimap.hpp"
+#include "projectile.hpp"
 
 using namespace std;
 using namespace Options;
@@ -68,13 +69,14 @@ Render::draw()
 		players->at(i)->draw(shader, camera, p);
 	}
 
-	//Projectile::draw_all(p, camera);
+	Projectile::draw_all(p, camera);
 	MiniMap::draw(0, this, center);
 }
 	
 void
 Render::fill_minimap()
 {
+	Projectile::draw_in_minimap();
 	MiniMap::draw_dot(cube);
 	for(size_t i = 1; i < players->size(); ++i)
 		MiniMap::draw_dot(*(players->at(i)));

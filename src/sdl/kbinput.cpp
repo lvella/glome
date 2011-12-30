@@ -3,6 +3,7 @@
 
 #include "options.hpp"
 
+#include "input.hpp"
 #include "kbinput.hpp"
 
 using namespace std;
@@ -56,12 +57,11 @@ button_event(SDL_Event e)
 	if(it == inputs.end())
 		return true;
 
-	//assert(it != inputs.end());
 	input_callback* temp = it->second;
 	pfunction func = temp->f;
 
 	if(state)
-		func(temp->cid, Kb::normalize(temp->e));
+		func(temp->cid, normalize_button(temp->e));
 	else
 		func(temp->cid, 0.0);
 

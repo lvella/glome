@@ -50,7 +50,7 @@ ShipController::update(Matrix4& t)
 	{
 		if(shot)
 		{
-			//Projectile::shot(this, t * (canon_shot_last ? gun_l->transformation() : gun_r->transformation()), gun_l->shot_speed - speed);
+			Projectile::shot(this, t * (canon_shot_last ? l_canon : r_canon), gun_l->shot_speed - speed);
 			shot_count += 60;
 			heat += gun_l->shot_power; // Shot heat, could be equivalent to damage
 			canon_shot_last = !canon_shot_last;
@@ -62,5 +62,6 @@ ShipController::update(Matrix4& t)
 	t = t * zw_matrix(speed) * yw_matrix(speed_v) * xw_matrix(speed_h)
 		 * xy_matrix(speed_s) * yz_matrix(v_tilt)
 		 * rotation(-h_tilt, 0.0, M_SQRT2 / 2.0, M_SQRT2 / 2.0);
+	_t = t;
 }
 

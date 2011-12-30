@@ -18,7 +18,7 @@
 #include "menu.hpp"
 #include "options.hpp"
 #include "game.hpp"
-//#include "jsinput.hpp"
+#include "jsinput.hpp"
 
 #include "native.hpp"
 
@@ -144,7 +144,7 @@ int main(int argc, char **argv)
 
 	initialize_SDL();
 	initialize_gl_context();
-	//Input::Js::initialize(0);
+	Input::Js::initialize(0);
 	Input::initialize();
 	Game::initialize();
 

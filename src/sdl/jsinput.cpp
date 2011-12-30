@@ -1,90 +1,115 @@
 #include <cstdlib>
+#include <unordered_map>
 
+#include "input.hpp"
 #include "jsinput.hpp"
 
 using namespace std;
 
-namespace Input {
-namespace Js {
+namespace Input
+{
+namespace Js
+{
 
-static Ship* ship;
+/* 
+* Map: < SDLKEY , PAIR(controller_id, callback_function) > 
+*/
+unordered_map<int, input_callback* > inputs;
+pair< int, std::function<void (int, float, float)> > motion_func;
+
 static SDL_Joystick* js = NULL;
 
-void initialize(int js_id)
+void
+initialize(int js_id)
 {
-  if(js)
-    SDL_JoystickClose(js);
+	if(js)
+		SDL_JoystickClose(js);
 
-  if(SDL_NumJoysticks() > js_id) {
-    js = SDL_JoystickOpen(js_id);
-  } else {
-    js = NULL;
-  }
+	if(SDL_NumJoysticks() > js_id)
+	{
+		js = SDL_JoystickOpen(js_id);
+	}
+	else
+	{
+		js = NULL;
+	}
 }
 
-void set_ship(Ship* s)
+void
+register_button(int keycode, input_callback* id_fcallback)
 {
-  ship = s;
+	inputs[keycode] = id_fcallback;
 }
 
-void axis_event(const SDL_JoyAxisEvent &e)
+void
+register_motion(int cid, std::function<void (int, float, float)> func)
 {
-  static float turn_x = 0.0f, turn_y = 0.0f;
-
-  if(e.axis == 0) {
-    if(e.value < 16000 && e.value > -16000) {
-      ship->move_left(false);
-      ship->move_right(false);
-    } else if(e.value > 16000) {
-      ship->move_right(true);
-    } else {
-      ship->move_left(true);
-    }
-  } else if(e.axis == 1) {
-      if(e.value > -16000 && e.value < 16000) {
-        ship->move_down(false);
-        ship->move_up(false);
-      } else if(e.value > 16000) {
-        ship->move_down(true);
-      } else {
-        ship->move_up(true);
-      }
-  } else if(e.axis == 2 || e.axis == 3) {
-      if(e.axis == 2) {
-        turn_x = e.value / 32768.0f;
-      } else {
-        turn_y = -e.value / 32768.0f;
-      }
-
-      ship->rotate(turn_x, turn_y);
-   }
+	motion_func.first = cid;
+	motion_func.second = func;
 }
 
-void button_event(const SDL_JoyButtonEvent &e)
+void
+axis_event(const SDL_JoyAxisEvent &e)
 {
-  bool p = e.state == SDL_PRESSED;
+	static float turn_x = 0.0f, turn_y = 0.0f;
+	float nx = e.value / 32768.0f;
+	float ny = -e.value / 32768.0f;
 
-  switch(e.button) {
-  case 1: // L3
-    ship->move_spinl(p);
-    break;
-  case 2: // R3
-    ship->move_spinr(p);
-    break;
+	if(e.axis == 0)
+	{
+		if(nx > 0)
+			move_right(0, nx);
+		else
+			move_left(0, nx);
+	}
+	else if(e.axis == 1)
+	{
+		if(ny > 0)
+			move_up(0, ny);
+		else
+			move_down(0, ny);	
+	}
+	else if(e.axis == 2 || e.axis == 3)
+	{
+		if(e.axis == 2)
+		{
+			turn_x = e.value / 32768.0f;
+		}
+		else
+		{
+			turn_y = -e.value / 32768.0f;
+		}
 
-  case 8: // L2
-    ship->move(p ? 0.00002 : 0.0);
-    break;
-  case 9: // R2
-    ship->move(p ? -0.00002 : 0.0);
-    break;
+		rotate(0, turn_x, turn_y);
+	}
+}
 
-  case 10: // L1
-  case 11: // R1
-    ship->shot(p);
-    break;
-  }
+bool
+button_event(const SDL_JoyButtonEvent &e)
+{
+	std::unordered_map<int , input_callback* >::iterator it;
+	int k;
+	bool state;
+
+	k = e.button;
+	state = (e.state == SDL_PRESSED);
+
+	it = inputs.find(k);
+
+	if(it == inputs.end())
+		return true;
+
+	input_callback* temp = it->second;
+	pfunction func = temp->f;
+
+	if(state)
+		func(temp->cid, normalize_button(temp->e));
+	else
+		func(temp->cid, 0.0);
+
+	return true;
 }
 
 }
 }
+

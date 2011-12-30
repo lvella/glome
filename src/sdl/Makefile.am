@@ -24,4 +24,5 @@ glome_LDADD = $(top_srcdir)/src/common/libcommon.a \
 glome_SOURCES = \
 	input.cpp \
 	kbinput.cpp \
+	jsinput.cpp \
 	sdl_main.cpp

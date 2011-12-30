@@ -1,4 +1,4 @@
-#include <time.h>
+#include <ctime>
 #include <cmath>
 #include <algorithm>
 #include <vector>
@@ -8,7 +8,8 @@
 #include "textures.hpp"
 
 #include "projectile.hpp"
-
+#include <iostream>
+using namespace std;
 typedef std::vector<Projectile> SList;
 static SList shots;
 
@@ -62,7 +63,7 @@ void Projectile::initialize()
 	uniform_projection = glGetUniformLocation(program_bullet.program(), "projection");
 }
 
-void Projectile::shot(Ship *s, const Matrix4& from, float speed)
+void Projectile::shot(ShipController *s, const Matrix4& from, float speed)
 {
   shots.push_back(Projectile(s, from, speed));
 }
@@ -155,7 +156,7 @@ bool Projectile::collide(const Vector4& position, float radius)
   return false;
 }
 
-bool Projectile::collide(Ship *s)
+bool Projectile::collide(ShipController *s)
 {
   const float r = 0.01f * 0.01f;
   Vector4 p = s->transformation().position();
@@ -170,7 +171,7 @@ bool Projectile::collide(Ship *s)
   return false;
 }
 
-Projectile::Projectile(Ship *s, const Matrix4& from, float speed):
+Projectile::Projectile(ShipController *s, const Matrix4& from, float speed):
   Object(from),
   ds(zw_matrix(-speed)),
   owner(s),
@@ -196,3 +197,4 @@ void Projectile::update(const Vector4& camera_pos)
 
   order_dist = (camera_pos - _t.position()).squared_length();
 }
+

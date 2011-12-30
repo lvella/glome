@@ -3,18 +3,18 @@
 #include "matrix4.hpp"
 #include "vector4.hpp"
 #include "object.hpp"
-#include "ship.hpp"
+#include "ship_controller.hpp"
 
 class Projectile: public Object
 {
 public:
 	static void initialize();
-	static void shot(Ship *s, const Matrix4& from, float speed);
+	static void shot(ShipController *s, const Matrix4& from, float speed);
 	static void draw_all(const Matrix4& projection, const Matrix4& camera);
 	static void draw_in_minimap();
 	static void update_all(const Vector4& camera_pos);
 	static bool collide(const Vector4& position, float radius);
-	static bool collide(Ship *s);
+	static bool collide(ShipController *s);
 
 	bool operator<(const Projectile& other) const
 	{
@@ -22,7 +22,7 @@ public:
 	}
 
 private:
-	Projectile(Ship *s, const Matrix4& from, float speed);
+	Projectile(ShipController *s, const Matrix4& from, float speed);
 	void draw(const Shader& cam);
 	void update(const Vector4& camera_pos);
 	inline bool dead()
@@ -37,7 +37,7 @@ private:
 	}
 
 	Matrix4 ds;
-	Ship *owner;
+	ShipController *owner;
 	unsigned short ttl;
 	unsigned short max_ttl;
 	unsigned short max_ttl_2;

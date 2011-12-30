@@ -25,6 +25,26 @@ namespace Input
 
 	bool handle();
 
+	inline float normalize_button(int e)
+	{
+		switch(e)
+		{
+		case SHOOT:
+		case MOVE_BACKWARD:
+		case MOVE_RIGHT:
+		case MOVE_UP:
+		case MOVE_SPINL:
+			return 1.0;
+		case MOVE_DOWN:
+		case MOVE_LEFT:
+		case MOVE_SPINR:
+		case MOVE_FORWARD:
+			return -1.0;
+		default:
+			return 0.0;
+		}
+	}
+
 	inline void rotate(int controller_id, float rx, float ry)
 	{
 		ship_controllers[controller_id]->rotate_h(rx);

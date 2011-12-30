@@ -26,6 +26,7 @@ Ship::set_controller(ShipController* pctrl)
 	ctrl = pctrl;
 	ctrl->set_engine(engine);
 	ctrl->set_guns(&gun_l, &gun_r);
+	ctrl->set_guns_matrices(l_canon, r_canon);
 }
 
 Ship::Ship(MeshTypes type)
