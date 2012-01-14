@@ -3,13 +3,13 @@
 #include "updatable.hpp"
 #include "drawable.hpp"
 
-class RandomCube: public Updatable, public drawable::Drawable 
+class RandomCube: public Updatable, public Glome::Drawable 
 {
 public:
 	RandomCube();
 	~RandomCube();
 
 	void update();
-	void draw(const Shader& s);
+	void draw(Camera& s);
 	void randomize();
 };

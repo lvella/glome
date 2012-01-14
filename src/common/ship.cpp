@@ -16,7 +16,7 @@
 #include <iostream>
 
 using namespace std;
-using namespace drawable;
+using namespace Glome;
 
 extern const char* mesh_filename[MESH_COUNT];
 
@@ -78,18 +78,12 @@ Ship::load_guns(MeshTypes type)
 }
 
 void 
-Ship::draw(const Shader& s)
+Ship::draw(Camera& c)
 {
-	s.setTransform(_t);
-	mesh->draw(s);
-}
-
-void
-Ship::draw(const Shader& s, Matrix4 cam, Matrix4 proj)
-{
-	s.setTransform(_t);
-	mesh->draw(s);
-	//engine->draw(cam, proj);
+	c.pushMult(_t);
+	mesh->draw(c);
+	//engine->draw(c);
+	c.pop();
 }
 
 void

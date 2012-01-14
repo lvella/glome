@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdio.h>
-
 #include <boost/ref.hpp>
 
 #include "shader.hpp"
@@ -13,7 +12,7 @@ class Mesh
 public:
   ~Mesh();
 
-  void draw(const Shader& s);
+  void draw(Camera& c);
 
   static Mesh* get_mesh(MeshTypes type);
   static void release_mesh(Mesh* m);

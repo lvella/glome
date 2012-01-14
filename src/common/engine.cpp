@@ -5,7 +5,7 @@
 #include "config.hpp"
 #include "fire.hpp"
 
-using namespace drawable;
+using namespace Glome;
 
 extern const char* mesh_filename[MESH_COUNT];
 
@@ -61,12 +61,8 @@ Engine::load_location(MeshTypes type)
   fclose(fd);
 }
 
-void Engine::draw(const Shader& cam)
+void Engine::draw(Camera& c)
 {
-}
-
-void Engine::draw(Matrix4 cam, Matrix4 proj)
-{
-	FX_engine->draw(cam,proj);
+	FX_engine->draw(c);
 }
 

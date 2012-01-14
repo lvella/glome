@@ -28,7 +28,7 @@ initialize_meridians()
 }
 
 void
-draw_meridians(const Shader &s)
+draw_meridians(const Shader &s) //TODO: change to use camera
 {
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

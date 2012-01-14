@@ -5,18 +5,40 @@
 #include "object.hpp"
 #include "textures.hpp"
 #include "gl.hpp"
+#include "drawable.hpp"
 
 /*** PARTICLE SYSTEM ***/
+/*                      (You don't say?)
+                          . ,MMMMMMM=..
+                          MMMMMMMMMMMMMM7.
+                        .M..    . .:MMMMMMM
+                        D.          ..DMMMMM
+                       I~.             .NMMMM
+                      .  ?M.            .NMMMM
+                     .  ~..       .      ~MMMMM
+                     8?DM         IM.    MMMMMMM.
+                     ...? : ...Z+~  ?   :MMMMMMM
+                   .   ...     ~M $.    MMMMMMMMM
+                      .,.    .  ..     .MMMMMMMMM
+                   , .~:.  .            MMMMMMMMM
+                   =     := .          NMM=MMMMM,
+                 . I:....     .          .:MMMMI.
+          ....,OMMMM  M I...  .         . $MMMM.
+       . .OMMMMMMMMM   MMN~~...      . :$7.MMMO~  .
+    ..,MMMMMMMMMMMMM   . ..          ... MMMMMMMMMMMM$..
+  .?MMMMMMMMMMMMMMMM..            . .  MMMMMMMMMMMMMMMMMZ.
+ MMMMMMMMMMMMMMMMMMM .Z         . ~.  MMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMM.         . I   Z8MMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMM: ..  .  .    ..MMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMM. ~..      7. =MMMMMMMMMMMMMMMMMMMMMMM
+MMMMMMMMMMMMMMMMMMMMMM7..~.   :.   .MMMMMMMMMMMMMMMMMMMMMMMM*/
 
-class ParticleSystem : public Object
+class ParticleSystem : public Glome::Drawable
 {
 public:
 	ParticleSystem(int np);
-	ParticleSystem(){}
 	virtual	~ParticleSystem() = 0;
 
-	virtual void draw(Matrix4 camera, Matrix4 projection) = 0;
-	void draw(const Shader& cam);
 	static void initialize();
 protected:
 	struct Particle

@@ -7,13 +7,12 @@
 #include "mesh.hpp"
 #include "ship_controller.hpp"
 
-class Ship : public Updatable, public drawable::Drawable 
+class Ship : public Updatable, public Glome::Drawable 
 {
 public:
 	Ship(MeshTypes type = HUNTER);
 	~Ship() {};
-	void draw(const Shader& s);
-	void draw(const Shader& s, Matrix4 cam, Matrix4 proj);
+	void draw(Camera& c);
 	void update();
 	void load_guns(MeshTypes type);
 	void set_controller(ShipController* pctrl);

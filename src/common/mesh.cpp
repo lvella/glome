@@ -82,17 +82,19 @@ Mesh::Mesh(MeshTypes type):
 }
 
 void
-Mesh::draw(const Shader& s)
+Mesh::draw(Camera& c)
 {
+	const Shader *s = c.getShader();
+
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glEnableVertexAttribArray(s.colorAttr());
+  glEnableVertexAttribArray(s->colorAttr());
 
-  glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, 32, NULL);
-  glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, 32, (void*) (4 * sizeof(float)));
+  glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, 32, NULL);
+  glVertexAttribPointer(s->colorAttr(), 4, GL_FLOAT, GL_FALSE, 32, (void*) (4 * sizeof(float)));
 
   glDrawElements(GL_LINES, len, GL_UNSIGNED_SHORT, NULL);
-  glDisableVertexAttribArray(s.colorAttr());
+  glDisableVertexAttribArray(s->colorAttr());
 }
 
 Mesh*

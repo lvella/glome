@@ -20,7 +20,7 @@ static GLuint texture;
 static GLint uniform_has_tex;
 static GLint uniform_camera;
 static GLint uniform_projection;
-static Shader program_bullet;
+static CamShader program_bullet;
 
 static GLuint minimap_vbo;
 static Vector4* minimap_buf = NULL;
@@ -114,14 +114,13 @@ void Projectile::update_all(const Vector4& camera_pos)
 	}
 }
 
-void Projectile::draw_all(const Matrix4& projection, const Matrix4& camera)
+void Projectile::draw_all(Camera& c)
 {
 	if(shots.size() != 0) {
-		program_bullet.enable();
+		c.setShader(&program_bullet);
+
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glUniform1i(uniform_has_tex, 1);
-		camera.loadTo(uniform_camera);
-		projection.loadTo(uniform_projection);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
 		glEnableVertexAttribArray(program_bullet.colorAttr());
@@ -130,7 +129,7 @@ void Projectile::draw_all(const Matrix4& projection, const Matrix4& camera)
 		glVertexAttribPointer(program_bullet.colorAttr(), 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (float*)0);
 
 		for(SList::reverse_iterator i = shots.rbegin(); i != shots.rend(); ++i)
-			i->draw(program_bullet);
+			i->draw(c);
 
 		glDisableVertexAttribArray(program_bullet.colorAttr());
 	}
@@ -182,10 +181,11 @@ Projectile::Projectile(ShipController *s, const Matrix4& from, float speed):
 {
 }
 
-void Projectile::draw(const Shader& s)
+void Projectile::draw(Camera& c)
 {
-	s.setTransform(_t);
+	c.pushMult(_t);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
+	c.pop();
 }
 
 void Projectile::update(const Vector4& camera_pos)

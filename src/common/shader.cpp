@@ -124,3 +124,14 @@ void Shader::setup_shader(const char *sources[])
 	attr_color = glGetAttribLocation(prog, "color");
 	attr_texcoord = glGetAttribLocation(prog, "texcoord");
 }
+
+void CamShader::setup_shader(const char *sources[])
+{
+	Shader::setup_shader(sources);
+	uniform_projection = glGetUniformLocation(prog, "projection");
+}
+
+void CamShader::setProjection(const Matrix4& proj) const
+{
+	proj.loadTo(uniform_projection);
+}

@@ -10,7 +10,7 @@ class Projectile: public Object
 public:
 	static void initialize();
 	static void shot(ShipController *s, const Matrix4& from, float speed);
-	static void draw_all(const Matrix4& projection, const Matrix4& camera);
+	static void draw_all(Camera& cam);
 	static void draw_in_minimap();
 	static void update_all(const Vector4& camera_pos);
 	static bool collide(const Vector4& position, float radius);
@@ -23,7 +23,7 @@ public:
 
 private:
 	Projectile(ShipController *s, const Matrix4& from, float speed);
-	void draw(const Shader& cam);
+	void draw(Camera& cam);
 	void update(const Vector4& camera_pos);
 	inline bool dead()
 	{

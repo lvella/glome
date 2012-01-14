@@ -6,7 +6,7 @@
 
 #include "randomcube.hpp"
 
-using namespace drawable;
+using namespace Glome;
 
 RandomCube::RandomCube()
 {
@@ -22,12 +22,13 @@ RandomCube::update()
 {
 }
 
-void RandomCube::draw(const Shader& s)
+void RandomCube::draw(Camera& c)
 {
   float a = 0.02;
   float w = -sqrt(1 - a*a);
 
-  s.setTransform(_t);
+  c.pushMult(_t);
+
   glBegin(GL_QUADS);
 
   glColor3ub(255, 0, 0);
@@ -67,6 +68,8 @@ void RandomCube::draw(const Shader& s)
   glVertex4f(-a, a, -a, w);
 
   glEnd();
+
+  c.pop();
 }
 
 void RandomCube::randomize() {

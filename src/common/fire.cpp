@@ -1,7 +1,7 @@
 #include "fire.hpp"
 #include "gl.hpp"
 
-static Shader program_fire;
+static CamShader program_fire;
 static GLuint vbo;
 static GLint attrib_size, uniform_projection, uniform_camera;
 
@@ -47,21 +47,15 @@ void Fire::initialize()
 	glEnable(GL_POINT_SPRITE);
 }
 
-void Fire::ParticleSystem::draw(const Shader& cam)
+void Fire::draw(Camera& c)
 {
-}
-
-void Fire::draw(Matrix4 cam, Matrix4 proj)
-{
-	program_fire.enable();
+	c.setShader(&program_fire);
 	
   glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex_particle);
 	glEnable(GL_TEXTURE_2D);
 
-	cam.loadTo(uniform_camera);
-	proj.loadTo(uniform_projection);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	//TODO: Pass parameters to shader in a better way

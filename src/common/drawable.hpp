@@ -1,16 +1,15 @@
 #pragma once
 
 #include "matrix4.hpp"
-#include "shader.hpp"
+#include "camera.hpp"
 #include "object.hpp"
 
-namespace drawable
+namespace Glome
 {
 	class Drawable : virtual public Object
 	{
 	public:
-		Drawable() {};
 		virtual ~Drawable() {};
-		virtual void draw(const Shader& cam) = 0;
+		virtual void draw(Camera& c) = 0;
 	};
 }

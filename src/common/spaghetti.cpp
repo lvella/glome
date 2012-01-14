@@ -7,7 +7,7 @@
 
 #include "spaghetti.hpp"
 
-using namespace drawable;
+using namespace Glome;
 
 static inline float randr()
 {
@@ -71,10 +71,10 @@ CalculateBezierPoint(float t, Vector4 *p)
     return v;
 }
 
-void Spaghetti::draw(const Shader& s)
+void Spaghetti::draw(Camera& c)
 {
-  glPushMatrix();
-  s.setTransform(_t);
+  c.pushMult(_t);
+
   glBegin(GL_LINE_LOOP);
 
   for(int i = 0; i < SPAGHETTI_COUNT; ++i) {
@@ -87,7 +87,8 @@ void Spaghetti::draw(const Shader& s)
   }
 
   glEnd();
-  glPopMatrix();
+
+  c.pop();
 }
 
 void Spaghetti::update() {

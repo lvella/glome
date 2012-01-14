@@ -5,12 +5,12 @@
 
 #define SPAGHETTI_COUNT 100 // Number of cubic Bézier curves
 
-class Spaghetti: public Updatable, public drawable::Drawable 
+class Spaghetti: public Updatable, public Glome::Drawable 
 {
 public:
   Spaghetti();
 
-  void draw(const Shader& s);
+  void draw(Camera& s);
   void update();
 private:
   Matrix4 velo;

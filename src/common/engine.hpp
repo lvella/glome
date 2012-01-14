@@ -6,7 +6,7 @@
 #include "mesh.hpp"
 #include "particle_system.hpp"
 
-class Engine: public drawable::Drawable
+class Engine: public Glome::Drawable
 {
 public:
 	Engine(MeshTypes type);
@@ -14,8 +14,7 @@ public:
 	float speed_forward, float accel_forward, float speed_vertical,
 	float speed_horizontal, float max_speed_spin);
 	~Engine();
-	void draw(const Shader& cam);
-	void draw(Matrix4 cam, Matrix4 proj);
+	void draw(Camera& c);
 	void load_location(MeshTypes type);
 
 private:
