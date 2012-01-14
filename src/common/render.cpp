@@ -71,7 +71,7 @@ void
 Render::fill_minimap()
 {
 	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
-	// Probably so insignificant it it not worth the effort.
+	// Probably so insignificant it is not worth the effort.
 	MiniMap::draw_dot(cube);
 	for(size_t i = 1; i < players->size(); ++i)
 		MiniMap::draw_dot(*(players->at(i)));
