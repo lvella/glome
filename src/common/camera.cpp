@@ -4,7 +4,7 @@
 
 Camera::Camera()
 {
-	shader = NULL;
+	reset(Matrix4::IDENTITY, NULL);
 }
 
 void Camera::setProjection(const Matrix4& p)
@@ -12,11 +12,12 @@ void Camera::setProjection(const Matrix4& p)
 	PROJ_MAT = p;
 }
 
-void Camera::reset(const Matrix4& invCam)
+void Camera::reset(const Matrix4& invCam, const CamShader *s)
 {
-	stack.resize(1, invCam);
-	if(shader)
-		shader->setTransform(invCam);
+	stack.resize(1);
+	stack[0] = invCam;
+
+	setShader(s);
 }
 
 void Camera::pushMult(const Matrix4& t)

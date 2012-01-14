@@ -13,7 +13,7 @@ public:
 
 	// TODO: make the thing to follow the ship here...
 	// TODO: create an "update()" method
-	void reset(const Matrix4& invCam);
+	void reset(const Matrix4& invCam, const CamShader *s);
 
 	void pushMult(const Matrix4& t);
 	void pop();

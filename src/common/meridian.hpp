@@ -1,6 +1,6 @@
 #pragma once
 
-#include "shader.hpp"
+#include "camera.hpp"
 
 void initialize_meridians();
-void draw_meridians(const Shader& s);
+void draw_meridians(Camera& c);

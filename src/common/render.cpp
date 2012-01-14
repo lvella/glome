@@ -50,13 +50,11 @@ Render::draw()
 
 	// Calculate camera postion
 	const Matrix4 cam_offset(yz_matrix(0.2) * zw_matrix(-0.015) * yw_matrix(-0.01));
-	camera.reset(cam_offset * cam_hist.front());
+	camera.reset(cam_offset * cam_hist.front(), &shader);
 	cam_hist.pop_front();
 	cam_hist.push_back(center);
 
-	camera.setShader(&shader);
-
-	draw_meridians(shader);
+	draw_meridians(camera);
 	cube.draw(camera);
 	//spg.draw(camera);
 
@@ -72,7 +70,8 @@ Render::draw()
 void
 Render::fill_minimap()
 {
-	Projectile::draw_in_minimap();
+	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
+	// Probably so insignificant it it not worth the effort.
 	MiniMap::draw_dot(cube);
 	for(size_t i = 1; i < players->size(); ++i)
 		MiniMap::draw_dot(*(players->at(i)));

@@ -2,7 +2,6 @@ attribute vec4 position;
 attribute vec4 texcoord;
 attribute vec4 color;
 
-uniform mat4 camera;
 uniform mat4 transform;
 uniform bool has_tex;
 
@@ -29,11 +28,11 @@ void main()
   vec3 v;
 
   if(has_tex) {
-  	v = project_vertex(camera * (transform * center));
+  	v = project_vertex(transform * center);
     v.xy = v.xy + position.xy * 0.045;
     v_texcoord = (1.0 + position.xy) * 0.5;
   } else {
-    v = project_vertex(camera * (transform * position));
+    v = project_vertex(transform * position);
     v_texcoord = texcoord.st;
   }
 
