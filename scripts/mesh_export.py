@@ -109,6 +109,12 @@ def vertex_conv(i, scale):
   d = 1 + x*x + y*y + z*z
   return (2*x/d, 2*y/d, 2*z/d, (-1 + x*x + y*y + z*z)/d)
 
+def write_matrix(mat, bfile):
+  for i in range(0, mat.row_size):
+    for j in range(0, mat.col_size):
+      # t[col][row] because this is how OpenGL represents matrices
+      bfile.write(struct.pack('<f', mat[j][i]))
+
 ###########
 # Objects #
 ###########
@@ -237,9 +243,7 @@ class Guns:
     bfile.write(struct.pack('<H', len(self.lguns)))
     for g in self.lguns:
       t = matrix_gen(g.location - self.objMesh.location)
-      for i in range(0, t.row_size):
-        for j in range(0, t.col_size):
-          bfile.write(struct.pack('<f', t[i][j]))
+      write_matrix(t, bfile)
     bfile.close()
 
 #Export Engines positions
@@ -253,9 +257,7 @@ class Engines:
     bfile.write(struct.pack('<H', len(self.lengines)))
     for e in self.lengines:
       t = matrix_gen(e.location - self.objMesh.location)
-      for i in range(0, t.row_size):
-        for j in range(0, t.col_size):
-          bfile.write(struct.pack('<f', t[i][j]))
+      write_matrix(t, bfile)
     bfile.close()
 
 ########
