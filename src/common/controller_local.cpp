@@ -14,7 +14,7 @@ ControllerLocal::ControllerLocal(vector<Ship*>* pp, vector<ShipAI*>* pvb) : Cont
 {
 	bots = pvb;
 
-	Ship* s = new Ship();
+	Ship* s = new Ship(MeshTypes(rand() % MESH_COUNT));
 	players->push_back(s);
 	ShipController* ctrl = Input::create_ship_controller(0);
 	s->set_controller(ctrl);	
