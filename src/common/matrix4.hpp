@@ -71,10 +71,47 @@ typedef float Real;
 class Matrix4
 {
 protected:
+	// Even though OGRE's uses column vectors, this shit originally was stored
+	// in memory transposed compared to how OpenGL stores the matrices. This
+	// is a hack to fix that, I hope optimizer will get rid of it.
+	class Accessor {
+	public:
+		template<class A>
+		class ColAccessor {
+		public:
+			ColAccessor(A* ac, int r):
+				a(ac),
+				row(r)
+			{}
+
+			Real& operator[](int col) {
+				return a->m[col][row];
+			}
+
+			Real operator[](int col) const {
+				return a->m[col][row];
+			}
+
+		private:
+			int row;
+			A* a;
+		};
+
+		const ColAccessor<const Accessor> operator[](int row) const {
+			return ColAccessor<const Accessor>(this, row);
+		}
+
+		ColAccessor<Accessor> operator[](int row) {
+			return ColAccessor<Accessor>(this, row);
+		}
+	private:
+		Real m[4][4];
+	};
+
   /// The matrix entries, indexed by [row][col].
   union {
-    Real m[4][4];
-    Real _m[16]; // This shit is stored transposed compared to OpenGL...
+    Accessor m;
+    Real _m[16]; // Now I hope this to be is stored in OpenGL format...
   };
 
 public:
@@ -127,13 +164,13 @@ public:
     std::swap(m[3][3], other.m[3][3]);
   }
 
-  inline Real* operator [] ( size_t iRow )
+  inline Accessor::ColAccessor<Accessor> operator [] ( size_t iRow )
   {
     assert( iRow < 4 );
     return m[iRow];
   }
 
-  inline const Real *operator [] ( size_t iRow ) const
+  inline const Accessor::ColAccessor<const Accessor> operator [] ( size_t iRow ) const
   {
     assert( iRow < 4 );
     return m[iRow];
@@ -321,32 +358,22 @@ public:
   /** Function for writing to a stream.
    */
   inline friend std::ostream& operator <<
-  ( std::ostream& o, const Matrix4& mat )
+  		( std::ostream& o, const Matrix4& mat )
   {
-    for (size_t i = 0; i < 4; ++i)
-      {
-	for(size_t j = 0; j < 4; ++j)
-	  {
-	    o << mat[i][j] << ", ";
-	  }
-	o << '\n';
-      }
-    o << "\n\n";
-    return o;
+  	for (size_t i = 0; i < 4; ++i)
+  	{
+  		for(size_t j = 0; j < 4; ++j)
+  		{
+  			o << mat[i][j] << ", ";
+  		}
+  		o << '\n';
+  	}
+  	o << "\n\n";
+  	return o;
   }
 
   void loadTo(GLint var) const {
-    glUniformMatrix4fv(var, 1, GL_TRUE, _m);
-  }
-
-  void loadToGL() const {
-    glLoadTransposeMatrixf(_m);
-  }
-  void multToGL() const {
-    glMultTransposeMatrixf(_m);
-  }
-  void loadFromGL() {
-    glGetFloatv(GL_TRANSPOSE_MODELVIEW_MATRIX, _m);
+  	glUniformMatrix4fv(var, 1, GL_FALSE, _m);
   }
 
   Vector4 position() const {
