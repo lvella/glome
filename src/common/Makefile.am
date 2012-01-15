@@ -26,7 +26,7 @@ libcommon_a_SOURCES = \
 	particle_system.cpp \
 	projectile.cpp \
 	randomcube.cpp \
-	render.cpp \
+	renderer.cpp \
 	shader.cpp \
 	ship_ai.cpp \
 	ship_controller.cpp \

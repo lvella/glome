@@ -1,6 +1,9 @@
 #pragma once
 
+#include <vector>
 #include "world_local.hpp"
+#include "spaghetti.hpp"
+#include "randomcube.hpp"
 
 class WorldDummy : public WorldLocal
 {
@@ -10,5 +13,10 @@ public:
 
 	void update();
 	void draw();
+
+private:
+	std::vector<Glome::Drawable*> objects;
+	RandomCube cube;
+	Spaghetti spg;
 };
 

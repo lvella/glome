@@ -8,7 +8,6 @@
 class WorldLocal : public World
 {
 public:
-	WorldLocal() {};
 	virtual ~WorldLocal() {};
 
 protected:

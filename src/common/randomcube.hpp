@@ -7,7 +7,7 @@ class RandomCube: public Updatable, public Glome::Drawable
 {
 public:
 	RandomCube();
-	~RandomCube();
+	virtual ~RandomCube();
 
 	void update();
 	void draw(Camera& s);

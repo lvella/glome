@@ -1,14 +1,13 @@
 #pragma once
 
 #include "controller.hpp"
-#include "render.hpp"
+#include "renderer.hpp"
 #include "ship.hpp"
 
 /** Every game mode should derive this class. */
 class World
 {
 public:
-	World() {};
 	virtual ~World() {};
 
 	static void initialize();
@@ -19,7 +18,7 @@ public:
 
 protected:
 	Controller* _ctrl;
-	Render* _render;
+	Renderer* _render;
 	std::vector<Ship*> players;
 };
 
