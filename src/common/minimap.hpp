@@ -11,7 +11,7 @@ namespace MiniMap
  * @param world Use to draw minimap in world
  * @param center Center of minimap 
  */
-  void draw(int wstart, Renderer* world, const Matrix4& center);
+  void draw(int wstart, int hstart, Renderer* world, const Matrix4& center);
   void draw_dot(const Object &obj);
   void update();
   void initialize();

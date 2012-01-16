@@ -35,12 +35,11 @@ Renderer::setup_display()
 Renderer::Renderer(vector<Ship*>* pp)
 {
 	assert(pp->size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
-	int x = 0, y = 0;
 	int h = height / (pp->size() > 2 ? 2 : 1);
 	int w = width / (pp->size() > 1 ? 2 : 1);
 
 	for(int i = 0; i < pp->size(); ++i) {
-		players.push_back(Viewport(pp->at(0), x + (i%2) * w, y + (i/2) * h, w, h));
+		players.push_back(Viewport(pp->at(i), (i%2) * w, height - (i/2 + 1) * h, w, h));
 	}
 
 	// Set non-changing camera perspective
@@ -51,10 +50,8 @@ void
 Renderer::draw(vector<Glome::Drawable*> *objs)
 {
 	objects = objs;
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	for(int i = 0; i < players.size(); ++i) {
-		// TODO: not sure if glClear clears the whole window or just the viewport.
-		// Test it.
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		players[i].enable();
 
 		camera.reset(players[i].newCameraTransform(), &shader);
@@ -65,10 +62,10 @@ Renderer::draw(vector<Glome::Drawable*> *objs)
 		}
 
 		Projectile::draw_all(camera);
-		//MiniMap::draw(0, this, center);
+		players[i].drawMiniMap(this);
 	}
 }
-	
+
 void
 Renderer::fill_minimap()
 {
@@ -76,6 +73,12 @@ Renderer::fill_minimap()
 	// Probably so insignificant it is not worth the effort.
 	for(size_t i = 1; i < objects->size(); ++i)
 		MiniMap::draw_dot(*(objects->at(i)));
+}
+
+void
+Renderer::Viewport::drawMiniMap(Renderer *r)
+{
+	MiniMap::draw(_x, _y, r, t->transformation().transpose());
 }
 
 CamShader Renderer::shader;

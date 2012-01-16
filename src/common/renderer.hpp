@@ -54,6 +54,8 @@ protected:
 			return ret;
 		}
 
+		void drawMiniMap(Renderer *r);
+
 	private:
 		Ship* t;
 		std::deque<Matrix4> cam_hist;
