@@ -135,7 +135,7 @@ class SpaceShip:
     self.ssEngines.export()
 
   def create_header(self):
-    bfile = open(filename, 'ab')
+    bfile = open(filename, 'a+b')
     # calc initial positions
     self.mesh_pos = header_size = 3 * isize
     mesh_size = (len(self.data.vertices) * 8 * fsize) + (len(self.data.edges) * 2 * usize) + (2 * usize)
@@ -214,7 +214,7 @@ class Mesh:
     #specular_color = self.data.materials[0].specular_color
 
   def export(self):
-    bfile = open(filename, 'ab')
+    bfile = open(filename, 'a+b')
     bfile.write(struct.pack('<H', len(self.data.vertices)))
     for v in self.data.vertices:
       out = vertex_conv(v.co, scale)
@@ -239,7 +239,7 @@ class Guns:
     self.objMesh = objMesh
 
   def export(self):
-    bfile = open(filename, 'ab')
+    bfile = open(filename, 'a+b')
     bfile.write(struct.pack('<H', len(self.lguns)))
     for g in self.lguns:
       t = matrix_gen(g.location - self.objMesh.location)
@@ -253,7 +253,7 @@ class Engines:
     self.objMesh = objMesh
 
   def export(self):
-    bfile = open(filename, 'ab')
+    bfile = open(filename, 'a+b')
     bfile.write(struct.pack('<H', len(self.lengines)))
     for e in self.lengines:
       t = matrix_gen(e.location - self.objMesh.location)
@@ -279,3 +279,4 @@ if __name__ == "__main__":
   ss.create_header()
   ss.export()
 #  ss.read()
+
