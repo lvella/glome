@@ -10,7 +10,7 @@
 #include "ship.hpp"
 #include "shader.hpp"
 #include "meridian.hpp"
-#include "render.hpp"
+#include "renderer.hpp"
 #include "options.hpp"
 #include "textures.hpp"
 #include "minimap.hpp"
@@ -32,14 +32,14 @@ static GLint hud_has_tex;
 static GLuint vbo;
 
 void
-MiniMap::draw(int wstart, Render* rend, const Matrix4& center)
+MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center)
 {
-	const int t = 160;
 	const int b = 10;
 	const int l = 10;
+	const int t = 160;
 	const int r = 160;
 
-	glViewport(wstart + l, b, r, t);
+	glViewport(wstart + l, hstart + b, r, t);
 
 	// Draw 2D green background.
 	hud.enable();
@@ -82,9 +82,6 @@ MiniMap::draw(int wstart, Render* rend, const Matrix4& center)
 	glBindTexture(GL_TEXTURE_2D, tex_object);
 	rend->fill_minimap();
 	glBindTexture(GL_TEXTURE_2D, 0);
-
-	// Disable 2D
-	glViewport(0, 0, width, height);
 }
 
 void MiniMap::draw_dot(const Object& obj)

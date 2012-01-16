@@ -48,10 +48,13 @@ Spaghetti::Spaghetti()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
 	{
-	        float vbo[SPAGHETTI_COUNT * 4 * 10];
-	        // TODO: To be continued...
+		float vbo[SPAGHETTI_COUNT * 4 * 10];
+		// TODO: To be continued...
 	}
 }
+
+Spaghetti::~Spaghetti()
+{}
 
 // From http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
 static Vector4

@@ -9,6 +9,7 @@ class Spaghetti: public Updatable, public Glome::Drawable
 {
 public:
   Spaghetti();
+  virtual ~Spaghetti();
 
   void draw(Camera& s);
   void update();
