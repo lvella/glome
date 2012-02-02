@@ -135,7 +135,6 @@ class SpaceShip:
     self.ssEngines.export()
 
   def create_header(self):
-    bfile = open(filename, 'a+b')
     # calc initial positions
     self.mesh_pos = header_size = 3 * isize
     mesh_size = (len(self.data.vertices) * 8 * fsize) + (len(self.data.edges) * 2 * usize) + (2 * usize)
@@ -147,7 +146,6 @@ class SpaceShip:
     bfile.write(struct.pack('<I', self.mesh_pos))
     bfile.write(struct.pack('<I', self.gun_pos))
     bfile.write(struct.pack('<I', self.engine_pos))
-    bfile.close()
 
   def read(self):
     bfile = open(filename, 'rb')
@@ -214,7 +212,6 @@ class Mesh:
     #specular_color = self.data.materials[0].specular_color
 
   def export(self):
-    bfile = open(filename, 'a+b')
     bfile.write(struct.pack('<H', len(self.data.vertices)))
     for v in self.data.vertices:
       out = vertex_conv(v.co, scale)
@@ -230,7 +227,6 @@ class Mesh:
     for e in self.data.edges.values():
       bfile.write(struct.pack('<H', e.key[0]))
       bfile.write(struct.pack('<H', e.key[1]))
-    bfile.close()
 
 #Export guns positions
 class Guns:
@@ -239,12 +235,10 @@ class Guns:
     self.objMesh = objMesh
 
   def export(self):
-    bfile = open(filename, 'a+b')
     bfile.write(struct.pack('<H', len(self.lguns)))
     for g in self.lguns:
       t = matrix_gen(g.location - self.objMesh.location)
       write_matrix(t, bfile)
-    bfile.close()
 
 #Export Engines positions
 class Engines:
@@ -253,17 +247,15 @@ class Engines:
     self.objMesh = objMesh
 
   def export(self):
-    bfile = open(filename, 'a+b')
     bfile.write(struct.pack('<H', len(self.lengines)))
     for e in self.lengines:
       t = matrix_gen(e.location - self.objMesh.location)
       write_matrix(t, bfile)
-    bfile.close()
 
 ########
 # Main #
 ########
-filename = ''
+bfile = None
 ssname = ''
 if __name__ == "__main__":
   # objects in blender need be separeted per scenes
@@ -274,9 +266,11 @@ if __name__ == "__main__":
     if(o.type == 'MESH'):
       filename = o.name + '.wire'
       ssname = o.name
+      bfile = open(filename, 'wb')
   #FIXME: spaceship name(ssname) is global
   ss = SpaceShip(objs, listAllScenes)
   ss.create_header()
   ss.export()
+  bfile.close()
 #  ss.read()
 
