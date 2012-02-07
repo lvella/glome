@@ -12,7 +12,7 @@ WorldDummy::WorldDummy()
 	s->set_controller(ctrl);
 	players.push_back(s);
 
-	_ctrl = new ControllerLocal(&players, &bots);
+	_ctrl = new ControllerLocal(&players);
 	_render = new Renderer(&players);
 
 	objects.insert(objects.begin(), players.begin(), players.end());
@@ -22,6 +22,8 @@ WorldDummy::WorldDummy()
 
 WorldDummy::~WorldDummy()
 {
+	delete _ctrl;
+	delete _render;
 }
 
 void

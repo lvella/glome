@@ -7,7 +7,6 @@
 class ControllerRemote : public ControllerLocal
 {
 public:
-	ControllerRemote() {};
 	virtual ~ControllerRemote() {};
 
 	void update();

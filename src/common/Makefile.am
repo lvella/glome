@@ -28,7 +28,7 @@ libcommon_a_SOURCES = \
 	randomcube.cpp \
 	renderer.cpp \
 	shader.cpp \
-	ship_ai.cpp \
+	ai_controller.cpp \
 	ship_controller.cpp \
 	ship.cpp \
 	sound.cpp \

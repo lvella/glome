@@ -19,7 +19,6 @@ ShipController::update(Matrix4& t)
 	/* Turning */
 	float h = h_tilt - h_req;
 	float v = v_tilt - v_req;
-
 	/* Limit the turning speed to MAXD rads per frame. */
 	if(h > engine->max_rot_per_frame)
 		h = engine->max_rot_per_frame;
