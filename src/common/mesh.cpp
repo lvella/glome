@@ -1,10 +1,12 @@
 #include <GL/glew.h>
 #include <iostream>
 #include <sstream>
+#include <cassert>
 
 #include "world.hpp"
 #include "mesh.hpp"
 #include "config.hpp"
+#include "vector4.hpp"
 
 using namespace std;
 
@@ -14,7 +16,8 @@ const char* mesh_filename[MESH_COUNT] =
   {
     "hunter",
     "destroyer",
-    "ufo"
+    "ufo",
+    NULL
   };
 
 Mesh::~Mesh()
@@ -25,14 +28,28 @@ Mesh::~Mesh()
 Mesh::Mesh(MeshTypes type):
   ref_count(1)
 {
+	assert(size_t(type) < MESH_COUNT);
+
+  const char* name = mesh_filename[int(type)];
+
+  glGenBuffers(2, bufobjs);
+
+  if(name)
+  	load_from_file(name);
+  else {
+  	// switch (type) { // when there are more than one procedural type
+  	generate_icosphere();
+  }
+}
+
+void Mesh::load_from_file(const char* name)
+{
   uint16_t ilen, vlen;
 
   int ret;
   FILE *fd;
 
-  const char* name = mesh_filename[int(type)];
-
-  std::cout << "Loading new mesh named " << name << '.' << std::endl;
+  std::cout << "Loading mesh " << name << std::endl;
 
   // Load mesh file and put it into the list of meshs if was not exist
   {
@@ -47,7 +64,6 @@ Mesh::Mesh(MeshTypes type):
     assert(fd != NULL);
   }
 
-  glGenBuffers(2, bufobjs);
   {
     // Reading 4-D vertex coordinates(16bytes) and colorRGBA values(16bytes)
     // format: <x, y, z, w> <r, g, b, a>
@@ -79,6 +95,69 @@ Mesh::Mesh(MeshTypes type):
   len = ilen * 2;
 
   fclose(fd);
+}
+
+// based on http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
+void Mesh::generate_icosphere()
+{
+	struct Builder {
+		float e[480][2];
+		Vector4 v[12 + 30 + 120];
+		int iv;
+		int ie;
+
+		Builder()
+		{
+			const float p = float((1.0 + sqrtf(5.0)) / 2.0); // golden ratio, used in building of an icosahedron
+
+			iv = 0;
+			ie = 0;
+
+			// initial vertexes
+			v[iv++] = Vector4(-1,  p, 0, 0);
+			v[iv++] = Vector4( 1,  p, 0, 0);
+			v[iv++] = Vector4( 1, -p, 0, 0);
+			v[iv++] = Vector4(-1, -p, 0, 0);
+
+			v[iv++] = Vector4(0, -1,  p, 0);
+			v[iv++] = Vector4(0,  1,  p, 0);
+			v[iv++] = Vector4(0,  1, -p, 0);
+			v[iv++] = Vector4(0, -1, -p, 0);
+
+			v[iv++] = Vector4( p, 0, -1, 0);
+			v[iv++] = Vector4( p, 0,  1, 0);
+			v[iv++] = Vector4(-p, 0,  1, 0);
+			v[iv++] = Vector4(-p, 0, -1, 0);
+
+			// recursive face subdivision
+			/*
+
+		  face_subdivide();*/
+		}
+
+		void face_subdivide(size_t iter, size_t a, size_t b, size_t c)
+		{
+			if(iter) {
+				int x, y, z;
+
+				// TODO: To be continued...
+			}
+			else {
+				e[ie][0] = a;
+				e[ie][1] = b;
+
+				e[ie][0] = b;
+				e[ie][1] = c;
+
+				e[ie][0] = c;
+				e[ie][1] = a;
+
+				++ie;
+			}
+		}
+	} b;
+
+
 }
 
 void

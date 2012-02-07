@@ -5,7 +5,7 @@
 
 #include "shader.hpp"
 
-enum MeshTypes {HUNTER, DESTROYER, UFO, MESH_COUNT};
+enum MeshTypes {HUNTER, DESTROYER, UFO, ICOSPHERE, MESH_COUNT};
 
 class Mesh
 {
@@ -18,6 +18,9 @@ public:
   static void release_mesh(Mesh* m);
 
 private:
+  void load_from_file(const char* name);
+  void generate_icosphere();
+
   // a reference counter for shapes
   unsigned int ref_count;
   

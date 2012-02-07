@@ -27,6 +27,7 @@ WorldDummy::~WorldDummy()
 void
 WorldDummy::update()
 {
+	spg.update();
 	_ctrl->update();
 }
 

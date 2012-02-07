@@ -61,7 +61,7 @@ AC_SUBST(GUICHAN_LIBS)
 # Check for Blender
 AX_CHECK_BLENDER([2.58])
 
-CXXFLAGS+=" -std=c++0x"
+CXXFLAGS+=" -std=gnu++0x"
 
 AC_CONFIG_FILES([
 	Makefile
