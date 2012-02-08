@@ -10,6 +10,6 @@ varying vec4 v_color;
 void main()
 {
 	gl_Position = position;
-	v_texcoord = (position.xy + 1.0f) * 0.5f;
+	v_texcoord = (position.xy + 1.0) * 0.5;
 	v_color = color;
 }
