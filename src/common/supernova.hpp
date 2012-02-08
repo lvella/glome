@@ -12,12 +12,15 @@ public:
 	virtual ~Supernova();
 
 	void update();
+	void draw(Camera &c);
 
 private:
-	// Expansion factor
-	float t;
+	Vector4 slerp_s;
+	float slerp_m;
+	float t; // Expansion factor
 
 	CamShader shader;
+	//Uniform slerp_sum;
+	//Uniform slerp_mult;
 	Mesh* mesh;
-	// TODO: minimap mesh
 };

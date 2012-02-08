@@ -32,7 +32,7 @@ WorldDummy::WorldDummy()
 	objects.insert(objects.begin(), ships.begin(), ships.end());
 	objects.push_back(&cube);
 	objects.push_back(&spg);
-
+	//objects.push_back(&nova);
 }
 
 WorldDummy::~WorldDummy()

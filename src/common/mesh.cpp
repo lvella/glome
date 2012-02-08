@@ -101,38 +101,75 @@ void Mesh::load_from_file(const char* name)
 void Mesh::generate_icosphere()
 {
 	struct Builder {
-		float e[480][2];
+		uint16_t e[480][2];
 		Vector4 v[12 + 30 + 120];
 		int iv;
 		int ie;
 
 		Builder()
 		{
-			const float p = float((1.0 + sqrtf(5.0)) / 2.0); // golden ratio, used in building of an icosahedron
+			const float P = float((1.0 + sqrtf(5.0)) / 2.0); // golden ratio, used in building of an icosahedron
+			const float R = 0.05; // shrink the ball to this radius
 
 			iv = 0;
 			ie = 0;
 
 			// initial vertexes
-			v[iv++] = Vector4(-1,  p, 0, 0);
-			v[iv++] = Vector4( 1,  p, 0, 0);
-			v[iv++] = Vector4( 1, -p, 0, 0);
-			v[iv++] = Vector4(-1, -p, 0, 0);
+			v[iv++] = Vector4(-1,  P, 0, 0);
+			v[iv++] = Vector4( 1,  P, 0, 0);
+			v[iv++] = Vector4( 1, -P, 0, 0);
+			v[iv++] = Vector4(-1, -P, 0, 0);
 
-			v[iv++] = Vector4(0, -1,  p, 0);
-			v[iv++] = Vector4(0,  1,  p, 0);
-			v[iv++] = Vector4(0,  1, -p, 0);
-			v[iv++] = Vector4(0, -1, -p, 0);
+			v[iv++] = Vector4(0, -1,  P, 0);
+			v[iv++] = Vector4(0,  1,  P, 0);
+			v[iv++] = Vector4(0,  1, -P, 0);
+			v[iv++] = Vector4(0, -1, -P, 0);
 
-			v[iv++] = Vector4( p, 0, -1, 0);
-			v[iv++] = Vector4( p, 0,  1, 0);
-			v[iv++] = Vector4(-p, 0,  1, 0);
-			v[iv++] = Vector4(-p, 0, -1, 0);
+			v[iv++] = Vector4( P, 0, -1, 0);
+			v[iv++] = Vector4( P, 0,  1, 0);
+			v[iv++] = Vector4(-P, 0,  1, 0);
+			v[iv++] = Vector4(-P, 0, -1, 0);
 
 			// recursive face subdivision
-			/*
+		  face_subdivide(2, 0, 11, 5);
+		  face_subdivide(2, 0, 5, 1);
+		  face_subdivide(2, 0, 1, 7);
+		  face_subdivide(2, 0, 7, 10);
+		  face_subdivide(2, 0, 10, 11);
 
-		  face_subdivide();*/
+		  // 5 adjacent faces
+		  face_subdivide(2, 1, 5, 9);
+		  face_subdivide(2, 5, 11, 4);
+		  face_subdivide(2, 11, 10, 2);
+		  face_subdivide(2, 10, 7, 6);
+		  face_subdivide(2, 7, 1, 8);
+
+		  // 5 faces around point 3
+		  face_subdivide(2, 3, 9, 4);
+		  face_subdivide(2, 3, 4, 2);
+		  face_subdivide(2, 3, 2, 6);
+		  face_subdivide(2, 3, 6, 8);
+		  face_subdivide(2, 3, 8, 9);
+
+		  // 5 adjacent faces
+		  face_subdivide(2, 4, 9, 5);
+		  face_subdivide(2, 2, 4, 11);
+		  face_subdivide(2, 6, 2, 10);
+		  face_subdivide(2, 8, 6, 7);
+		  face_subdivide(2, 9, 8, 1);
+
+		  assert(iv == sizeof(v) / sizeof(float));
+		  assert(ie == sizeof(e) / 4);
+
+		  // Scale all vertices to radius
+		  // Project them to 4-D
+		  for(int i = 0; i < iv; ++i) {
+		  	v[i].normalize();
+		  	v[i] *= R;
+		  	v[i].calc_norm_w();
+
+		  	std::cout << v[i].dot(Vector4::CANONICAL);
+		  }
 		}
 
 		void face_subdivide(size_t iter, size_t a, size_t b, size_t c)
@@ -140,24 +177,37 @@ void Mesh::generate_icosphere()
 			if(iter) {
 				int x, y, z;
 
-				// TODO: To be continued...
+				v[x = iv++] = (v[a] + v[b]) * 0.5;
+				v[y = iv++] = (v[b] + v[c]) * 0.5;
+				v[z = iv++] = (v[c] + v[a]) * 0.5;
+
+				--iter;
+				face_subdivide(iter, a, x, z);
+				face_subdivide(iter, x, b, y);
+				face_subdivide(iter, z, y, c);
+				face_subdivide(iter, x, y, z);
 			}
 			else {
 				e[ie][0] = a;
 				e[ie][1] = b;
+				++ie;
 
 				e[ie][0] = b;
 				e[ie][1] = c;
+				++ie;
 
 				e[ie][0] = c;
 				e[ie][1] = a;
-
 				++ie;
 			}
 		}
 	} b;
 
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(b.v), b.v, GL_STATIC_DRAW);
 
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(b.e), b.e, GL_STATIC_DRAW);
 }
 
 void

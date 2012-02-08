@@ -34,6 +34,7 @@ libcommon_a_SOURCES = \
 	sound.cpp \
 	source.cpp \
 	spaghetti.cpp \
+	supernova.cpp \
 	textures.cpp \
 	vector4.cpp \
 	world_dummy.cpp
