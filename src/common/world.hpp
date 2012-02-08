@@ -19,6 +19,7 @@ public:
 protected:
 	Controller* _ctrl;
 	Renderer* _render;
-	std::vector<Ship*> players;
+	std::vector<Ship*> ships;
+	std::vector<Ship*> bot;
 };
 

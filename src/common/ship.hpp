@@ -2,7 +2,7 @@
 
 #include "updatable.hpp"
 #include "drawable.hpp"
-
+#include "ai_controller.hpp"
 #include "engine.hpp"
 #include "mesh.hpp"
 #include "ship_controller.hpp"
@@ -25,5 +25,6 @@ protected:
 	ship_gun gun_r;
 	uint16_t nguns;
 	Engine* engine;
+
 };
 

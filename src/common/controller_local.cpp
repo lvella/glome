@@ -8,16 +8,7 @@ using namespace std;
 
 ControllerLocal::ControllerLocal(vector<Ship*>* pp) : Controller(pp)
 {
-	Ship* s = new Ship();
-	players->push_back(s);
-	ShipController* ctrl = Input::create_ship_controller(0);
-	s->set_controller(ctrl);
 
-	/*bots = pvb;
-	if(bots) {
-		ShipAI* enemy = new ShipAI();
-		bots->push_back(enemy);
-	}*/
 }
 
 ControllerLocal::~ControllerLocal()
