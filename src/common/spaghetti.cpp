@@ -76,7 +76,9 @@ CalculateBezierPoint(float t, Vector4 *p)
 
 void Spaghetti::draw(Camera& c)
 {
-  c.pushMult(_t);
+  // TODO: Fix it... or throw away
+#if 0
+	c.pushMult(_t);
 
   glBegin(GL_LINE_LOOP);
 
@@ -92,6 +94,7 @@ void Spaghetti::draw(Camera& c)
   glEnd();
 
   c.pop();
+#endif
 }
 
 void Spaghetti::update() {

@@ -51,9 +51,9 @@ public:
 		return Vector4(s*x, s*y, s*z, s*w);
 	}
 
-	Vector4 operator*=(float s) const
+	Vector4 operator*=(float s)
 	{
-		return (*this) * s;
+		return (*this) = (*this) * s;
 	}
 
 	float& operator[](size_t elem)
@@ -79,11 +79,6 @@ public:
 	float length() const
 	{
 		return sqrt(squared_length());
-	}
-
-	void loadVertex() const
-	{
-		glVertex4fv(v);
 	}
 
 	const float* getVertex() const {return v;}

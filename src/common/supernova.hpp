@@ -20,7 +20,7 @@ private:
 	float t; // Expansion factor
 
 	CamShader shader;
-	//Uniform slerp_sum;
-	//Uniform slerp_mult;
+	Uniform slerp_sum;
+	Uniform slerp_mult;
 	Mesh* mesh;
 };

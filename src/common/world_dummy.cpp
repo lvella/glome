@@ -31,8 +31,7 @@ WorldDummy::WorldDummy()
 	}
 	objects.insert(objects.begin(), ships.begin(), ships.end());
 	objects.push_back(&cube);
-	objects.push_back(&spg);
-	//objects.push_back(&nova);
+	objects.push_back(&nova);
 }
 
 WorldDummy::~WorldDummy()
@@ -44,7 +43,7 @@ WorldDummy::~WorldDummy()
 void
 WorldDummy::update()
 {
-	spg.update();
+	nova.update();
 	_ctrl->update();
 }
 

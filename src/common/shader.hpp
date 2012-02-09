@@ -4,6 +4,32 @@
 #include "matrix4.hpp"
 #include <map>
 
+class Uniform
+{
+public:
+	Uniform() {}
+	Uniform(GLint location): id(location) {}
+
+	void set(float val)
+	{
+		glUniform1f(id, val);
+	}
+
+	void set(const Vector4 &val)
+	{
+		glUniform4fv(id, 1, val.getVertex());
+	}
+
+	void set(const Matrix4 &val)
+	{
+		val.loadTo(id);
+	}
+
+private:
+	// Lightweight object, should have no other attribute.
+	GLint id;
+};
+
 class Shader
 {
 public:
@@ -31,6 +57,10 @@ public:
 
 	GLint texcoordAttr() const {
 		return attr_texcoord;
+	}
+
+	Uniform getUniform(const char *name) const {
+		return glGetUniformLocation(prog, name);
 	}
 
 	GLuint program() const {
