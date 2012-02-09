@@ -1,8 +1,7 @@
 // Input
 uniform mat4 transform;
 uniform mat4 projection;
-uniform vec4 slerp_sum;
-uniform float slerp_mult;
+uniform vec2 slerp_arc;
 
 attribute vec4 position;
 attribute vec4 color;
@@ -13,7 +12,8 @@ varying float fog_coord;
 
 void main()
 {
-  vec4 tmp = slerp_sum + slerp_mult * position;
+  vec4 tmp = slerp_arc.x * position;
+  tmp.w = -slerp_arc.y;
   tmp = transform * tmp;
   
   // Ortographic projection to 3-D

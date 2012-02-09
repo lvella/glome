@@ -1,5 +1,6 @@
 #pragma once
 
+#include "vector2.hpp"
 #include "updatable.hpp"
 #include "drawable.hpp"
 #include "mesh.hpp"
@@ -15,12 +16,10 @@ public:
 	void draw(Camera &c);
 
 private:
-	Vector4 slerp_s;
-	float slerp_m;
+	Vector2 slerp;
 	float t; // Expansion factor
 
 	CamShader shader;
-	Uniform slerp_sum;
-	Uniform slerp_mult;
+	Uniform slerp_arc;
 	Mesh* mesh;
 };

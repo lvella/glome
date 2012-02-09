@@ -2,6 +2,7 @@
 
 #include "gl.hpp"
 #include "matrix4.hpp"
+#include "vector2.hpp"
 #include <map>
 
 class Uniform
@@ -13,6 +14,11 @@ public:
 	void set(float val)
 	{
 		glUniform1f(id, val);
+	}
+
+	void set(const Vector2 &val)
+	{
+		glUniform2fv(id, 1, val.getVertex());
 	}
 
 	void set(const Vector4 &val)
