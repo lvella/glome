@@ -49,7 +49,7 @@ void Fire::initialize()
 
 void Fire::draw(Camera& c)
 {
-	c.setShader(&program_fire);
+	c.pushShader(&program_fire);
 	
   glActiveTexture(GL_TEXTURE0);
 	glEnable(GL_TEXTURE_2D);
@@ -71,5 +71,7 @@ void Fire::draw(Camera& c)
 		}
 	}
 	glDisable(GL_TEXTURE_2D);
+
+	c.popShader();
 }
 

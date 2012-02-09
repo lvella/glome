@@ -117,7 +117,7 @@ void Projectile::update_all(const Vector4& camera_pos)
 void Projectile::draw_all(Camera& c)
 {
 	if(shots.size() != 0) {
-		c.setShader(&program_bullet);
+		c.pushShader(&program_bullet);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glUniform1i(uniform_has_tex, 1);
@@ -132,6 +132,7 @@ void Projectile::draw_all(Camera& c)
 			i->draw(c);
 
 		glDisableVertexAttribArray(program_bullet.colorAttr());
+		c.popShader();
 	}
 }
 
@@ -183,9 +184,9 @@ Projectile::Projectile(ShipController *s, const Matrix4& from, float speed):
 
 void Projectile::draw(Camera& c)
 {
-	c.pushMult(_t);
+	c.pushMultMat(_t);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	c.pop();
+	c.popMat();
 }
 
 void Projectile::update(const Vector4& camera_pos)

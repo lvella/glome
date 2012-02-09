@@ -13,17 +13,23 @@ public:
 
 	// TODO: make the thing to follow the ship here...
 	// TODO: create an "update()" method
-	void reset(const Matrix4& invCam, const CamShader *s);
+	void reset(const Matrix4& invCam);
 
-	void pushMult(const Matrix4& t);
-	void pop();
+	void pushMultMat(const Matrix4& t);
+	void popMat();
 
-	void setShader(const CamShader *s);
+	void pushShader(const CamShader *s);
+	void popShader();
 	const Shader* getShader() const;
+
+	// TODO, FOR PERFORMANCE: Implement a kind of flush: that must be
+	// called right before drawing, so to flush the properties to the
+	// video card... must spare a few video memory writes.
+	//void flush();
 
 private:
 	static Matrix4 PROJ_MAT;
 
-	const CamShader *shader;
-	std::vector<Matrix4> stack;
+	std::vector<const CamShader *> shader_stack;
+	std::vector<Matrix4> mat_stack;
 };

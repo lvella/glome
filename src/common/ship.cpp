@@ -80,10 +80,10 @@ Ship::load_guns(MeshTypes type)
 void 
 Ship::draw(Camera& c)
 {
-	c.pushMult(_t);
+	c.pushMultMat(_t);
 	mesh->draw(c);
 	//engine->draw(c);
-	c.pop();
+	c.popMat();
 }
 
 void

@@ -68,7 +68,8 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center)
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	// From now on, use the camera with transform stack to draw objects
-	camera.reset(yz_matrix(M_PI / 2) * center, &map_projection);
+	camera.reset(yz_matrix(M_PI / 2) * center);
+	camera.pushShader(&map_projection);
 
 	// Draw shots
 	glUniform1i(proj_has_tex, 0);
@@ -86,14 +87,14 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center)
 
 void MiniMap::draw_dot(const Object& obj)
 {
-	camera.pushMult(obj.transformation());
+	camera.pushMultMat(obj.transformation());
 
 	glVertexAttrib3f(map_projection.colorAttr(), 1.0f, 0.0f, 0.0f);
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glVertexAttribPointer(map_projection.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
-	camera.pop();
+	camera.popMat();
 }
 
 void

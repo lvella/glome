@@ -29,9 +29,12 @@ void Supernova::update()
 
 void Supernova::draw(Camera &c)
 {
-	c.pushMult(_t);
-	c.setShader(&shader);
+	c.pushShader(&shader);
+	c.pushMultMat(_t);
+
 	slerp_arc.set(slerp);
 	mesh->draw(c);
-	c.pop();
+
+	c.popMat();
+	c.popShader();
 }

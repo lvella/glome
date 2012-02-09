@@ -27,7 +27,7 @@ void RandomCube::draw(Camera& c)
   float a = 0.02;
   float w = -sqrt(1 - a*a);
 
-  c.pushMult(_t);
+  c.pushMultMat(_t);
 
   glBegin(GL_QUADS);
 
@@ -69,7 +69,7 @@ void RandomCube::draw(Camera& c)
 
   glEnd();
 
-  c.pop();
+  c.popMat();
 }
 
 void RandomCube::randomize() {

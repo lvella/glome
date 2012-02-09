@@ -54,7 +54,8 @@ Renderer::draw(vector<Glome::Drawable*> *objs)
 	for(int i = 0; i < players.size(); ++i) {
 		players[i].enable();
 
-		camera.reset(players[i].newCameraTransform(), &shader);
+		camera.reset(players[i].newCameraTransform());
+		camera.pushShader(&shader);
 		draw_meridians(camera);
 
 		for(int j = 0; j < objs->size(); ++j) {
