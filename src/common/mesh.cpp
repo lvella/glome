@@ -120,7 +120,6 @@ void Mesh::generate_icosphere()
 			ie = 0;
 
 			const float P = float((1.0 + sqrtf(5.0)) / 2.0); // golden ratio, used in building of an icosahedron
-			const float R = 0.0005; // shrink the ball to this radius
 			const unsigned char SUB = 2; // number of subdivisions, maximum 2
 
 			// initial vertexes
@@ -180,16 +179,14 @@ void Mesh::generate_icosphere()
 				face_subdivide(SUB, FACES[i][0], FACES[i][1], FACES[i][2]);
 			}
 
-		  //assert(iv == sizeof(v) / (2 * sizeof(Vector4)));
-		  //assert(ie == sizeof(e) / 4);
+		  assert(iv == sizeof(v) / (2 * sizeof(Vector4)));
+		  assert(ie == sizeof(e) / 4);
 
 		  // Scale all vertices to radius
 		  // Project them to 4-D
 		  // Assign random colors
 		  for(int i = 0; i < iv; ++i) {
 		  	v[i].p.normalize();
-		  	v[i].p *= R;
-		  	v[i].p.calc_norm_w();
 
 		  	v[i].c = Vector4(
 		  			rand() / float(RAND_MAX),

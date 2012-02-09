@@ -23,10 +23,9 @@ Supernova::~Supernova()
 void Supernova::update()
 {
 	// Based on http://math.stackexchange.com/a/99171/7721
-	const float ANGLE = M_PI / 20.0f;
-	slerp_s = Vector4::CANONICAL * (sinf((1 - t) * ANGLE) / sinf(ANGLE));
-	slerp_m = sinf(t * ANGLE) / sinf(ANGLE);
-	t += 0.01;
+	slerp_s = Vector4::CANONICAL * cosf(t);
+	slerp_m = sinf(t);
+	t += 0.0001; // Expanding rate; 0 is collapsed at origin, M_PI is collapsed at opposite pole.
 }
 
 void Supernova::draw(Camera &c)
