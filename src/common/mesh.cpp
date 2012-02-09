@@ -95,9 +95,10 @@ void Mesh::load_from_file(const char* name)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, ibolen, idata, GL_STATIC_DRAW);
   }
 
-  len = ilen * 2;
-
   fclose(fd);
+
+  len = ilen * 2;
+  primitive_type = GL_LINES;
 }
 
 // based on http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
@@ -105,6 +106,7 @@ void Mesh::generate_icosphere()
 {
 	struct Builder {
 		uint16_t e[480][2];
+		uint16_t faces[320][3];
 		struct {
 			Vector4 p;
 			Vector4 c;
@@ -113,11 +115,13 @@ void Mesh::generate_icosphere()
 		set<pair<uint16_t, uint16_t>> edges;
 		uint16_t iv;
 		uint16_t ie;
+		uint16_t ifaces;
 
 		Builder()
 		{
 			iv = 0;
 			ie = 0;
+			ifaces = 0;
 
 			const float P = float((1.0 + sqrtf(5.0)) / 2.0); // golden ratio, used in building of an icosahedron
 			const unsigned char SUB = 2; // number of subdivisions, maximum 2
@@ -181,6 +185,7 @@ void Mesh::generate_icosphere()
 
 		  assert(iv == sizeof(v) / (2 * sizeof(Vector4)));
 		  assert(ie == sizeof(e) / 4);
+		  assert(ifaces == sizeof(faces) / 6);
 
 		  // Scale all vertices to radius
 		  // Project them to 4-D
@@ -239,6 +244,11 @@ void Mesh::generate_icosphere()
 				insert_edge(a, b);
 				insert_edge(b, c);
 				insert_edge(c, a);
+
+				faces[ifaces][0] = a;
+				faces[ifaces][1] = b;
+				faces[ifaces][2] = c;
+				++ifaces;
 			}
 		}
 	} b;
@@ -247,9 +257,17 @@ void Mesh::generate_icosphere()
   glBufferData(GL_ARRAY_BUFFER, sizeof(b.v), b.v, GL_STATIC_DRAW);
 
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(b.e), b.e, GL_STATIC_DRAW);
 
-  len = 2 * b.ie;
+  // TODO: one of the two kind of primitives data being generated is useless...
+  // maybe remove it when we are satisfied with the result?
+
+  //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(b.e), b.e, GL_STATIC_DRAW);
+  //len = 2 * b.ie;
+  //primitive_type = GL_LINES;
+
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(b.faces), b.faces, GL_STATIC_DRAW);
+  len = 3 * b.ifaces;
+  primitive_type = GL_TRIANGLES;
 }
 
 void
@@ -264,7 +282,7 @@ Mesh::draw(Camera& c)
   glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, 32, NULL);
   glVertexAttribPointer(s->colorAttr(), 4, GL_FLOAT, GL_FALSE, 32, (void*) (4 * sizeof(float)));
 
-  glDrawElements(GL_LINES, len, GL_UNSIGNED_SHORT, NULL);
+  glDrawElements(primitive_type, len, GL_UNSIGNED_SHORT, NULL);
   glDisableVertexAttribArray(s->colorAttr());
 }
 

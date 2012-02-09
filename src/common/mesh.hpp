@@ -31,6 +31,7 @@ private:
   	GLuint bufobjs[2];
   };
   size_t len;
+  GLenum primitive_type;
 
   Mesh(MeshTypes type);
 };
