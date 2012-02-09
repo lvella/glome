@@ -28,7 +28,7 @@ Spaghetti::Spaghetti()
 		xy_matrix((float(rand()) / RAND_MAX) * 2 * M_PI) *
 		xz_matrix((float(rand()) / RAND_MAX) * 2 * M_PI) *
 		yz_matrix((float(rand()) / RAND_MAX) * 2 * M_PI) *
-		R_DISP * Vector4::CANONICAL; 
+		R_DISP * Vector4::ORIGIN; 
 		
 		Vector4 d = Vector4::random_direction();
 		// Those points are outside the glome's surface, lets see how it renders.

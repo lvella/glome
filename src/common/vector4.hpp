@@ -10,7 +10,7 @@ class Matrix4;
 class Vector4
 {
 public:
-	static const Vector4 CANONICAL;
+	static const Vector4 ORIGIN;
 
 	static Vector4 random_direction();
 
