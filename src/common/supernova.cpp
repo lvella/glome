@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "supernova.hpp"
 
 Supernova::Supernova():
@@ -12,7 +10,6 @@ Supernova::Supernova():
 	slerp_mult = shader.getUniform("slerp_mult");
 
 	update();
-	std::cout << _t;
 }
 
 Supernova::~Supernova()
