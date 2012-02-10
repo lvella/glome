@@ -28,7 +28,7 @@ static size_t minimap_buf_size = 0;
 
 void Projectile::initialize()
 {
-	const char *source[] = {"projectile.vert", "world.frag", "texture.frag", NULL};
+	const char *source[] = {"projectile.vert", "world.frag", "texture.frag", "fog.frag", NULL};
 
 	{
 		const float data[] = {

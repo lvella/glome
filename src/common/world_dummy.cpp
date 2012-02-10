@@ -8,7 +8,7 @@ using namespace std;
 WorldDummy::WorldDummy()
 {
 	vector<Ship*> players;
-	for(int i = 0; i < 2; i++)
+	for(int i = 0; i < 1; i++)
 	{
 		ShipController* ctrl;
 		Ship* s = new Ship(MeshTypes(rand() % (UFO + 1)));

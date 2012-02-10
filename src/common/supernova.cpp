@@ -4,9 +4,17 @@ Supernova::Supernova():
 	t(0.0f),
 	mesh(Mesh::get_mesh(ICOSPHERE))
 {
-	const char *source[] = {"supernova.vert", "supernova.frag", NULL};
+	const char *source[] = {"supernova.vert", "supernova.frag", "fog.frag", NULL};
 	shader.setup_shader(source);
 	slerp_arc = shader.getUniform("slerp_arc");
+
+	// Better place to start...
+	_t = Matrix4(
+			1, 0, 0, 0,
+			0, 1, 0, 0,
+			0, 0, 0, 1,
+			0, 0, 1, 0
+	);
 
 	update();
 }

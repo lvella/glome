@@ -7,7 +7,7 @@ attribute vec4 position;
 attribute vec4 color;
 
 // Output
-//varying vec4 v_color;
+varying vec4 v_color;
 varying vec3 frac_coord;
 varying float fog_coord;
 
@@ -24,6 +24,6 @@ void main()
   gl_Position = projection * tmp;
   fog_coord = gl_Position.z;
 
-  //v_color = color;
+  v_color = color;
   frac_coord = position.xyz;
 }
