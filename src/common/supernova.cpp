@@ -7,6 +7,7 @@ Supernova::Supernova():
 	const char *source[] = {"supernova.vert", "supernova.frag", "fog.frag", NULL};
 	shader.setup_shader(source);
 	slerp_arc = shader.getUniform("slerp_arc");
+	center = shader.getUniform("center");
 
 	// Better place to start...
 	_t = Matrix4(
@@ -40,7 +41,10 @@ void Supernova::draw(Camera &c)
 	c.pushShader(&shader);
 	c.pushMultMat(_t);
 
+	Vector4 vcenter = (c.transformation() * Vector4::ORIGIN).ortho_proj();
+
 	slerp_arc.set(slerp);
+	center.set(vcenter);
 	mesh->draw(c);
 
 	c.popMat();

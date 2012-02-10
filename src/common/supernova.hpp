@@ -21,5 +21,6 @@ private:
 
 	CamShader shader;
 	Uniform slerp_arc;
+	Uniform center;
 	Mesh* mesh;
 };

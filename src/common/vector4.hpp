@@ -66,9 +66,15 @@ public:
 		*this = (*this) * (1.0 / length());
 	}
 
-	void calc_norm_w()
+	float calc_norm_w()
 	{
-		w = -sqrtf(1.0f - x*x - y*y - z*z);
+		return -sqrtf(1.0f - x*x - y*y - z*z);
+	}
+
+	Vector4 ortho_proj()
+	{
+		float factor = 1.0f - w;
+		return Vector4(x/factor, y/factor, z/factor, 1.0f);
 	}
 
 	float squared_length() const

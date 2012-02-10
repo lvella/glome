@@ -27,6 +27,10 @@ public:
 	// video card... must spare a few video memory writes.
 	//void flush();
 
+	const Matrix4& transformation() {
+		return mat_stack.back();
+	}
+
 private:
 	static Matrix4 PROJ_MAT;
 
