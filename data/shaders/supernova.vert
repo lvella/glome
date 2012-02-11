@@ -25,6 +25,9 @@ void main()
 	tmp.xyz = tmp.xyz / (1.0 - tmp.w);
 	tmp.w = 1.0;
 
+	// There is something not right with this normal,
+	// it gets screwed when the sphere enlarges (or so I believe).
+	// This method is not reliable to compute it...
 	normal = normalize((tmp - center).xyz);
 	frag_pos = normalize(tmp.xyz);
 	
