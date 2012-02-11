@@ -11,6 +11,11 @@ public:
 	Uniform() {}
 	Uniform(GLint location): id(location) {}
 
+	void set(bool val)
+	{
+		glUniform1i(id, (int)val);
+	}
+
 	void set(float val)
 	{
 		glUniform1f(id, val);

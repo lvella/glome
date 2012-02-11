@@ -8,23 +8,12 @@ uniform bool has_tex;
 varying vec2 v_texcoord;
 varying vec4 v_color;
 
-vec3 project_vertex(vec4 vert) {
-  const float two_by_pi = 0.63661977236758134307553505349005744813783858296183;
-  vec3 ret;
-  float r, R;
-  
-  ret = vert.xyz / (1.0 - vert.w);
-  R = length(ret);
-  r = atan(R) * two_by_pi;
-  ret = ret * (r / R);
-  
-  return ret;
-}
+vec3 project_vertex(vec4 vert);
+vec4 color_blend(vec4 color, float z);
 
 void main()
 {
   const vec4 center = vec4(0.0, 0.0, 0.0, -1.0);
-  const vec4 pale_color = vec4(0.25, 0.65, 0.25, 1.0);
   vec3 v;
 
   if(has_tex) {
@@ -36,7 +25,7 @@ void main()
     v_texcoord = texcoord.st;
   }
 
-  v_color = mix(pale_color, color, (v.z + 1.0) * 0.5);
+  v_color = color_blend(color, v.z);
 
   gl_Position = vec4(v.xy, -v.z, 1.0);
   gl_PointSize = 1.0;

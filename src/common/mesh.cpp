@@ -20,7 +20,8 @@ const char* mesh_filename[MESH_COUNT] =
     "hunter",
     "destroyer",
     "ufo",
-    NULL
+    NULL, // icosphere
+    NULL, // uvsphere
   };
 
 Mesh::~Mesh()
@@ -33,16 +34,24 @@ Mesh::Mesh(MeshTypes type):
 {
 	assert(size_t(type) < MESH_COUNT);
 
-  const char* name = mesh_filename[int(type)];
+	const char* name = mesh_filename[int(type)];
 
-  glGenBuffers(2, bufobjs);
+	glGenBuffers(2, bufobjs);
 
-  if(name)
-  	load_from_file(name);
-  else {
-  	// switch (type) { // when there are more than one procedural type
-  	generate_icosphere();
-  }
+	if(name)
+		load_from_file(name);
+	else {
+		switch (type) { // when there are more than one procedural type
+		case ICOSPHERE:
+			generate_icosphere();
+			break;
+		case UVSPHERE:
+			generate_uvsphere();
+			break;
+		default:
+			assert(0 && "Invalid mesh type.");
+		}
+	}
 }
 
 void Mesh::load_from_file(const char* name)
@@ -99,6 +108,65 @@ void Mesh::load_from_file(const char* name)
 
   len = ilen * 2;
   primitive_type = GL_LINES;
+  has_colorbuf = true;
+}
+
+// Not a full uv sphere: open in the poles so it looks cool in minimap
+void Mesh::generate_uvsphere()
+{
+	const uint8_t SEGMENTS = 16;
+	const uint8_t RINGS = 13; // must be odd
+
+	Vector4 v[SEGMENTS * RINGS];
+	uint16_t e[3 * SEGMENTS + SEGMENTS * (RINGS - 1)][2];
+
+	uint16_t e_idx = 0;
+	uint16_t v_idx = 0;
+
+	// Create vertices and link segments
+	for(int i = 0; i < SEGMENTS; ++i)
+	{
+		float a = i * (2.0 * M_PI / SEGMENTS);
+		float x, y;
+
+		x = sin(a);
+		y = cos(a);
+
+		for(int j = 0; j < RINGS; ++j)
+		{
+			if(j > 0) {
+				e[e_idx][0] = v_idx - 1;
+				e[e_idx][1] = v_idx;
+				++e_idx;
+			}
+
+			float b = 0.15 + j * ((M_PI - 0.3) / (RINGS - 1));
+			float sb = sin(b);
+
+			v[v_idx++] = Vector4(sb * x, sb * y, cos(b), 0.0f);
+		}
+	}
+
+	// Link only 3 rings, for style sake...
+	for(int i = 0; i < 3; ++i) {
+		for(int j = 0; j < SEGMENTS; ++j) {
+			e[e_idx][0] = j * RINGS + i * (RINGS / 2);
+			e[e_idx][1] = (j + 1) % SEGMENTS * RINGS + i * (RINGS / 2);
+			++e_idx;
+		}
+	}
+
+	//assert(e_idx == sizeof(e) / 4);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
+
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(e), e, GL_STATIC_DRAW);
+
+  len = 2 * e_idx;
+  primitive_type = GL_LINES;
+  has_colorbuf = false;
 }
 
 // based on http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
@@ -107,9 +175,8 @@ void Mesh::generate_icosphere()
 	struct Builder {
 		uint16_t e[480][2];
 		uint16_t faces[320][3];
-		struct {
-			Vector4 p;
-			Vector4 c;
+		struct{
+			Vector4 p, c;
 		} v[12 + 30 + 120];
 		map<pair<uint16_t, uint16_t>, uint16_t> vertices;
 		set<pair<uint16_t, uint16_t>> edges;
@@ -268,22 +335,34 @@ void Mesh::generate_icosphere()
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(b.faces), b.faces, GL_STATIC_DRAW);
   len = 3 * b.ifaces;
   primitive_type = GL_TRIANGLES;
+
+  has_colorbuf = true;
 }
 
 void
 Mesh::draw(Camera& c)
 {
 	const Shader *s = c.getShader();
+	int stride;
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glEnableVertexAttribArray(s->colorAttr());
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-  glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, 32, NULL);
-  glVertexAttribPointer(s->colorAttr(), 4, GL_FLOAT, GL_FALSE, 32, (void*) (4 * sizeof(float)));
+	if(has_colorbuf) {
+		stride = 32;
+		glEnableVertexAttribArray(s->colorAttr());
+		glVertexAttribPointer(s->colorAttr(), 4, GL_FLOAT, GL_FALSE, 32, (void*) (4 * sizeof(float)));
+	}
+	else {
+		stride = 0;
+	}
 
-  glDrawElements(primitive_type, len, GL_UNSIGNED_SHORT, NULL);
-  glDisableVertexAttribArray(s->colorAttr());
+	glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, stride, NULL);
+
+	glDrawElements(primitive_type, len, GL_UNSIGNED_SHORT, NULL);
+
+	if(has_colorbuf)
+		glDisableVertexAttribArray(s->colorAttr());
 }
 
 Mesh*

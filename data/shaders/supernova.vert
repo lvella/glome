@@ -17,6 +17,7 @@ void main()
 	// Scale to the real size
 	vec4 tmp = slerp_arc.x * position;
 	tmp.w = -slerp_arc.y;
+
 	tmp = transform * tmp;
   
 	// Ortographic projection to 3-D

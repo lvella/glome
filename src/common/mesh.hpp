@@ -5,7 +5,7 @@
 
 #include "shader.hpp"
 
-enum MeshTypes {HUNTER, DESTROYER, UFO, ICOSPHERE, MESH_COUNT};
+enum MeshTypes {HUNTER, DESTROYER, UFO, ICOSPHERE, UVSPHERE, MESH_COUNT};
 
 class Mesh
 {
@@ -19,6 +19,7 @@ public:
 
 private:
   void load_from_file(const char* name);
+  void generate_uvsphere();
   void generate_icosphere();
 
   // a reference counter for shapes
@@ -32,6 +33,7 @@ private:
   };
   size_t len;
   GLenum primitive_type;
+  bool has_colorbuf;
 
   Mesh(MeshTypes type);
 };

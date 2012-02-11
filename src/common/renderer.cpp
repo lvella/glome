@@ -68,12 +68,12 @@ Renderer::draw(vector<Glome::Drawable*> *objs)
 }
 
 void
-Renderer::fill_minimap()
+Renderer::fill_minimap(Camera &cam)
 {
 	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
 	// Probably so insignificant it is not worth the effort.
 	for(size_t i = 1; i < objects->size(); ++i)
-		MiniMap::draw_dot(*(objects->at(i)));
+		objects->at(i)->minimap_draw(cam);
 }
 
 void

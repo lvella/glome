@@ -14,13 +14,18 @@ public:
 
 	void update();
 	void draw(Camera &c);
+	void minimap_draw(Camera &c);
 
 private:
 	Vector2 slerp;
 	float t; // Expansion factor
 
+	Mesh* mesh;
 	CamShader shader;
 	Uniform slerp_arc;
 	Uniform center;
-	Mesh* mesh;
+
+	Mesh* map_mesh;
+	CamShader map_shader;
+	Uniform map_slerp_arc;
 };

@@ -21,7 +21,7 @@ public:
 
 	void draw(std::vector<Glome::Drawable*> *objs);
 	void setup_display();
-	void fill_minimap();
+	void fill_minimap(Camera &cam);
 
 	Renderer(std::vector<Ship*>* pp);
 

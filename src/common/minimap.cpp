@@ -29,7 +29,8 @@ static GLuint tex_object;
 static GLint proj_has_tex;
 static GLint hud_has_tex;
 
-static GLuint vbo;
+// TODO: Ugly! Encapsulate this!
+GLuint square_vbo;
 
 void
 MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center)
@@ -49,7 +50,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center)
 	glBindTexture(GL_TEXTURE_2D, tex_minimap);
 	glVertexAttrib4f(hud.colorAttr(), 0.06f, 0.64f, 0.12f, 0.55f);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, square_vbo);
 	glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -81,20 +82,8 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center)
 	// Draw map objects
 	glUniform1i(proj_has_tex, 1);
 	glBindTexture(GL_TEXTURE_2D, tex_object);
-	rend->fill_minimap();
+	rend->fill_minimap(camera);
 	glBindTexture(GL_TEXTURE_2D, 0);
-}
-
-void MiniMap::draw_dot(const Object& obj)
-{
-	camera.pushMultMat(obj.transformation());
-
-	glVertexAttrib3f(map_projection.colorAttr(), 1.0f, 0.0f, 0.0f);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glVertexAttribPointer(map_projection.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
-
-	camera.popMat();
 }
 
 void
@@ -104,7 +93,7 @@ MiniMap::initialize()
 	create_circle_texture(16, 0.8, 0, 255, tex_object);
 
 	{
-		glGenBuffers(1, &vbo);
+		glGenBuffers(1, &square_vbo);
 
 		// Coordinates of the lines representing the field of vision
 		const float cx = 0.0f;
@@ -137,17 +126,16 @@ MiniMap::initialize()
 			cy, cy,
 			ppx1, ppy
 		};
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, square_vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 	}
 
-	const char* sources[] = {"minimap.vert","minimap.frag", "texture.frag", NULL};
-	const char* sources2[] = {"hud.vert", "minimap.frag", "texture.frag", NULL};
-
-	map_projection.setup_shader(sources);
+	const char* src_proj[] = {"minimap.vert", "map_stuff.vert", "minimap.frag", "texture.frag", NULL};
+	map_projection.setup_shader(src_proj);
 	proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
 
-	hud.setup_shader(sources2);
+	const char* src_hud[] = {"hud.vert", "map_stuff.vert", "minimap.frag", "texture.frag", NULL};
+	hud.setup_shader(src_hud);
 	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
 }
 
