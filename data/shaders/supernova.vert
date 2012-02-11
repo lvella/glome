@@ -8,8 +8,9 @@ attribute vec4 position;
 attribute vec4 color;
 
 // Output
-varying vec4 v_color;
 varying vec3 normal;
+varying float v_color;
+varying vec3 frag_pos;
 varying float fog_coord;
 
 void main()
@@ -25,9 +26,10 @@ void main()
 	tmp.w = 1.0;
 
 	normal = normalize((tmp - center).xyz);
-
+	frag_pos = normalize(tmp.xyz);
+	
 	gl_Position = projection * tmp;
 	fog_coord = gl_Position.z;
 
-	v_color = color;
+	v_color = color.r;
 }
