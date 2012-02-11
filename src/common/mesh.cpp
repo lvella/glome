@@ -115,7 +115,7 @@ void Mesh::load_from_file(const char* name)
 void Mesh::generate_uvsphere()
 {
 	const uint8_t SEGMENTS = 16;
-	const uint8_t RINGS = 13; // must be odd
+	const uint8_t RINGS = 17; // must be odd
 
 	Vector4 v[SEGMENTS * RINGS];
 	uint16_t e[3 * SEGMENTS + SEGMENTS * (RINGS - 1)][2];
