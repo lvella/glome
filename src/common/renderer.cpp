@@ -20,16 +20,24 @@ void
 Renderer::setup_display()
 {
 	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_LINE_SMOOTH);
 	glEnable(GL_BLEND);
 	glEnable(GL_ALPHA_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-	glLineWidth(1.5f);
 	glAlphaFunc(GL_NOTEQUAL, 0.0f);
 	glViewport(0, 0, width, height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// Things that are not in OpenGL ES:
+	//TODO: use #ifdefs
+	//TODO: load anti-alias settings from configuration
+	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+
+	glLineWidth(1.5f);
+	glEnable(GL_LINE_SMOOTH);
+	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+
+	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+	glEnable(GL_POLYGON_SMOOTH);
 }
 
 Renderer::Renderer(vector<Ship*>* pp)
