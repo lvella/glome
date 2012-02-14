@@ -16,10 +16,12 @@ public:
 	void update();
 	void load_guns(MeshTypes type);
 	void set_controller(ShipController* pctrl);
+	ShipController* ctrl;
+	AiController* aux;
 
 protected:
 	Mesh* mesh;
-	ShipController* ctrl;
+
 	Matrix4 r_canon, l_canon;
 	ship_gun gun_l;
 	ship_gun gun_r;

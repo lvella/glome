@@ -14,5 +14,6 @@ public:
 
 protected:
 	std::unordered_map<int, Ship*>* remote_players;
+	std::vector<AiController*>* ai_c;
 };
 

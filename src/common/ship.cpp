@@ -90,6 +90,9 @@ void
 Ship::update()
 {
 	if(ctrl != NULL)
+	{
 		ctrl->update(_t);
+	}
+
 }
 

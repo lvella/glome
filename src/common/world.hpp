@@ -21,5 +21,7 @@ protected:
 	Renderer* _render;
 	std::vector<Ship*> ships;
 	std::vector<Ship*> bot;
+	std::vector<Ship*> players;
+	std::vector<AiController*> ai_controls;
 };
 

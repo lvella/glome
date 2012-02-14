@@ -7,13 +7,15 @@
 class Controller : public Updatable
 {
 public:
-	Controller() {}
+	Controller() {};
 	virtual ~Controller() {};
 
 	virtual void update() = 0;
-	Controller(std::vector<Ship*>* pp);
+	Controller(std::vector<Ship*>* pp );
 
 protected:
 	std::vector<Ship*>* players;
+	std::vector<Ship*>* bots;
+	std::vector<AiController*>* ai_controllers;
 };
 
