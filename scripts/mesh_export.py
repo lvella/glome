@@ -110,8 +110,8 @@ def vertex_conv(i, scale):
   return (2*x/d, 2*y/d, 2*z/d, (-1 + x*x + y*y + z*z)/d)
 
 def write_matrix(mat, bfile):
-  for i in range(0, mat.row_size):
-    for j in range(0, mat.col_size):
+  for i in range(0, len(mat.row)):
+    for j in range(0, len(mat.col)):
       # t[col][row] because this is how OpenGL represents matrices
       bfile.write(struct.pack('<f', mat[j][i]))
 
