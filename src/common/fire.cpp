@@ -9,7 +9,6 @@ Fire::Fire(int number_of_particles, Matrix4 velocity):
 	ParticleSystem(number_of_particles)
 {
 	create_circle_texture(56, 0.9, 0, 255, tex_particle);
-	glUniform1i(tex_particle,0);
 	for(int i = 0; i < particle_vector.size(); ++i)
 	{
 		particle_vector[i].active = true;
