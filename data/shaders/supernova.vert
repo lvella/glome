@@ -16,7 +16,8 @@ varying float fog_coord;
 void main()
 {
 	// Scale to the real size
-	vec4 tmp = slerp_arc.x * position;
+	vec4 tmp;
+	tmp.xyz = slerp_arc.x * position.xyz;
 	tmp.w = -slerp_arc.y;
 
 	tmp = transform * tmp;
