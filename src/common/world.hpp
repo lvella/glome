@@ -4,7 +4,9 @@
 #include "renderer.hpp"
 #include "ship.hpp"
 
-/** Every game mode should derive this class. */
+/** Every game mode should derive this class.
+ * TODO: Based upon similarities between the game modes, refactor this class to hold what is common.
+ */
 class World
 {
 public:
@@ -20,8 +22,6 @@ protected:
 	Controller* _ctrl;
 	Renderer* _render;
 	std::vector<Ship*> ships;
-	std::vector<Ship*> bot;
-	std::vector<Ship*> players;
 	std::vector<AiController*> ai_controls;
 };
 

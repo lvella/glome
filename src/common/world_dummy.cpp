@@ -9,6 +9,8 @@ using namespace std;
 
 WorldDummy::WorldDummy()
 {
+	std::vector<Ship*> bot;
+	std::vector<Ship*> players;
 	Ship* s;
 
 	s = new Ship(MeshTypes(rand() % (UFO + 1)));
@@ -31,12 +33,10 @@ WorldDummy::WorldDummy()
 	_ctrl = new ControllerLocal(&ships, &bot, &ai_controls);
 
 	if(Options::showBotScreen && players.size() < 3) {
-		vector<Ship*> visible(players);
-		visible.insert(visible.end(), bot.begin(), bot.begin() + min(bot.size(), 4 - players.size()));
-		_render = new Renderer(&visible);
-	} else {
-		_render = new Renderer(&players);
+		players.insert(players.end(), bot.begin(), bot.begin() + min(bot.size(), 4 - players.size()));
 	}
+	_render = new Renderer(&players);
+
 	objects.insert(objects.begin(), ships.begin(), ships.end());
 	objects.push_back(&cube);
 	objects.push_back(&nova);
@@ -46,6 +46,16 @@ WorldDummy::~WorldDummy()
 {
 	delete _ctrl;
 	delete _render;
+
+	for(Ship* e : ships) {
+		delete e;
+	}
+	ships.resize(0);
+
+	for(AiController* e : ai_controls) {
+		delete e;
+	}
+	ai_controls.resize(0);
 }
 
 void
