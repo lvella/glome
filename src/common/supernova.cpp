@@ -36,7 +36,7 @@ void Supernova::update()
 	// Based on http://math.stackexchange.com/a/99171/7721
 	// Expanding rate; 0 is collapsed at origin, M_PI is
 	// collapsed at opposite pole.
-	t += 0.0005;
+	t = 1;//+= 0.0005;
 
 	slerp[0] = sinf(t);
 	slerp[1] = cosf(t);
