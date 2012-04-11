@@ -29,7 +29,8 @@ Shader::Shader(const char *sources[])
 
 Shader::~Shader()
 {
-	glDeleteProgram(prog);
+	if(prog)
+		glDeleteProgram(prog);
 }
 
 void Shader::setup_shader(const char *sources[])
