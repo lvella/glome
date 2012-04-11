@@ -47,7 +47,7 @@ void Supernova::draw(Camera &c)
 	c.pushShader(&shader);
 	c.pushMultMat(_t);
 
-	Vector4 vcenter = (c.transformation() * Vector4::ORIGIN).ortho_proj();
+	Vector4 vcenter = (c.transformation() * Vector4::ORIGIN).stereo_proj();
 
 	slerp_arc.set(slerp);
 	center.set(vcenter);

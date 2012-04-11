@@ -71,7 +71,7 @@ public:
 		return -sqrtf(1.0f - x*x - y*y - z*z);
 	}
 
-	Vector4 ortho_proj() const
+	Vector4 stereo_proj() const
 	{
 		float factor = 1.0f - w;
 		return Vector4(x/factor, y/factor, z/factor, 1.0f);
