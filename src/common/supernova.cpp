@@ -1,3 +1,5 @@
+#include "math.hpp"
+
 #include "supernova.hpp"
 
 Supernova::Supernova():
@@ -47,10 +49,20 @@ void Supernova::draw(Camera &c)
 	c.pushShader(&shader);
 	c.pushMultMat(_t);
 
-	Vector4 vcenter = (c.transformation() * Vector4::ORIGIN).stereo_proj();
+	{
+		float center_angle = acosf(-c.transformation()[3][3]);
+		float p1d = sinf(center_angle + t) / (1.0f - cosf(center_angle + t));
+		float p2d = sinf(center_angle - t) / (1.0f - cosf(center_angle - t));
+		float dist = (p1d + p2d) / 2.0f;
+
+		Vector4 vcenter = c.transformation().position().stereo_proj();
+		float len = sqrtf(vcenter.x*vcenter.x + vcenter.y*vcenter.y + vcenter.z*vcenter.z);
+		vcenter *= dist / len;
+		vcenter.w = 1.0f;
+		center.set(vcenter);
+	}
 
 	slerp_arc.set(slerp);
-	center.set(vcenter);
 	mesh->draw(c);
 
 	c.popMat();
