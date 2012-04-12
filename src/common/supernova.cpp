@@ -38,7 +38,7 @@ void Supernova::update()
 	// Based on http://math.stackexchange.com/a/99171/7721
 	// Expanding rate; 0 is collapsed at origin, M_PI is
 	// collapsed at opposite pole.
-	t = 1;//+= 0.0005;
+	t += 0.0005;
 
 	slerp[0] = sinf(t);
 	slerp[1] = cosf(t);
@@ -50,6 +50,8 @@ void Supernova::draw(Camera &c)
 	c.pushMultMat(_t);
 
 	{
+		// Calculate the center of the projected sphere, to use in the yellow gloom effect.
+		// TODO: For a better effect, increase the LOD if the player gets close enough.
 		float center_angle = acosf(-c.transformation()[3][3]);
 		float p1d = sinf(center_angle + t) / (1.0f - cosf(center_angle + t));
 		float p2d = sinf(center_angle - t) / (1.0f - cosf(center_angle - t));
