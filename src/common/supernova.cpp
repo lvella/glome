@@ -24,6 +24,9 @@ Supernova::Supernova():
 			0, 0, 1, 0
 	);
 
+	glEnable(GL_CULL_FACE);
+	glCullFace(GL_FRONT);
+
 	update();
 }
 
@@ -60,7 +63,6 @@ void Supernova::draw(Camera &c)
 		Vector4 vcenter = c.transformation().position().stereo_proj();
 		float len = sqrtf(vcenter.x*vcenter.x + vcenter.y*vcenter.y + vcenter.z*vcenter.z);
 		vcenter *= dist / len;
-		vcenter.w = 1.0f;
 		center.set(vcenter);
 	}
 
