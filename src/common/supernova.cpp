@@ -56,10 +56,14 @@ void Supernova::draw(Camera &c)
 		float p1d = sinf(center_angle + t) / (1.0f - cosf(center_angle + t));
 		float p2d = sinf(center_angle - t) / (1.0f - cosf(center_angle - t));
 		float dist = (p1d + p2d) / 2.0f;
+		float r = (p2d - p1d) / 2.0f;
 
 		Vector4 vcenter = c.transformation().position().stereo_proj();
 		float len = sqrtf(vcenter.x*vcenter.x + vcenter.y*vcenter.y + vcenter.z*vcenter.z);
 		vcenter *= dist / len;
+
+		// TODO: For better performance, use a different shader when r < 0.
+		vcenter.w = powf(1.4f, -r) * 0.3f;
 		center.set(vcenter);
 	}
 

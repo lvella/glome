@@ -9,18 +9,14 @@ void mix_fog(inout vec4 color);
 void main()
 {
 	vec4 color;
-	float cos_angle;
+	float cos_angle = dot(normalize(normal), -normalize(frag_pos));
 
-	color = vec4(v_color * 0.5, 0.0, 0.0, 1.0);
-	mix_fog(color);
-
-	cos_angle = dot(normalize(normal), -normalize(frag_pos));
-	if(cos_angle < 0.30) {
-		vec4 gloom;
-
-		cos_angle = cos_angle / 0.30;
-		gloom = vec4(1.0, 1.0, 0.2, cos_angle);
-		color = mix(gloom, color, cos_angle);
+	if(center.w < 0.3 && cos_angle < center.w) {
+		float alpha = cos_angle * 0.7 / center.w;
+		color = vec4(1.0, 1.0, 0.0, alpha);
+	} else {
+		color = vec4(v_color * 0.5, 0.0, 0.0, 1.0);
+		mix_fog(color);
 	}
 
 	gl_FragColor = color;
