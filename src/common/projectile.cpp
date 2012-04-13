@@ -36,13 +36,13 @@ void Projectile::initialize()
 				1.0f, 1.0f,
 
 				0.59f, 1.0f, 0.59f,
-				-1.0f, 1.0f,
+				1.0f, -1.0f,
 
 				0.51f, 0.39f, 0.98f,
 				-1.0f, -1.0f,
 
 				1.0f, 0.59f, 0.59f,
-				1.0f, -1.0f
+				-1.0f, 1.0f
 		};
 
 		GLuint vbos[2];
