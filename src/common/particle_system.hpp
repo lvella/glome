@@ -6,6 +6,7 @@
 #include "textures.hpp"
 #include "gl.hpp"
 #include "drawable.hpp"
+#include "updatable.hpp"
 
 /*** PARTICLE SYSTEM ***/
 /*                      (You don't say?)
@@ -33,7 +34,7 @@ MMMMMMMMMMMMMMMMMMMMM: ..  .  .    ..MMMMMMMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMMMMM. ~..      7. =MMMMMMMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMMMMM7..~.   :.   .MMMMMMMMMMMMMMMMMMMMMMMM*/
 
-class ParticleSystem : public Glome::Drawable
+class ParticleSystem : public Updatable, public Glome::Drawable
 {
 public:
 	ParticleSystem(int np);

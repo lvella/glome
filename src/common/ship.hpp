@@ -6,6 +6,7 @@
 #include "engine.hpp"
 #include "mesh.hpp"
 #include "ship_controller.hpp"
+#include "fire.hpp"
 
 class Ship : public Updatable, public Glome::Drawable 
 {
@@ -28,5 +29,6 @@ protected:
 	uint16_t nguns;
 	Engine* engine;
 
+	Fire fx_engine;
 };
 

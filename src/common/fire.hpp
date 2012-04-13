@@ -8,6 +8,7 @@ public:
 	Fire(int number_of_particles, Matrix4 velocity);
 	virtual ~Fire(){}
 
+	void update();
 	void draw(Camera& c);
 
 	static void initialize();

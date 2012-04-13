@@ -3,7 +3,6 @@
 
 #include "engine.hpp"
 #include "config.hpp"
-#include "fire.hpp"
 
 using namespace Glome;
 
@@ -21,13 +20,10 @@ Engine::Engine(MeshTypes type, float rot_per_frame,
 	max_speed_spin = speed_spin;
 
   load_location(type);
-  FX_engine = new Fire(100, velocity);
 }
 
 Engine::~Engine()
-{
-	delete FX_engine;
-}
+{}
 
 void 
 Engine::load_location(MeshTypes type)
@@ -61,8 +57,4 @@ Engine::load_location(MeshTypes type)
   fclose(fd);
 }
 
-void Engine::draw(Camera& c)
-{
-	FX_engine->draw(c);
-}
 

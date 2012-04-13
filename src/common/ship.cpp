@@ -29,7 +29,8 @@ Ship::set_controller(ShipController* pctrl)
 	ctrl->set_guns_matrices(l_canon, r_canon);
 }
 
-Ship::Ship(MeshTypes type)
+Ship::Ship(MeshTypes type):
+		fx_engine(100, Matrix4::IDENTITY)
 {
 	mesh = Mesh::get_mesh(type);
 	load_guns(type);
@@ -82,7 +83,7 @@ Ship::draw(Camera& c)
 {
 	c.pushMultMat(_t);
 	mesh->draw(c);
-	//engine->draw(c);
+	fx_engine.draw(c);
 	c.popMat();
 }
 
@@ -93,6 +94,6 @@ Ship::update()
 	{
 		ctrl->update(_t);
 	}
-
+	fx_engine.update();
 }
 

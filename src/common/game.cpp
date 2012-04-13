@@ -40,7 +40,7 @@ initialize()
 
 	MiniMap::initialize();
 	Projectile::initialize();
-	//ParticleSystem::initialize();
+	ParticleSystem::initialize();
 	//Menu::initialize();
 	initialize_meridians();
 }

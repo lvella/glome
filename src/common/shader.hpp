@@ -11,27 +11,32 @@ public:
 	Uniform() {}
 	Uniform(GLint location): id(location) {}
 
-	void set(bool val)
+	void set(bool val) const
 	{
 		glUniform1i(id, (int)val);
 	}
 
-	void set(float val)
+	void set(int val) const
+	{
+		glUniform1i(id, val);
+	}
+
+	void set(float val) const
 	{
 		glUniform1f(id, val);
 	}
 
-	void set(const Vector2 &val)
+	void set(const Vector2 &val) const
 	{
 		glUniform2fv(id, 1, val.getVertex());
 	}
 
-	void set(const Vector4 &val)
+	void set(const Vector4 &val) const
 	{
 		glUniform4fv(id, 1, val.getVertex());
 	}
 
-	void set(const Matrix4 &val)
+	void set(const Matrix4 &val) const
 	{
 		val.loadTo(id);
 	}
@@ -55,7 +60,7 @@ public:
 	}
 
 	void setTransform(const Matrix4& t) const {
-    t.loadTo(uniform_transform);
+		transform.set(t);
 	}
 
 	GLint posAttr() const {
@@ -81,7 +86,7 @@ public:
 protected:
 	GLuint prog;
 
-	GLint uniform_transform;
+	Uniform transform;
 
 	GLint attr_color;
 	GLint attr_texcoord;
@@ -94,5 +99,5 @@ public:
 	void setProjection(const Matrix4& proj) const;
 
 protected:
-	GLint uniform_projection;
+	Uniform projection;
 };
