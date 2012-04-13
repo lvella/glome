@@ -31,6 +31,8 @@ initialize()
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0f);
 
+	glEnable(GL_CULL_FACE);
+
 	Renderer::initialize();
 
 	world = new WorldDummy();

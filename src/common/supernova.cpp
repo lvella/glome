@@ -24,9 +24,6 @@ Supernova::Supernova():
 			0, 0, 1, 0
 	);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_FRONT);
-
 	update();
 }
 

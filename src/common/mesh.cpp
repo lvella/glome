@@ -71,7 +71,7 @@ void Mesh::load_from_file(const char* name)
     fd = fopen(dir.str().c_str(), "rb");
     /* Read header of file */
 		fread(&mesh_pos, sizeof(unsigned int), 1, fd);
-		/* Poiter file to mesh position */
+		/* Pointer file to mesh position */
     fseek(fd, mesh_pos, SEEK_SET);
     assert(fd != NULL);
   }
@@ -156,7 +156,7 @@ void Mesh::generate_uvsphere()
 		}
 	}
 
-	//assert(e_idx == sizeof(e) / 4);
+	assert(e_idx == sizeof(e) / 4);
 
   glBindBuffer(GL_ARRAY_BUFFER, vbo);
   glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
@@ -247,7 +247,7 @@ void Mesh::generate_icosphere()
 					{9, 8, 1},
 			};
 			for(int i = 0; i < 20; ++i) {
-				face_subdivide(SUB, FACES[i][0], FACES[i][1], FACES[i][2]);
+				face_subdivide(SUB, FACES[i][2], FACES[i][1], FACES[i][0]);
 			}
 
 		  assert(iv == sizeof(v) / (2 * sizeof(Vector4)));
