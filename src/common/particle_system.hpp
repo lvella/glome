@@ -44,11 +44,11 @@ public:
 protected:
 	struct Particle
 	{
-		bool active;	/* Particle is alive or not */
-		float fade; 	/* Fade Speed */
-		int energy;	/*  Energy of the particle */
-		float size;
-		Vector4 color;	
+		bool active; /* Particle is alive or not */
+		float fade; /* Fade Speed */
+		int energy;	/* Energy of the particle */
+		float radius; /* Radius, in radians */
+		Vector4 color;
 		Vector4 position;
 		//Vector4	oldPos;
 		Matrix4 velocity; 

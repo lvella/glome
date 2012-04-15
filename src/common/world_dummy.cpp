@@ -37,9 +37,9 @@ WorldDummy::WorldDummy()
 	}
 	_render = new Renderer(&players);
 
-	objects.insert(objects.begin(), ships.begin(), ships.end());
-	objects.push_back(&cube);
 	objects.push_back(&nova);
+	objects.push_back(&cube);
+	objects.insert(objects.end(), ships.begin(), ships.end());
 }
 
 WorldDummy::~WorldDummy()
