@@ -32,7 +32,9 @@ void Fire::initialize()
 	program_fire.enable();
 	program_fire.getUniform("has_tex").set(true);
 	program_fire.getUniform("texbase").set(0);
-	program_fire.getUniform("half_width").set(Options::width / 2.0f);
+	if(width > 0) {
+		program_fire.getUniform("half_width").set(width / 2.0f);
+	}
 
 	glGenBuffers(1,&vbo);
 
@@ -40,6 +42,16 @@ void Fire::initialize()
 	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_POINT_SPRITE);
 }
+
+void Fire::set_width(int w)
+{
+	width = w;
+	if(program_fire.program() != 0) {
+		program_fire.getUniform("half_width").set(width / 2.0f);
+	}
+}
+
+int Fire::width = -1;
 
 void Fire::update()
 {

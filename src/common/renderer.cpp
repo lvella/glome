@@ -1,9 +1,10 @@
-#include "renderer.hpp"
-
 #include "options.hpp"
 #include "meridian.hpp"
 #include "minimap.hpp"
 #include "projectile.hpp"
+#include "fire.hpp"
+
+#include "renderer.hpp"
 
 using namespace std;
 using namespace Options;
@@ -52,6 +53,7 @@ Renderer::Renderer(vector<Ship*>* pp)
 
 	// Set non-changing camera perspective
 	camera.setProjection(perspective(FOV, float(w) / float(h), 0.001f, 5.0f));
+	Fire::set_width(w);
 }
 
 void
