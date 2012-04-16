@@ -117,9 +117,9 @@ MiniMap::initialize()
 
 			// Position 8: ship arrow
 			0, a,
-			a, -a,
-			0, (-a * 0.5f),
 			-a, -a,
+			0, (-a * 0.5f),
+			a, -a,
 
 			// Position 16: FOV
 			ppx0, ppy,

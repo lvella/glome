@@ -26,9 +26,8 @@ public:
 	Renderer(std::vector<Ship*>* pp);
 
 protected:
-	class Viewport
+	struct Viewport
 	{
-	public:
 		Viewport(Ship* target, int x, int y, int w, int h):
 			t(target), _x(x), _y(y), _w(w), _h(h)
 		{
@@ -40,23 +39,8 @@ protected:
 			glViewport(_x, _y, _w, _h);
 		}
 
-		Matrix4 newCameraTransform()
-		{
-			// Calculate camera position
-			const Matrix4 cam_offset(yz_matrix(0.2) * zw_matrix(-0.015) * yw_matrix(-0.01));
-			Matrix4 ret;
+		inline Matrix4 newCameraTransform();
 
-			ret = cam_offset * cam_hist.front();
-
-			cam_hist.pop_front();
-			cam_hist.push_back(t->transformation().transpose());
-
-			return ret;
-		}
-
-		void drawMiniMap(Renderer *r);
-
-	private:
 		Ship* t;
 		std::deque<Matrix4> cam_hist;
 
@@ -66,6 +50,7 @@ protected:
 	std::vector<Viewport> players;
 	std::vector<Glome::Drawable*> *objects;
 
+	std::vector<Viewport>::iterator active;
 	Camera camera;
 
 	static CamShader shader;

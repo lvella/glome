@@ -61,10 +61,10 @@ Renderer::draw(vector<Glome::Drawable*> *objs)
 {
 	objects = objs;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	for(int i = 0; i < players.size(); ++i) {
-		players[i].enable();
+	for(active = begin(players); active != end(players); ++active) {
+		active->enable();
 
-		camera.reset(players[i].newCameraTransform());
+		camera.reset(active->newCameraTransform());
 		camera.pushShader(&shader);
 		draw_meridians(camera);
 
@@ -73,7 +73,8 @@ Renderer::draw(vector<Glome::Drawable*> *objs)
 		}
 
 		Projectile::draw_all(camera);
-		players[i].drawMiniMap(this);
+
+		MiniMap::draw(active->_x, active->_y, this, active->t->transformation().transpose());
 	}
 }
 
@@ -82,14 +83,25 @@ Renderer::fill_minimap(Camera &cam)
 {
 	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
 	// Probably so insignificant it is not worth the effort.
-	for(size_t i = 1; i < objects->size(); ++i)
-		objects->at(i)->minimap_draw(cam);
+	for(size_t i = 0; i < objects->size(); ++i) {
+		if(objects->at(i) != active->t)
+			objects->at(i)->minimap_draw(cam);
+	}
 }
 
-void
-Renderer::Viewport::drawMiniMap(Renderer *r)
+inline Matrix4
+Renderer::Viewport::newCameraTransform()
 {
-	MiniMap::draw(_x, _y, r, t->transformation().transpose());
+	// Calculate camera position
+	const Matrix4 cam_offset(yz_matrix(0.2) * zw_matrix(-0.015) * yw_matrix(-0.01));
+	Matrix4 ret;
+
+	ret = cam_offset * cam_hist.front();
+
+	cam_hist.pop_front();
+	cam_hist.push_back(t->transformation().transpose());
+
+	return ret;
 }
 
 CamShader Renderer::shader;
