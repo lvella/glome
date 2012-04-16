@@ -83,8 +83,8 @@ Ship::draw(Camera& c)
 {
 	c.pushMultMat(_t);
 	mesh->draw(c);
-	fx_engine.draw(c);
 	c.popMat();
+	fx_engine.draw(c);
 }
 
 void
@@ -94,6 +94,7 @@ Ship::update()
 	{
 		ctrl->update(_t);
 	}
+	fx_engine.set_transformation(_t);
 	fx_engine.update();
 }
 

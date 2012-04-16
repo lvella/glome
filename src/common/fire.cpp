@@ -7,18 +7,28 @@ static CamShader program_fire;
 static GLuint vbo;
 static GLint attrib_radius;
 
+static Vector4 rand_in_sphere(float r)
+{
+	Vector4 ret(rand() - RAND_MAX / 2, rand() - RAND_MAX / 2, rand() - RAND_MAX / 2, 0.0);
+
+	ret.normalize();
+	r = r * rand() / RAND_MAX;
+	ret *= r;
+	ret.w = -sqrt(1 - ret.x*ret.x - ret.y*ret.y - ret.z*ret.z);
+	return ret;
+}
+
 Fire::Fire(int number_of_particles, Matrix4 velocity):
 	ParticleSystem(number_of_particles)
 {
-	create_circle_texture(56, 0.9, 0, 255, tex_particle);
+	create_circle_texture(56, 0.1, 0, 255, tex_particle);
 	for(int i = 0; i < particle_vector.size(); ++i)
 	{
 		particle_vector[i].active = true;
-		particle_vector[i].energy = 100;
-		particle_vector[i].fade = 1;
-		particle_vector[i].radius = 0.0003;
-		particle_vector[i].color = Vector4(1,0,0,0.5);
-		particle_vector[i].position = Vector4::ORIGIN;//t.position();
+		particle_vector[i].energy = i * 30 / (particle_vector.size() - 1);
+		particle_vector[i].radius = 0.0003f;
+		particle_vector[i].color = Vector4(1, 0, 0, 0.5);//float(i) / particle_vector.size());
+		particle_vector[i].position = rand_in_sphere(0.0004f);
 		particle_vector[i].velocity = Matrix4::IDENTITY;//velocity;
 	}
 }
@@ -55,8 +65,21 @@ int Fire::width = -1;
 
 void Fire::update()
 {
+	Vector4 *buf = new Vector4[particle_vector.size()];
+
+	for(int i = 0; i < particle_vector.size(); ++i) {
+		Particle &p = particle_vector[i];
+		if(p.energy-- == 0) {
+			p.position = _t * rand_in_sphere(0.0004f);
+			p.energy = 30;
+		}
+		p.color[3] = p.energy / 30.0;
+		buf[particle_vector.size() - i -1] = p.position;
+	}
+
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, 16, particle_vector[0].position.getVertex(), GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, 16 * particle_vector.size(), buf[0].getVertex(), GL_STATIC_DRAW);
+	delete buf;
 }
 
 void Fire::draw(Camera& c)
@@ -69,14 +92,13 @@ void Fire::draw(Camera& c)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	//TODO: Pass parameters to shader in a better way
-	for(int i = 0; i < /*particle_vector.size()*/1; ++i)
+	for(int i = 0; i < particle_vector.size(); ++i)
 	{
 		if(particle_vector[i].active)
 		{
-			particle_vector[i].position = particle_vector[i].velocity * particle_vector[i].position;
 			glVertexAttrib1f(attrib_radius, particle_vector[i].radius);
-			glVertexAttrib4fv(program_fire.colorAttr(),particle_vector[i].color.getVertex());
-			glVertexAttribPointer(program_fire.posAttr(), 4, GL_FLOAT, GL_FALSE,  0, NULL);
+			glVertexAttrib4fv(program_fire.colorAttr(), particle_vector[i].color.getVertex());
+			glVertexAttribPointer(program_fire.posAttr(), 4, GL_FLOAT, GL_FALSE,  0, (GLfloat*)(16*i));
 			glDrawArrays(GL_POINTS, 0, 1);
 		}
 	}
