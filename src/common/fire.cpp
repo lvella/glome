@@ -1,6 +1,7 @@
 #include "gl.hpp"
 #include "options.hpp"
 #include "textures.hpp"
+#include "math.hpp"
 
 #include "fire.hpp"
 
@@ -20,9 +21,12 @@ static Vector4 rand_in_sphere(float &r)
 	return ret;
 }
 
-Fire::Fire(int number_of_particles, Matrix4 velocity):
+Fire::Fire(int number_of_particles):
 	ParticleSystem(number_of_particles)
 {
+	assert(number_of_particles >= 15);
+	setIntensity(0.0f);
+
 	create_circle_texture(32, 0.1, 0, 255, tex_particle);
 	for(int i = 0; i < count; ++i)
 	{
@@ -32,7 +36,7 @@ Fire::Fire(int number_of_particles, Matrix4 velocity):
 
 		rattrs[i].radius = 0.0005f;
 		rattrs[i].color = Vector4(0.8, 0.8, 1.0, 0.5);//float(i) / particle_vector.size());
-		float r = 0.0005f;
+		float r = origin_radius;
 		rattrs[i].position = rand_in_sphere(r);
 	}
 }
@@ -65,27 +69,49 @@ void Fire::set_width(int w)
 
 int Fire::width = -1;
 
+void Fire::setIntensity(float i)
+{
+	velocity = zw_matrix(0.00003 * i);
+	origin_radius = 0.0003f + i * 0.0002f;
+	target_count = 15 + i * (count - 15);
+}
+
 void Fire::update()
 {
-	int ac_count = 0;
+	int new_count = actives_count;
+
 	for(int i = 0; i < count; ++i) {
 		OfflineAttributes &oattr = oattrs[i];
+
+		if(new_count < target_count) {
+			oattr.active = true;
+			oattr.energy = 0;
+			++new_count;
+		}
+
 		if(oattr.active) {
 			RenderAttributes &rattr = rattrs[i];
-			if(oattr.energy-- == 0) {
-				float r = 0.0005f;
+
+			if(oattr.energy-- <= 0) {
+				if(new_count > target_count) {
+					oattr.active = false;
+					--new_count;
+					continue;
+				}
+
+				float r = origin_radius;
 				rattr.position = _t * rand_in_sphere(r);
-				r /= 0.0005f;
-				oattr.energy = FIRE_LIFE;// * (1.0f - r);
-				rattr.color = Vector4(1.0f, 0.5f, 0.0f, 0.0f) * r + Vector4(0.8, 0.8, 1.0f, 0.0f) * (1.0 - r);
+				r /= origin_radius;
+				oattr.energy = FIRE_LIFE * (1.0f - r);
+				rattr.color = Vector4(1.0f, 0.5f, 0.0f, 0.0f) * r + Vector4(0.5, 0.5, 1.0f, 0.0f) * (1.0 - r);
+			} else {
+				rattr.position = velocity * rattr.position;
 			}
 			rattr.color[3] = oattr.energy / float(FIRE_LIFE);
-			//rattr.radius = 0.0005f / rattr.color[3];
-			++ac_count;
 		}
 	}
 
-	actives_count = ac_count;
+	actives_count = new_count;
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	// TODO: take inactive particles out of the way, and only copy relevant data
@@ -102,21 +128,26 @@ void Fire::draw(Camera& c)
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex_particle);
-
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+	glDisable(GL_DEPTH_TEST);
 	glEnableVertexAttribArray(program_fire.colorAttr());
 	glEnableVertexAttribArray(attrib_radius);
 
 	c.pushShader(&program_fire);
+	c.pushMultMat(_t);
 
-	glVertexAttribPointer(program_fire.posAttr(), 4, GL_FLOAT, GL_FALSE,  sizeof(*rattrs), 0);
-	glVertexAttribPointer(program_fire.colorAttr(), 4, GL_FLOAT, GL_FALSE,  sizeof(*rattrs), (GLfloat*)(sizeof(Vector4)));
-	glVertexAttribPointer(attrib_radius, 1, GL_FLOAT, GL_FALSE,  sizeof(*rattrs), (GLfloat*)(2*sizeof(Vector4)));
+	glVertexAttribPointer(program_fire.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), 0);
+	glVertexAttribPointer(program_fire.colorAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(sizeof(Vector4)));
+	glVertexAttribPointer(attrib_radius, 1, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(2*sizeof(Vector4)));
 	glDrawElements(GL_POINTS, actives_count, GL_UNSIGNED_SHORT, 0);
 
+	c.popMat();
 	c.popShader();
 
 	glDisableVertexAttribArray(attrib_radius);
 	glDisableVertexAttribArray(program_fire.colorAttr());
+	glEnable(GL_DEPTH_TEST);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_TEXTURE_2D);
 }
 

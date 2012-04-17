@@ -30,7 +30,7 @@ Ship::set_controller(ShipController* pctrl)
 }
 
 Ship::Ship(MeshTypes type):
-		fx_engine(100, Matrix4::IDENTITY)
+		fx_engine(20)
 {
 	mesh = Mesh::get_mesh(type);
 	load_guns(type);
@@ -83,8 +83,8 @@ Ship::draw(Camera& c)
 {
 	c.pushMultMat(_t);
 	mesh->draw(c);
-	c.popMat();
 	fx_engine.draw(c);
+	c.popMat();
 }
 
 void
@@ -94,7 +94,7 @@ Ship::update()
 	{
 		ctrl->update(_t);
 	}
-	fx_engine.set_transformation(_t);
+	//fx_engine.setIntensity(1.0f);
 	fx_engine.update();
 }
 
