@@ -4,10 +4,12 @@
 
 #include "fire.hpp"
 
+static const int FIRE_LIFE = 8;
+
 static CamShader program_fire;
 static GLint attrib_radius;
 
-static Vector4 rand_in_sphere(float r)
+static Vector4 rand_in_sphere(float &r)
 {
 	Vector4 ret(rand() - RAND_MAX / 2, rand() - RAND_MAX / 2, rand() - RAND_MAX / 2, 0.0);
 
@@ -25,12 +27,13 @@ Fire::Fire(int number_of_particles, Matrix4 velocity):
 	for(int i = 0; i < count; ++i)
 	{
 		oattrs[i].active = true;
-		oattrs[i].energy = i * 30 / (count - 1);
+		oattrs[i].energy = i * FIRE_LIFE / (count - 1);
 		oattrs[i].velocity = Matrix4::IDENTITY;//velocity;
 
-		rattrs[i].radius = 0.0003f;
-		rattrs[i].color = Vector4(1, 0, 0, 0.5);//float(i) / particle_vector.size());
-		rattrs[i].position = rand_in_sphere(0.0005f);
+		rattrs[i].radius = 0.0005f;
+		rattrs[i].color = Vector4(0.8, 0.8, 1.0, 0.5);//float(i) / particle_vector.size());
+		float r = 0.0005f;
+		rattrs[i].position = rand_in_sphere(r);
 	}
 }
 
@@ -70,10 +73,14 @@ void Fire::update()
 		if(oattr.active) {
 			RenderAttributes &rattr = rattrs[i];
 			if(oattr.energy-- == 0) {
-				rattr.position = _t * rand_in_sphere(0.0005f);
-				oattr.energy = 30;
+				float r = 0.0005f;
+				rattr.position = _t * rand_in_sphere(r);
+				r /= 0.0005f;
+				oattr.energy = FIRE_LIFE;// * (1.0f - r);
+				rattr.color = Vector4(1.0f, 0.5f, 0.0f, 0.0f) * r + Vector4(0.8, 0.8, 1.0f, 0.0f) * (1.0 - r);
 			}
-			rattr.color[3] = oattr.energy / 30.0;
+			rattr.color[3] = oattr.energy / float(FIRE_LIFE);
+			//rattr.radius = 0.0005f / rattr.color[3];
 			++ac_count;
 		}
 	}
