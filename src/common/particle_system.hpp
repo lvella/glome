@@ -3,10 +3,10 @@
 #include <vector>
 #include "shader.hpp"
 #include "object.hpp"
-#include "textures.hpp"
 #include "gl.hpp"
 #include "drawable.hpp"
 #include "updatable.hpp"
+#include "matrix4.hpp"
 
 /*** PARTICLE SYSTEM ***/
 /*                      (You don't say?)
@@ -39,21 +39,42 @@ class ParticleSystem : public Updatable, public Glome::Drawable
 public:
 	ParticleSystem(int np);
 	virtual	~ParticleSystem() = 0;
+	void depthSort(const Matrix4 &t);
 
 	static void initialize();
 protected:
-	struct Particle
+	// TODO: Think of some kind of BO pool to share the usage of stream BOs
+	union {
+		struct {
+			GLuint vbo;
+			GLuint ibo;
+		};
+		GLuint buffobjs[2];
+	};
+
+	// Attributes sent to OpenGL
+	struct RenderAttributes
 	{
+		Vector4 position;
+		Vector4 color;
+		float radius; /* Radius, in radians */
+	};
+
+	// Logical attributes not used directly in rendering
+	struct OfflineAttributes
+	{
+		// TODO: Remove this 'active' property and everything related.
 		bool active; /* Particle is alive or not */
 		int energy;	/* Energy of the particle */
-		float radius; /* Radius, in radians */
-		Vector4 color;
-		Vector4 position;
-		Matrix4 velocity; 
-		Particle(){}
+		Matrix4 velocity;
+		float cam_dist;
 	};
-	std::vector<Particle> particle_vector;
-	uint16_t number_of_particles;
+
+	RenderAttributes *rattrs;
+	OfflineAttributes *oattrs;
+	uint16_t *idx;
+	uint16_t count;
+	uint16_t actives_count;
 	GLuint tex_particle;
 };
 

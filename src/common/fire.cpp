@@ -1,10 +1,10 @@
 #include "gl.hpp"
 #include "options.hpp"
+#include "textures.hpp"
 
 #include "fire.hpp"
 
 static CamShader program_fire;
-static GLuint vbo;
 static GLint attrib_radius;
 
 static Vector4 rand_in_sphere(float r)
@@ -21,15 +21,16 @@ static Vector4 rand_in_sphere(float r)
 Fire::Fire(int number_of_particles, Matrix4 velocity):
 	ParticleSystem(number_of_particles)
 {
-	create_circle_texture(56, 0.1, 0, 255, tex_particle);
-	for(int i = 0; i < particle_vector.size(); ++i)
+	create_circle_texture(32, 0.1, 0, 255, tex_particle);
+	for(int i = 0; i < count; ++i)
 	{
-		particle_vector[i].active = true;
-		particle_vector[i].energy = i * 30 / (particle_vector.size() - 1);
-		particle_vector[i].radius = 0.0003f;
-		particle_vector[i].color = Vector4(1, 0, 0, 0.5);//float(i) / particle_vector.size());
-		particle_vector[i].position = rand_in_sphere(0.0004f);
-		particle_vector[i].velocity = Matrix4::IDENTITY;//velocity;
+		oattrs[i].active = true;
+		oattrs[i].energy = i * 30 / (count - 1);
+		oattrs[i].velocity = Matrix4::IDENTITY;//velocity;
+
+		rattrs[i].radius = 0.0003f;
+		rattrs[i].color = Vector4(1, 0, 0, 0.5);//float(i) / particle_vector.size());
+		rattrs[i].position = rand_in_sphere(0.0005f);
 	}
 }
 
@@ -45,8 +46,6 @@ void Fire::initialize()
 	if(width > 0) {
 		program_fire.getUniform("half_width").set(width / 2.0f);
 	}
-
-	glGenBuffers(1,&vbo);
 
 	// Without this in GLES
 	glEnable(GL_PROGRAM_POINT_SIZE);
@@ -65,45 +64,52 @@ int Fire::width = -1;
 
 void Fire::update()
 {
-	Vector4 *buf = new Vector4[particle_vector.size()];
-
-	for(int i = 0; i < particle_vector.size(); ++i) {
-		Particle &p = particle_vector[i];
-		if(p.energy-- == 0) {
-			p.position = _t * rand_in_sphere(0.0004f);
-			p.energy = 30;
+	int ac_count = 0;
+	for(int i = 0; i < count; ++i) {
+		OfflineAttributes &oattr = oattrs[i];
+		if(oattr.active) {
+			RenderAttributes &rattr = rattrs[i];
+			if(oattr.energy-- == 0) {
+				rattr.position = _t * rand_in_sphere(0.0005f);
+				oattr.energy = 30;
+			}
+			rattr.color[3] = oattr.energy / 30.0;
+			++ac_count;
 		}
-		p.color[3] = p.energy / 30.0;
-		buf[particle_vector.size() - i -1] = p.position;
 	}
 
+	actives_count = ac_count;
+
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, 16 * particle_vector.size(), buf[0].getVertex(), GL_STATIC_DRAW);
-	delete buf;
+	// TODO: take inactive particles out of the way, and only copy relevant data
+	glBufferData(GL_ARRAY_BUFFER, sizeof(RenderAttributes) * count, rattrs, GL_STREAM_DRAW);
 }
 
 void Fire::draw(Camera& c)
 {
-	c.pushShader(&program_fire);
+	depthSort(c.transformation());
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * actives_count, idx, GL_STREAM_DRAW);
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex_particle);
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glEnableVertexAttribArray(program_fire.colorAttr());
+	glEnableVertexAttribArray(attrib_radius);
 
-	//TODO: Pass parameters to shader in a better way
-	for(int i = 0; i < particle_vector.size(); ++i)
-	{
-		if(particle_vector[i].active)
-		{
-			glVertexAttrib1f(attrib_radius, particle_vector[i].radius);
-			glVertexAttrib4fv(program_fire.colorAttr(), particle_vector[i].color.getVertex());
-			glVertexAttribPointer(program_fire.posAttr(), 4, GL_FLOAT, GL_FALSE,  0, (GLfloat*)(16*i));
-			glDrawArrays(GL_POINTS, 0, 1);
-		}
-	}
-	glDisable(GL_TEXTURE_2D);
+	c.pushShader(&program_fire);
+
+	glVertexAttribPointer(program_fire.posAttr(), 4, GL_FLOAT, GL_FALSE,  sizeof(*rattrs), 0);
+	glVertexAttribPointer(program_fire.colorAttr(), 4, GL_FLOAT, GL_FALSE,  sizeof(*rattrs), (GLfloat*)(sizeof(Vector4)));
+	glVertexAttribPointer(attrib_radius, 1, GL_FLOAT, GL_FALSE,  sizeof(*rattrs), (GLfloat*)(2*sizeof(Vector4)));
+	glDrawElements(GL_POINTS, actives_count, GL_UNSIGNED_SHORT, 0);
 
 	c.popShader();
+
+	glDisableVertexAttribArray(attrib_radius);
+	glDisableVertexAttribArray(program_fire.colorAttr());
+	glDisable(GL_TEXTURE_2D);
 }
 
