@@ -111,18 +111,20 @@ void Fire::update()
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	// TODO: take inactive particles out of the way, and only copy relevant data
 	glBufferData(GL_ARRAY_BUFFER, sizeof(RenderAttributes) * count, rattrs, GL_STREAM_DRAW);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * actives_count, idx, GL_STREAM_DRAW);
 }
 
 void Fire::draw(Camera& c)
 {
+	depthSort(c.transformation());
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * actives_count, idx, GL_STREAM_DRAW);
+
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex_particle);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	glDisable(GL_DEPTH_TEST);
 	glEnableVertexAttribArray(program_fire.colorAttr());
 	glEnableVertexAttribArray(attrib_radius);
 
@@ -139,7 +141,6 @@ void Fire::draw(Camera& c)
 
 	glDisableVertexAttribArray(attrib_radius);
 	glDisableVertexAttribArray(program_fire.colorAttr());
-	glEnable(GL_DEPTH_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glDisable(GL_TEXTURE_2D);
 }
