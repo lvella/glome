@@ -29,18 +29,14 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::depthSort(const Matrix4 &t)
 {
-	// TODO: Do not use hardcoded values, take them from the projection matrix;
-	// TODO: Pass the whole camera as parameter.
-	float zNear = 0.001f;
-	float zFar = 5.0f;
-	float dif = zNear - zFar;
+	const Matrix4& proj = Camera::getProjection();
 
 	for(int i = 0; i < count; ++i) {
-		Vector4 v = t * rattrs[i].position;
-		float z = v.z / (1.0 - v.w);
-
-		z = (z * (zFar + zNear) / dif + 2.0 * zFar * zNear / dif) / -z;
-		oattrs[i].cam_dist = z;
+		if(oattrs[i].active) {
+			// I like to believe the compiler will optimize the stuff bellow and only
+			// perform the needed computation, like with lazy evaluation.
+			oattrs[i].cam_dist = (proj * (t * rattrs[i].position).stereo_proj()).z;
+		}
 	}
 
 	struct {

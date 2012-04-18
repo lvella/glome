@@ -10,6 +10,7 @@ class Camera
 public:
 	Camera();
 	static void setProjection(const Matrix4& p);
+	static const Matrix4& getProjection();
 
 	// TODO: make the thing to follow the ship here...
 	// TODO: create an "update()" method

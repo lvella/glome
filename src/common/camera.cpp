@@ -12,6 +12,11 @@ void Camera::setProjection(const Matrix4& p)
 	PROJ_MAT = p;
 }
 
+const Matrix4& Camera::getProjection()
+{
+	return PROJ_MAT;
+}
+
 void Camera::reset(const Matrix4& invCam)
 {
 	mat_stack.resize(1);
