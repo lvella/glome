@@ -3,6 +3,7 @@
 #include <fstream>
 #include <cstdlib>
 #include <cmath>
+#include <cassert>
 #include "gl.hpp"
 
 class Matrix4;
@@ -11,8 +12,6 @@ class Vector4
 {
 public:
 	static const Vector4 ORIGIN;
-
-	static Vector4 random_direction();
 
 	Vector4()
 	{}
@@ -88,6 +87,8 @@ public:
 	}
 
 	const float* getVertex() const {return v;}
+	float* getVertex() {return v;}
+
 	/** Function for writing to a stream. */
 	friend std::ostream& operator<<(std::ostream& o, const Vector4& v);
 

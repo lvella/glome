@@ -26,6 +26,7 @@ libcommon_a_SOURCES = \
 	options.cpp \
 	particle_system.cpp \
 	projectile.cpp \
+	random.cpp \
 	randomcube.cpp \
 	renderer.cpp \
 	shader.cpp \

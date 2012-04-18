@@ -2,6 +2,7 @@
 #include "ai_controller.hpp"
 #include "input.hpp"
 #include "options.hpp"
+#include "random.hpp"
 
 #include "world_dummy.hpp"
 
@@ -13,7 +14,7 @@ WorldDummy::WorldDummy()
 	std::vector<Ship*> players;
 	Ship* s;
 
-	s = new Ship(MeshTypes(rand() % (UFO + 1)));
+	s = new Ship(MeshTypes(Random::range<0, UFO>()));
 	s->set_controller(Input::create_ship_controller(0));
 	players.push_back(s);
 	ships.push_back(s);
@@ -22,7 +23,7 @@ WorldDummy::WorldDummy()
 	{
 		AiController *ctrl_ai;
 
-		s = new Ship(MeshTypes(rand() % (UFO + 1)));
+		s = new Ship(MeshTypes(Random::range<0, UFO>()));
 		ctrl_ai = new AiController();
 		s->set_controller(ctrl_ai);
 		ai_controls.push_back(ctrl_ai);

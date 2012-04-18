@@ -2,6 +2,7 @@
 #include <math.h>
 #include "object.hpp"
 #include "math.hpp"
+#include "random.hpp"
 #include "projectile.hpp"
 
 #include "randomcube.hpp"
@@ -73,10 +74,10 @@ void RandomCube::draw(Camera& c)
 }
 
 void RandomCube::randomize() {
-  _t = xy_matrix(rand()/10000.0f)
-      * xz_matrix(rand()/10000.0f)
-      * yz_matrix(rand()/10000.0f)
-      * xw_matrix(rand()/10000.0f)
-      * yw_matrix(rand()/10000.0f)
-      * zw_matrix(rand()/10000.0f);
+  _t = xy_matrix(Random::arc())
+      * xz_matrix(Random::arc())
+      * yz_matrix(Random::arc())
+      * xw_matrix(Random::arc())
+      * yw_matrix(Random::arc())
+      * zw_matrix(Random::arc());
 }

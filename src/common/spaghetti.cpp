@@ -3,16 +3,12 @@
 #include <cmath>
 #include "object.hpp"
 #include "math.hpp"
+#include "random.hpp"
 #include "vector4.hpp"
 
 #include "spaghetti.hpp"
 
 using namespace Glome;
-
-static inline float randr()
-{
-	return float(rand()) / RAND_MAX;
-}
 
 Spaghetti::Spaghetti()
 {
@@ -25,22 +21,23 @@ Spaghetti::Spaghetti()
 		Vector4 &p1 = bezier[i*3 + 2];
 		
 		m =
-		xy_matrix((float(rand()) / RAND_MAX) * 2 * M_PI) *
-		xz_matrix((float(rand()) / RAND_MAX) * 2 * M_PI) *
-		yz_matrix((float(rand()) / RAND_MAX) * 2 * M_PI) *
+		xy_matrix(Random::arc()) *
+		xz_matrix(Random::arc()) *
+		yz_matrix(Random::arc()) *
 		R_DISP * Vector4::ORIGIN; 
 		
-		Vector4 d = Vector4::random_direction();
+		// TODO: Fix it, or throw it away.
+		Vector4 d; // = Vector4::random_direction();
+
 		// Those points are outside the glome's surface, lets see how it renders.
-		p0 = m + d * (R / 2.0 * randr());
-		p1 = m - d * (R / 2.0 * randr());
+		p0 = m + d * (R / 2.0 * Random::zeroToOne());
+		p1 = m - d * (R / 2.0 * Random::zeroToOne());
 	}
 	
 	bezier[SPAGHETTI_COUNT*3] = bezier[0];
 	bezier[SPAGHETTI_COUNT*3 + 1] = bezier[1];
 	
-	Vector4 dir3d(rand() - (RAND_MAX / 2), rand() - (RAND_MAX / 2), rand() - (RAND_MAX / 2), 0);
-	dir3d.normalize();
+	Vector4 dir3d = Random::direction();
 	velo = rotation(0.04f, dir3d[0], dir3d[1], dir3d[2]);
 
 	glGenBuffers(2, bufobjs);

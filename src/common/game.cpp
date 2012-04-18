@@ -5,6 +5,7 @@
 #include "projectile.hpp"
 #include "particle_system.hpp"
 #include "world_dummy.hpp"
+#include "random.hpp"
 
 #include "game.hpp"
 

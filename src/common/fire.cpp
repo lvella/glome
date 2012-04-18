@@ -2,6 +2,7 @@
 #include "options.hpp"
 #include "textures.hpp"
 #include "math.hpp"
+#include "random.hpp"
 
 #include "fire.hpp"
 
@@ -12,11 +13,9 @@ static GLint attrib_radius;
 
 static Vector4 rand_in_sphere(float &r)
 {
-	Vector4 ret(rand() - RAND_MAX / 2, rand() - RAND_MAX / 2, rand() - RAND_MAX / 2, 0.0);
-	float rand_num = rand() / float(RAND_MAX);
+	Vector4 ret = Random::direction();
 
-	ret.normalize();
-	r = r * rand_num;
+	r = r * Random::zeroToOne();
 	ret *= r;
 	ret.w = -sqrt(1 - ret.x*ret.x - ret.y*ret.y - ret.z*ret.z);
 	return ret;

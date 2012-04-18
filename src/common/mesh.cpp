@@ -6,10 +6,11 @@
 #include <set>
 #include <utility>
 
-#include "world.hpp"
-#include "mesh.hpp"
 #include "config.hpp"
 #include "vector4.hpp"
+#include "world.hpp"
+#include "random.hpp"
+#include "mesh.hpp"
 
 using namespace std;
 
@@ -261,9 +262,9 @@ void Mesh::generate_icosphere()
 		  	v[i].p.normalize();
 
 		  	v[i].c = Vector4(
-		  			rand() / float(RAND_MAX),
-		  			rand() / float(RAND_MAX),
-		  			rand() / float(RAND_MAX),
+		  			Random::zeroToOne(),
+		  			Random::zeroToOne(),
+		  			Random::zeroToOne(),
 		  			1.0f);
 		  }
 		}
