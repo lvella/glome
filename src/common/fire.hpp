@@ -5,7 +5,7 @@
 class Fire : public ParticleSystem
 {
 public:
-	Fire(int number_of_particles);
+	Fire(float radius);
 	virtual ~Fire(){}
 
 	void update();
@@ -19,6 +19,7 @@ public:
 
 private:
 	Matrix4 velocity;
+	float scale_radius;
 	float origin_radius;
 	uint16_t target_count;
 

@@ -30,7 +30,7 @@ Ship::set_controller(ShipController* pctrl)
 }
 
 Ship::Ship(MeshTypes type):
-		fx_engine(20)
+		fx_engine(0.001f)
 {
 	mesh = Mesh::get_mesh(type);
 	load_guns(type);
