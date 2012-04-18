@@ -2,39 +2,51 @@
 #include <cstdlib>
 #include <cmath>
 
-void create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
+#include <iostream>
+
+void create_circle_texture(int w, float p, int a0, int a1, GLuint& tex, bool gen_mipmap)
 {
-	// TODO: create mipmaps down to every size.
 	struct elem {
 		unsigned char l;
 		unsigned char a;
 	};
 	int i, j;
 	float cx, cy, d, tex_r, tex_r_lim;
+	int level = 0;
 
 	elem* texture = (elem*)malloc(w * w * sizeof(elem));
 
-	cx = cy = (w - 1) / 2.;
-	tex_r = w / 2.;
-	tex_r_lim = tex_r * p;
-
-	for(i = 0; i < w; ++i)
-	{
-		for(j = 0; j < w; ++j)
-		{
-			float x;
-			d = sqrtf(((i - cx) * (i - cx)) + ((j - cy) * (j - cy)));
-			texture[(i * w) + j].l = 255u;
-			texture[(i * w) + j + 1].a = (d > tex_r) ? a0 : ((d < tex_r_lim) ? a1 : ( (x = (tex_r - d) / (tex_r - tex_r_lim), x*x) * a1 ));
-		}
-	}
-
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, w, w, 0,
-	GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)texture);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, gen_mipmap ? GL_NEAREST_MIPMAP_NEAREST : GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+	w *= 2;
+	do {
+		w /= 2;
+		cx = cy = (w - 1) / 2.;
+		tex_r = w / 2.;
+		tex_r_lim = tex_r * p;
+
+		for(i = 0; i < w; ++i)
+		{
+			for(j = 0; j < w; ++j)
+			{
+				float x;
+				d = sqrtf(((i - cx) * (i - cx)) + ((j - cy) * (j - cy)));
+				texture[(i * w) + j].l = 255u;
+				texture[(i * w) + j + 1].a = (d > tex_r) ? a0 : ((d < tex_r_lim) ? a1 : ( (x = (tex_r - d) / (tex_r - tex_r_lim), x*x) * a1 ));
+			}
+		}
+
+		glTexImage2D(GL_TEXTURE_2D, level++, GL_LUMINANCE_ALPHA, w, w, 0,
+				GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)texture);
+
+	} while(gen_mipmap && w > 1);
 
 	free(texture);
 }

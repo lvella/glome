@@ -23,11 +23,12 @@ static Vector4 rand_in_sphere(float &r)
 
 Fire::Fire(float radius):
 	ParticleSystem(200),
-	scale_radius(radius)
+	scale_radius(radius),
+	intensity(1.0f)
 {
 	setIntensity(0.0f);
 
-	create_circle_texture(32, 0.1, 0, 255, tex_particle);
+	create_circle_texture(64, 0.1, 0, 255, tex_particle, true);
 	for(int i = 0; i < count; ++i)
 	{
 		rattrs[i].radius = radius;
