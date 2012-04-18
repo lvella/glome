@@ -4,6 +4,7 @@
 
 void create_circle_texture(int w, float p, int a0, int a1, GLuint& tex)
 {
+	// TODO: create mipmaps down to every size.
 	struct elem {
 		unsigned char l;
 		unsigned char a;

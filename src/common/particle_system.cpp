@@ -29,10 +29,18 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::depthSort(const Matrix4 &t)
 {
+	// TODO: Do not use hardcoded values, take them from the projection matrix;
+	// TODO: Pass the whole camera as parameter.
+	float zNear = 0.001f;
+	float zFar = 5.0f;
+	float dif = zNear - zFar;
+
 	for(int i = 0; i < count; ++i) {
 		Vector4 v = t * rattrs[i].position;
-		v.w += 1;
-		oattrs[i].cam_dist = v.squared_length();
+		float z = v.z / (1.0 - v.w);
+
+		z = (z * (zFar + zNear) / dif + 2.0 * zFar * zNear / dif) / -z;
+		oattrs[i].cam_dist = z;
 	}
 
 	struct {

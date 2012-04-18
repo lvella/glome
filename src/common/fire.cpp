@@ -115,8 +115,10 @@ void Fire::update()
 
 void Fire::draw(Camera& c)
 {
-	depthSort(c.transformation());
+	c.pushShader(&program_fire);
+	c.pushMultMat(_t);
 
+	depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * actives_count, idx, GL_STREAM_DRAW);
 
@@ -127,9 +129,6 @@ void Fire::draw(Camera& c)
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glEnableVertexAttribArray(program_fire.colorAttr());
 	glEnableVertexAttribArray(attrib_radius);
-
-	c.pushShader(&program_fire);
-	c.pushMultMat(_t);
 
 	glVertexAttribPointer(program_fire.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), 0);
 	glVertexAttribPointer(program_fire.colorAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(sizeof(Vector4)));
