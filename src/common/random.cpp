@@ -1,15 +1,24 @@
 #include <fstream>
 #include <cstdlib>
+#include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_on_sphere.hpp>
 #include <boost/random/uniform_01.hpp>
 #include <boost/random/uniform_real.hpp>
+#include <boost/random/uniform_smallint.hpp>
+#include <boost/random/variate_generator.hpp>
 
 #include "random.hpp"
 
 namespace Random
 {
-
+typedef boost::mt19937 Generator;
 Generator gen(time(0));
+
+int range(int a, int b)
+{
+	boost::variate_generator<Generator*, boost::uniform_smallint<> > dist(&gen, boost::uniform_smallint<>(a, b));
+	return dist();
+}
 
 float zeroToOne()
 {
