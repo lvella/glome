@@ -59,7 +59,7 @@ Ship::load_guns(MeshTypes type)
 		/* Read header of file */
 		fseek(fd, 4, SEEK_SET);
 		fread(&gun_pos, sizeof(unsigned int), 1, fd);
-		/* Poiter file to gun position */
+		/* Pointer file to gun position */
 		fseek(fd, gun_pos, SEEK_SET);
 		assert(fd != NULL);
 	}
@@ -93,8 +93,8 @@ Ship::update()
 	if(ctrl != NULL)
 	{
 		ctrl->update(_t);
+		fx_engine.setIntensity(std::max(0.0f, ctrl->getRelativeSpeed()));
 	}
-	//fx_engine.setIntensity(1.0f);
 	fx_engine.update();
 }
 

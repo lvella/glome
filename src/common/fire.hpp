@@ -21,6 +21,8 @@ private:
 	Matrix4 velocity;
 	float scale_radius;
 	float origin_radius;
+	float intensity;
+
 	uint16_t target_count;
 
 	static int width;

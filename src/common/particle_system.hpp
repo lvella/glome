@@ -66,7 +66,6 @@ protected:
 		// TODO: Remove this 'active' property and everything related.
 		bool active; /* Particle is alive or not */
 		int energy;	/* Energy of the particle */
-		Matrix4 velocity;
 		float cam_dist;
 	};
 

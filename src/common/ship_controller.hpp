@@ -60,10 +60,12 @@ public:
 		shot = s;
 	}
 
-	inline const Matrix4& transformation() { return _t; }
+	inline float getRelativeSpeed()
+	{
+		return rel_speed;
+	}
 
 private:
-	Matrix4 _t;
 	Engine* engine;
 	int nguns;
 	ship_gun* gun_l;
@@ -81,6 +83,6 @@ private:
 	float v_req, h_req;
 	float v_tilt, h_tilt;
 	float accel;
-	float speed, speed_v, speed_h, speed_s;
+	float rel_speed, speed, speed_v, speed_h, speed_s;
 };
 

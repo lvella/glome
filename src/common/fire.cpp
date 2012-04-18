@@ -25,7 +25,7 @@ Fire::Fire(float radius):
 	ParticleSystem(200),
 	scale_radius(radius)
 {
-	setIntensity(1.0f);
+	setIntensity(0.0f);
 
 	create_circle_texture(32, 0.1, 0, 255, tex_particle);
 	for(int i = 0; i < count; ++i)
@@ -66,6 +66,10 @@ int Fire::width = -1;
 
 void Fire::setIntensity(float i)
 {
+	if(i == intensity)
+		return;
+
+	intensity = i;
 	velocity = zw_matrix(i * scale_radius * 0.4);
 	origin_radius = scale_radius * 0.8f + i * scale_radius * 0.3f;
 	target_count = 15 + i * (count - 15);

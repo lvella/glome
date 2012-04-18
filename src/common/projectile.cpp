@@ -156,7 +156,7 @@ bool Projectile::collide(const Vector4& position, float radius)
   return false;
 }
 
-bool Projectile::collide(ShipController *s)
+/*bool Projectile::collide(ShipController *s)
 {
   const float r = 0.01f * 0.01f;
   Vector4 p = s->transformation().position();
@@ -169,7 +169,7 @@ bool Projectile::collide(ShipController *s)
   }
 
   return false;
-}
+}*/
 
 Projectile::Projectile(ShipController *s, const Matrix4& from, float speed):
   Object(from),

@@ -6,7 +6,7 @@
 
 ShipController::ShipController()
 {
-	v_req = h_req = v_tilt = h_tilt = accel = speed = speed_v = speed_h = speed_s = 0.0f;
+	v_req = h_req = v_tilt = h_tilt = accel = rel_speed = speed = speed_v = speed_h = speed_s = 0.0f;
 	shot_count = 0;
     canon_shot_last = false;
     heat = 0;
@@ -19,6 +19,7 @@ ShipController::update(Matrix4& t)
 	/* Turning */
 	float h = h_tilt - h_req;
 	float v = v_tilt - v_req;
+
 	/* Limit the turning speed to MAXD rads per frame. */
 	if(h > engine->max_rot_per_frame)
 		h = engine->max_rot_per_frame;
@@ -32,11 +33,17 @@ ShipController::update(Matrix4& t)
 	h_tilt -= h;
 	v_tilt -= v;
 
+	float old_speed = speed;
 	speed += accel;
-	if(speed > engine->max_speed_forward)
+	if(speed > engine->max_speed_forward) {
 		speed = engine->max_speed_forward;
-	else if(speed < -engine->max_speed_forward)
-	speed = -engine->max_speed_forward;
+		rel_speed = -1.0f;
+	} else if(speed < -engine->max_speed_forward) {
+		speed = -engine->max_speed_forward;
+		rel_speed = 1.0f;
+	} else if(old_speed != speed) {
+		rel_speed = -speed / engine->max_speed_forward;
+	}
 
 	/* Shooting */
 	if(heat > 0)
@@ -61,6 +68,5 @@ ShipController::update(Matrix4& t)
 	t = t * zw_matrix(speed) * yw_matrix(speed_v) * xw_matrix(speed_h)
 		 * xy_matrix(speed_s) * yz_matrix(v_tilt)
 		 * rotation(-h_tilt, 0.0, M_SQRT2 / 2.0, M_SQRT2 / 2.0);
-	_t = t;
 }
 
