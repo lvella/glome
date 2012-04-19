@@ -19,7 +19,17 @@ void main()
 		color = vec4(1.0, 1.0, 0.0, alpha);
 	} else {
 		float n0 = snoise(direction * slerp_arc.x * 50.0f);
-		color = vec4((1.0 - n0) * 0.6, 0.0, 0.0, 1.0);
+		float n1 = snoise(frag_pos * 10.0f);
+		color =
+		vec4(
+		     mix(
+		         vec2((1.0 - n0) * 0.6, 0.0),
+		         vec2(0.8, 0.6) * (1.0-n1),
+		         n0
+		        ),
+		     0.0,
+		     1.0
+		    );
 		mix_fog(color);
 	}
 
