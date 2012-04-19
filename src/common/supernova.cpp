@@ -7,7 +7,7 @@ Supernova::Supernova():
 	mesh(Mesh::get_mesh(ICOSPHERE)),
 	map_mesh(Mesh::get_mesh(UVSPHERE))
 {
-	const char *source[] = {"supernova.vert", "supernova.frag", "fog.frag", NULL};
+	const char *source[] = {"supernova.vert", "supernova.frag", "fog.frag", "noise3D.frag", NULL};
 	shader.setup_shader(source);
 	slerp_arc = shader.getUniform("slerp_arc");
 	center = shader.getUniform("center");

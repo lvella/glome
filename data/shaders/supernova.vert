@@ -12,6 +12,7 @@ varying vec3 normal;
 varying float v_color;
 varying vec3 frag_pos;
 varying float fog_coord;
+varying vec3 direction;
 
 void main()
 {
@@ -31,6 +32,8 @@ void main()
 	
 	gl_Position = projection * tmp;
 	fog_coord = gl_Position.z;
+	
+	direction = position.xyz;
 
 	v_color = color.r;
 }
