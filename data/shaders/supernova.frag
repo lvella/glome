@@ -1,4 +1,5 @@
 uniform vec4 center;
+uniform vec2 slerp_arc;
 
 varying float v_color;
 varying vec3 normal;
@@ -17,7 +18,8 @@ void main()
 		float alpha = cos_angle * 0.7 / center.w;
 		color = vec4(1.0, 1.0, 0.0, alpha);
 	} else {
-		color = vec4(snoise(direction * 10.0f), 0.0, 0.0, 1.0);
+		float n0 = snoise(direction * slerp_arc.x * 50.0f);
+		color = vec4((1.0 - n0) * 0.6, 0.0, 0.0, 1.0);
 		mix_fog(color);
 	}
 
