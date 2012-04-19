@@ -1,7 +1,6 @@
 uniform vec4 center;
 uniform vec2 slerp_arc;
 
-varying float v_color;
 varying vec3 normal;
 varying vec3 frag_pos;
 varying vec3 direction;

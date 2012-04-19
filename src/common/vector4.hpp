@@ -60,9 +60,9 @@ public:
 		return v[elem];
 	}
 
-	void normalize()
+	Vector4 normalized()
 	{
-		*this = (*this) * (1.0 / length());
+		return (*this) * (1.0 / length());
 	}
 
 	float calc_norm_w() const

@@ -176,9 +176,7 @@ void Mesh::generate_icosphere()
 	struct Builder {
 		uint16_t e[480][2];
 		uint16_t faces[320][3];
-		struct{
-			Vector4 p, c;
-		} v[12 + 30 + 120];
+		Vector4 v[12 + 30 + 120];
 		map<pair<uint16_t, uint16_t>, uint16_t> vertices;
 		set<pair<uint16_t, uint16_t>> edges;
 		uint16_t iv;
@@ -195,25 +193,25 @@ void Mesh::generate_icosphere()
 			const unsigned char SUB = 2; // number of subdivisions, maximum 2
 
 			// initial vertexes
-			const float VERTS[12][4] =
+			const float VERTS[12][3] =
 			{
-					{-1,  P, 0, 0},
-					{ 1,  P, 0, 0},
-					{-1, -P, 0, 0},
-					{ 1, -P, 0, 0},
+					{-1,  P, 0},
+					{ 1,  P, 0},
+					{-1, -P, 0},
+					{ 1, -P, 0},
 
-					{0, -1,  P, 0},
-					{0,  1,  P, 0},
-					{0, -1, -P, 0},
-					{0,  1, -P, 0},
+					{0, -1,  P},
+					{0,  1,  P},
+					{0, -1, -P},
+					{0,  1, -P},
 
-					{ P, 0, -1, 0},
-					{ P, 0,  1, 0},
-					{-P, 0, -1, 0},
-					{-P, 0,  1, 0},
+					{ P, 0, -1},
+					{ P, 0,  1},
+					{-P, 0, -1},
+					{-P, 0,  1},
 			};
 			for(int i = 0; i < 12; ++i) {
-				v[iv++].p = Vector4(VERTS[i][0], VERTS[i][1], VERTS[i][2], VERTS[i][3]);
+				v[iv++] = Vector4(VERTS[i][0], VERTS[i][1], VERTS[i][2], 0.0f).normalized();
 			}
 
 			// initial faces for recursive subdivision
@@ -251,22 +249,9 @@ void Mesh::generate_icosphere()
 				face_subdivide(SUB, FACES[i][2], FACES[i][1], FACES[i][0]);
 			}
 
-		  assert(iv == sizeof(v) / (2 * sizeof(Vector4)));
+		  assert(iv == sizeof(v) / sizeof(Vector4));
 		  assert(ie == sizeof(e) / 4);
 		  assert(ifaces == sizeof(faces) / 6);
-
-		  // Scale all vertices to radius
-		  // Project them to 4-D
-		  // Assign random colors
-		  for(int i = 0; i < iv; ++i) {
-		  	v[i].p.normalize();
-
-		  	v[i].c = Vector4(
-		  			Random::zeroToOne(),
-		  			Random::zeroToOne(),
-		  			Random::zeroToOne(),
-		  			1.0f);
-		  }
 		}
 
 		uint16_t middle_vert(uint16_t a, uint16_t b)
@@ -276,7 +261,7 @@ void Mesh::generate_icosphere()
 			auto key = make_pair(a, b);
 			auto outcome = vertices.insert(make_pair(key, iv));
 			if(outcome.second) {
-				v[iv++].p = (v[a].p + v[b].p) * 0.5;
+				v[iv++] = ((v[a] + v[b]) * 0.5).normalized();
 			}
 			return outcome.first->second;
 		}
@@ -309,6 +294,7 @@ void Mesh::generate_icosphere()
 				face_subdivide(iter, x, y, z);
 			}
 			else {
+				// Recursion base case:
 				insert_edge(a, b);
 				insert_edge(b, c);
 				insert_edge(c, a);
@@ -337,7 +323,7 @@ void Mesh::generate_icosphere()
   len = 3 * b.ifaces;
   primitive_type = GL_TRIANGLES;
 
-  has_colorbuf = true;
+  has_colorbuf = false;
 }
 
 void
