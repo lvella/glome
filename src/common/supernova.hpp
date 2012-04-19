@@ -18,7 +18,7 @@ public:
 
 private:
 	Vector2 slerp;
-	float t; // Expansion factor
+	float size; // Expansion factor
 
 	Mesh* mesh;
 	CamShader shader;

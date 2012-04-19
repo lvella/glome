@@ -1,9 +1,10 @@
 #include "math.hpp"
+#include "random.hpp"
 
 #include "supernova.hpp"
 
 Supernova::Supernova():
-	t(0.0f),
+	size(0.0f),
 	mesh(Mesh::get_mesh(ICOSPHERE)),
 	map_mesh(Mesh::get_mesh(UVSPHERE))
 {
@@ -25,6 +26,9 @@ Supernova::Supernova():
 			0, 0, 1, 0
 	);
 
+	Vector4 rot_dir = Random::direction();
+	_t = _t * rotation(Random::arc(), rot_dir.x, rot_dir.y, rot_dir.z);
+
 	update();
 }
 
@@ -39,10 +43,12 @@ void Supernova::update()
 	// Based on http://math.stackexchange.com/a/99171/7721
 	// Expanding rate; 0 is collapsed at origin, M_PI is
 	// collapsed at opposite pole.
-	t += 0.0005;
+	size += 0.0005;
 
-	slerp[0] = sinf(t);
-	slerp[1] = cosf(t);
+	slerp[0] = sinf(size);
+	slerp[1] = cosf(size);
+
+	_t = _t * xy_matrix(slerp[1] * 0.002);
 }
 
 void Supernova::draw(Camera &c)
@@ -54,8 +60,8 @@ void Supernova::draw(Camera &c)
 		// Calculate the center of the projected sphere, to use in the yellow gloom effect.
 		// TODO: For a better effect, increase the LOD if the player gets close enough.
 		float center_angle = acosf(-c.transformation()[3][3]);
-		float p1d = sinf(center_angle + t) / (1.0f - cosf(center_angle + t));
-		float p2d = sinf(center_angle - t) / (1.0f - cosf(center_angle - t));
+		float p1d = sinf(center_angle + size) / (1.0f - cosf(center_angle + size));
+		float p2d = sinf(center_angle - size) / (1.0f - cosf(center_angle - size));
 		float dist = (p1d + p2d) / 2.0f;
 		float r = (p2d - p1d) / 2.0f;
 
