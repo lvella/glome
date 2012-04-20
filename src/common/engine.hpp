@@ -8,12 +8,12 @@
 class Engine
 {
 public:
-	Engine(MeshTypes type);
-	Engine(MeshTypes type, float rot_per_frame,
+	Engine(Mesh::Types type);
+	Engine(Mesh::Types type, float rot_per_frame,
 	float speed_forward, float accel_forward, float speed_vertical,
 	float speed_horizontal, float max_speed_spin);
 	~Engine();
-	void load_location(MeshTypes type);
+	void load_location(Mesh::Types type);
 
 private:
 	Matrix4 velocity;

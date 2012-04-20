@@ -5,16 +5,16 @@
 
 #include "shader.hpp"
 
-enum MeshTypes {HUNTER, DESTROYER, UFO, ICOSPHERE, UVSPHERE, MESH_COUNT};
-
 class Mesh
 {
 public:
+	enum Types {HUNTER, DESTROYER, UFO, ICOSPHERE, UVSPHERE, MESH_COUNT};
+
   ~Mesh();
 
   void draw(Camera& c);
 
-  static Mesh* get_mesh(MeshTypes type);
+  static Mesh* get_mesh(Types type);
   static void release_mesh(Mesh* m);
 
 private:
@@ -35,6 +35,6 @@ private:
   GLenum primitive_type;
   bool has_colorbuf;
 
-  Mesh(MeshTypes type);
+  Mesh(Types type);
 };
 

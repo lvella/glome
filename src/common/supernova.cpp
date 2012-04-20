@@ -5,8 +5,8 @@
 
 Supernova::Supernova():
 	size(0.0f),
-	mesh(Mesh::get_mesh(ICOSPHERE)),
-	map_mesh(Mesh::get_mesh(UVSPHERE))
+	mesh(Mesh::get_mesh(Mesh::ICOSPHERE)),
+	map_mesh(Mesh::get_mesh(Mesh::UVSPHERE))
 {
 	// TODO: initialize this stuff only once
 	const char *source[] = {"supernova.vert", "supernova.frag", "fog.frag", "noise3D.frag", NULL};

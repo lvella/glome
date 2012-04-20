@@ -6,9 +6,9 @@
 
 using namespace Glome;
 
-extern const char* mesh_filename[MESH_COUNT];
+extern const char* mesh_filename[Mesh::MESH_COUNT];
 
-Engine::Engine(MeshTypes type, float rot_per_frame,
+Engine::Engine(Mesh::Types type, float rot_per_frame,
 	float speed_forward, float accel_forward, float speed_vertical,
 	float speed_horizontal, float speed_spin)
 {
@@ -26,7 +26,7 @@ Engine::~Engine()
 {}
 
 void 
-Engine::load_location(MeshTypes type)
+Engine::load_location(Mesh::Types type)
 {
   int ret;
   FILE *fd;

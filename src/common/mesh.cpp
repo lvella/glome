@@ -14,9 +14,9 @@
 
 using namespace std;
 
-static Mesh* mesh_list[MESH_COUNT] = {NULL};
+static Mesh* mesh_list[Mesh::MESH_COUNT] = {NULL};
 
-const char* mesh_filename[MESH_COUNT] =
+const char* mesh_filename[Mesh::MESH_COUNT] =
   {
     "hunter",
     "destroyer",
@@ -30,7 +30,7 @@ Mesh::~Mesh()
   glDeleteBuffers(2, bufobjs);
 }
 
-Mesh::Mesh(MeshTypes type):
+Mesh::Mesh(Types type):
   ref_count(1)
 {
 	assert(size_t(type) < MESH_COUNT);
@@ -367,7 +367,7 @@ Mesh::draw(Camera& c)
 }
 
 Mesh*
-Mesh::get_mesh(MeshTypes type)
+Mesh::get_mesh(Types type)
 {
   Mesh *&m = mesh_list[int(type)];
   if(m)

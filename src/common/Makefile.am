@@ -12,6 +12,7 @@ libcommon_a_SOURCES = \
 	controller.cpp \
 	controller_local.cpp \
 	controller_remote.cpp \
+	destroyer.cpp \
 	drawable.cpp \
 	effect.cpp \
 	engine.cpp \
