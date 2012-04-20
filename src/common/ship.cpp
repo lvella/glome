@@ -21,7 +21,7 @@
 using namespace std;
 using namespace Glome;
 
-extern const char* mesh_filename[MESH_COUNT];
+extern const char* mesh_filename[Mesh::MESH_COUNT];
 
 void
 Ship::set_controller(ShipController* pctrl)
@@ -35,7 +35,7 @@ Ship::set_controller(ShipController* pctrl)
 	ctrl->max_speed_spin = 0.02;
 }
 
-Ship::Ship(MeshTypes type):
+Ship::Ship(Mesh::Types type):
 		fx_engine(0.001f)
 {
 	mesh = Mesh::get_mesh(type);
@@ -54,7 +54,7 @@ Ship::Ship(MeshTypes type):
 }
 
 void 
-Ship::load_guns(MeshTypes type)
+Ship::load_guns(Mesh::Types type)
 {
 	int ret;
 	FILE *fd;
@@ -88,7 +88,7 @@ Ship::load_guns(MeshTypes type)
 }
 
 void 
-Ship::load_engines(MeshTypes type)
+Ship::load_engines(Mesh::Types type)
 {
   int ret;
   FILE *fd;

@@ -278,5 +278,4 @@ if __name__ == "__main__":
   ss.create_header()
   ss.export()
   bfile.close()
-#  ss.read()
-
+  ss.read()

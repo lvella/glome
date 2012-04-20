@@ -10,12 +10,12 @@
 class Ship : public Updatable, public Glome::Drawable 
 {
 public:
-	Ship(MeshTypes type = HUNTER);
-	~Ship() {};
-	void draw(Camera& c);
-	void update();
-	void load_guns(MeshTypes type); //TODO: This method is similar to load_engines, change it!
-	void load_engines(MeshTypes type);
+	Ship(Mesh::Types type = Mesh::HUNTER);
+	virtual ~Ship() {};
+	virtual void draw(Camera& c);
+	virtual void update();
+	void load_guns(Mesh::Types type); //TODO: This method is similar to load_engines, change it!
+	void load_engines(Mesh::Types type);
 	void set_controller(ShipController* pctrl);
 	ShipController* ctrl;
 	AiController* aux;
