@@ -3,7 +3,6 @@
 #include "updatable.hpp"
 #include "drawable.hpp"
 #include "ai_controller.hpp"
-#include "engine.hpp"
 #include "mesh.hpp"
 #include "ship_controller.hpp"
 #include "fire.hpp"
@@ -15,7 +14,8 @@ public:
 	~Ship() {};
 	void draw(Camera& c);
 	void update();
-	void load_guns(MeshTypes type);
+	void load_guns(MeshTypes type); //TODO: This method is similar to load_engines, change it!
+	void load_engines(MeshTypes type);
 	void set_controller(ShipController* pctrl);
 	ShipController* ctrl;
 	AiController* aux;
@@ -23,12 +23,23 @@ public:
 protected:
 	Mesh* mesh;
 
+	// Gun properties
 	Matrix4 r_canon, l_canon;
-	ship_gun gun_l;
-	ship_gun gun_r;
 	uint16_t nguns;
-	Engine* engine;
+	float shot_speed; /* Speed of shot relative to the ship */
+	int shot_power; /* Damage done and heat generated */
+	int max_canon_heat; /* Maximum heat supported by canons */
+	int canon_cooldown_rate; /* Heat cooldown per frame */
+	int cold_fire_rate; /* Shots per second when cold */
 
+	// Engine properties
+	float rel_speed;
+	Matrix4 velocity;
+	uint16_t nengines;
 	Fire fx_engine;
+
+	// Shield properties
+	uint16_t life;
+
 };
 

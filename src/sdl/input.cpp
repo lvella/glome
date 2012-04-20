@@ -4,6 +4,7 @@
 #include <utility>
 #include <string>
 
+#include <assert.h>
 #include <SDL.h>
 
 #include "config.hpp"

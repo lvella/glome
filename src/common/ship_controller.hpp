@@ -1,29 +1,11 @@
 #pragma once
 
-#include "vector4.hpp"
-#include "engine.hpp"
-
-struct ship_gun
-{
-	float shot_speed; /* Speed of shot relative to the ship */
-	int shot_power; /* Damage done and heat generated */
-	int max_canon_heat; /* Maximum heat supported by canons */
-	int canon_cooldown_rate; /* Heat cooldown per frame */
-	int cold_fire_rate; /* Shots per second when cold */
-};
+class Ship;
 
 class ShipController
 {
 public:
 	ShipController();
-
-	void update(Matrix4& t);
-
-	inline void set_engine(Engine* pEng) { engine = pEng; }
-
-	inline void set_guns(ship_gun* pL, ship_gun* pR) { gun_l = pL; gun_r = pR; }
-
-	inline void set_guns_matrices(Matrix4& l, Matrix4& r) { l_canon = l; r_canon = r; }
 
 	inline void rotate_h(float rx)
 	{
@@ -37,22 +19,22 @@ public:
 
 	inline void move_v(float y)
 	{
-		speed_v = y * engine->max_speed_vertical;
+		speed_v = y * max_speed_vertical;
 	}
 
 	inline void move_h(float x)
 	{
-		speed_h = x * engine->max_speed_horizontal;
+		speed_h = x * max_speed_horizontal;
 	}
 
 	inline void move(float a)
 	{
-		accel = a * engine->max_accel_forward;
+		accel = a * max_accel_forward;
 	}
 
 	inline void move_s(float a)
 	{
-		speed_s = a * engine->max_speed_spin;
+		speed_s = a * max_speed_spin;
 	}
 
 	inline void shoot(bool s)
@@ -60,18 +42,8 @@ public:
 		shot = s;
 	}
 
-	inline float getRelativeSpeed()
-	{
-		return rel_speed;
-	}
-
 private:
-	Engine* engine;
-	int nguns;
-	ship_gun* gun_l;
-	ship_gun* gun_r;
-	Matrix4 l_canon;
-	Matrix4 r_canon;
+	friend class Ship;
 
 	/** Shot */
 	int shot_count;
@@ -80,9 +52,15 @@ private:
 	bool shot;
 
 	/** Movement */
+	float max_rot_per_frame; /* Maximum turning delta per frame */
+	float max_speed_forward;
+	float max_accel_forward;
+	float max_speed_vertical;
+	float max_speed_horizontal;
+	float max_speed_spin;
 	float v_req, h_req;
 	float v_tilt, h_tilt;
 	float accel;
-	float rel_speed, speed, speed_v, speed_h, speed_s;
+	float speed, speed_v, speed_h, speed_s;
 };
 

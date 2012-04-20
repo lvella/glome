@@ -41,7 +41,7 @@ Tooltip: 'Export meshes to Binary file format for Glome Game Renega Desruga'
 # nvertices (ushort)
 # nvertices lines contaning vertex coordenates and colors attributes: <x, y, z, w> <r, g, b, a> (8*float ea)
 # nedges (ushort)
-# nedges lines contaning 2 vertex index per line: <v_in0 , v_in1> (2*ushort ea)
+# nedges lines contaning 2 vertex index: <v_in0 , v_in1> (2*ushort ea)
 # nguns (ushort)
 # nguns * <guns Matrix4d positions> (16*float ea)
 # nengines (ushort)
@@ -110,8 +110,14 @@ def vertex_conv(i, scale):
   return (2*x/d, 2*y/d, 2*z/d, (-1 + x*x + y*y + z*z)/d)
 
 def write_matrix(mat, bfile):
-  for i in range(0, len(mat.row)):
-    for j in range(0, len(mat.col)):
+  if(bpy.app.version >= (2,62,0)):
+    row_len = len(mat.row)
+    col_len = len(mat.col)
+  else:
+    row_len = mat.row_size
+    col_len = mat.col_size
+  for i in range(0, row_len):
+    for j in range(0, col_len):
       # t[col][row] because this is how OpenGL represents matrices
       bfile.write(struct.pack('<f', mat[j][i]))
 

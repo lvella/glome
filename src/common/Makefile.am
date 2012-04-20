@@ -14,7 +14,6 @@ libcommon_a_SOURCES = \
 	controller_remote.cpp \
 	drawable.cpp \
 	effect.cpp \
-	engine.cpp \
 	fire.cpp \
 	game.cpp \
 	math.cpp \
