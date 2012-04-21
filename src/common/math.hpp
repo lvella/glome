@@ -1,6 +1,9 @@
 #pragma once
 
+#include <cmath>
+
 #include "matrix4.hpp"
+#include "vector3.hpp"
 
 // Rotations from viewpoint
 
@@ -18,3 +21,57 @@ Matrix4 yz_matrix(float angle);
 Matrix4 xw_matrix(float angle);
 Matrix4 zw_matrix(float angle);
 Matrix4 yw_matrix(float angle);
+
+// Generic vector stuff
+template <class T>
+T vfloor(T v)
+{
+	for(float& e: v)
+		e = floorf(e);
+
+	return v;
+}
+
+template <class T>
+T vmax(T v, float s)
+{
+	for(float& e: v)
+		e = std::max(e, s);
+
+	return v;
+}
+
+template <class T>
+T vfract(T v)
+{
+	for(float& e: v)
+		e -= floorf(e);
+
+	return v;
+}
+
+template <class T>
+T vabs(T v)
+{
+	for(float& e: v)
+		e -= fabsf(e);
+
+	return v;
+}
+
+template<class T>
+T operator+(float a, const T& b)
+{
+	return b + a;
+}
+
+template<class T>
+T operator-(float a, const T& b)
+{
+	return -b + a;
+}
+template<class T>
+T operator*(float a, const T& b)
+{
+	return b * a;
+}
