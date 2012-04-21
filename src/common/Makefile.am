@@ -33,6 +33,7 @@ libcommon_a_SOURCES = \
 	ai_controller.cpp \
 	ship_controller.cpp \
 	ship.cpp \
+	simplexnoise1234.c \
 	sound.cpp \
 	source.cpp \
 	spaghetti.cpp \

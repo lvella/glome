@@ -1,8 +1,14 @@
-#include "textures.hpp"
 #include <cstdlib>
 #include <cmath>
 
+#include <fstream>
 #include <iostream>
+
+extern "C" {
+#include "simplexnoise1234.h"
+}
+
+#include "textures.hpp"
 
 void create_circle_texture(int w, float p, int a0, int a1, GLuint& tex, bool gen_mipmap)
 {
@@ -78,4 +84,45 @@ void create_spherical_texture(int size, GLuint& tex)
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	free(buffer);
+}
+
+GLuint create_noise_texture(int w, int h, float scale, const Vector2& offset)
+{
+	GLuint tex;
+	float max = -1000.0f;
+	float min = 1000.0f;
+
+	glGenTextures(1, &tex);
+	glBindTexture(GL_TEXTURE_2D, tex);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	float* fbuffer = new float[w * h];
+	for(int i = 0; i < h; ++i) {
+		float y = offset.y + i * scale;
+		for(int j = 0; j < w; ++j) {
+			float x = offset.x + j * scale;
+			float noise = snoise2(x, y);
+			fbuffer[i*w + j] = noise;
+			if(noise > max)
+				max = noise;
+			if(noise < min)
+				min = noise;
+		}
+	}
+	float byte_scale = 255.0f / (max - min);
+
+	uint8_t* buffer = new uint8_t[w * h];
+
+	for(int i = 0; i < h; ++i) {
+		for(int j = 0; j < w; ++j) {
+			int idx = i*w + j;
+			buffer[idx] = uint8_t((fbuffer[idx] - min) * byte_scale);
+		}
+	}
+	delete fbuffer;
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
+	delete buffer;
+
+	return tex;
 }

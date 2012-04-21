@@ -20,6 +20,9 @@ private:
 	Vector2 slerp;
 	float size; // Expansion factor
 
+	// Stuff that should be static:
+	GLuint bg_noise;
+
 	Mesh* mesh;
 	CamShader shader;
 	Uniform slerp_arc;
