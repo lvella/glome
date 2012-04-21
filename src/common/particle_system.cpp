@@ -5,7 +5,8 @@
 static Shader program_particle_system;
 
 ParticleSystem::ParticleSystem(int np):
-	count(np)
+	count(np),
+	actives_count(0)
 {
 	rattrs = new RenderAttributes[np];
 	oattrs = new OfflineAttributes[np];
@@ -20,9 +21,9 @@ ParticleSystem::ParticleSystem(int np):
 
 ParticleSystem::~ParticleSystem()
 {
-	delete idx;
-	delete oattrs;
-	delete rattrs;
+	delete[] idx;
+	delete[] oattrs;
+	delete[] rattrs;
 
 	glDeleteBuffers(2, buffobjs);
 }

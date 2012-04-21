@@ -63,7 +63,12 @@ protected:
 	// Logical attributes not used directly in rendering
 	struct OfflineAttributes
 	{
-		// TODO: Remove this 'active' property and everything related.
+		OfflineAttributes():
+			active(false),
+			energy(0),
+			cam_dist(0.0f)
+		{}
+
 		bool active; /* Particle is alive or not */
 		int energy;	/* Energy of the particle */
 		float cam_dist;

@@ -45,7 +45,7 @@ void create_circle_texture(int w, float p, int a0, int a1, GLuint& tex, bool gen
 				float x;
 				d = sqrtf(((i - cx) * (i - cx)) + ((j - cy) * (j - cy)));
 				texture[(i * w) + j].l = 255u;
-				texture[(i * w) + j + 1].a = (d > tex_r) ? a0 : ((d < tex_r_lim) ? a1 : ( (x = (tex_r - d) / (tex_r - tex_r_lim), x*x) * a1 ));
+				texture[(i * w) + j].a = (d > tex_r) ? a0 : ((d < tex_r_lim) ? a1 : ( (x = (tex_r - d) / (tex_r - tex_r_lim), x*x) * a1 ));
 			}
 		}
 
@@ -120,9 +120,9 @@ GLuint create_noise_texture(int w, int h, float scale, const Vector2& offset)
 			buffer[idx] = uint8_t((fbuffer[idx] - min) * byte_scale);
 		}
 	}
-	delete fbuffer;
+	delete[] fbuffer;
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
-	delete buffer;
+	delete[] buffer;
 
 	return tex;
 }
