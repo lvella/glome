@@ -4,10 +4,7 @@
 #include <fstream>
 #include <iostream>
 
-extern "C" {
-#include "simplexnoise1234.h"
-}
-
+#include "simplexnoise1234.hpp"
 #include "textures.hpp"
 
 void create_circle_texture(int w, float p, int a0, int a1, GLuint& tex, bool gen_mipmap)
@@ -102,7 +99,7 @@ GLuint create_noise_texture(int w, int h, float scale, const Vector2& offset)
 		float y = offset.y + i * scale;
 		for(int j = 0; j < w; ++j) {
 			float x = offset.x + j * scale;
-			float noise = snoise2(x, y);
+			float noise = SimplexNoise1234::noise(x, y);
 			fbuffer[i*w + j] = noise;
 			if(noise > max)
 				max = noise;
