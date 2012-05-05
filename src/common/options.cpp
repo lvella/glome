@@ -46,8 +46,8 @@ void usage()
 			"\t--bot-screen \t: enable view of bot screen (at most 3 bots are shown)\n"
 #endif
 			"Video options:\n"
-			"\t-w/--width [number] \t: set window's width\n"
-			"\t-h/--height [number] \t: set window's height\n"
+			"\t-x/--width [number] \t: set window's width\n"
+			"\t-y/--height [number] \t: set window's height\n"
 			"\t-f/--fullscreen\t\t: be fullscreen\n"
 			"Networking options:\n"
 			"\t-h/--host [ip]\t\t: host ip\n"
@@ -68,8 +68,8 @@ int parse_args(int argc, char** argv)
 			{"bot-screen",  no_argument,				0,  'v'},
 #endif
 			{"full-screen",	no_argument,				0,	'f'},
-			{"width",				required_argument,	0,	'w'},
-			{"height",			required_argument,	0,	'h'},
+			{"width",				required_argument,	0,	'x'},
+			{"height",			required_argument,	0,	'y'},
 			{"is-server",		no_argument,				0,	's'},
 			{"is-client",		no_argument,				0,	'c'},
 			{"host",				required_argument,	0,	'h'},
@@ -81,7 +81,7 @@ int parse_args(int argc, char** argv)
 	char option;
 	int option_index = 0;
 
-	while ((option = getopt_long(argc, argv, "fw:h:csh:p:", long_options, &option_index)) != EOF)
+	while ((option = getopt_long(argc, argv, "fx:y:csh:p:", long_options, &option_index)) != EOF)
 	{
 		switch (option)
 		{
