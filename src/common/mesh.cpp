@@ -338,7 +338,7 @@ Mesh::draw(Camera& c)
 	if(has_colorbuf) {
 		stride = 32;
 		glEnableVertexAttribArray(s->colorAttr());
-		glVertexAttribPointer(s->colorAttr(), 4, GL_FLOAT, GL_FALSE, 32, (void*) (4 * sizeof(float)));
+		glVertexAttribPointer(s->colorAttr(), 4, GL_FLOAT, GL_FALSE, stride, (void*) (4 * sizeof(float)));
 	}
 	else {
 		stride = 0;
