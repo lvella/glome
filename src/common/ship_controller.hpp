@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ship_stats.hpp"
+
 class Ship;
 
 class ShipController
@@ -19,22 +21,22 @@ public:
 
 	inline void move_v(float y)
 	{
-		speed_v = y * max_speed_vertical;
+		speed_v = y * stats->max_speed_vertical;
 	}
 
 	inline void move_h(float x)
 	{
-		speed_h = x * max_speed_horizontal;
+		speed_h = x * stats->max_speed_horizontal;
 	}
 
 	inline void move(float a)
 	{
-		accel = a * max_accel_forward;
+		accel = a * stats->max_accel_forward;
 	}
 
 	inline void move_s(float a)
 	{
-		speed_s = a * max_speed_spin;
+		speed_s = a * stats->max_speed_spin;
 	}
 
 	inline void shoot(bool s)
@@ -52,12 +54,7 @@ private:
 	bool shot;
 
 	/** Movement */
-	float max_rot_per_frame; /* Maximum turning delta per frame */
-	float max_speed_forward;
-	float max_accel_forward;
-	float max_speed_vertical;
-	float max_speed_horizontal;
-	float max_speed_spin;
+	ShipStats *stats;
 	float v_req, h_req;
 	float v_tilt, h_tilt;
 	float accel;

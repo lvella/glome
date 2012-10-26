@@ -27,16 +27,12 @@ void
 Ship::set_controller(ShipController* pctrl)
 {
 	ctrl = pctrl;
-	ctrl->max_rot_per_frame = 0.03;
-	ctrl->max_speed_forward = 0.0015;
-	ctrl->max_accel_forward = 0.0002;
-	ctrl->max_speed_vertical = 0.0004;
-	ctrl->max_speed_horizontal = 0.0004;
-	ctrl->max_speed_spin = 0.02;
+	ctrl->stats = stats.get();
 }
 
 Ship::Ship(Mesh::Types type):
-		fx_engine(0.001f)
+		fx_engine(0.001f),
+		stats(ShipStats::get())
 {
 	mesh = Mesh::get_mesh(type);
 	load_guns(type);
@@ -45,12 +41,6 @@ Ship::Ship(Mesh::Types type):
 	rel_speed = 0.0f;
 
 	ctrl = NULL;
-
-	shot_speed = shot_speed = 0.02;
-	shot_power = shot_power = 82;
-	// max_canon_heat = ?; // TODO: Mathematical model for cooldown, that uses all heat parameters.
-	canon_cooldown_rate = canon_cooldown_rate = 7;
-	cold_fire_rate = cold_fire_rate = 15;
 }
 
 void 
@@ -138,35 +128,35 @@ Ship::update()
 		float v = ctrl->v_tilt - ctrl->v_req;
 
 		/* Limit the turning speed to MAXD rads per frame. */
-		if(h > ctrl->max_rot_per_frame)
-			h = ctrl->max_rot_per_frame;
-		else if(h < -ctrl->max_rot_per_frame)
-			h = -ctrl->max_rot_per_frame;
-		if(v > ctrl->max_rot_per_frame)
-			v = ctrl->max_rot_per_frame;
-		else if(v < -ctrl->max_rot_per_frame)
-			v = -ctrl->max_rot_per_frame;
+		if(h > stats->max_rot_per_frame)
+			h = stats->max_rot_per_frame;
+		else if(h < -stats->max_rot_per_frame)
+			h = -stats->max_rot_per_frame;
+		if(v > stats->max_rot_per_frame)
+			v = stats->max_rot_per_frame;
+		else if(v < -stats->max_rot_per_frame)
+			v = -stats->max_rot_per_frame;
 
 		ctrl->h_tilt -= h;
 		ctrl->v_tilt -= v;
 
 		float old_speed = ctrl->speed;
 		ctrl->speed += ctrl->accel;
-		if(ctrl->speed > ctrl->max_speed_forward) {
-			ctrl->speed = ctrl->max_speed_forward;
+		if(ctrl->speed > stats->max_speed_forward) {
+			ctrl->speed = stats->max_speed_forward;
 			rel_speed = -1.0f;
-		} else if(ctrl->speed < -ctrl->max_speed_forward) {
-			ctrl->speed = -ctrl->max_speed_forward;
+		} else if(ctrl->speed < -stats->max_speed_forward) {
+			ctrl->speed = -stats->max_speed_forward;
 			rel_speed = 1.0f;
 		} else if(old_speed != ctrl->speed) {
-			rel_speed = -ctrl->speed / ctrl->max_speed_forward;
+			rel_speed = -ctrl->speed / stats->max_speed_forward;
 		}
 
 		/* Shooting */
 		if(ctrl->heat > 0)
-			ctrl->heat -= canon_cooldown_rate; // Cooldown rate
+			ctrl->heat -= stats->canon_cooldown_rate; // Cooldown rate
 
-		int sps = (cold_fire_rate * 100 - ctrl->heat) / 100; // Firerate at maximum
+		int sps = (stats->max_fire_rate * 100 - ctrl->heat) / 100; // Firerate at maximum
 
 		ctrl->shot_count -= sps;
 		if(ctrl->shot_count < 0)
@@ -174,9 +164,9 @@ Ship::update()
 			if(ctrl->shot)
 			{
 				//TODO: Put shots collision elsewhere, rather than the ship_controller
-				Projectile::shot(ctrl, _t * (ctrl->canon_shot_last ? l_canon : r_canon), shot_speed - ctrl->speed);
+				Projectile::shot(ctrl, _t * (ctrl->canon_shot_last ? l_canon : r_canon), stats->shot_speed - ctrl->speed);
 				ctrl->shot_count += 60;
-				ctrl->heat += shot_power; // Shot heat, could be equivalent to damage
+				ctrl->heat += stats->shot_power; // Shot heat, could be equivalent to damage
 				ctrl->canon_shot_last = !ctrl->canon_shot_last;
 			}
 			else
