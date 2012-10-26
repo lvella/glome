@@ -53,6 +53,7 @@ void Supernova::update()
 	slerp[0] = sinf(size);
 	slerp[1] = cosf(size);
 
+	// Spin
 	_t = _t * xy_matrix(slerp[1] * 0.002);
 }
 

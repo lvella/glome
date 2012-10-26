@@ -140,7 +140,6 @@ int main(int argc, char **argv)
 		return 1;
 
 	/* TODO: Network in game archive. */
-	srand(time(NULL));
 
 	initialize_SDL();
 	initialize_gl_context();

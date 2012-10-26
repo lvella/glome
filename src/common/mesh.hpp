@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdio.h>
-#include <boost/ref.hpp>
 
 #include "shader.hpp"
 
