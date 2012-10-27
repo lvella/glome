@@ -11,11 +11,13 @@ AC_DEFINE_UNQUOTED([DATA_DIR], ["$DATA_DIR"] , [Data directory])
 m4_pattern_allow([^AX_])
 AC_CONFIG_MACRO_DIR([m4])
 
+AC_CANONICAL_HOST
+
 AM_INIT_AUTOMAKE
 
+AC_ARG_PROGRAM
 AC_PROG_CXX
 AC_PROG_RANLIB
-
 
 # Packages configuration
 AC_PATH_PROG(PKG_CONFIG, pkg-config)
@@ -77,7 +79,12 @@ echo ["\
 
  ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
 
- Prefix: '${prefix}'.
+ Prefix: '${prefix}'
+
+ Build system: $build
+ Host system: $host
+ Target system: $target
+
  Compiler: '${CXX} ${CXXFLAGS} ${CPPFLAGS}'
  Libraries: '${SDL_LIBS} ${SDL_IMAGE_LIBS} ${GUICHAN_LIBS} ${OPENGL_LIBS} ${BOOST_LIBS}'
 "]
