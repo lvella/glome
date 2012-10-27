@@ -1,5 +1,7 @@
 #pragma once
 
+#include "vector4.hpp"
+
 class Vector3
 {
 public:
@@ -53,9 +55,14 @@ public:
 		return Vector3(x * o.x, y * o.y, z * o.z);
 	}
 
-	float dot(const Vector3& o)
+	float dot(const Vector3& o) const
 	{
 		return x * o.x + y * o.y + z * o.z;
+	}
+
+	Vector4 inverse_stereo_proj() const {
+		float d = 1.0f + x*x + y*y + z*z;
+		return Vector4(2.0f*x/d, 2.0f*y/d, 2.0f*z/d, (x*x + y*y + z*z - 1.0f) / d);
 	}
 
 	const float* getVertex() const {return v;}

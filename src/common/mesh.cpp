@@ -55,6 +55,24 @@ Mesh::Mesh(Types type):
 	}
 }
 
+void Mesh::fill_VBO(const std::vector<VertexData>& vdata, float scale) {
+	struct VertexData4D {
+		Vector4 pos;
+		Vector4 color;
+	};
+
+	std::vector<VertexData4D> transformed(vdata.size());
+
+	for(int i = 0; i < vdata.size(); ++i) {
+		transformed[i].pos = (vdata[i].pos * scale).inverse_stereo_proj();
+		transformed[i].color = vdata[i].color;
+	}
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData4D) * transformed.size(),
+		     &transformed[0], GL_STATIC_DRAW);
+}
+
 void Mesh::load_from_file(const char* name)
 {
 	uint16_t ilen, vlen;
@@ -64,14 +82,16 @@ void Mesh::load_from_file(const char* name)
 
 	std::cout << "Loading mesh " << name << std::endl;
 
-	// Load mesh file and put it into the list of meshs if was not exist
+	// Load mesh file and put it into the list of meshs if does not exists
 	{
 		unsigned int mesh_pos;
 		std::stringstream dir;
 		dir << DATA_DIR << "/models/" << name << ".wire";
 		fd = fopen(dir.str().c_str(), "rb");
 		/* Read header of file */
-		fread(&mesh_pos, sizeof(unsigned int), 1, fd);
+		ret = fread(&mesh_pos, sizeof(unsigned int), 1, fd);
+		assert(ret == 1);
+
 		/* Pointer file to mesh position */
 		fseek(fd, mesh_pos, SEEK_SET);
 		assert(fd != NULL);
@@ -83,13 +103,13 @@ void Mesh::load_from_file(const char* name)
 		//#TODO: Make the inverse projection to 4-D using the 3-D vector, to scale objects easily
 		ret = fread(&vlen, sizeof(vlen), 1, fd);
 		assert(ret == 1);
-		// Create vertex buffer
-		uint16_t vbolen = vlen * 7 * sizeof(float);
-		float vdata[vbolen];
-		ret = fread(vdata, 7 * sizeof(float), vlen, fd);
+
+		std::vector<VertexData> vdata(vlen);
+		ret = fread(&vdata[0], sizeof(VertexData), vlen, fd);
 		assert(ret == vlen);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vbolen, vdata, GL_STATIC_DRAW);
+
+		// Create vertex buffer
+		fill_VBO(vdata);
 	}
 
 	{
