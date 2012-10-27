@@ -32,6 +32,7 @@ libcommon_a_SOURCES = \
 	shader.cpp \
 	ai_controller.cpp \
 	ship_controller.cpp \
+	ship_stats.cpp \
 	ship.cpp \
 	simplexnoise1234.cpp \
 	sound.cpp \

@@ -8,8 +8,6 @@ class ControllerRemote : public ControllerLocal
 {
 public:
 	virtual ~ControllerRemote() {};
-
-	void update();
 	ControllerRemote(std::vector<Ship*>* pp, std::unordered_map<int, Ship*>* prp);
 
 protected:

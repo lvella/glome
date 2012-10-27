@@ -1,5 +1,7 @@
 #pragma once
 
+#include <memory>
+
 #include "updatable.hpp"
 #include "drawable.hpp"
 #include "ai_controller.hpp"
@@ -23,14 +25,12 @@ public:
 protected:
 	Mesh* mesh;
 
+	// Attributes of the ship
+	std::unique_ptr<ShipStats> stats;
+
 	// Gun properties
 	Matrix4 r_canon, l_canon;
 	uint16_t nguns;
-	float shot_speed; /* Speed of shot relative to the ship */
-	int shot_power; /* Damage done and heat generated */
-	int max_canon_heat; /* Maximum heat supported by canons */
-	int canon_cooldown_rate; /* Heat cooldown per frame */
-	int cold_fire_rate; /* Shots per second when cold */
 
 	// Engine properties
 	float rel_speed;

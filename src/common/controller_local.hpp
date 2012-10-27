@@ -7,7 +7,7 @@ class ControllerLocal : public Controller
 {
 public:
 	ControllerLocal(std::vector<Ship*>* pp, std::vector<Ship*>* bp, std::vector<AiController*>* ai);
-	~ControllerLocal();
+	virtual ~ControllerLocal();
 	virtual void update();
 
 protected:
