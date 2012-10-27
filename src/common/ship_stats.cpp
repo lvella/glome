@@ -1,31 +1,33 @@
 #include "ship_stats.hpp"
 
-#ifdef STATUS_TUNNING
+#ifdef STATS_TUNNING
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
+#include <sys/mman.h>
 #include <fcntl.h>
+
+static void deleter(ShipStats *del_ptr) {
+	munmap(del_ptr, sizeof(ShipStats));
+};
+
 #endif
 
-std::unique_ptr< ShipStats > ShipStats::get()
+auto ShipStats::get() -> unique_ptr
 {
-	#ifdef STATUS_TUNNING
-	int fd = open("ship_params.bin", O_CREAT | O_RDWR);
+	#ifdef STATS_TUNNING
+	int fd = open("ship_params.bin", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
 	ftruncate(fd, sizeof(ShipStats));
 
 	void *ptr = mmap(NULL, sizeof(ShipStats),
 			 PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
-	auto deleter = [=fd](ShipStats *del_ptr) {
-		munmap(del_ptr, sizeof(ShipStats));
-		
-		close(fd);
-	}
+	close(fd);
 
-	std::unique_ptr<ShipStats, decltype(deleter)> ret((ShipStats*)ptr, deleter);
+	unique_ptr ret((ShipStats*)ptr, deleter);
 
 	#else
 
-	std::unique_ptr<ShipStats> ret(new ShipStats);
+	unique_ptr ret(new ShipStats);
 
 	#endif
 

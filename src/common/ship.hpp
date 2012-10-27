@@ -26,7 +26,7 @@ protected:
 	Mesh* mesh;
 
 	// Attributes of the ship
-	std::unique_ptr<ShipStats> stats;
+	ShipStats::unique_ptr stats;
 
 	// Gun properties
 	Matrix4 r_canon, l_canon;
