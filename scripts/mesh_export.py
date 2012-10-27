@@ -143,7 +143,8 @@ class SpaceShip:
   def create_header(self):
     # calc initial positions
     self.mesh_pos = header_size = 3 * isize
-    mesh_size = (len(self.data.vertices) * 8 * fsize) + (len(self.data.edges) * 2 * usize) + (2 * usize)
+#    mesh_size = (len(self.data.vertices) * 8 * fsize) + (len(self.data.edges) * 2 * usize) + (2 * usize)
+    mesh_size = (len(self.data.vertices) * 8) + (len(self.data.edges) * 2 * usize) + (2 * usize)
     self.gun_pos = header_size + mesh_size
     gun_size = (len(self.lguns) * 16 * fsize) + usize
     self.engine_pos = header_size + mesh_size + gun_size
@@ -168,12 +169,13 @@ class SpaceShip:
       x = bfile.read(fsize)
       y = bfile.read(fsize)
       z = bfile.read(fsize)
-      w = bfile.read(fsize)
+#      w = bfile.read(fsize)
       r = bfile.read(fsize)
       g = bfile.read(fsize)
       b = bfile.read(fsize)
       a = bfile.read(fsize)
-      print(struct.unpack('<f', x)[0], struct.unpack('<f', y)[0], struct.unpack('<f', z)[0], struct.unpack('<f', w)[0], struct.unpack('<f', r)[0], struct.unpack('<f', g)[0], struct.unpack('<f', b)[0], struct.unpack('<f', a)[0])
+#      print(struct.unpack('<f', x)[0], struct.unpack('<f', y)[0], struct.unpack('<f', z)[0], struct.unpack('<f', w)[0], struct.unpack('<f', r)[0], struct.unpack('<f', g)[0], struct.unpack('<f', b)[0], struct.unpack('<f', a)[0])
+      print(struct.unpack('<f', x)[0], struct.unpack('<f', y)[0], struct.unpack('<f', z)[0], struct.unpack('<f', r)[0], struct.unpack('<f', g)[0], struct.unpack('<f', b)[0], struct.unpack('<f', a)[0])
     ne = bfile.read(usize)
     print(struct.unpack('<H', ne)[0])
     for e in self.data.edges:
@@ -224,7 +226,7 @@ class Mesh:
       bfile.write(struct.pack('<f', out[0]))
       bfile.write(struct.pack('<f', out[1]))
       bfile.write(struct.pack('<f', out[2]))
-      bfile.write(struct.pack('<f', out[3]))
+#      bfile.write(struct.pack('<f', out[3]))
       bfile.write(struct.pack('<f', self.diffuse_color[0]))
       bfile.write(struct.pack('<f', self.diffuse_color[1]))
       bfile.write(struct.pack('<f', self.diffuse_color[2]))

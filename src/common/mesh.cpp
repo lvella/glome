@@ -57,59 +57,59 @@ Mesh::Mesh(Types type):
 
 void Mesh::load_from_file(const char* name)
 {
-  uint16_t ilen, vlen;
+	uint16_t ilen, vlen;
 
-  int ret;
-  FILE *fd;
+	int ret;
+	FILE *fd;
 
-  std::cout << "Loading mesh " << name << std::endl;
+	std::cout << "Loading mesh " << name << std::endl;
 
-  // Load mesh file and put it into the list of meshs if was not exist
-  {
+	// Load mesh file and put it into the list of meshs if was not exist
+	{
 		unsigned int mesh_pos;
-    std::stringstream dir;
-    dir << DATA_DIR << "/models/" << name << ".wire";
-    fd = fopen(dir.str().c_str(), "rb");
-    /* Read header of file */
+		std::stringstream dir;
+		dir << DATA_DIR << "/models/" << name << ".wire";
+		fd = fopen(dir.str().c_str(), "rb");
+		/* Read header of file */
 		fread(&mesh_pos, sizeof(unsigned int), 1, fd);
 		/* Pointer file to mesh position */
-    fseek(fd, mesh_pos, SEEK_SET);
-    assert(fd != NULL);
-  }
+		fseek(fd, mesh_pos, SEEK_SET);
+		assert(fd != NULL);
+	}
 
-  {
-    // Reading 4-D vertex coordinates(16bytes) and colorRGBA values(16bytes)
-    // format: <x, y, z, w> <r, g, b, a>
-    ret = fread(&vlen, sizeof(vlen), 1, fd);
-    assert(ret == 1);
-    // Create vertex buffer
-    uint16_t vbolen = vlen * 2 * 4 * sizeof(float);
-    float vdata[vbolen];
-    ret = fread(vdata, 2 * 4 * sizeof(float), vlen, fd);
-    assert(ret == vlen);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vbolen, vdata, GL_STATIC_DRAW);
-  }
+	{
+		// Reading 4-D vertex coordinates(16bytes) and colorRGBA values(16bytes)
+		// format: <x, y, z, w> <r, g, b, a>
+		ret = fread(&vlen, sizeof(vlen), 1, fd);
+		assert(ret == 1);
+		// Create vertex buffer
+		uint16_t vbolen = vlen * 2 * 4 * sizeof(float);
+		float vdata[vbolen];
+		ret = fread(vdata, 2 * 4 * sizeof(float), vlen, fd);
+		assert(ret == vlen);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		glBufferData(GL_ARRAY_BUFFER, vbolen, vdata, GL_STATIC_DRAW);
+	}
 
-  {
-    // Reading 4-D edges coordinates (8bytes)
-    // format:  <v_index0 , v_index1>
-    ret = fread(&ilen, sizeof(ilen), 1, fd);
-    assert(ret == 1);
-    // Create index buffer
-    uint16_t ibolen = ilen * 2 * sizeof(uint16_t);
-    uint16_t idata[ibolen];
-    ret = fread(idata, 2 * sizeof(uint16_t), ilen, fd);
-    assert(ret == ilen);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, ibolen, idata, GL_STATIC_DRAW);
-  }
+	{
+		// Reading 4-D edges coordinates (8bytes)
+		// format:  <v_index0 , v_index1>
+		ret = fread(&ilen, sizeof(ilen), 1, fd);
+		assert(ret == 1);
+		// Create index buffer
+		uint16_t ibolen = ilen * 2 * sizeof(uint16_t);
+		uint16_t idata[ibolen];
+		ret = fread(idata, 2 * sizeof(uint16_t), ilen, fd);
+		assert(ret == ilen);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ibolen, idata, GL_STATIC_DRAW);
+	}
 
-  fclose(fd);
+	fclose(fd);
 
-  len = ilen * 2;
-  primitive_type = GL_LINES;
-  has_colorbuf = true;
+	len = ilen * 2;
+	primitive_type = GL_LINES;
+	has_colorbuf = true;
 }
 
 // Not a full uv sphere: open in the poles so it looks cool in minimap
