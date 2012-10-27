@@ -17,13 +17,13 @@ using namespace std;
 static Mesh* mesh_list[Mesh::MESH_COUNT] = {NULL};
 
 const char* mesh_filename[Mesh::MESH_COUNT] =
-  {
-    "hunter",
-    "destroyer",
-    "ufo",
-    NULL, // icosphere
-    NULL, // uvsphere
-  };
+	{
+		"hunter",
+		"destroyer",
+		"ufo",
+		NULL, // icosphere
+		NULL, // uvsphere
+	};
 
 Mesh::~Mesh()
 {
@@ -78,21 +78,22 @@ void Mesh::load_from_file(const char* name)
 	}
 
 	{
-		// Reading 4-D vertex coordinates(16bytes) and colorRGBA values(16bytes)
-		// format: <x, y, z, w> <r, g, b, a>
+		// Reading 3-D vertex coordinates(12bytes) and colorRGBA values(16bytes)
+		// format: <x, y, z> <r, g, b, a>
+		//#TODO: Make the inverse projection to 4-D using the 3-D vector, to scale objects easily
 		ret = fread(&vlen, sizeof(vlen), 1, fd);
 		assert(ret == 1);
 		// Create vertex buffer
-		uint16_t vbolen = vlen * 2 * 4 * sizeof(float);
+		uint16_t vbolen = vlen * 7 * sizeof(float);
 		float vdata[vbolen];
-		ret = fread(vdata, 2 * 4 * sizeof(float), vlen, fd);
+		ret = fread(vdata, 7 * sizeof(float), vlen, fd);
 		assert(ret == vlen);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, vbolen, vdata, GL_STATIC_DRAW);
 	}
 
 	{
-		// Reading 4-D edges coordinates (8bytes)
+		// Reading edges coordinates (8bytes)
 		// format:  <v_index0 , v_index1>
 		ret = fread(&ilen, sizeof(ilen), 1, fd);
 		assert(ret == 1);
