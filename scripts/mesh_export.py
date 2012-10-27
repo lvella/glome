@@ -101,14 +101,6 @@ def zw_matrix(angle):
 def matrix_gen(v):
   return xw_matrix(v[0] * gscale) * yw_matrix(v[2] * gscale) *  zw_matrix(v[1] * gscale)
 
-def vertex_conv(i, scale):
-  'Convert 3-D to 4-D coordinates'
-  x = i[0] * scale
-  y = i[1] * scale
-  z = i[2] * scale
-  d = 1 + x*x + y*y + z*z
-  return (2*x/d, 2*y/d, 2*z/d, (-1 + x*x + y*y + z*z)/d)
-
 def write_matrix(mat, bfile):
   if(bpy.app.version >= (2,62,0)):
     row_len = len(mat.row)
@@ -222,11 +214,10 @@ class Mesh:
   def export(self):
     bfile.write(struct.pack('<H', len(self.data.vertices)))
     for v in self.data.vertices:
-      out = vertex_conv(v.co, scale)
+      out = v.co * scale
       bfile.write(struct.pack('<f', out[0]))
       bfile.write(struct.pack('<f', out[1]))
       bfile.write(struct.pack('<f', out[2]))
-#      bfile.write(struct.pack('<f', out[3]))
       bfile.write(struct.pack('<f', self.diffuse_color[0]))
       bfile.write(struct.pack('<f', self.diffuse_color[1]))
       bfile.write(struct.pack('<f', self.diffuse_color[2]))
