@@ -135,8 +135,7 @@ class SpaceShip:
   def create_header(self):
     # calc initial positions
     self.mesh_pos = header_size = 3 * isize
-#    mesh_size = (len(self.data.vertices) * 8 * fsize) + (len(self.data.edges) * 2 * usize) + (2 * usize)
-    mesh_size = (len(self.data.vertices) * 8) + (len(self.data.edges) * 2 * usize) + (2 * usize)
+    mesh_size = (len(self.data.vertices) * 7 * fsize) + (len(self.data.edges) * 2 * usize) + (2 * usize)
     self.gun_pos = header_size + mesh_size
     gun_size = (len(self.lguns) * 16 * fsize) + usize
     self.engine_pos = header_size + mesh_size + gun_size
