@@ -22,7 +22,7 @@ public:
 	ShipController* ctrl;
 	AiController* aux;
 
-	#ifdef STATS_TUNNING
+	#ifdef STATS_TUNING
 	float get_scale() {
 		return stats->scale;
 	}

@@ -4,7 +4,7 @@
 
 #include "config.hpp"
 
-#ifdef STATS_TUNNING
+#ifdef STATS_TUNING
 #define STATS_VOLATILE volatile
 #define STATS_PACKING __attribute__ ((__packed__))
 #define STATS_POINTER std::unique_ptr< ShipStats, void(*)(ShipStats *) >

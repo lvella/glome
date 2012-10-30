@@ -123,7 +123,7 @@ Ship::draw(Camera& c)
 void
 Ship::update()
 {
-	#ifdef STATS_TUNNING
+	#ifdef STATS_TUNING
 	static float curr_scale = 1.0;
 	if(curr_scale != stats->scale) {
 		curr_scale = stats->scale;

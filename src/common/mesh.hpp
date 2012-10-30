@@ -43,7 +43,7 @@ private:
 
 	Mesh(Types type);
 
-	#ifdef STATS_TUNNING
+	#ifdef STATS_TUNING
 	std::vector<VertexData> mesh_data;
 public:
 	void rescale(float scale) {

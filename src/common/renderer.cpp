@@ -93,7 +93,7 @@ inline Matrix4
 Renderer::Viewport::newCameraTransform()
 {
 	// Calculate camera position
-	#ifdef STATS_TUNNING
+	#ifdef STATS_TUNING
 	const float scale = t->get_scale();
 	#else
 	const float scale = 1.0f;

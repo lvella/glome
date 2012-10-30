@@ -1,6 +1,6 @@
 #include "ship_stats.hpp"
 
-#ifdef STATS_TUNNING
+#ifdef STATS_TUNING
 #include <unistd.h>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -15,7 +15,7 @@ static void deleter(ShipStats *del_ptr) {
 
 auto ShipStats::get() -> unique_ptr
 {
-	#ifdef STATS_TUNNING
+	#ifdef STATS_TUNING
 	int fd = open("ship_params.bin", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
 	ftruncate(fd, sizeof(ShipStats));
 
