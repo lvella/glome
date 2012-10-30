@@ -42,5 +42,14 @@ private:
 	bool has_colorbuf;
 
 	Mesh(Types type);
+
+	#ifdef STATS_TUNNING
+	std::vector<VertexData> mesh_data;
+public:
+	void rescale(float scale) {
+		fill_VBO(mesh_data, scale);
+	}
+private:
+	#endif
 };
 

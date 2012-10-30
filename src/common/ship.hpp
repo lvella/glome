@@ -12,7 +12,7 @@
 class Ship : public Updatable, public Glome::Drawable 
 {
 public:
-	Ship(Mesh::Types type = Mesh::HUNTER);
+	Ship(Mesh::Types type, std::shared_ptr<ShipStats> sstats);
 	virtual ~Ship() {};
 	virtual void draw(Camera& c);
 	virtual void update();
@@ -22,11 +22,17 @@ public:
 	ShipController* ctrl;
 	AiController* aux;
 
+	#ifdef STATS_TUNNING
+	float get_scale() {
+		return stats->scale;
+	}
+	#endif
+
 protected:
 	Mesh* mesh;
 
 	// Attributes of the ship
-	ShipStats::unique_ptr stats;
+	std::shared_ptr<ShipStats> stats;
 
 	// Gun properties
 	Matrix4 r_canon, l_canon;

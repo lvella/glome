@@ -110,6 +110,10 @@ void Mesh::load_from_file(const char* name)
 
 		// Create vertex buffer
 		fill_VBO(vdata);
+		
+		#ifdef STATS_TUNNING
+		mesh_data = std::move(vdata);
+		#endif
 	}
 
 	{

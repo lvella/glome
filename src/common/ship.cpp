@@ -30,9 +30,9 @@ Ship::set_controller(ShipController* pctrl)
 	ctrl->stats = stats.get();
 }
 
-Ship::Ship(Mesh::Types type):
+Ship::Ship(Mesh::Types type, std::shared_ptr<ShipStats> sstats):
 		fx_engine(0.001f),
-		stats(ShipStats::get())
+		stats(std::move(sstats))
 {
 	mesh = Mesh::get_mesh(type);
 	load_guns(type);
@@ -57,7 +57,8 @@ Ship::load_guns(Mesh::Types type)
 		fd = fopen(dir.str().c_str(), "rb");
 		/* Read header of file */
 		fseek(fd, 4, SEEK_SET);
-		fread(&gun_pos, sizeof(unsigned int), 1, fd);
+		ret = fread(&gun_pos, sizeof(unsigned int), 1, fd);
+		assert(ret == 1);
 		/* Pointer file to gun position */
 		fseek(fd, gun_pos, SEEK_SET);
 		assert(fd != NULL);
@@ -92,7 +93,8 @@ Ship::load_engines(Mesh::Types type)
 		fd = fopen(dir.str().c_str(), "rb");
 		/* Read header of file */
 		fseek(fd, 8, SEEK_SET);
-		fread(&engine_pos, sizeof(unsigned int), 1, fd);
+		ret = fread(&engine_pos, sizeof(unsigned int), 1, fd);
+		assert(ret == 1);
 		/* Poiter file to engine position */
 		fseek(fd, engine_pos, SEEK_SET);
 		assert(fd != NULL);
@@ -121,6 +123,13 @@ Ship::draw(Camera& c)
 void
 Ship::update()
 {
+	#ifdef STATS_TUNNING
+	static float curr_scale = 1.0;
+	if(curr_scale != stats->scale) {
+		curr_scale = stats->scale;
+		mesh->rescale(curr_scale);
+	}
+	#endif
 	if(ctrl != NULL)
 	{
 		/* Turning */

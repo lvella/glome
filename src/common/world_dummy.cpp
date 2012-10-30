@@ -4,6 +4,7 @@
 #include "options.hpp"
 #include "random.hpp"
 #include "destroyer.hpp"
+#include "ship_stats.hpp"
 
 #include "world_dummy.hpp"
 
@@ -13,9 +14,10 @@ WorldDummy::WorldDummy()
 {
 	std::vector<Ship*> bot;
 	std::vector<Ship*> players;
+	std::shared_ptr<ShipStats> stats(ShipStats::get());
 	Ship* s;
 
-	s = new Destroyer();//new Ship(Mesh::Types(Random::range(0, Mesh::UFO)));
+	s = new Ship(Mesh::Types(Random::range(0, Mesh::UFO)), stats);//new Destroyer();
 	s->set_controller(Input::create_ship_controller(0));
 	players.push_back(s);
 	ships.push_back(s);
@@ -24,7 +26,7 @@ WorldDummy::WorldDummy()
 	{
 		AiController *ctrl_ai;
 
-		s = new Ship(Mesh::Types(Random::range(0, Mesh::UFO)));
+		s = new Ship(Mesh::Types(Random::range(0, Mesh::UFO)), stats);
 		ctrl_ai = new AiController();
 		s->set_controller(ctrl_ai);
 		ai_controls.push_back(ctrl_ai);

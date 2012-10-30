@@ -31,6 +31,8 @@ auto ShipStats::get() -> unique_ptr
 
 	#endif
 
+	ret->scale = 1.0f;
+	
 	ret->max_rot_per_frame = 0.03;
 	ret->max_speed_forward = 0.0015;
 	ret->max_accel_forward = 0.0002;
