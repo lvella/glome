@@ -1,10 +1,10 @@
 #pragma once
 
-#include "world.hpp"
+#include "runcontext.hpp"
 
 namespace Game
 {
-	extern World* world;
+	extern RunContext* context;
 	enum state {EXIT, MENU, WORLD};
 
 	/** Process and renders a game frame. */

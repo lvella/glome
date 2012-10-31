@@ -14,13 +14,15 @@ using namespace Options;
 
 namespace Game
 {
-World* world;
+RunContext* context;
+
+static std::unique_ptr<World> world;
 
 void
 frame()
 {
-	world->update();
-	world->draw();
+	context->update();
+	context->draw();
 }
 
 void
@@ -36,14 +38,15 @@ initialize()
 
 	Renderer::initialize();
 
-	world = new WorldDummy();
-	world->setup_display();
+	world.reset(new WorldDummy());
 
 	MiniMap::initialize();
 	Projectile::initialize();
 	ParticleSystem::initialize();
 	//Menu::initialize();
 	initialize_meridians();
+
+	switch_state(WORLD);
 }
 
 void switch_state(state s)
@@ -57,9 +60,10 @@ void switch_state(state s)
 		// TODO...
 		break;
 	case WORLD:
-		// TODO...
+		context = world.get();
 		break;
 	}
+	context->setup_display();
 }
 }
 

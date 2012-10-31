@@ -34,13 +34,13 @@ WorldDummy::WorldDummy()
 		ships.push_back(s);
 	}
 
-	_ctrl = new ControllerLocal(&ships, &bot, &ai_controls);
-
 	if(Options::showBotScreen && players.size() < 3) {
 		players.insert(players.end(), bot.begin(), bot.begin() + min(bot.size(), 4 - players.size()));
 	}
 	_render = new Renderer(&players);
 
+	_ctrl = new ControllerLocal(vector<Ship*>(ships), std::move(bot), vector<AiController*>(ai_controls));
+	
 	objects.push_back(&nova);
 	objects.push_back(&cube);
 	objects.insert(objects.end(), ships.begin(), ships.end());
