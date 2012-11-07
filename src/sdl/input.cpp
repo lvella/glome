@@ -27,7 +27,7 @@ std::unordered_map<int, ShipController*> ship_controllers;
 
 ShipController* create_ship_controller(int controller_id)
 {
-	return ship_controllers[controller_id];	
+	return ship_controllers[controller_id];
 }
 
 /*
