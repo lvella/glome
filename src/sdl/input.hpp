@@ -2,10 +2,13 @@
 
 #include <functional>
 #include <unordered_map>
+#include <SDL.h>
+#include <iostream>
 
 #include "ship_controller.hpp"
 #include "input_callback.hpp"
 #include "events.hpp"
+#include "game.hpp"
 
 namespace Input
 {
@@ -40,6 +43,8 @@ namespace Input
 		case MOVE_SPINR:
 		case MOVE_FORWARD:
 			return -1.0;
+		case PAUSE:
+			return 1.0;
 		default:
 			return 0.0;
 		}
@@ -96,10 +101,16 @@ namespace Input
 		ship_controllers[controller_id]->shoot((bool)a);
 	}
 
-	//FIXME: not work for variable number of arguments
-	inline void quit(int b, float a)
+	inline void game_pause(int b, float a)
 	{
+		static bool paused = false;
+		if(a > 0.5f) {
+			Game::switch_state(paused ? Game::WORLD : Game::MENU);
+			paused = !paused;
+			
+			SDL_ShowCursor(int(paused));
+			SDL_WM_GrabInput(paused ? SDL_GRAB_OFF : SDL_GRAB_ON);
+		}
 	}
-
 }
 
