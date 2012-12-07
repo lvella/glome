@@ -2,7 +2,7 @@
 
 enum events
 {
-	QUIT = 0,
+	PAUSE = 0,
 	SHOOT,
 	MOVE_UP,
 	MOVE_DOWN,

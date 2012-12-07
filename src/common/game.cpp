@@ -16,7 +16,20 @@ namespace Game
 {
 RunContext* context;
 
+
+class Paused: public RunContext {
+	void setup_display() {
+	}
+	
+	void draw() {
+	}
+	
+	void update() {
+	}
+};
+
 static std::unique_ptr<World> world;
+static std::unique_ptr<Paused> paused;
 
 void
 frame()
@@ -39,6 +52,7 @@ initialize()
 	Renderer::initialize();
 
 	world.reset(new WorldDummy());
+	paused.reset(new Paused());
 
 	MiniMap::initialize();
 	Projectile::initialize();
@@ -57,7 +71,7 @@ void switch_state(state s)
 		//running = true;
 		break;
 	case MENU:
-		// TODO...
+		context = paused.get();
 		break;
 	case WORLD:
 		context = world.get();

@@ -151,9 +151,9 @@ Ship::update()
 
 		float old_speed = ctrl->speed;
 		ctrl->speed += ctrl->accel;
-		if(ctrl->speed > stats->max_speed_forward) {
-			ctrl->speed = stats->max_speed_forward;
-			rel_speed = -1.0f;
+		if(ctrl->speed > 0.0f) {
+			ctrl->speed = 0.0f;
+			rel_speed = 0.0f;
 		} else if(ctrl->speed < -stats->max_speed_forward) {
 			ctrl->speed = -stats->max_speed_forward;
 			rel_speed = 1.0f;

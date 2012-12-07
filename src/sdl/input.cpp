@@ -27,7 +27,7 @@ std::unordered_map<int, ShipController*> ship_controllers;
 
 ShipController* create_ship_controller(int controller_id)
 {
-	return ship_controllers[controller_id];	
+	return ship_controllers[controller_id];
 }
 
 /*
@@ -89,9 +89,9 @@ void
 initialize()
 {
 	int i;
-	std::function<void (int, float)> funcs[] = {quit, shoot, move_up, move_down,
-										   move_left, move_right, move_spinl,
-										   move_spinr, move_forward, move_backward};
+	std::function<void (int, float)> funcs[] = {game_pause, shoot, move_up, move_down,
+	move_left, move_right, move_spinl,
+	move_spinr, move_forward, move_backward};
 	for(i = 0; i < QTTY; ++i)
 		pfunctions_to_inputs[i] = funcs[i];
 
