@@ -1,6 +1,6 @@
 Navigate through the surface of a hypersphere and kill your enemies.
   
-* Necessary packages (used in Debian 6 and Ubuntu 11.04):
+* Necessary packages (used in Debian 6, Ubuntu 11.04, Mint 12):
   build-essential
   automake (This and below only if you do not have "configure" script generated)
   autoconf
@@ -18,18 +18,23 @@ Navigate through the surface of a hypersphere and kill your enemies.
   libopenal-dev
   libvorbis-dev
 
-
 -> Debian and Ubuntu users:
 sudo apt-get install build-essential automake autoconf libtool libgl1-mesa-dev libglu1-mesa-dev libglew1.5-dev libsdl1.2-dev libboost-thread-dev libboost-system-dev libguichan-0.8.1-1 libguichan-opengl-0.8.1-1 libguichan-sdl-0.8.1-1 libguichan-dev libopenal-dev libvorbis-dev
 
 * Optional packages:
   Doxygen
+  python3-gobject
+  blender 2.59+
 
 * Generate configuration files:
   $ ./autogen.sh
 
 * Compile:
   $ ./configure
+  $ make -j
+
+* Enable stats tunning:
+  $ CXXFLAGS="-DSTATS_TUNNING" ./configure
   $ make -j
 
 * Generate documentation:

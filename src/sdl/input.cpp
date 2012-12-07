@@ -32,6 +32,9 @@ ShipController* create_ship_controller(int controller_id)
 
 /*
 * Read the controllers settings
+* [nro of inputs]
+* [input_type(kb=0 or js=1)] [id_controller] [number_of_functions]
+* [key] [func_key]
 */
 void read_controllers_settings()
 {

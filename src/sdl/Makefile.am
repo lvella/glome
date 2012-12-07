@@ -10,7 +10,7 @@ INCLUDES = \
 	-I$(includedir) \
 	-I$(top_srcdir)/src/common
 
-BOOST_LIBS = -lboost_system -lboost_thread
+#BOOST_LIBS = -lboost_system -lboost_thread
 
 bin_PROGRAMS = glome
 
@@ -19,7 +19,7 @@ glome_LDADD = $(top_srcdir)/src/common/libcommon.a \
 	$(SDL_IMAGE_LIBS) \
 	$(GUICHAN_LIBS) \
 	$(OPENGL_LIBS) \
-	$(BOOST_LIBS)
+	$(BOOST_LDFLAGS)
 
 glome_SOURCES = \
 	input.cpp \

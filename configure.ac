@@ -85,8 +85,8 @@ echo ["\
  Host system: $host
  Target system: $target
 
- Compiler: '${CXX} ${CXXFLAGS} ${CPPFLAGS}'
- Libraries: '${SDL_LIBS} ${SDL_IMAGE_LIBS} ${GUICHAN_LIBS} ${OPENGL_LIBS} ${BOOST_LIBS}'
+ Compiler: '${CXX} ${CXXFLAGS} ${CPPFLAGS} ${BOOST_CPPFLAGS}'
+ Libraries: '${SDL_LIBS} ${SDL_IMAGE_LIBS} ${GUICHAN_LIBS} ${OPENGL_LIBS} ${BOOST_LDFLAGS}'
 "]
 if test "$BLENDER" != ""; then
 echo ["
