@@ -23,8 +23,7 @@ static GLint uniform_projection;
 static CamShader program_bullet;
 
 static GLuint minimap_vbo;
-static Vector4* minimap_buf = NULL;
-static size_t minimap_buf_size = 0;
+static std::vector<Vector4> minimap_buf;
 
 void Projectile::initialize()
 {
@@ -88,16 +87,12 @@ void Projectile::update_all(const Vector4& camera_pos)
 	shots.erase(shots.end() - dead_count, shots.end());
 
 	// Updates the buffer that will be drawn in minimap
-	{
+	if(shots.size() > 0) {
 		bool resized = false;
 
 		// If not big enough, increase the buffer size
-		if(minimap_buf_size < (shots.size() * sizeof(Vector4))) {
-			// Increase the buffer for at least 20 Vector4 elements...
-			// (Why 20? It is a good number...)
-			minimap_buf_size = std::max(shots.size(), minimap_buf_size + 20) * sizeof(Vector4);
-			free(minimap_buf);
-			minimap_buf = (Vector4*)malloc(minimap_buf_size);
+		if(minimap_buf.size() < shots.size()) {
+			minimap_buf.resize(shots.size());
 			resized = true;
 		}
 
@@ -107,11 +102,14 @@ void Projectile::update_all(const Vector4& camera_pos)
 		}
 
 		glBindBuffer(GL_ARRAY_BUFFER, minimap_vbo);
-		if(resized)
-			glBufferData(GL_ARRAY_BUFFER, minimap_buf_size, minimap_buf, GL_STREAM_DRAW);
-		else
-			glBufferSubData(GL_ARRAY_BUFFER, 0, shots.size()*sizeof(Vector4), minimap_buf);
-	}
+		if(resized) {
+			glBufferData(GL_ARRAY_BUFFER, minimap_buf.size()*sizeof(Vector4), &minimap_buf[0], GL_STREAM_DRAW);
+        }
+		else {
+			glBufferSubData(GL_ARRAY_BUFFER, 0, shots.size()*sizeof(Vector4), &minimap_buf[0]);
+        }
+        std::cout.flush();
+    }
 }
 
 void Projectile::draw_all(Camera& c)
@@ -138,9 +136,12 @@ void Projectile::draw_all(Camera& c)
 
 void Projectile::draw_in_minimap()
 {
-	glBindBuffer(GL_ARRAY_BUFFER, minimap_vbo);
-	glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
-	glDrawArrays(GL_POINTS, 0, shots.size());
+    if(shots.size() > 0) {
+        assert(minimap_buf.size() >= shots.size());
+	    glBindBuffer(GL_ARRAY_BUFFER, minimap_vbo);
+	    glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+	    glDrawArrays(GL_POINTS, 0, shots.size());
+    }
 }
 
 bool Projectile::collide(const Vector4& position, float radius)
