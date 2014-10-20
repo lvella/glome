@@ -52,6 +52,19 @@ button_event(SDL_Event e)
 		state = (e.button.state == SDL_PRESSED);
 	}
 
+    if(state){ 
+    if(e.key.keysym.sym == SDLK_UP) {
+        rotate(0, 0.0, 0.1);
+    } else if(e.key.keysym.sym == SDLK_DOWN) {
+        rotate(0, 0.0, -0.1);
+    } else if(e.key.keysym.sym == SDLK_LEFT) {
+        rotate(0, 0.1, 0.0);
+    } else if(e.key.keysym.sym == SDLK_RIGHT) {
+        rotate(0, -0.1, 0.0);
+    }} else {
+        rotate(0, 0.0, 0.0);
+    }
+
 	it = inputs.find(k);
 
 	if(it == inputs.end())

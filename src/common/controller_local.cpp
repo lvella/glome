@@ -19,6 +19,6 @@ ControllerLocal::update()
 	/*for(i = 0; i < bots.size(); ++i)
 		bots[i]->update();*/
 
-	Projectile::update_all(Vector4(0.0f, 0.0f, 0.0f, -1.0f));
+	Projectile::update_all();
 }
 

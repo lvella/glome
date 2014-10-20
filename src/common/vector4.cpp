@@ -3,6 +3,8 @@
 #include "vector4.hpp"
 
 const Vector4 Vector4::ORIGIN = Vector4(0.0f, 0.0f, 0.0f, -1.0f);
+const Vector4 Vector4::UP = Vector4(0.0f, 1.0f, 0.0f, 0.0f);
+const Vector4 Vector4::FRONT = Vector4(0.0f, 0.0f, -1.0f, 0.0f);
 
 std::ostream&
 operator<<(std::ostream& o, const Vector4& v)

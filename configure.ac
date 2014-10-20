@@ -63,7 +63,7 @@ AC_SUBST(GUICHAN_LIBS)
 # Check for Blender
 AX_CHECK_BLENDER([2.58])
 
-CXXFLAGS+=" -std=gnu++0x"
+CXXFLAGS+=" -std=gnu++0x -pthread"
 
 AC_CONFIG_FILES([
 	Makefile
@@ -73,6 +73,9 @@ AC_CONFIG_FILES([
 	src/sdl/Makefile
 ])
 AC_OUTPUT
+
+ALL_FLAGS="${CXXFLAGS} ${OPENGL_CFLAGS} ${SDL_CFLAGS} ${BOOST_CPPFLAGS} -I${SRC_COMMON} -I${SRC_SDL}"
+AC_SUBST(ALL_FLAGS)
 
 echo ["\
 -------------------------------------------------

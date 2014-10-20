@@ -37,7 +37,7 @@ WorldDummy::WorldDummy()
 	if(Options::showBotScreen && players.size() < 3) {
 		players.insert(players.end(), bot.begin(), bot.begin() + min(bot.size(), 4 - players.size()));
 	}
-	_render = new Renderer(&players);
+	_render = new Renderer(players);
 
 	_ctrl = new ControllerLocal(vector<Ship*>(ships), std::move(bot), vector<AiController*>(ai_controls));
 	
@@ -72,6 +72,6 @@ WorldDummy::update()
 void
 WorldDummy::draw()
 {
-	_render->draw(&objects);
+	_render->draw(objects);
 }
 

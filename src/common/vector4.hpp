@@ -12,6 +12,8 @@ class Vector4
 {
 public:
 	static const Vector4 ORIGIN;
+    static const Vector4 UP;
+    static const Vector4 FRONT;
 
 	Vector4()
 	{}

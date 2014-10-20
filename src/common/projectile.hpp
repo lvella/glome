@@ -10,21 +10,17 @@ class Projectile: public Object
 public:
 	static void initialize();
 	static void shot(ShipController *s, const Matrix4& from, float speed);
-	static void draw_all(Camera& cam);
+	static void draw_many(const std::vector<Projectile*>& shots, Camera& cam);
 	static void draw_in_minimap();
-	static void update_all(const Vector4& camera_pos);
+	static void update_all();
+	static std::vector<Projectile*> cull_sort_from_camera(const Camera& cam);
 	static bool collide(const Vector4& position, float radius);
 	static bool collide(ShipController *s);
-
-	bool operator<(const Projectile& other) const
-	{
-		return order_dist < other.order_dist;
-	}
 
 private:
 	Projectile(ShipController *s, const Matrix4& from, float speed);
 	void draw(Camera& cam);
-	void update(const Vector4& camera_pos);
+	void update();
 	inline bool dead()
 	{
 		// Maximum Time To Live
@@ -42,6 +38,4 @@ private:
 	unsigned short max_ttl;
 	unsigned short max_ttl_2;
 	unsigned char alpha;
-
-	float order_dist;
 };

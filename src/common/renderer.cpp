@@ -1,3 +1,4 @@
+#include <future>
 #include "options.hpp"
 #include "meridian.hpp"
 #include "minimap.hpp"
@@ -41,14 +42,14 @@ Renderer::setup_display()
 	glEnable(GL_POLYGON_SMOOTH);
 }
 
-Renderer::Renderer(vector<Ship*>* pp)
+Renderer::Renderer(const vector<Ship*>& pp)
 {
-	assert(pp->size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
-	int h = height / (pp->size() > 2 ? 2 : 1);
-	int w = width / (pp->size() > 1 ? 2 : 1);
+	assert(pp.size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
+	int h = height / (pp.size() > 2 ? 2 : 1);
+	int w = width / (pp.size() > 1 ? 2 : 1);
 
-	for(int i = 0; i < pp->size(); ++i) {
-		players.push_back(Viewport(pp->at(i), (i%2) * w, height - (i/2 + 1) * h, w, h));
+	for(int i = 0; i < pp.size(); ++i) {
+		players.emplace_back(pp[i], (i%2) * w, height - (i/2 + 1) * h, w, h);
 	}
 
 	// Set non-changing camera perspective
@@ -57,35 +58,38 @@ Renderer::Renderer(vector<Ship*>* pp)
 }
 
 void
-Renderer::draw(vector<Glome::Drawable*> *objs)
+Renderer::draw(const vector<Glome::Drawable*>& objs)
 {
-	objects = objs;
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
 	for(active = begin(players); active != end(players); ++active) {
 		active->enable();
 
 		camera.reset(active->newCameraTransform());
 		camera.pushShader(&shader);
-		draw_meridians(camera);
 
-		for(int j = 0; j < objs->size(); ++j) {
-			objs->at(j)->draw(camera);
+        auto sorted_projs = std::async(&Projectile::cull_sort_from_camera, camera);
+
+        draw_meridians(camera);
+
+		for(auto &obj: objs) {
+			obj->draw(camera);
 		}
 
-		Projectile::draw_all(camera);
+		Projectile::draw_many(sorted_projs.get(), camera);
 
-		MiniMap::draw(active->_x, active->_y, this, active->t->transformation().transpose());
+		MiniMap::draw(active->_x, active->_y, this, active->t->transformation().transpose(), objs);
 	}
 }
 
 void
-Renderer::fill_minimap(Camera &cam)
+Renderer::fill_minimap(const vector<Glome::Drawable*>& objs, Camera &cam)
 {
 	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
 	// Probably so insignificant it is not worth the effort.
-	for(size_t i = 0; i < objects->size(); ++i) {
-		if(objects->at(i) != active->t)
-			objects->at(i)->minimap_draw(cam);
+	for(auto &obj: objs) {
+		if(obj != active->t)
+			obj->minimap_draw(cam);
 	}
 }
 

@@ -7,3 +7,6 @@ SUBDIRS = \
 	src
 
 dist_noinst_SCRIPTS = autogen.sh
+
+flags:
+	@echo $(ALL_FLAGS)

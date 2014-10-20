@@ -17,13 +17,11 @@ class Renderer
 public:
 	static void initialize();
 
-	Renderer();
+	Renderer(const std::vector<Ship*>& pp);
 
-	void draw(std::vector<Glome::Drawable*> *objs);
+	void draw(const std::vector<Glome::Drawable*> &objs);
 	void setup_display();
-	void fill_minimap(Camera &cam);
-
-	Renderer(std::vector<Ship*>* pp);
+	void fill_minimap(const std::vector<Glome::Drawable*> &objs, Camera &cam);
 
 protected:
 	struct Viewport
@@ -48,7 +46,6 @@ protected:
 	};
 
 	std::vector<Viewport> players;
-	std::vector<Glome::Drawable*> *objects;
 
 	std::vector<Viewport>::iterator active;
 	Camera camera;

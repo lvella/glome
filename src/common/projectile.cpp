@@ -2,15 +2,16 @@
 #include <cmath>
 #include <algorithm>
 #include <vector>
+#include <deque>
 
 #include "shader.hpp"
 #include "math.hpp"
 #include "textures.hpp"
 
 #include "projectile.hpp"
-#include <iostream>
+
 using namespace std;
-typedef std::vector<Projectile> SList;
+typedef std::deque<Projectile> SList;
 static SList shots;
 
 static GLuint tex_projectile;
@@ -64,27 +65,26 @@ void Projectile::initialize()
 
 void Projectile::shot(ShipController *s, const Matrix4& from, float speed)
 {
-  shots.push_back(Projectile(s, from, speed));
+  // TODO: find a non-hackish way to use emplace_back...
+  shots.push_front(Projectile(s, from, speed));
 }
 
-void Projectile::update_all(const Vector4& camera_pos)
+void Projectile::update_all()
 {
-	size_t dead_count = 0;
+    {
+        auto i = shots.begin();
+	    for(; i != shots.end(); ++i)
+	    {
+		    if(i->dead())
+                // Assumes all projectiles beyond this
+                // point are dead, i.e. they all have the
+                // same initial TTL.
+                break;
+            i->update();
+	    }
 
-	for(SList::iterator i = shots.begin(); i != shots.end(); ++i)
-	{
-		if(!i->dead())
-			i->update(camera_pos);
-		else
-		{
-			// Greater than the maximum possible squared distance (which is 9.87).
-			i->order_dist = 10.0f;
-			++dead_count;
-		}
-	}
-
-	std::sort(shots.begin(), shots.end());
-	shots.erase(shots.end() - dead_count, shots.end());
+	    shots.erase(i, shots.end());
+    }
 
 	// Updates the buffer that will be drawn in minimap
 	if(shots.size() > 0) {
@@ -108,11 +108,45 @@ void Projectile::update_all(const Vector4& camera_pos)
 		else {
 			glBufferSubData(GL_ARRAY_BUFFER, 0, shots.size()*sizeof(Vector4), &minimap_buf[0]);
         }
-        std::cout.flush();
     }
 }
 
-void Projectile::draw_all(Camera& c)
+std::vector<Projectile*> Projectile::cull_sort_from_camera(const Camera& cam)
+{
+    struct Sortable {
+        Projectile* proj;
+        float dist;
+
+        Sortable(Projectile* p, float d):
+            proj(p), dist(d)
+        {}
+
+        bool operator<(const Sortable& other) const {
+            return dist > other.dist;
+        }
+    };
+
+    std::vector<Sortable> to_sort;
+    to_sort.reserve(shots.size());
+
+    for(auto &shot: shots) {
+        Vector4 pos = cam.transformation() * shot._t.position();
+        if(pos[2] <= 0) {
+            to_sort.emplace_back(&shot, pos.squared_length());
+        }
+    }
+    std::sort(to_sort.begin(), to_sort.end());
+
+    std::vector<Projectile*> ret;
+    ret.reserve(to_sort.size());
+    for(auto &e: to_sort) {
+        ret.push_back(e.proj);
+    }
+
+    return ret;
+}
+
+void Projectile::draw_many(const std::vector<Projectile*>& shots, Camera& c)
 {
 	if(shots.size() != 0) {
 		c.pushShader(&program_bullet);
@@ -126,7 +160,7 @@ void Projectile::draw_all(Camera& c)
 		glVertexAttribPointer(program_bullet.posAttr(), 2, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (float*)0 + 3);
 		glVertexAttribPointer(program_bullet.colorAttr(), 3, GL_FLOAT, GL_FALSE, 5 * sizeof(float), (float*)0);
 
-		for(SList::reverse_iterator i = shots.rbegin(); i != shots.rend(); ++i)
+		for(auto i: shots)
 			i->draw(c);
 
 		glDisableVertexAttribArray(program_bullet.colorAttr());
@@ -190,13 +224,10 @@ void Projectile::draw(Camera& c)
 	c.popMat();
 }
 
-void Projectile::update(const Vector4& camera_pos)
+void Projectile::update()
 {
   ++ttl;
   alpha = ttl < (max_ttl_2) ? 255u : 255u - (ttl - max_ttl_2) * 200 / max_ttl_2;
 
   _t = _t * ds;
-
-  order_dist = (camera_pos - _t.position()).squared_length();
 }
-
