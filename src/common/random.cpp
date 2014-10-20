@@ -1,6 +1,6 @@
 #include <fstream>
-#include <ctime>
 #include <cstdlib>
+#include <random>
 #include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_on_sphere.hpp>
 #include <boost/random/uniform_01.hpp>
@@ -13,7 +13,7 @@
 namespace Random
 {
 typedef boost::mt19937 Generator;
-Generator gen(time(0));
+Generator gen((std::random_device())());
 
 int range(int a, int b)
 {
@@ -33,27 +33,35 @@ float arc()
 	return dist();
 }
 
-Vector4 direction()
+template<unsigned int DIM>
+Vector4 point_on_spheric_surface()
 {
-	struct proxy {
+    static_assert(DIM > 0 && DIM <= 4, "Dimension does not fit in Vector4");
+
+    struct Proxy {
 		typedef float* iterator;
-		proxy(int n) {
-			v.w = 0.0f;
+		Proxy(int n) {
+            for(int i = DIM; i < 4; ++i)
+                v[i] = 0.0;
 		}
+
 		float* begin() {
 			return v.getVertex();
 		}
 		float* end() {
-			return v.getVertex() + 3;
+			return v.getVertex() + DIM;
 		}
 
 		Vector4 v;
 	};
 
-	static boost::variate_generator<Generator*, boost::uniform_on_sphere<float, proxy> > dist(&gen, boost::uniform_on_sphere<float, proxy>(3));
+    static boost::variate_generator<Generator*, boost::uniform_on_sphere<float, Proxy> > dist(&gen, boost::uniform_on_sphere<float, Proxy>(DIM));
 
-	return dist().v;
+    return dist().v;
 }
+
+Vector4 (* const direction)() = point_on_spheric_surface<3>;
+Vector4 (* const point)() = point_on_spheric_surface<4>;
 
 // TODO: This is wrong:
 /*Vector4 Vector4::random_direction() {

@@ -50,8 +50,6 @@ void Fire::initialize()
 		program_fire.getUniform("half_width").set(width / 2.0f);
 	}
 
-	// Without this in GLES
-	glEnable(GL_PROGRAM_POINT_SIZE);
 	glEnable(GL_POINT_SPRITE);
 }
 
@@ -123,7 +121,10 @@ void Fire::draw(Camera& c)
 	c.pushShader(&program_fire);
 	c.pushMultMat(_t);
 
-	depthSort(c.transformation());
+	// Without this in GLES
+    glEnable(GL_PROGRAM_POINT_SIZE);
+
+    depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * actives_count, idx, GL_STREAM_DRAW);
 

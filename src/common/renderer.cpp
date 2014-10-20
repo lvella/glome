@@ -4,6 +4,7 @@
 #include "minimap.hpp"
 #include "projectile.hpp"
 #include "fire.hpp"
+#include "dustfield.hpp"
 
 #include "renderer.hpp"
 
@@ -71,6 +72,7 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
         auto sorted_projs = std::async(&Projectile::cull_sort_from_camera, camera);
 
         draw_meridians(camera);
+        DustField::draw(camera);
 
 		for(auto &obj: objs) {
 			obj->draw(camera);

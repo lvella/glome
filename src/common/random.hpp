@@ -14,6 +14,9 @@ float zeroToOne();
 float arc();
 
 // Generates a random point in the unit sphere (3-D point).
-Vector4 direction();
+extern Vector4 (* const direction)();
+
+// Generates a random point in the glome (4-D point).
+extern Vector4 (* const point)();
 
 }

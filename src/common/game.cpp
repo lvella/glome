@@ -6,6 +6,7 @@
 #include "particle_system.hpp"
 #include "world_dummy.hpp"
 #include "random.hpp"
+#include "dustfield.hpp"
 
 #include "game.hpp"
 
@@ -57,6 +58,7 @@ initialize()
 	MiniMap::initialize();
 	Projectile::initialize();
 	ParticleSystem::initialize();
+    DustField::initialize();
 	//Menu::initialize();
 	initialize_meridians();
 

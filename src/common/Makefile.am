@@ -13,6 +13,7 @@ libcommon_a_SOURCES = \
 	controller_remote.cpp \
 	destroyer.cpp \
 	drawable.cpp \
+	dustfield.cpp \
 	effect.cpp \
 	fire.cpp \
 	game.cpp \
