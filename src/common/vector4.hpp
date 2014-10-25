@@ -94,9 +94,6 @@ public:
 	/** Function for writing to a stream. */
 	friend std::ostream& operator<<(std::ostream& o, const Vector4& v);
 
-private:
-	friend class Matrix4;
-
 	union {
 		struct {
 			float x;
