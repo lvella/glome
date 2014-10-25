@@ -70,6 +70,7 @@ T operator-(float a, const T& b)
 {
 	return -b + a;
 }
+
 template<class T>
 T operator*(float a, const T& b)
 {
