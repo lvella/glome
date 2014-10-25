@@ -9,4 +9,4 @@ SUBDIRS = \
 dist_noinst_SCRIPTS = autogen.sh
 
 flags:
-	@echo $(ALL_FLAGS)
+	@echo $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
