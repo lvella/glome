@@ -78,7 +78,6 @@ public:
 		return &v[3];
 	}
 
-private:
 	union {
 		struct {
 			float x;

@@ -58,21 +58,3 @@ T vabs(T v)
 
 	return v;
 }
-
-template<class T>
-T operator+(float a, const T& b)
-{
-	return b + a;
-}
-
-template<class T>
-T operator-(float a, const T& b)
-{
-	return -b + a;
-}
-
-template<class T>
-T operator*(float a, const T& b)
-{
-	return b * a;
-}
