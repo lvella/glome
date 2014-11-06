@@ -44,8 +44,8 @@ protected:
 
 		int _x, _y, _w, _h;
 
-        // Camera position relative to target...
-        static const Matrix4 cam_offset;
+		// Camera position relative to target...
+		static const Matrix4 cam_offset;
 	};
 
 	std::vector<Viewport> players;
