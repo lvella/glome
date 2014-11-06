@@ -29,7 +29,7 @@ protected:
 		Viewport(Ship* target, int x, int y, int w, int h):
 			t(target), _x(x), _y(y), _w(w), _h(h)
 		{
-			cam_hist.resize(10, Matrix4::IDENTITY);
+			cam_hist.resize(10, cam_offset);
 		}
 
 		void enable()
@@ -43,6 +43,9 @@ protected:
 		std::deque<Matrix4> cam_hist;
 
 		int _x, _y, _w, _h;
+
+        // Camera position relative to target...
+        static const Matrix4 cam_offset;
 	};
 
 	std::vector<Viewport> players;

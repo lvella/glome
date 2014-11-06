@@ -98,18 +98,6 @@ Renderer::fill_minimap(const vector<Glome::Drawable*>& objs, Camera &cam)
 inline Matrix4
 Renderer::Viewport::newCameraTransform()
 {
-	// Calculate camera position
-	#ifdef STATS_TUNING
-	const float scale = t->get_scale();
-	#else
-	const float scale = 1.0f;
-	#endif
-	const Matrix4 cam_offset(
-		yz_matrix(0.2) *
-		zw_matrix(-0.015 * scale) *
-		yw_matrix(-0.01 * scale)
-	);
-
 	Matrix4 ret;
 
 	ret = cam_hist.front();
@@ -121,3 +109,8 @@ Renderer::Viewport::newCameraTransform()
 }
 
 CamShader Renderer::shader;
+const Matrix4 Renderer::Viewport::cam_offset(
+		yz_matrix(0.2) *
+		zw_matrix(-0.015) *
+		yw_matrix(-0.01)
+	);
