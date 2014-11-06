@@ -51,6 +51,9 @@ void Fire::initialize()
 	}
 
 	glEnable(GL_POINT_SPRITE);
+
+	// Without this in GLES
+    glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
 void Fire::set_width(int w)
@@ -120,9 +123,6 @@ void Fire::draw(Camera& c)
 {
 	c.pushShader(&program_fire);
 	c.pushMultMat(_t);
-
-	// Without this in GLES
-    glEnable(GL_PROGRAM_POINT_SIZE);
 
     depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

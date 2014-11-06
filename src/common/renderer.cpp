@@ -72,7 +72,7 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
         auto sorted_projs = std::async(&Projectile::cull_sort_from_camera, camera);
 
         draw_meridians(camera);
-        DustField::draw(camera);
+        DustField::draw(camera, active->cam_hist.front());
 
 		for(auto &obj: objs) {
 			obj->draw(camera);
@@ -112,10 +112,10 @@ Renderer::Viewport::newCameraTransform()
 
 	Matrix4 ret;
 
-	ret = cam_offset * cam_hist.front();
+	ret = cam_hist.front();
 
 	cam_hist.pop_front();
-	cam_hist.push_back(t->transformation().transpose());
+	cam_hist.push_back(cam_offset * t->transformation().transpose());
 
 	return ret;
 }
