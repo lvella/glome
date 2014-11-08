@@ -5,6 +5,7 @@
 *.gcda
 *.log
 *.gcno
+*.swp
 config.status
 configure
 config.hpp
