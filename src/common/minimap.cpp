@@ -44,6 +44,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center, std
 
 	// Draw 2D green background.
 	hud.enable();
+	glDisableVertexAttribArray(hud.colorAttr());
 	glDisable(GL_DEPTH_TEST);
 
 	glUniform1i(hud_has_tex, 1);

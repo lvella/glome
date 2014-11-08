@@ -21,7 +21,7 @@ struct Star
     StarPoint endpoints[2];
 };
 
-const size_t DUST_SIZE = 2000;
+const size_t DUST_SIZE = 200000;
 
 GLuint vbo;
 CamShader program;
@@ -49,7 +49,7 @@ void initialize()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, dust.size() * sizeof(Star), &dust[0], GL_STATIC_DRAW);
 
-	const char* src[] = {"dustfield.vert", "world.frag", "no_texture.frag", "fog.frag", NULL};
+	const char* src[] = {"dustfield.vert", "world.frag", "no_texture.frag", "dustfield_fog.frag", NULL};
 	program.setup_shader(src);
 	attrib_endpoint = glGetAttribLocation(program.program(), "endpoint");
 
@@ -62,6 +62,7 @@ void draw(Camera& cam, const Matrix4 &old_cam_transform)
 
     old_transform.set(old_cam_transform);
 
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glEnableVertexAttribArray(attrib_endpoint);
