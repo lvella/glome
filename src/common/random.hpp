@@ -19,4 +19,6 @@ extern Vector4 (* const direction)();
 // Generates a random point in the glome (4-D point).
 extern Vector4 (* const point)();
 
+float normalDistribution(float mean, float std_dev);
+
 }

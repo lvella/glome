@@ -62,7 +62,6 @@ void draw(Camera& cam, const Matrix4 &old_cam_transform)
 
     old_transform.set(old_cam_transform);
 
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glEnableVertexAttribArray(attrib_endpoint);

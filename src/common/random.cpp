@@ -60,19 +60,14 @@ Vector4 point_on_spheric_surface()
     return dist().v;
 }
 
+float normalDistribution(float mean, float std_dev)
+{
+	std::normal_distribution<float> dist(mean, std_dev);
+
+	return dist(gen);
+}
+
 Vector4 (* const direction)() = point_on_spheric_surface<3>;
 Vector4 (* const point)() = point_on_spheric_surface<4>;
-
-// TODO: This is wrong:
-/*Vector4 Vector4::random_direction() {
-    Vector4 ret;
-
-    for(int i = 0; i < 4; ++i)
-        ret.v[i] = rand() - (RAND_MAX / 2);
-
-    ret.normalize();
-
-    return ret;
-}*/
 
 }

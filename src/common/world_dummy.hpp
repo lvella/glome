@@ -4,6 +4,7 @@
 #include "world_local.hpp"
 #include "randomcube.hpp"
 #include "supernova.hpp"
+#include "spaghetti.hpp"
 
 class WorldDummy : public WorldLocal
 {
@@ -18,5 +19,6 @@ private:
 	std::vector<Glome::Drawable*> objects;
 	RandomCube cube;
 	Supernova nova;
+	Spaghetti asteroid;
 };
 

@@ -43,6 +43,7 @@ WorldDummy::WorldDummy()
 	
 	objects.push_back(&nova);
 	objects.push_back(&cube);
+	objects.push_back(&asteroid);
 	objects.insert(objects.end(), ships.begin(), ships.end());
 }
 
@@ -67,6 +68,10 @@ WorldDummy::update()
 {
 	nova.update();
 	_ctrl->update();
+
+	// TODO: Make a list of updatable objects...
+	// TODO: Update them in parallel...
+	asteroid.update();
 }
 
 void

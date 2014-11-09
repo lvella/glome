@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <cmath>
 #include <cassert>
-#include "gl.hpp"
 
 class Matrix4;
 
