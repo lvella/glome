@@ -7,6 +7,7 @@
 #include "math.hpp"
 #include "random.hpp"
 #include "vector4.hpp"
+#include "color.hpp"
 
 #include "spaghetti.hpp"
 
@@ -34,17 +35,34 @@ CalculateBezierPoint(float t, T *p)
     return v;
 }
 
+// From http://paulbourke.net/miscellaneous/interpolation/
+template <class T>
+static T
+CubicInterpolate(
+   T y0, T y1,
+   T y2, T y3,
+   float mu)
+{
+   T a0,a1,a2,a3;
+   float mu2;
+
+   mu2 = mu*mu;
+   a0 = y3 - y2 - y0 + y1;
+   a1 = y0 - y1 - a0;
+   a2 = y2 - y0;
+   a3 = y1;
+
+   return (a0*mu*mu2 + a1*mu2 + a2*mu + a3);
+}
+
 Spaghetti::Spaghetti()
 {
-	// TODO: add color to the spaghetti
-	/*struct Vertex {
-		Vector4 pos;
-		Vector4 color;
-	};*/
-
 	// Random spaghetti propertiers:
 	const float radius = std::max(0.003f, Random::normalDistribution(0.009f, 0.0035f));
 	const float density = std::max(1500.0f, Random::normalDistribution(6000.0f, 2000.0f));
+	const Vector3 mean_color = Color::rgbFromHsv(Random::arc(),
+			0.15f + 0.8 * Random::zeroToOne(),
+			0.2f + 0.8 * Random::zeroToOne());
 
 	// Number of cubic Bézier curves
 	const size_t spaghetti_count = roundf(radius * density);
@@ -57,6 +75,7 @@ Spaghetti::Spaghetti()
 	count = spaghetti_count * SEGMENTS;
 
 	std::vector<Vector4> bezier((spaghetti_count * 3)+2);
+	std::vector<Vector3> colors(spaghetti_count + 2);
 
 	for(int i = 0; i < spaghetti_count; ++i) {
 		Vector4 &p0 = bezier[i*3];
@@ -74,27 +93,42 @@ Spaghetti::Spaghetti()
 		// Those points are outside the glome's surface, lets see how it renders.
 		p0 = m + d * (radius / 2.0 * Random::zeroToOne());
 		p1 = m - d * (radius / 2.0 * Random::zeroToOne());
+
+		colors[i] = mean_color + Vector3(Random::direction()) * Random::normalDistribution(0.0f, 0.2);
 	}
 	
 	bezier[spaghetti_count*3] = bezier[0];
 	bezier[spaghetti_count*3 + 1] = bezier[1];
+
+	colors[spaghetti_count] = colors[0];
+	colors[spaghetti_count + 1] = colors[1];
 	
 	Vector4 dir3d = Random::direction();
-	velo = rotation(Random::normalDistribution(0.008, 0.01), dir3d[0], dir3d[1], dir3d[2]);
+	velo = rotation(Random::normalDistribution(0.0, 0.02), dir3d[0], dir3d[1], dir3d[2]);
 
 	// Build the Vertex Buffer Object
 	{
-		std::vector<Vector4> vertices;
+		std::vector<Vertex> vertices;
 		vertices.reserve(count);
 
 		for(int i = 0; i < spaghetti_count; ++i) {
 			Vector4 *curve = &bezier[(i*3)+1];
 
 			for(int j = 0; j < SEGMENTS; ++j) {
+				// Position Bezier interpolation
 				float val = j / float(SEGMENTS);
 				Vector4 v = CalculateBezierPoint(val, curve);
 				v.w = -1.0;
-				vertices.push_back(v.normalized());
+				v = v.normalized();
+
+				// Color cubic interpolation
+				Vector3 color = CubicInterpolate(colors[i], colors[i+1], colors[i+2], colors[i+3], val);
+				for(auto &c : color.v){
+					c = clamp(0.0f, c, 1.0f);
+				}
+
+				// Add to the VBO to be drawn
+				vertices.push_back(Vertex{v, Vector4(color, 1.0)});
 			}
 		}
 
@@ -113,11 +147,15 @@ Spaghetti::~Spaghetti()
 
 void Spaghetti::draw(Camera& c)
 {
+	auto &s = *c.getShader();
 	c.pushMultMat(_t);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glVertexAttribPointer(c.getShader()->posAttr(), 4, GL_FLOAT, GL_FALSE, 0, nullptr);
+    glEnableVertexAttribArray(s.colorAttr());
+
+	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*) offsetof(Vertex, pos));
+	glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*) offsetof(Vertex, color));
 
 	glDrawArrays(GL_LINE_LOOP, 0, count);
 

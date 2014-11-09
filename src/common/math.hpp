@@ -58,3 +58,13 @@ T vabs(T v)
 
 	return v;
 }
+
+template <class T>
+T clamp(T min, T val, T max)
+{
+	if(val < min)
+		return min;
+	if(val > max)
+		return max;
+	return val;
+}

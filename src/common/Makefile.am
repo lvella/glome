@@ -9,6 +9,7 @@ noinst_LIBRARIES = libcommon.a
 
 libcommon_a_SOURCES = \
 	camera.cpp \
+	color.cpp \
 	controller_local.cpp \
 	controller_remote.cpp \
 	destroyer.cpp \

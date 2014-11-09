@@ -15,6 +15,13 @@ public:
 		z = zl;
 	}
 
+	Vector3(const Vector4 &other)
+	{
+		x = other.x;
+		y = other.y;
+		z = other.z;
+	}
+
 	float& operator[](size_t elem)
 	{
 		return v[elem];
@@ -28,6 +35,12 @@ public:
 	Vector3 operator+(float s) const
 	{
 		return Vector3(x + s, y + s, z + s);
+	}
+
+	template<class T>
+	Vector3 operator+=(const T& o)
+	{
+		return *this = *this + o;
 	}
 
 	Vector3 operator-() const

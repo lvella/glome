@@ -6,6 +6,7 @@
 #include <cassert>
 
 class Matrix4;
+class Vector3;
 
 class Vector4
 {
@@ -24,6 +25,8 @@ public:
 		z = zl;
 		w = wl;
 	}
+
+	Vector4(const Vector3 &other, float wl=0.0f);
 
 	float dot(const Vector4& ref) const
 	{
