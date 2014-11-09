@@ -102,9 +102,6 @@ Spaghetti::Spaghetti()
 
 	colors[spaghetti_count] = colors[0];
 	colors[spaghetti_count + 1] = colors[1];
-	
-	Vector4 dir3d = Random::direction();
-	velo = rotation(Random::normalDistribution(0.0, 0.02), dir3d[0], dir3d[1], dir3d[2]);
 
 	// Build the Vertex Buffer Object
 	{
@@ -138,6 +135,23 @@ Spaghetti::Spaghetti()
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]), &vertices[0], GL_STATIC_DRAW);
 	}
+
+	// Define rotation direction	
+	Vector4 dir3d = Random::direction();
+	velo = rotation(Random::normalDistribution(0.0, 0.02), dir3d[0], dir3d[1], dir3d[2]);
+
+	// Define translation speed
+	// TODO: understando this stuff better and improve it...
+	float speed = Random::normalDistribution(0.0008, 0.0004);
+	velo = velo * zw_matrix(speed);
+
+	// Define starting position
+	_t = xy_matrix(Random::arc())
+      * xz_matrix(Random::arc())
+      * yz_matrix(Random::arc())
+      * xw_matrix(Random::arc())
+      * yw_matrix(Random::arc())
+      * zw_matrix(Random::arc());
 }
 
 Spaghetti::~Spaghetti()
@@ -163,5 +177,5 @@ void Spaghetti::draw(Camera& c)
 }
 
 void Spaghetti::update() {
-  _t = velo * _t;
+  _t = _t * velo;
 }

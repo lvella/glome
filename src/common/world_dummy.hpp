@@ -17,8 +17,10 @@ public:
 
 private:
 	std::vector<Glome::Drawable*> objects;
+	std::vector<Updatable*> dynamic_objects;
+
 	RandomCube cube;
 	Supernova nova;
-	Spaghetti asteroid;
+	std::vector<Spaghetti> fsms;
 };
 

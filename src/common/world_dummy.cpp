@@ -1,3 +1,5 @@
+#include <thread>
+
 #include "controller_local.hpp"
 #include "ai_controller.hpp"
 #include "input.hpp"
@@ -10,7 +12,8 @@
 
 using namespace std;
 
-WorldDummy::WorldDummy()
+WorldDummy::WorldDummy():
+	fsms(30)
 {
 	std::vector<Ship*> bot;
 	std::vector<Ship*> players;
@@ -43,8 +46,16 @@ WorldDummy::WorldDummy()
 	
 	objects.push_back(&nova);
 	objects.push_back(&cube);
-	objects.push_back(&asteroid);
 	objects.insert(objects.end(), ships.begin(), ships.end());
+
+	dynamic_objects.push_back(&nova);
+
+	dynamic_objects.reserve(dynamic_objects.size() + fsms.size());
+	objects.reserve(objects.size() + fsms.size());
+	for(auto &fsm : fsms) {
+		dynamic_objects.push_back(&fsm);
+		objects.push_back(&fsm);
+	}
 }
 
 WorldDummy::~WorldDummy()
@@ -66,12 +77,13 @@ WorldDummy::~WorldDummy()
 void
 WorldDummy::update()
 {
-	nova.update();
 	_ctrl->update();
 
-	// TODO: Make a list of updatable objects...
 	// TODO: Update them in parallel...
-	asteroid.update();
+	for(auto obj: dynamic_objects)
+	{
+		obj->update();
+	}
 }
 
 void
