@@ -58,7 +58,7 @@ CubicInterpolate(
 Spaghetti::Spaghetti()
 {
 	// Random spaghetti propertiers:
-	const float radius = std::max(0.003f, Random::normalDistribution(0.009f, 0.0035f));
+	const float radius = std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f));
 	const float density = std::max(1500.0f, Random::normalDistribution(6000.0f, 2000.0f));
 	const Vector3 mean_color = Color::rgbFromHsv(Random::arc(),
 			0.15f + 0.8 * Random::zeroToOne(),
@@ -66,7 +66,6 @@ Spaghetti::Spaghetti()
 
 	// Number of cubic Bézier curves
 	const size_t spaghetti_count = roundf(radius * density);
-	std::cout << "Radius: " << radius << "\nDesity: "<< density << "\nBezier count: " << spaghetti_count << std::endl;
 
 	// Displacement along radius
 	const Matrix4 R_DISP = xw_matrix(radius);
