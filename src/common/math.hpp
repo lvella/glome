@@ -22,6 +22,8 @@ Matrix4 xw_matrix(float angle);
 Matrix4 zw_matrix(float angle);
 Matrix4 yw_matrix(float angle);
 
+Vector4 cross(const Vector4 &a, const Vector4 &b, const Vector4 &c);
+
 // Generic vector stuff
 template <class T>
 T vfloor(T v)
