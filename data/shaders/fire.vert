@@ -21,8 +21,8 @@ void proj3d(inout vec4 v)
 float radius_map(float r, float w)
 {
   float center_angle = acos(w);
-  float p1d = sin(center_angle + r) / (1.0f - cos(center_angle + r));
-  float p2d = sin(center_angle - r) / (1.0f - cos(center_angle - r));
+  float p1d = sin(center_angle + r) / (1.0 - cos(center_angle + r));
+  float p2d = sin(center_angle - r) / (1.0 - cos(center_angle - r));
 
   return (p2d - p1d) * 0.5;
 }

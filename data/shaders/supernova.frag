@@ -19,7 +19,7 @@ void main()
 		vec2 dir_screen = normalize(frag_pos.xy);
 		color = vec4(1.0, 1.0 - dir_screen.x * dir_screen.y, 0.5, alpha*alpha*alpha*alpha);
 	} else {
-		float n0 = snoise(direction * slerp_arc.x * 30.0f);
+		float n0 = snoise(direction * slerp_arc.x * 30.0);
 		float n1 = texture2D(texbase, frag_pos.xy * 0.5 + 0.5).r;
 		color =
 		vec4(
