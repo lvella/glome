@@ -43,3 +43,6 @@ libcommon_a_SOURCES = \
 	textures.cpp \
 	vector4.cpp \
 	world_dummy.cpp
+
+flags:
+	@echo $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

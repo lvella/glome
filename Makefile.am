@@ -7,6 +7,3 @@ SUBDIRS = \
 	src
 
 dist_noinst_SCRIPTS = autogen.sh
-
-flags:
-	@echo $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)

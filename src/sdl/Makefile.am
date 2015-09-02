@@ -26,3 +26,6 @@ glome_SOURCES = \
 	kbinput.cpp \
 	jsinput.cpp \
 	sdl_main.cpp
+
+flags:
+	@echo $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CXXFLAGS) $(CXXFLAGS)
