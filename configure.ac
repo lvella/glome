@@ -48,17 +48,8 @@ AX_CHECK_OPENGL
 # Check for SDL
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
-AM_PATH_SDL(1.2.11, :, AC_MSG_ERROR(SDL not found. Make sure sdl-config is in your PATH, or specify with --with-sdl-prefix))
+AM_PATH_SDL2(2.0.2, :, AC_MSG_ERROR(SDL not found. Make sure sdl-config is in your PATH, or specify with --with-sdl-prefix))
 AC_LANG_RESTORE
-AC_CHECK_HEADERS([SDL/SDL_image.h])
-SDL_IMAGE_LIBS=""
-AC_CHECK_LIB([SDL_image], [IMG_Load], [SDL_IMAGE_LIBS="-lSDL_image"], AC_MSG_ERROR([ *** Unable to find SDL_image library (http://www.libsdl.org/projects/SDL_image/)]))
-AC_SUBST(SDL_IMAGE_LIBS)
-
-# Check for Guichan
-GUICHAN_LIBS=""
-AC_CHECK_LIB([guichan], [gcnGuichanVersion], GUICHAN_LIBS="-lguichan -lguichan_sdl -lguichan_opengl", AC_MSG_ERROR([Could not find lib Guichan (http://guichan.sourceforge.net/)]))
-AC_SUBST(GUICHAN_LIBS)
 
 # Check for Blender
 AX_CHECK_BLENDER([2.58])
@@ -88,8 +79,8 @@ echo ["\
  Host system: $host
  Target system: $target
 
- Compiler: '${CXX} ${CXXFLAGS} ${CPPFLAGS} ${BOOST_CPPFLAGS}'
- Libraries: '${SDL_LIBS} ${SDL_IMAGE_LIBS} ${GUICHAN_LIBS} ${OPENGL_LIBS} ${BOOST_LDFLAGS}'
+ Compiler: '${CXX} ${CXXFLAGS} ${CPPFLAGS} ${OPENGL_CFLAGS} ${SDL_CFLAGS} ${BOOST_CPPFLAGS}'
+ Libraries: '${SDL_LIBS} ${OPENGL_LIBS} ${BOOST_LDFLAGS}'
 "]
 if test "$BLENDER" != ""; then
 echo ["

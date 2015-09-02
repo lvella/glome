@@ -1,5 +1,7 @@
 #include <iostream>
 #include <cstdlib>
+#include <chrono>
+#include <thread>
 
 #include <GL/glew.h>
 #ifdef WIN32
@@ -10,9 +12,6 @@
 #endif
 
 #include <SDL.h>
-#include <guichan.hpp>
-#include <guichan/sdl.hpp>
-#include <guichan/opengl/openglsdlimageloader.hpp>
 
 #include "input.hpp"
 #include "menu.hpp"
@@ -24,52 +23,40 @@
 
 using namespace std;
 
-gcn::Input* gcn_input()
-{
-	return new gcn::SDLInput();
-}
-
-gcn::ImageLoader* gcn_image_loader()
-{
-	return new gcn::OpenGLSDLImageLoader();
-}
-
-void list_video_modes(vector<string> &out)
-{
-	SDL_Rect** modes = SDL_ListModes(NULL, SDL_FULLSCREEN | SDL_HWSURFACE);
-	while(*modes) {
-		char str[15];
-		snprintf(str, 15, "%dx%d", (*modes)->w, (*modes)->h);
-		out.push_back(string(str));
-		++modes;
-	}
-}
-
 static bool v_sync_enabled = true;
+
+SDL_Window *window;
+SDL_GLContext glcontext;
 
 static void initialize_SDL()
 {
 	/* SDL Startup */
-	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_JOYSTICK) != 0)
+	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) != 0)
 	{
 		cerr << "Unable to initialize SDL: " << SDL_GetError() << endl;
 		exit(1);
 	}
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
 	{
-		int video_flags = SDL_OPENGL | SDL_HWSURFACE | SDL_HWACCEL;
+		Uint32 video_flags = SDL_WINDOW_OPENGL;
 		if(Options::fullscreen)
-			video_flags |= SDL_FULLSCREEN;
-		SDL_SetVideoMode(Options::width, Options::height, 0, video_flags);
+			video_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+		window = SDL_CreateWindow(
+	        "Glome",
+	        SDL_WINDOWPOS_UNDEFINED,
+    	    SDL_WINDOWPOS_UNDEFINED,
+			Options::width,
+			Options::height,
+			video_flags);
 	}
-	SDL_WM_SetCaption("Glome", NULL);
+	glcontext = SDL_GL_CreateContext(window);
+
 	SDL_ShowCursor(SDL_ENABLE);
-	SDL_EnableUNICODE(1);
 	SDL_JoystickEventState(SDL_ENABLE);
 
-	SDL_EnableKeyRepeat(SDL_DEFAULT_REPEAT_DELAY, SDL_DEFAULT_REPEAT_INTERVAL);
-	SDL_ShowCursor(SDL_DISABLE);
-	SDL_WM_GrabInput(SDL_GRAB_ON);
+	SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 static void initialize_gl_context()
@@ -94,45 +81,48 @@ static void initialize_gl_context()
 	}
 
 	// Enable V-Sync
-	#ifdef WIN32
-	if(WGLEW_EXT_swap_control)
-		wglSwapIntervalEXT(1);
-	#else
-	if(GLXEW_SGI_swap_control)
-		glXSwapIntervalSGI(1);
-	#endif
-	else
+	if(SDL_GL_SetSwapInterval(-1) < 0 && SDL_GL_SetSwapInterval(1) < 0) {
 		v_sync_enabled = false;
+		cout << "V-Sync disabled" << endl;
+	} else {
+		cout << "V-Sync enabled" << endl;
+	}
 }
 
 static void main_loop()
 {
+	typedef std::chrono::steady_clock Timer;
+	typedef std::chrono::duration<float> FloatSec;
+
 	const int FPS = 60;
 	uint64_t frame_count = 0;
 	bool running = true;
-	Uint32 start;
-	Uint32 ticks;
 
-	start = ticks = SDL_GetTicks();
+	auto start = std::chrono::steady_clock::now();
+	auto ticks = start;
 	while(running) 
 	{
 		running = Input::handle();
 		Game::frame();
-		SDL_GL_SwapBuffers();
+		SDL_GL_SwapWindow(window);
 		// Fix framerate
 		// TODO: deal with refresh rate different from 60 Hz
 		if(!v_sync_enabled) {
 			// TODO: maybe clk_div is useful here...
-			const int period = 1000 / FPS;
-			Uint32 now = SDL_GetTicks();
-			int delay = period - int(now - ticks);
-			if(delay > 0)
-				SDL_Delay(delay);
+			const std::chrono::duration<unsigned, std::ratio<1, FPS>> period(1);
+			auto now = Timer::now();
+
+			auto delay = period - (now - ticks);
+			if(delay.count() > 0)
+				std::this_thread::sleep_for(delay);
+
 			ticks = now;
 		}
 		++frame_count;
 	}
-	cout << frame_count << " frames rendered at " << frame_count / ((SDL_GetTicks() - start) / 1000.0) << " FPS.\n";
+
+	FloatSec time_running = Timer::now() - start;
+	cout << frame_count << " frames rendered at " << frame_count / time_running.count() << " FPS.\n";
 }
 
 int main(int argc, char **argv)

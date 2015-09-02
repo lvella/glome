@@ -108,8 +108,7 @@ namespace Input
 			Game::switch_state(paused ? Game::WORLD : Game::MENU);
 			paused = !paused;
 			
-			SDL_ShowCursor(int(paused));
-			SDL_WM_GrabInput(paused ? SDL_GRAB_OFF : SDL_GRAB_ON);
+			SDL_SetRelativeMouseMode(SDL_bool(!paused));
 		}
 	}
 }
