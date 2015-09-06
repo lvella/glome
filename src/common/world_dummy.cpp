@@ -7,6 +7,7 @@
 #include "random.hpp"
 #include "destroyer.hpp"
 #include "ship_stats.hpp"
+#include "projectile.hpp"
 
 #include "world_dummy.hpp"
 
@@ -78,6 +79,12 @@ void
 WorldDummy::update()
 {
 	_ctrl->update();
+
+	for(const auto &fsm: fsms) {
+		unsigned hits = Projectile::collide(fsm);
+		if(hits)
+			std::cout << "### Hits: " << hits << std::endl;
+	}
 
 	// TODO: Update them in parallel...
 	for(auto obj: dynamic_objects)

@@ -2,17 +2,13 @@
 #include <cmath>
 #include <algorithm>
 #include <vector>
-#include <deque>
 
 #include "shader.hpp"
 #include "math.hpp"
 #include "textures.hpp"
-
 #include "projectile.hpp"
 
 using namespace std;
-typedef std::deque<Projectile> SList;
-static SList shots;
 
 static GLuint tex_projectile;
 
@@ -25,6 +21,8 @@ static CamShader program_bullet;
 
 static GLuint minimap_vbo;
 static std::vector<Vector4> minimap_buf;
+
+Projectile::SList Projectile::shots;
 
 void Projectile::initialize()
 {
@@ -178,19 +176,6 @@ void Projectile::draw_in_minimap()
     }
 }
 
-bool Projectile::collide(const Vector4& position, float radius)
-{
-  radius *= radius;
-
-  for(SList::iterator i = shots.begin(); i != shots.end(); ++i)
-    if((position - i->transformation().position()).squared_length() < radius) {
-      i->die();
-      return true;
-    }
-
-  return false;
-}
-
 /*bool Projectile::collide(ShipController *s)
 {
   const float r = 0.01f * 0.01f;
@@ -208,6 +193,7 @@ bool Projectile::collide(const Vector4& position, float radius)
 
 Projectile::Projectile(ShipController *s, const Matrix4& from, float speed):
   Object(from),
+  VolSphere<Object>(0.004),
   ds(zw_matrix(-speed)),
   owner(s),
   ttl(0),

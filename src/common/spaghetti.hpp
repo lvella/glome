@@ -2,8 +2,12 @@
 
 #include "updatable.hpp"
 #include "drawable.hpp"
+#include "vol_sphere.hpp"
 
-class Spaghetti: public Updatable, public Glome::Drawable 
+class Spaghetti:
+  public Updatable,
+  public Glome::Drawable,
+  public VolSphere<Object>
 {
 public:
   Spaghetti();

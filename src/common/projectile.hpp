@@ -1,11 +1,12 @@
 #pragma once
 
+#include <deque>
 #include "matrix4.hpp"
 #include "vector4.hpp"
-#include "object.hpp"
+#include "vol_sphere.hpp"
 #include "ship_controller.hpp"
 
-class Projectile: public Object
+class Projectile: virtual public Object, public VolSphere<Object>
 {
 public:
 	static void initialize();
@@ -14,7 +15,22 @@ public:
 	static void draw_in_minimap();
 	static void update_all();
 	static std::vector<Projectile*> cull_sort_from_camera(const Camera& cam);
-	static bool collide(const Vector4& position, float radius);
+
+	template <class O>
+	static unsigned collide(const VolSphere<O>& other)
+	{
+		unsigned hit_count = 0;
+	  for(Projectile &p: shots) {
+			if(p.intersects(other)) {
+    	  p.die();
+      	++hit_count;
+    	}
+		}
+
+	  return hit_count;
+	}
+
+
 	static bool collide(ShipController *s);
 
 private:
@@ -38,4 +54,7 @@ private:
 	unsigned short max_ttl;
 	unsigned short max_ttl_2;
 	unsigned char alpha;
+
+	typedef std::deque<Projectile> SList;
+	static SList shots;
 };
