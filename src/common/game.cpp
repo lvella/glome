@@ -43,7 +43,6 @@ void
 initialize()
 {
 	// OpenGL nonchanging settings
-	glEnable(GL_TEXTURE_2D);
 	glEnableVertexAttribArray(0);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0f);
