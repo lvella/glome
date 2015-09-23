@@ -7,16 +7,14 @@
 #ifdef STATS_TUNING
 #define STATS_VOLATILE volatile
 #define STATS_PACKING __attribute__ ((__packed__))
-#define STATS_POINTER std::unique_ptr< ShipStats, void(*)(ShipStats *) >
 #else
 #define STATS_VOLATILE
 #define STATS_PACKING
-#define STATS_POINTER std::unique_ptr< ShipStats >
 #endif
 
 struct STATS_PACKING ShipStats {
-	typedef STATS_POINTER unique_ptr;
-	static unique_ptr get();
+	typedef std::shared_ptr<ShipStats> shared_ptr;
+	static shared_ptr get();
 
 	STATS_VOLATILE float scale;
 

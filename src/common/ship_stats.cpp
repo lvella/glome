@@ -13,7 +13,7 @@ static void deleter(ShipStats *del_ptr) {
 
 #endif
 
-auto ShipStats::get() -> unique_ptr
+auto ShipStats::get() -> shared_ptr
 {
 	#ifdef STATS_TUNING
 	int fd = open("ship_params.bin", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
@@ -23,16 +23,16 @@ auto ShipStats::get() -> unique_ptr
 			 PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	close(fd);
 
-	unique_ptr ret((ShipStats*)ptr, deleter);
+	shared_ptr ret((ShipStats*)ptr, deleter);
 
 	#else
 
-	unique_ptr ret(new ShipStats);
+	shared_ptr ret(new ShipStats);
 
 	#endif
 
 	ret->scale = 1.0f;
-	
+
 	ret->max_rot_per_frame = 0.03;
 	ret->max_speed_forward = 0.0015;
 	ret->max_accel_forward = 0.0002;

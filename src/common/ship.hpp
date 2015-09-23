@@ -9,10 +9,10 @@
 #include "ship_controller.hpp"
 #include "fire.hpp"
 
-class Ship : public Updatable, public Glome::Drawable 
+class Ship : public Updatable, public Glome::Drawable
 {
 public:
-	Ship(Mesh::Types type, std::shared_ptr<ShipStats> sstats);
+	Ship(Mesh::Types type, ShipStats::shared_ptr sstats);
 	virtual ~Ship() {};
 	virtual void draw(Camera& c);
 	virtual void update();
@@ -32,7 +32,7 @@ protected:
 	Mesh* mesh;
 
 	// Attributes of the ship
-	std::shared_ptr<ShipStats> stats;
+	ShipStats::shared_ptr stats;
 
 	// Gun properties
 	Matrix4 r_canon, l_canon;
@@ -46,6 +46,5 @@ protected:
 
 	// Shield properties
 	uint16_t life;
-
 };
 

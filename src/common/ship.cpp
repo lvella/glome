@@ -9,7 +9,6 @@
 #include "math.hpp"
 #include "projectile.hpp"
 #include "config.hpp"
-#include "effect.hpp"
 
 #include "vector4.hpp"
 #include "matrix4.hpp"
@@ -30,7 +29,7 @@ Ship::set_controller(ShipController* pctrl)
 	ctrl->stats = stats.get();
 }
 
-Ship::Ship(Mesh::Types type, std::shared_ptr<ShipStats> sstats):
+Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
 		fx_engine(0.001f),
 		stats(std::move(sstats))
 {
@@ -43,7 +42,7 @@ Ship::Ship(Mesh::Types type, std::shared_ptr<ShipStats> sstats):
 	ctrl = NULL;
 }
 
-void 
+void
 Ship::load_guns(Mesh::Types type)
 {
 	int ret;
@@ -78,7 +77,7 @@ Ship::load_guns(Mesh::Types type)
 	fclose(fd);
 }
 
-void 
+void
 Ship::load_engines(Mesh::Types type)
 {
 	int ret;
@@ -111,7 +110,7 @@ Ship::load_engines(Mesh::Types type)
 	fclose(fd);
 }
 
-void 
+void
 Ship::draw(Camera& c)
 {
 	c.pushMultMat(_t);

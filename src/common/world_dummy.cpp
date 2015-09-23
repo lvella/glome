@@ -1,5 +1,3 @@
-#include <thread>
-
 #include "controller_local.hpp"
 #include "ai_controller.hpp"
 #include "input.hpp"
@@ -18,7 +16,7 @@ WorldDummy::WorldDummy():
 {
 	std::vector<Ship*> bot;
 	std::vector<Ship*> players;
-	std::shared_ptr<ShipStats> stats(ShipStats::get());
+	ShipStats::shared_ptr stats(ShipStats::get());
 	Ship* s;
 
 	s = new Ship(Mesh::Types(Random::range(0, Mesh::UFO)), stats);//new Destroyer();
@@ -44,7 +42,7 @@ WorldDummy::WorldDummy():
 	_render = new Renderer(players);
 
 	_ctrl = new ControllerLocal(vector<Ship*>(ships), std::move(bot), vector<AiController*>(ai_controls));
-	
+
 	objects.push_back(&nova);
 	objects.push_back(&cube);
 	objects.insert(objects.end(), ships.begin(), ships.end());
