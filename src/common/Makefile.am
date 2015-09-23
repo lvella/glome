@@ -8,6 +8,11 @@ INCLUDES = \
 noinst_LIBRARIES = libcommon.a
 
 libcommon_a_SOURCES = \
+	ai_controller.cpp \
+	audio.cpp \
+	audio_effect.cpp \
+	audio_source.cpp \
+	audio_world.cpp	\
 	camera.cpp \
 	color.cpp \
 	controller_local.cpp \
@@ -31,7 +36,6 @@ libcommon_a_SOURCES = \
 	randomcube.cpp \
 	renderer.cpp \
 	shader.cpp \
-	ai_controller.cpp \
 	ship_controller.cpp \
 	ship_stats.cpp \
 	ship.cpp \
