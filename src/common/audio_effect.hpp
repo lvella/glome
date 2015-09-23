@@ -5,7 +5,7 @@
 #include <iostream>
 #include "audio_sound.hpp"
 
-namespace Audio 
+namespace Audio
 {
 	/** Sound effect.
 	 *
@@ -13,7 +13,7 @@ namespace Audio
 	 * Takes up a lot of space, so, use only for sound effects, not music.
 	 *
 	 */
-	class Effect: public Audio::Sound 
+	class Effect: public Audio::Sound
 	{
 		public:
 		static Effect* getEffect(const std::string& soundid);
@@ -36,15 +36,16 @@ namespace Audio
 		* creates the OpenAL buffer, and frees the original
 		* structure. Used on initialization of the object.
 		*/
-		void LoadAndClear(OggOpusFile *of);
+		size_t LoadAndClear(OggOpusFile *of);
 
 		/** Plays the sound in a OpenAL source. */
-		virtual void selfPlay(ALuint src) override;
+		virtual void selfPlay(ALuint src, bool loop, float offset=0) override;
 
 		private:
 		ALuint m_Buffer;
 		unsigned int ref_count;
 		iter it;
-		bool loop;
+
+		size_t num_samples;
 	};
 }

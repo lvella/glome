@@ -11,8 +11,7 @@
 
 using namespace std;
 
-WorldDummy::WorldDummy():
-	fsms(30)
+WorldDummy::WorldDummy()
 {
 	std::vector<Ship*> bot;
 	std::vector<Ship*> players;
@@ -39,7 +38,7 @@ WorldDummy::WorldDummy():
 	if(Options::showBotScreen && players.size() < 3) {
 		players.insert(players.end(), bot.begin(), bot.begin() + min(bot.size(), 4 - players.size()));
 	}
-	_render = new Renderer(players);
+	_render = new Renderer(players, audio_world);
 
 	_ctrl = new ControllerLocal(vector<Ship*>(ships), std::move(bot), vector<AiController*>(ai_controls));
 
@@ -48,6 +47,13 @@ WorldDummy::WorldDummy():
 	objects.insert(objects.end(), ships.begin(), ships.end());
 
 	dynamic_objects.push_back(&nova);
+
+	// Create flying spaghetti monsters
+	const size_t NUM_FSMS = 1;
+	fsms.reserve(NUM_FSMS);
+	for(size_t i = 0; i < NUM_FSMS; ++i) {
+		fsms.emplace_back(audio_world);
+	}
 
 	dynamic_objects.reserve(dynamic_objects.size() + fsms.size());
 	objects.reserve(objects.size() + fsms.size());
@@ -89,6 +95,8 @@ WorldDummy::update()
 	{
 		obj->update();
 	}
+
+	_render->audio_update();
 }
 
 void

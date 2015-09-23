@@ -1,7 +1,9 @@
 AM_CXXFLAGS = \
 	$(SDL_CFLAGS) \
 	$(OPENGL_CFLAGS) \
-	$(BOOST_CPPFLAGS) 
+	$(BOOST_CPPFLAGS) \
+	$(OPUS_CFLAGS) \
+	$(AL_CFLAGS)
 
 INCLUDES = \
 	$(SDL_CFLAGS) \
@@ -19,7 +21,9 @@ glome_LDADD = $(top_srcdir)/src/common/libcommon.a \
 	$(SDL_IMAGE_LIBS) \
 	$(GUICHAN_LIBS) \
 	$(OPENGL_LIBS) \
-	$(BOOST_LDFLAGS)
+	$(BOOST_LDFLAGS) \
+	$(OPUS_LIBS) \
+	$(AL_LIBS)
 
 glome_SOURCES = \
 	input.cpp \

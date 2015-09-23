@@ -13,7 +13,7 @@ Vector3 rgbFromHsv(float H, float S, float V)
 
 	float C = S * V;
 	float H_ = H / (M_PI / 3.0);
-	float X = C * (1.0 - fabsf(fmodf(H_, 2.0) - 1.0));
+	float X = C * (1.0f - fabsf(fmodf(H_, 2.0f) - 1.0f));
 
 	Vector3 rgb;
 	switch(int(H_)) {

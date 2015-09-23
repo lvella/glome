@@ -4,12 +4,10 @@
 
 #include "audio.hpp"
 
-using namespace Audio;
-
 static ALCdevice* al_device;
 static ALCcontext* al_context;
 
-void Initialize()
+void Audio::initialize()
 {
    al_device = alcOpenDevice(NULL);
    if(al_device == NULL) {
@@ -19,9 +17,11 @@ void Initialize()
 
    al_context = alcCreateContext(al_device, NULL);
    alcMakeContextCurrent(al_context);
+
+   // TODO: properly configure AL_SPEED_OF_SOUND
 }
 
-void Shutdown()
+void Audio::shutdown()
 {
    if(al_device)
       alcCloseDevice(al_device);

@@ -9,7 +9,9 @@ namespace Game
 
 	/** Process and renders a game frame. */
 	void frame();
+
 	void initialize();
+	void shutdown();
 
 	/** Switches between game states. */
 	void switch_state(state s);

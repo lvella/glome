@@ -139,5 +139,7 @@ int main(int argc, char **argv)
 	Game::initialize();
 
 	main_loop();
+
+	Game::shutdown();
 }
 

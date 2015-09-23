@@ -3,6 +3,8 @@ INCLUDES = \
 	$(SDL_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
+	$(OPUS_CFLAGS) \
+	$(AL_CFLAGS) \
 	-I$(includedir)
 
 noinst_LIBRARIES = libcommon.a
@@ -11,6 +13,7 @@ libcommon_a_SOURCES = \
 	ai_controller.cpp \
 	audio.cpp \
 	audio_effect.cpp \
+	audio_listener.cpp \
 	audio_source.cpp \
 	audio_world.cpp	\
 	camera.cpp \
@@ -20,7 +23,6 @@ libcommon_a_SOURCES = \
 	destroyer.cpp \
 	drawable.cpp \
 	dustfield.cpp \
-	effect.cpp \
 	fire.cpp \
 	game.cpp \
 	math.cpp \
@@ -40,8 +42,6 @@ libcommon_a_SOURCES = \
 	ship_stats.cpp \
 	ship.cpp \
 	simplexnoise1234.cpp \
-	sound.cpp \
-	source.cpp \
 	spaghetti.cpp \
 	supernova.cpp \
 	textures.cpp \

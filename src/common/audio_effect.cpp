@@ -25,12 +25,10 @@ Effect::Effect():
 	ref_count(1)
 {}
 
-Effect::Effect(const string& rFilename, iter iterator): 
-	Audio::Sound(), 
-	m_Buffer(0), 
+Effect::Effect(const string& rFilename, iter iterator):
+	m_Buffer(0),
 	ref_count(1),
-	it(iterator),
-   loop(true)
+	it(iterator)
 {
    OggOpusFile* of;
 
@@ -42,7 +40,7 @@ Effect::Effect(const string& rFilename, iter iterator):
    of = op_open_file(fname.c_str(), &err_code);
 
 	if(!err_code) {
-      LoadAndClear(of);
+      num_samples = LoadAndClear(of);
 	} else {
       cerr << "Error while loading file \"" << fname << "\".\n";
    }
@@ -52,13 +50,14 @@ Effect::~Effect() {
    alDeleteBuffers(1, &m_Buffer);
 }
 
-void Effect::LoadAndClear(OggOpusFile *of)
+size_t Effect::LoadAndClear(OggOpusFile *of)
 {
+   size_t filled = 0;
+
    // Generate audio buffer
    alGenBuffers(1, &m_Buffer);
    if(alGetError() == AL_NO_ERROR) {
       std::vector<opus_int16> buf(1024*1024);
-      size_t filled = 0;
       int ret;
 
       do {
@@ -76,6 +75,8 @@ void Effect::LoadAndClear(OggOpusFile *of)
    }
 
    op_free(of);
+
+   return filled;
 }
 
 Effect*
@@ -99,13 +100,12 @@ Effect::releaseEffect(Effect* soundEffect)
 	}
 }
 
-void Effect::selfPlay(ALuint src) {
+void Effect::selfPlay(ALuint src, bool loop, float offset) {
    if(m_Buffer)
    {
       alSourcei(src, AL_BUFFER, m_Buffer);
       alSourcei(src, AL_LOOPING, loop ? AL_TRUE : AL_FALSE);
+      alSourcef(src, AL_SAMPLE_OFFSET, offset * num_samples);
       alSourcePlay(src);
    }
 }
-
-

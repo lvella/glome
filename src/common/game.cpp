@@ -7,6 +7,7 @@
 #include "world_dummy.hpp"
 #include "random.hpp"
 #include "dustfield.hpp"
+#include "audio.hpp"
 
 #include "game.hpp"
 
@@ -21,10 +22,10 @@ RunContext* context;
 class Paused: public RunContext {
 	void setup_display() {
 	}
-	
+
 	void draw() {
 	}
-	
+
 	void update() {
 	}
 };
@@ -49,6 +50,8 @@ initialize()
 
 	glEnable(GL_CULL_FACE);
 
+	Audio::initialize();
+
 	Renderer::initialize();
 
 	world.reset(new WorldDummy());
@@ -62,6 +65,12 @@ initialize()
 	initialize_meridians();
 
 	switch_state(WORLD);
+}
+
+void
+shutdown()
+{
+	Audio::shutdown();
 }
 
 void switch_state(state s)

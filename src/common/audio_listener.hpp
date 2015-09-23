@@ -8,21 +8,20 @@ namespace Audio {
 
 	class Listener {
 	public:
-		Listener(World* w):
-			world(w)
-		{
-			pos_in_world = w->listeners.size();
-			w->addListener(this);
-		}
-		Listener(Listener&) = delete;
-		Listener &operator=(Listener&) = delete;
+		Listener(World* w);
 
-		void update(const Matrix4& transform)
-		{
-			world->updateFromListener(pos_in_world, transform);
-		}
+		Listener(Listener&) = delete;
+		Listener(Listener&& other);
+
+		virtual ~Listener() = default;
+
+		void update(const Matrix4& transform);
+
+		virtual const Matrix4 &transformation() const = 0;
 
 	private:
+		Listener &operator=(Listener&) = default;
+
 		size_t pos_in_world;
 		World *world;
 	};

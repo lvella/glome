@@ -8,6 +8,7 @@
 #include "random.hpp"
 #include "vector4.hpp"
 #include "color.hpp"
+#include "audio_effect.hpp"
 
 #include "spaghetti.hpp"
 
@@ -55,7 +56,8 @@ CubicInterpolate(
    return (a0*mu*mu2 + a1*mu2 + a2*mu + a3);
 }
 
-Spaghetti::Spaghetti():
+Spaghetti::Spaghetti(Audio::World &audio_world):
+	Audio::Source(&audio_world),
 	VolSphere<Object>(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f)))
 {
 	// Random spaghetti propertiers:
@@ -81,13 +83,13 @@ Spaghetti::Spaghetti():
 		Vector4 &p0 = bezier[i*3];
 		Vector4 &m  = bezier[i*3 + 1];
 		Vector4 &p1 = bezier[i*3 + 2];
-		
+
 		m =
 			xy_matrix(Random::arc()) *
 			xz_matrix(Random::arc()) *
 			yz_matrix(Random::arc()) *
 			R_DISP * Vector4::ORIGIN;
-		
+
 		Vector4 d = Random::direction();
 
 		// Those points are outside the glome's surface, lets see how it renders.
@@ -96,7 +98,7 @@ Spaghetti::Spaghetti():
 
 		colors[i] = mean_color + Vector3(Random::direction()) * Random::normalDistribution(0.0f, 0.2);
 	}
-	
+
 	bezier[spaghetti_count*3] = bezier[0];
 	bezier[spaghetti_count*3 + 1] = bezier[1];
 
@@ -136,7 +138,7 @@ Spaghetti::Spaghetti():
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]), &vertices[0], GL_STATIC_DRAW);
 	}
 
-	// Define rotation direction	
+	// Define rotation direction
 	Vector4 dir3d = Random::direction();
 	velo = rotation(Random::normalDistribution(0.0, 0.02), dir3d[0], dir3d[1], dir3d[2]);
 
@@ -152,6 +154,11 @@ Spaghetti::Spaghetti():
       * xw_matrix(Random::arc())
       * yw_matrix(Random::arc())
       * zw_matrix(Random::arc());
+
+	// Configure humming sound effect
+	static Audio::Effect *hum_sound = Audio::Effect::getEffect("spaghetti");
+	//setGain(1.0);
+	play(*hum_sound, true, Random::zeroToOne());
 }
 
 Spaghetti::~Spaghetti()

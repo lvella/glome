@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <AL/al.h>
+#include "matrix4.hpp"
 #include "vector4.hpp"
 #include "vector3.hpp"
 #include "audio_sound.hpp"
@@ -15,8 +16,8 @@ namespace Audio {
    class Source {
 
    public:
-      Source(World *w, Vector4& initial_pos);
-      
+      Source(World *w);
+
       /* Non-copyable */
       Source(Source&) = delete;
       Source &operator=(Source&) = delete;
@@ -28,7 +29,7 @@ namespace Audio {
       virtual ~Source();
 
       /** Plays a sound from this source */
-      void play(Sound &sound);
+      void play(Sound &sound, bool loop=false, float offset=0);
 
       void setGain(float g) {
          gain = g;
@@ -42,8 +43,7 @@ namespace Audio {
 
    private:
       struct SourceForListener {
-         SourceForListener(Source *s, const Vector4& initial_pos):
-            prev_pos(initial_pos)
+         SourceForListener(Source *s)
          {
             al_source = 0;
             alGenSources(1, &al_source);
@@ -59,8 +59,9 @@ namespace Audio {
             alSourcei(al_source, AL_SOURCE_RELATIVE, AL_FALSE);
             alSourcef(al_source, AL_PITCH, s->pitch);
             alSourcef(al_source, AL_GAIN, s->gain);
-            alSource3f(al_source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
-            alSource3f(al_source, AL_POSITION, prev_pos.x, prev_pos.y, prev_pos.z);
+
+            alSourcef(al_source, AL_REFERENCE_DISTANCE, 0.01f);
+            alSourcef(al_source, AL_MAX_DISTANCE, 2.0f);
          }
 
          ~SourceForListener() {
@@ -68,9 +69,9 @@ namespace Audio {
                alDeleteSources(1, &al_source);
          }
 
-         void update(Source *s, const Matrix4& curr) {
-            Vector3 pos = (curr * s->position()).stereo_proj();
-            Vector3 velo = pos - prev_pos;
+         void update(Source *s, const Matrix4& transform) {
+            Vector3 pos = (transform * s->position()).stereo_proj();
+            Vector3 velo = (pos - prev_pos) * 60;
 
             alSource3f(al_source, AL_VELOCITY, velo.x, velo.y, velo.z);
             alSource3f(al_source, AL_POSITION, pos.x, pos.y, pos.z);
@@ -82,7 +83,7 @@ namespace Audio {
          ALuint al_source;
       };
 
-      virtual const Vector4 position() const = 0;
+      virtual Vector4 position() const = 0;
 
       void setAllProp(ALenum prop, ALfloat val) {
          for(auto& l: listeners_source) {

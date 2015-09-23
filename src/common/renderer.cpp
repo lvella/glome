@@ -43,14 +43,14 @@ Renderer::setup_display()
 	glEnable(GL_POLYGON_SMOOTH);
 }
 
-Renderer::Renderer(const vector<Ship*>& pp)
+Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)
 {
 	assert(pp.size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
 	int h = height / (pp.size() > 2 ? 2 : 1);
 	int w = width / (pp.size() > 1 ? 2 : 1);
 
 	for(int i = 0; i < pp.size(); ++i) {
-		players.emplace_back(pp[i], (i%2) * w, height - (i/2 + 1) * h, w, h);
+		players.emplace_back(pp[i], (i%2) * w, height - (i/2 + 1) * h, w, h, audio_world);
 	}
 
 	// Set non-changing camera perspective
@@ -92,6 +92,15 @@ Renderer::fill_minimap(const vector<Glome::Drawable*>& objs, Camera &cam)
 	for(auto &obj: objs) {
 		if(obj != active->t)
 			obj->minimap_draw(cam);
+	}
+}
+
+void
+Renderer::audio_update()
+{
+	for(auto &p :players)
+	{
+		p.Audio::Listener::update(p.cam_hist.front());
 	}
 }
 

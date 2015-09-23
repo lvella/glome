@@ -9,8 +9,8 @@ void World::addListener(Listener *l) {
 	}
 }
 
-void World::updateFromListener(size_t listener, const Matrix4& prev, const Matrix4& curr) {
+void World::updateFromListener(size_t listener, const Matrix4& transform) {
 	for(Source *s: sources) {
-		s->updateFromListener(listener, curr);
+		s->updateFromListener(listener, transform);
 	}
 }

@@ -14,7 +14,7 @@ namespace Audio {
       friend class Source;
 
       /** Play this sound on a OpenAL source. */
-      virtual void selfPlay(ALuint src) = 0;
+      virtual void selfPlay(ALuint src, bool loop, float offset=0) = 0;
    };
 
 }

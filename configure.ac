@@ -45,6 +45,12 @@ AX_CHECK_OPENGL
 #check for libglew
 #PKG_CHECK_MODULES([GLEW],[glew >= 1.5])
 
+# Check for opusfile decoding library
+PKG_CHECK_MODULES([OPUS], [opusfile])
+
+# Check for OpenAL
+PKG_CHECK_MODULES([AL], [openal])
+
 # Check for SDL
 AC_LANG_SAVE
 AC_LANG_CPLUSPLUS
@@ -65,8 +71,12 @@ AC_CONFIG_FILES([
 ])
 AC_OUTPUT
 
-ALL_FLAGS="${CXXFLAGS} ${OPENGL_CFLAGS} ${SDL_CFLAGS} ${BOOST_CPPFLAGS} -I${SRC_COMMON} -I${SRC_SDL}"
+ALL_FLAGS="${CXXFLAGS} ${OPENGL_CFLAGS} ${SDL_CFLAGS} ${AL_CFLAGS} ${OPUS_CFLAGS} ${BOOST_CPPFLAGS} -I${SRC_COMMON} -I${SRC_SDL}"
 AC_SUBST(ALL_FLAGS)
+AC_SUBST([OPUS_CFLAGS])
+AC_SUBST([OPUS_LIBS])
+AC_SUBST([AL_CFLAGS])
+AC_SUBST([AL_LIBS])
 
 echo ["\
 -------------------------------------------------
