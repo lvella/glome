@@ -64,17 +64,17 @@ int parse_args(int argc, char** argv)
 	static struct option long_options[] =
 	{
 #ifndef NDEBUG
-			{"bot-count",   required_argument,	0,  'b'},
-			{"bot-screen",  no_argument,				0,  'v'},
+			{"bot-count",   required_argument,	0,	'b'},
+			{"bot-screen",  no_argument,		0,	'v'},
 #endif
-			{"full-screen",	no_argument,				0,	'f'},
-			{"width",				required_argument,	0,	'x'},
-			{"height",			required_argument,	0,	'y'},
-			{"is-server",		no_argument,				0,	's'},
-			{"is-client",		no_argument,				0,	'c'},
-			{"host",				required_argument,	0,	'h'},
-			{"port",				required_argument,	0,	'p'},
-			{"no-split", 		no_argument,				0,	'l'},
+			{"full-screen",	no_argument,		0,	'f'},
+			{"width",	required_argument,	0,	'x'},
+			{"height",	required_argument,	0,	'y'},
+			{"is-server",	no_argument,		0,	's'},
+			{"is-client",	no_argument,		0,	'c'},
+			{"host",	required_argument,	0,	'h'},
+			{"port",	required_argument,	0,	'p'},
+			{"no-split",	no_argument,		0,	'l'},
 			{0, 0, 0, 0}
 	};
 
