@@ -1,3 +1,5 @@
+#include "game.hpp"
+
 //#include "menu.hpp"
 #include "options.hpp"
 #include "meridian.hpp"
@@ -8,8 +10,6 @@
 #include "random.hpp"
 #include "dustfield.hpp"
 #include "audio.hpp"
-
-#include "game.hpp"
 
 using namespace std;
 using namespace Options;
@@ -60,7 +60,7 @@ initialize()
 	MiniMap::initialize();
 	Projectile::initialize();
 	ParticleSystem::initialize();
-    DustField::initialize();
+	DustField::initialize();
 	//Menu::initialize();
 	initialize_meridians();
 
