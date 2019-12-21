@@ -1,4 +1,4 @@
-INCLUDES = \
+AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/sdl \
 	$(SDL_CFLAGS) \
 	$(OPENGL_CFLAGS) \

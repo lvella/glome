@@ -1,14 +1,9 @@
-AM_CXXFLAGS = \
+AM_CPPFLAGS = \
 	$(SDL_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
 	$(OPUS_CFLAGS) \
-	$(AL_CFLAGS)
-
-INCLUDES = \
-	$(SDL_CFLAGS) \
-	$(OPENGL_CFLAGS) \
-	$(BOOST_CPPFLAGS) \
+	$(AL_CFLAGS) \
 	-I$(includedir) \
 	-I$(top_srcdir)/src/common
 
