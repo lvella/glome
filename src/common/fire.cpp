@@ -42,7 +42,7 @@ void Fire::initialize()
 	const char* src[] = {"fire.vert", "world.frag", "point_texture.frag", "fog.frag", NULL};
 	program_fire.setup_shader(src);
 	attrib_radius = glGetAttribLocation(program_fire.program(), "radius");
-	
+
 	program_fire.enable();
 	program_fire.getUniform("has_tex").set(true);
 	program_fire.getUniform("texbase").set(0);

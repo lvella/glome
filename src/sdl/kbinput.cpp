@@ -15,8 +15,8 @@ namespace Input
 namespace Kb
 {
 
-/* 
-* Map: < SDLKEY , PAIR(controller_id, callback_function) > 
+/*
+* Map: < SDLKEY , PAIR(controller_id, callback_function) >
 */
 unordered_map<int, input_callback* > inputs;
 pair< int, std::function<void (int, float, float)> > motion_func;
@@ -52,7 +52,7 @@ button_event(SDL_Event e)
 		state = (e.button.state == SDL_PRESSED);
 	}
 
-    if(state){ 
+    if(state){
     if(e.key.keysym.sym == SDLK_UP) {
         rotate(0, 0.0, 0.1);
     } else if(e.key.keysym.sym == SDLK_DOWN) {

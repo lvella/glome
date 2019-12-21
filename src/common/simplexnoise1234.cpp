@@ -83,7 +83,7 @@ static unsigned char perm[512] = {151,160,137,91,90,15,
   129,22,39,253, 19,98,108,110,79,113,224,232,178,185, 112,104,218,246,97,228,
   251,34,242,193,238,210,144,12,191,179,162,241, 81,51,145,235,249,14,239,107,
   49,192,214, 31,181,199,106,157,184, 84,204,176,115,121,50,45,127, 4,150,254,
-  138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180 
+  138,236,205,93,222,114,67,29,24,72,243,141,128,195,78,66,215,61,156,180
 };
 
 //---------------------------------------------------------------------
@@ -214,7 +214,7 @@ float noise(float x, float y) {
     if(t0 < 0.0f) n0 = 0.0f;
     else {
       t0 *= t0;
-      n0 = t0 * t0 * grad(perm[ii+perm[jj]], x0, y0); 
+      n0 = t0 * t0 * grad(perm[ii+perm[jj]], x0, y0);
     }
 
     float t1 = 0.5f - x1*x1-y1*y1;
@@ -254,7 +254,7 @@ float noise(float x, float y, float z) {
     int j = FASTFLOOR(ys);
     int k = FASTFLOOR(zs);
 
-    float t = (float)(i+j+k)*G3; 
+    float t = (float)(i+j+k)*G3;
     float X0 = i-t; // Unskew the cell origin back to (x,y,z) space
     float Y0 = j-t;
     float Z0 = k-t;
@@ -337,7 +337,7 @@ float noise(float x, float y, float z) {
 
 // 4D simplex noise
 float noise(float x, float y, float z, float w) {
-  
+
   // The skewing and unskewing factors are hairy again for the 4D case
 #define F4 0.309016994 // F4 = (Math.sqrt(5.0)-1.0)/4.0
 #define G4 0.138196601 // G4 = (5.0-Math.sqrt(5.0))/20.0

@@ -12,14 +12,13 @@
 
 namespace Input
 {
-	/* 
-	* Generic Callback function for input 
+	/*
+	* Generic Callback function for input
 	* TODO: Make this work for variable number of arguments:
 	* http://en.wikipedia.org/wiki/Variadic_templates
 	*/
-	
 	extern std::unordered_map<int, ShipController*> ship_controllers;
-		
+
 	ShipController* create_ship_controller(int);
 
 	void read_controllers_settings();
@@ -107,7 +106,7 @@ namespace Input
 		if(a > 0.5f) {
 			Game::switch_state(paused ? Game::WORLD : Game::MENU);
 			paused = !paused;
-			
+
 			SDL_SetRelativeMouseMode(SDL_bool(!paused));
 		}
 	}

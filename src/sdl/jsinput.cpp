@@ -11,8 +11,8 @@ namespace Input
 namespace Js
 {
 
-/* 
-* Map: < SDLKEY , PAIR(controller_id, callback_function) > 
+/*
+* Map: < SDLKEY , PAIR(controller_id, callback_function) >
 */
 unordered_map<int, input_callback* > inputs;
 pair< int, std::function<void (int, float, float)> > motion_func;
@@ -67,7 +67,7 @@ axis_event(const SDL_JoyAxisEvent &e)
 		if(ny > 0)
 			move_up(0, ny);
 		else
-			move_down(0, ny);	
+			move_down(0, ny);
 	}
 	else if(e.axis == 2 || e.axis == 3)
 	{

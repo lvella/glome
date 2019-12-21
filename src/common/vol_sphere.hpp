@@ -21,7 +21,7 @@ class VolSphere: virtual private Location
       assert(radius >= 0);
       assert(radius < M_PI);
     }
-    
+
     template<typename Q> friend class VolSphere;
 
     // Tells if two given sphere intersects

@@ -10,7 +10,7 @@ public:
 	void draw(gcn::Graphics* graphics);
 	void mouseEntered(gcn::MouseEvent& mouseEvent);
 	void mouseExited(gcn::MouseEvent& mouseEvent);
-	
+
 private:
 	gcn::Font* hl_font;
 	bool has_mouse;

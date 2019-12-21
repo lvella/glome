@@ -7,7 +7,7 @@
 
 // Isso fica temporariamente..
 #define QUIT 0
-#define TURN 1 
+#define TURN 1
 #define MOVE_F 2
 #define MOVE_B 3
 #define SHOT 4
@@ -57,7 +57,7 @@ struct protocol
 			ushort motionx;
 			ushort motiony;
 		} input;
-		
+
 		// Someone requests info about server (game mode, qtt of players etc) (used in lobby)
 		struct
 		{

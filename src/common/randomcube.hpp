@@ -3,7 +3,7 @@
 #include "updatable.hpp"
 #include "drawable.hpp"
 
-class RandomCube: public Updatable, public Glome::Drawable 
+class RandomCube: public Updatable, public Glome::Drawable
 {
 public:
 	RandomCube();

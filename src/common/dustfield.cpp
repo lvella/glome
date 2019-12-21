@@ -29,8 +29,8 @@ Uniform old_transform;
 
 /** Each star is drawn as a line. If the ship is stopped,
  * the both ends of the line are in the same point.
- * If the ship is moving, the star is stretched by the 
- * vertex shader. This attribute tells which end of the 
+ * If the ship is moving, the star is stretched by the
+ * vertex shader. This attribute tells which end of the
  * the line the vertex is. */
 GLint attrib_endpoint;
 

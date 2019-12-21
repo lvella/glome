@@ -100,7 +100,7 @@ static void main_loop()
 
 	auto start = std::chrono::steady_clock::now();
 	auto ticks = start;
-	while(running) 
+	while(running)
 	{
 		running = Input::handle();
 		Game::frame();

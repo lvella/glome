@@ -120,16 +120,16 @@ namespace Menu
 		gui = new gcn::Gui();
 		gui->setGraphics(graphics);
 		gui->setInput(input);
-		
+
 		top = new gcn::Container();
 		mainC = new gcn::Container();
 		optionsC = new gcn::Container();
-		
+
 		mainC->setVisible(true);
 		optionsC->setVisible(false);
 		top->add(mainC);
 		top->add(optionsC);
-		
+
 		top->setDimension(gcn::Rectangle(0, 0, width, height));
 		mainC->setDimension(gcn::Rectangle(0, 0, width, height));
 		optionsC->setDimension(gcn::Rectangle(0, 0, width, height));
@@ -175,7 +175,7 @@ namespace Menu
 		options_button->addActionListener(buttonActionListener);
 		options_button->setPosition(width/2 - 60, height/2 - 30);
 		options_button->setFont(font_normal);
-		Menu::mainC->add(options_button);	
+		Menu::mainC->add(options_button);
 		options_button->adjustSize();
 
 		/*
@@ -219,7 +219,7 @@ namespace Menu
 		//TODO: Change to pick from configure
 		resolution->setSelected(3);
 	}
-  
+
   /*
    * TODO: Not sure if this input shuld be there, but eitherway
    * the input from the menu and the actual game are doing different

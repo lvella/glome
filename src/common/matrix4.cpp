@@ -41,7 +41,7 @@ THE SOFTWARE.
 
     //-----------------------------------------------------------------------
     inline static Real
-        MINOR(const Matrix4& m, const size_t r0, const size_t r1, const size_t r2, 
+        MINOR(const Matrix4& m, const size_t r0, const size_t r1, const size_t r2,
 								const size_t c0, const size_t c1, const size_t c2)
     {
         return m[r0][c0] * (m[r1][c1] * m[r2][c2] - m[r2][c1] * m[r1][c2]) -
