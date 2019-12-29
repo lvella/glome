@@ -3,6 +3,7 @@
 #include "controller.hpp"
 #include "renderer.hpp"
 #include "ship.hpp"
+#include "octree.hpp"
 #include "runcontext.hpp"
 
 /** Every game mode should derive this class.
@@ -19,6 +20,8 @@ public:
 	virtual void update() = 0;
 
 protected:
+	Octree::Hypercube collision_tree;
+
 	Controller* _ctrl;
 	Renderer* _render;
 	std::vector<Ship*> ships;

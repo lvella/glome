@@ -1,3 +1,5 @@
+#include <chrono>
+
 #include "controller_local.hpp"
 #include "ai_controller.hpp"
 #include "input.hpp"
@@ -49,7 +51,7 @@ WorldDummy::WorldDummy()
 	dynamic_objects.push_back(&nova);
 
 	// Create flying spaghetti monsters
-	const size_t NUM_FSMS = 1;
+	const size_t NUM_FSMS = 1000;
 	fsms.reserve(NUM_FSMS);
 	for(size_t i = 0; i < NUM_FSMS; ++i) {
 		fsms.emplace_back(audio_world);
@@ -84,10 +86,19 @@ WorldDummy::update()
 {
 	_ctrl->update();
 
-	for(const auto &fsm: fsms) {
-		unsigned hits = Projectile::collide(fsm);
-		if(hits)
-			std::cout << "### Hits: " << hits << std::endl;
+	{
+		auto start = std::chrono::steady_clock::now();
+
+		std::vector<VolSphere*> collision_objects =
+			Projectile::get_collision_volumes();
+		for(auto &fsm: fsms) {
+			collision_objects.push_back(&fsm);
+		}
+		collision_tree.collide(std::move(collision_objects));
+
+		auto end = std::chrono::steady_clock::now();
+		std::chrono::duration<double> elapsed_seconds = end-start;
+		std::cout << "Octree culling took " << elapsed_seconds.count() << "s\n";
 	}
 
 	// TODO: Update them in parallel...

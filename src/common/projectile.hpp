@@ -1,6 +1,6 @@
 #pragma once
 
-#include <deque>
+#include <list>
 #include "matrix4.hpp"
 #include "vector4.hpp"
 #include "vol_sphere.hpp"
@@ -14,28 +14,19 @@ public:
 	static void draw_many(const std::vector<Projectile*>& shots, Camera& cam);
 	static void draw_in_minimap();
 	static void update_all();
+	static std::vector<VolSphere*> get_collision_volumes();
 	static std::vector<Projectile*> cull_sort_from_camera(const Camera& cam);
 
-	static unsigned collide(const VolSphere& other)
+	void collided_with(const VolSphere& other, float) override
 	{
-		unsigned hit_count = 0;
-		for(Projectile &p: shots) {
-			if(p.intersects(other)) {
-				p.die();
-				++hit_count;
-			}
-		}
-
-		return hit_count;
+		die();
 	}
-
-	static bool collide(ShipController *s);
 
 private:
 	Projectile(ShipController *s, const Matrix4& from, float speed);
 	void draw(Camera& cam);
 	void update();
-	inline bool dead()
+	inline bool is_dead() const
 	{
 		// Maximum Time To Live
 		return ttl >= max_ttl;
@@ -53,6 +44,6 @@ private:
 	unsigned short max_ttl_2;
 	unsigned char alpha;
 
-	typedef std::deque<Projectile> SList;
+	typedef std::list<Projectile> SList;
 	static SList shots;
 };

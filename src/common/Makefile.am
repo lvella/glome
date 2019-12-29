@@ -31,6 +31,7 @@ libcommon_a_SOURCES = \
 	mesh.cpp \
 	minimap.cpp \
 	object.cpp \
+	octree.cpp \
 	options.cpp \
 	particle_system.cpp \
 	projectile.cpp \

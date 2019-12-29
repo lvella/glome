@@ -60,7 +60,7 @@ AC_LANG_RESTORE
 # Check for Blender
 AX_CHECK_BLENDER([2.58])
 
-CXXFLAGS+=" -std=c++11 -pthread"
+CXXFLAGS+=" -std=c++17 -pthread"
 
 AC_CONFIG_FILES([
 	Makefile

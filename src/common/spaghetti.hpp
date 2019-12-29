@@ -20,6 +20,11 @@ public:
   void draw(Camera& s) override;
   void update() override;
 
+  void collided_with(const VolSphere& other, float) override
+  {
+    // TODO: implement
+  }
+
 private:
 
   Vector4 position() const override {
