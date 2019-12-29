@@ -6,7 +6,7 @@
 #include "vol_sphere.hpp"
 #include "ship_controller.hpp"
 
-class Projectile: virtual public Object, public VolSphere<Object>
+class Projectile: virtual public Object, public VolSphere
 {
 public:
 	static void initialize();
@@ -16,20 +16,18 @@ public:
 	static void update_all();
 	static std::vector<Projectile*> cull_sort_from_camera(const Camera& cam);
 
-	template <class O>
-	static unsigned collide(const VolSphere<O>& other)
+	static unsigned collide(const VolSphere& other)
 	{
 		unsigned hit_count = 0;
-	  for(Projectile &p: shots) {
+		for(Projectile &p: shots) {
 			if(p.intersects(other)) {
-    	  p.die();
-      	++hit_count;
-    	}
+				p.die();
+				++hit_count;
+			}
 		}
 
-	  return hit_count;
+		return hit_count;
 	}
-
 
 	static bool collide(ShipController *s);
 

@@ -1,3 +1,5 @@
+#include "spaghetti.hpp"
+
 #include <iostream>
 #include <cstdlib>
 #include <cmath>
@@ -9,8 +11,6 @@
 #include "vector4.hpp"
 #include "color.hpp"
 #include "audio_effect.hpp"
-
-#include "spaghetti.hpp"
 
 using namespace Glome;
 
@@ -58,7 +58,7 @@ CubicInterpolate(
 
 Spaghetti::Spaghetti(Audio::World &audio_world):
 	Audio::Source(&audio_world),
-	VolSphere<Object>(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f)))
+	VolSphere(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f)))
 {
 	// Random spaghetti propertiers:
 	const float radius = get_radius();
@@ -149,11 +149,11 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 
 	// Define starting position
 	_t = xy_matrix(Random::arc())
-      * xz_matrix(Random::arc())
-      * yz_matrix(Random::arc())
-      * xw_matrix(Random::arc())
-      * yw_matrix(Random::arc())
-      * zw_matrix(Random::arc());
+	  * xz_matrix(Random::arc())
+	  * yz_matrix(Random::arc())
+	  * xw_matrix(Random::arc())
+	  * yw_matrix(Random::arc())
+	  * zw_matrix(Random::arc());
 
 	// Configure humming sound effect
 	static Audio::Effect *hum_sound = Audio::Effect::getEffect("spaghetti");

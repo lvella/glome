@@ -193,7 +193,7 @@ void Projectile::draw_in_minimap()
 
 Projectile::Projectile(ShipController *s, const Matrix4& from, float speed):
   Object(from),
-  VolSphere<Object>(0.004),
+  VolSphere(0.004),
   ds(zw_matrix(-speed)),
   owner(s),
   ttl(0),

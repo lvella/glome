@@ -9,7 +9,7 @@ class Spaghetti:
   public Updatable,
   public Glome::Drawable,
   public Audio::Source,
-  public VolSphere<Object>
+  public VolSphere
 {
 public:
   Spaghetti(Audio::World &audio_world);
