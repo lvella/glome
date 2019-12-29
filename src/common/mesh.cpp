@@ -27,11 +27,11 @@ const char* mesh_filename[Mesh::MESH_COUNT] =
 
 Mesh::~Mesh()
 {
-  glDeleteBuffers(2, bufobjs);
+	glDeleteBuffers(2, bufobjs);
 }
 
 Mesh::Mesh(Types type):
-  ref_count(1)
+	ref_count(1)
 {
 	assert(size_t(type) < MESH_COUNT);
 
@@ -39,9 +39,9 @@ Mesh::Mesh(Types type):
 
 	glGenBuffers(2, bufobjs);
 
-	if(name)
+	if(name) {
 		load_from_file(name);
-	else {
+	} else {
 		switch (type) { // when there are more than one procedural type
 		case ICOSPHERE:
 			generate_icosphere();
@@ -63,7 +63,7 @@ void Mesh::fill_VBO(const std::vector<VertexData>& vdata, float scale) {
 
 	std::vector<VertexData4D> transformed(vdata.size());
 
-	for(int i = 0; i < vdata.size(); ++i) {
+	for(unsigned i = 0; i < vdata.size(); ++i) {
 		transformed[i].pos = (vdata[i].pos * scale).inverse_stereo_proj();
 		transformed[i].color = vdata[i].color;
 	}
@@ -184,15 +184,15 @@ void Mesh::generate_uvsphere()
 
 	assert(e_idx == sizeof(e) / 4);
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(e), e, GL_STATIC_DRAW);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(e), e, GL_STATIC_DRAW);
 
-  len = 2 * e_idx;
-  primitive_type = GL_LINES;
-  has_colorbuf = false;
+	len = 2 * e_idx;
+	primitive_type = GL_LINES;
+	has_colorbuf = false;
 }
 
 // based on http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
@@ -274,9 +274,9 @@ void Mesh::generate_icosphere()
 				face_subdivide(SUB, FACES[i][2], FACES[i][1], FACES[i][0]);
 			}
 
-		  assert(iv == sizeof(v) / sizeof(Vector4));
-		  assert(ie == sizeof(e) / 4);
-		  assert(ifaces == sizeof(faces) / 6);
+			assert(iv == sizeof(v) / sizeof(Vector4));
+			assert(ie == sizeof(e) / 4);
+			assert(ifaces == sizeof(faces) / 6);
 		}
 
 		uint16_t middle_vert(uint16_t a, uint16_t b)
@@ -332,23 +332,23 @@ void Mesh::generate_icosphere()
 		}
 	} b;
 
-  glBindBuffer(GL_ARRAY_BUFFER, vbo);
-  glBufferData(GL_ARRAY_BUFFER, sizeof(b.v), b.v, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(b.v), b.v, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-  // TODO: one of the two kind of primitives data being generated is useless...
-  // maybe remove it when we are satisfied with the result?
+	// TODO: one of the two kind of primitives data being generated is useless...
+	// maybe remove it when we are satisfied with the result?
 
-  //glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(b.e), b.e, GL_STATIC_DRAW);
-  //len = 2 * b.ie;
-  //primitive_type = GL_LINES;
+	//glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(b.e), b.e, GL_STATIC_DRAW);
+	//len = 2 * b.ie;
+	//primitive_type = GL_LINES;
 
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(b.faces), b.faces, GL_STATIC_DRAW);
-  len = 3 * b.ifaces;
-  primitive_type = GL_TRIANGLES;
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(b.faces), b.faces, GL_STATIC_DRAW);
+	len = 3 * b.ifaces;
+	primitive_type = GL_TRIANGLES;
 
-  has_colorbuf = false;
+	has_colorbuf = false;
 }
 
 void
@@ -363,7 +363,9 @@ Mesh::draw(Camera& c)
 	if(has_colorbuf) {
 		stride = 32;
 		glEnableVertexAttribArray(s->colorAttr());
-		glVertexAttribPointer(s->colorAttr(), 4, GL_FLOAT, GL_FALSE, stride, (void*) (4 * sizeof(float)));
+		glVertexAttribPointer(s->colorAttr(),
+			4, GL_FLOAT, GL_FALSE, stride, (void*) (4 * sizeof(float))
+		);
 	}
 	else {
 		stride = 0;
@@ -380,18 +382,18 @@ Mesh::draw(Camera& c)
 Mesh*
 Mesh::get_mesh(Types type)
 {
-  Mesh *&m = mesh_list[int(type)];
-  if(m)
-    ++m->ref_count;
-  else
-    m = new Mesh(type);
-  return m;
+	Mesh *&m = mesh_list[int(type)];
+	if(m)
+		++m->ref_count;
+	else
+		m = new Mesh(type);
+	return m;
 }
 
 void
 Mesh::release_mesh(Mesh* m)
 {
-  --m->ref_count;
-  if(!m->ref_count)
-    delete(m);
+	--m->ref_count;
+	if(!m->ref_count)
+		delete(m);
 }
