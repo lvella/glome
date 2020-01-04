@@ -51,7 +51,7 @@ WorldDummy::WorldDummy()
 	dynamic_objects.push_back(&nova);
 
 	// Create flying spaghetti monsters
-	const size_t NUM_FSMS = 1000;
+	const size_t NUM_FSMS = 5000;
 	fsms.reserve(NUM_FSMS);
 	for(size_t i = 0; i < NUM_FSMS; ++i) {
 		fsms.emplace_back(audio_world);
@@ -89,12 +89,16 @@ WorldDummy::update()
 	{
 		auto start = std::chrono::steady_clock::now();
 
-		std::vector<VolSphere*> collision_objects =
-			Projectile::get_collision_volumes();
+		std::vector<VolSphere*> collision_objects;
+		collision_objects.reserve(fsms.size());
 		for(auto &fsm: fsms) {
 			collision_objects.push_back(&fsm);
 		}
-		collision_tree.collide(std::move(collision_objects));
+
+		collision_tree.collide(
+			Projectile::get_collision_volumes(),
+			std::move(collision_objects)
+		);
 
 		auto end = std::chrono::steady_clock::now();
 		std::chrono::duration<double> elapsed_seconds = end-start;

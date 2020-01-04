@@ -6,21 +6,51 @@
 
 namespace Octree {
 
-size_t exhaustive_cost(size_t count)
+size_t exhaustive_cost(size_t inter_count, size_t intra_count)
 {
-	return count * (count - 1) / 2;
+	return intra_count * (2 * inter_count + intra_count - 1) / 2;
+}
+
+size_t descend_cost(size_t total_count)
+{
+	return
+		// Fixed cost of descent (creating the cells, etc).
+		// TODO: maybe should be higher?
+		1
+
+		// Number of elements times the average number of
+		// sphere <-> wall tests.
+		// Modeled as:
+		// 8 * (3 * 1/8 + 7/8 * (1/3 * 1 + 1/3 * 2 + 1/3 * 3))
+		// which equals 17.
+		+ total_count * 17;
+}
+
+static void single_collide(VolSphere* a, VolSphere* b,
+	std::unordered_map<CollisionPair, float>& collisions)
+{
+	float cos_dist;
+	if(a->intersects(*b, cos_dist)) {
+		collisions[{a, b}] = cos_dist;
+	}
 }
 
 void exhaustive_collide(
-	const std::vector<VolSphere*>& elems,
+	const std::vector<VolSphere*>& inter,
+	const std::vector<VolSphere*>& intra,
 	std::unordered_map<CollisionPair, float>& collisions)
 {
-	for(size_t i = 0; i < elems.size(); ++i) {
-		for(size_t j = i + 1; j < elems.size(); ++j) {
-			float cos_dist;
-			if(elems[i]->intersects(*elems[j], cos_dist)) {
-				collisions[{elems[i], elems[j]}] = cos_dist;
-			}
+	// Collisions between inter and intra:
+	for(auto a: inter) {
+		for(auto b: intra) {
+			single_collide(a, b, collisions);
+		}
+	}
+
+	// Collisions between intras:
+	for(size_t i = 0; i < intra.size(); ++i) {
+		for(size_t j = i + 1; j < intra.size(); ++j) {
+			single_collide(intra[i], intra[j], collisions);
 		}
 	}
 }
@@ -88,10 +118,10 @@ bool Hypercube::Cell::intersects(const VolSphere& sphere) const
 	return true;
 }
 
-void Hypercube::collide(std::vector<VolSphere*>&& objs)
+void Hypercube::collide(std::vector<VolSphere*>&& inter, std::vector<VolSphere*>&& intra)
 {
 	std::unordered_map<CollisionPair, float> collisions;
-	collision_filter(*this, MAX_DEPTH, std::move(objs), collisions);
+	collision_filter(*this, MAX_DEPTH, std::move(inter), std::move(intra), collisions);
 
 	for(const auto& c: collisions) {
 		c.first.notify_collision(c.second);

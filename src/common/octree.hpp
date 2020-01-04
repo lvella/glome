@@ -59,47 +59,62 @@ namespace std
 
 namespace Octree {
 
-size_t exhaustive_cost(size_t count);
+/** Estimated cost of descending one level in the octree. */
+size_t descend_cost(size_t total_count);
 
-void exhaustive_collide(const std::vector<VolSphere*>& elems,
+/** Estimated cost of exhaustivelly colliding all objects. */
+size_t exhaustive_cost(size_t inter_count, size_t intra_count);
+
+void exhaustive_collide(
+	const std::vector<VolSphere*>& inter,
+	const std::vector<VolSphere*>& intra,
 	std::unordered_map<CollisionPair, float>& collisions
 );
 
 template<class OctreeNode>
 void collision_filter(const OctreeNode& node, uint8_t depth,
-		std::vector<VolSphere*>&& elems,
+		std::vector<VolSphere*>&& inter,
+		std::vector<VolSphere*>&& intra,
 		std::unordered_map<CollisionPair, float>& collisions)
 {
-	// I estimate the cost of going down one level
-	// to be about the cost of exhaustive collision
-	// testing 33 elements, so there is no point in
-	// going down if we have no more than 33 elements.
-	//
-	// Source:
-	// https://www.wolframalpha.com/input/?i=x*%28x-1%29%2F2%3Dx*8*3+*+%282%2F3%29
-	if(depth != 0 && elems.size() > 33) {
-		std::vector<VolSphere*> cell_split[8];
+	const size_t ex_cost = exhaustive_cost(inter.size(), intra.size());
+
+	// If the cost of going down one level is greater than
+	// the cost of exhaustive collision testing, stop recursion
+	// as there is no point in going down.
+	if(depth != 0 && descend_cost(inter.size() + intra.size()) <= ex_cost) {
+		std::vector<VolSphere*> cell_splits[8][2];
+		std::vector<VolSphere*> *input_lists[2] = {&inter, &intra};
+
 		auto cells = node.get_cells();
 
 		size_t lower_cost = 0;
 		for(uint8_t i = 0; i < 8; ++i) {
-			auto& split = cell_split[i];
-			for(auto e: elems) {
-				if(cells[i].intersects(*e)) {
-					split.push_back(e);
+			for(uint8_t j = 0; j < 2; ++j) {
+				auto& split = cell_splits[i][j];
+				for(auto e: *input_lists[j]) {
+					if(cells[i].intersects(*e)) {
+						split.push_back(e);
+					}
 				}
 			}
-			lower_cost += exhaustive_cost(split.size());
+
+			lower_cost += exhaustive_cost(
+				cell_splits[i][0].size(),
+				cell_splits[i][1].size()
+			);
 		}
 
 		// If the collision test cost in lower level is not
 		// higher than it would be in current level, descend.
-		if(lower_cost <= exhaustive_cost(elems.size())) {
-			elems.clear();
+		if(lower_cost <= ex_cost) {
+			inter.clear();
+			intra.clear();
 
 			for(uint8_t i = 0; i < 8; ++i) {
 				collision_filter(cells[i], depth - 1,
-					std::move(cell_split[i]),
+					std::move(cell_splits[i][0]),
+					std::move(cell_splits[i][1]),
 					collisions
 				);
 			}
@@ -110,7 +125,7 @@ void collision_filter(const OctreeNode& node, uint8_t depth,
 	// If execution reached here, it means it have decided
 	// it is not worthwhile to descend the tree anymore,
 	// so, performs exhaustive collision attempts.
-	exhaustive_collide(elems, collisions);
+	exhaustive_collide(inter, intra, collisions);
 }
 
 // A HalfCell contains only half of the walls that
@@ -200,7 +215,7 @@ private:
 	};
 
 public:
-	void collide(std::vector<VolSphere*>&& objs);
+	void collide(std::vector<VolSphere*>&& inter, std::vector<VolSphere*>&& intra);
 
 	const Cell* get_cells() const
 	{
