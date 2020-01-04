@@ -84,6 +84,8 @@ WorldDummy::~WorldDummy()
 void
 WorldDummy::update()
 {
+	static double sum_time = 0;
+	static size_t count = 0;
 	_ctrl->update();
 
 	{
@@ -102,7 +104,9 @@ WorldDummy::update()
 
 		auto end = std::chrono::steady_clock::now();
 		std::chrono::duration<double> elapsed_seconds = end-start;
-		std::cout << "Octree culling took " << elapsed_seconds.count() << "s\n";
+
+		sum_time += elapsed_seconds.count();
+		std::cout << "Octree culling avg " << sum_time/ ++count << "s\n";
 	}
 
 	// TODO: Update them in parallel...

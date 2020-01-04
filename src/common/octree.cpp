@@ -4,7 +4,64 @@
 #include <cmath>
 #include <unordered_map>
 
-namespace Octree {
+namespace {
+
+class CollisionPair {
+public:
+	CollisionPair(VolSphere *a, VolSphere *b) {
+		if(a < b) {
+			lower = a;
+			higher = b;
+		} else {
+			lower = b;
+			higher = a;
+		}
+	}
+
+	bool operator==(const CollisionPair& other) const {
+		return lower == other.lower && higher == other.higher;
+	}
+
+	size_t hash() const {
+		std::hash<VolSphere *> h;
+
+		size_t res = h(lower);
+		boost::hash_combine(res, h(higher));
+		return res;
+	}
+
+	void notify_collision(float cos_dist) const;
+
+private:
+	VolSphere *lower;
+	VolSphere *higher;
+};
+
+void CollisionPair::notify_collision(float cos_dist) const
+{
+	lower->collided_with(*higher, cos_dist);
+	higher->collided_with(*lower, cos_dist);
+}
+
+} // anonymous namespace
+
+
+
+namespace std
+{
+	template <>
+	struct hash<::CollisionPair>
+	{
+		size_t operator()(const ::CollisionPair& k) const
+		{
+			return k.hash();
+		}
+	};
+}
+
+
+
+namespace {
 
 size_t exhaustive_cost(size_t inter_count, size_t intra_count)
 {
@@ -26,7 +83,7 @@ size_t descend_cost(size_t total_count)
 		+ total_count * 17;
 }
 
-static void single_collide(VolSphere* a, VolSphere* b,
+void single_collide(VolSphere* a, VolSphere* b,
 	std::unordered_map<CollisionPair, float>& collisions)
 {
 	float cos_dist;
@@ -55,11 +112,100 @@ void exhaustive_collide(
 	}
 }
 
-void CollisionPair::notify_collision(float cos_dist) const
+template<class OctreeNode>
+void collision_filter(const OctreeNode& node, uint8_t depth,
+		std::vector<VolSphere*>&& inter,
+		std::vector<VolSphere*>&& intra,
+		std::unordered_map<CollisionPair, float>& collisions)
 {
-	lower->collided_with(*higher, cos_dist);
-	higher->collided_with(*lower, cos_dist);
+	const size_t ex_cost = exhaustive_cost(inter.size(), intra.size());
+
+	// If the cost of going down one level is greater than
+	// the cost of exhaustive collision testing, stop recursion
+	// as there is no point in going down.
+	if(depth != 0 && descend_cost(inter.size() + intra.size()) <= ex_cost) {
+		std::vector<VolSphere*> cell_splits[8][2];
+		std::vector<VolSphere*> *input_lists[2] = {&inter, &intra};
+
+		auto cells = node.get_cells();
+
+		size_t lower_cost = 0;
+		for(uint8_t i = 0; i < 8; ++i) {
+			for(uint8_t j = 0; j < 2; ++j) {
+				auto& split = cell_splits[i][j];
+				for(auto e: *input_lists[j]) {
+					if(cells[i].intersects(*e)) {
+						split.push_back(e);
+					}
+				}
+			}
+
+			lower_cost += exhaustive_cost(
+				cell_splits[i][0].size(),
+				cell_splits[i][1].size()
+			);
+		}
+
+		// If the collision test cost in lower level is not
+		// higher than it would be in current level, descend.
+		if(lower_cost <= ex_cost) {
+			inter.clear();
+			intra.clear();
+
+			for(uint8_t i = 0; i < 8; ++i) {
+				collision_filter(cells[i], depth - 1,
+					std::move(cell_splits[i][0]),
+					std::move(cell_splits[i][1]),
+					collisions
+				);
+			}
+			return;
+		}
+	}
+
+	// If execution reached here, it means it have decided
+	// it is not worthwhile to descend the tree anymore,
+	// so, performs exhaustive collision attempts.
+	exhaustive_collide(inter, intra, collisions);
 }
+
+// Takes a cube cell and splits in eight.
+template<class OctreeCell>
+std::array<Octree::HalfCell, 8> split_cell(const OctreeCell& cell)
+{
+	std::array<const Vector4 *, 2> walls[3];
+	Vector4 middle_walls[3][2];
+
+	for(uint8_t i = 0; i < 3; ++i) {
+		walls[i] = cell.get_opposites(i);
+
+		middle_walls[i][0] = ((*walls[i][1] - *walls[i][0]) * 0.5).normalized();
+		middle_walls[i][1] = ((*walls[i][0] - *walls[i][1]) * 0.5).normalized();
+	}
+
+	std::array<Octree::HalfCell, 8> ret;
+
+	uint8_t idx = 0;
+	for(uint8_t i = 0; i < 2; ++i) {
+		for(uint8_t j = 0; j < 2; ++j) {
+			for(uint8_t k = 0; k < 2; ++k) {
+				ret[idx++] = Octree::HalfCell(
+					middle_walls[0][i], walls[0][i],
+					middle_walls[1][j], walls[1][j],
+					middle_walls[2][k], walls[2][k]
+				);
+			}
+		}
+	}
+
+	return ret;
+}
+
+} // anonymous namespace
+
+
+
+namespace Octree {
 
 bool HalfCell::intersects(const VolSphere& sphere) const
 {
@@ -71,7 +217,7 @@ bool HalfCell::intersects(const VolSphere& sphere) const
 	return true;
 }
 
-std::vector<HalfCell> HalfCell::get_cells() const
+std::array<HalfCell, 8> HalfCell::get_cells() const
 {
 	return split_cell(*this);
 }
@@ -128,7 +274,7 @@ void Hypercube::collide(std::vector<VolSphere*>&& inter, std::vector<VolSphere*>
 	}
 }
 
-std::vector<HalfCell> Hypercube::Cell::get_cells() const
+std::array<HalfCell, 8> Hypercube::Cell::get_cells() const
 {
 	return split_cell(*this);
 }
