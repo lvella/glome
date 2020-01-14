@@ -4,6 +4,8 @@
 #include <cmath>
 #include <unordered_map>
 
+#include "make_array.hpp"
+
 namespace {
 
 class CollisionPair {
@@ -183,22 +185,18 @@ std::array<Octree::HalfCell, 8> split_cell(const OctreeCell& cell)
 		middle_walls[i][1] = ((*walls[i][0] - *walls[i][1]) * 0.5).normalized();
 	}
 
-	std::array<Octree::HalfCell, 8> ret;
+	return make_array<8>([&](uint8_t idx) {
+		uint8_t i = (idx >> 2) & 1;
+		uint8_t j = (idx >> 1) & 1;
+		uint8_t k = (idx >> 0) & 1;
 
-	uint8_t idx = 0;
-	for(uint8_t i = 0; i < 2; ++i) {
-		for(uint8_t j = 0; j < 2; ++j) {
-			for(uint8_t k = 0; k < 2; ++k) {
-				ret[idx++] = Octree::HalfCell(
-					middle_walls[0][i], walls[0][i],
-					middle_walls[1][j], walls[1][j],
-					middle_walls[2][k], walls[2][k]
-				);
-			}
-		}
-	}
 
-	return ret;
+		return Octree::HalfCell(
+			middle_walls[0][i], walls[0][i],
+			middle_walls[1][j], walls[1][j],
+			middle_walls[2][k], walls[2][k]
+		);
+	});
 }
 
 } // anonymous namespace

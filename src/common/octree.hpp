@@ -19,8 +19,6 @@ namespace Octree {
 // again.
 class HalfCell {
 public:
-	HalfCell() = default;
-
 	HalfCell(
 		const Vector4& wall0, const Vector4* opposite0,
 		const Vector4& wall1, const Vector4* opposite1,
