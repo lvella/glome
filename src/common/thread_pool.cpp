@@ -44,4 +44,4 @@ void ThreadPool::add_task(Task&& t)
 	queue.enqueue(t);
 }
 
-ThreadPool globalThreadPool(1);
+ThreadPool globalThreadPool;
