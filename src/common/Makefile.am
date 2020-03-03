@@ -1,5 +1,6 @@
 AM_CPPFLAGS = \
 	-I$(top_srcdir)/src/sdl \
+	-I$(top_srcdir)/external/concurrentqueue \
 	$(SDL_CFLAGS) \
 	$(OPENGL_CFLAGS) \
 	$(BOOST_CPPFLAGS) \
@@ -46,6 +47,7 @@ libcommon_a_SOURCES = \
 	spaghetti.cpp \
 	supernova.cpp \
 	textures.cpp \
+	thread_pool.cpp \
 	vector4.cpp \
 	world_dummy.cpp
 

@@ -2,9 +2,12 @@
 
 #include <algorithm>
 #include <cmath>
+#include <mutex>
+#include <type_traits>
 #include <unordered_map>
 
 #include "make_array.hpp"
+#include "thread_pool.hpp"
 
 namespace {
 
@@ -65,6 +68,26 @@ namespace std
 
 namespace {
 
+class CollisionSet
+{
+public:
+	void register_collision(VolSphere* a, VolSphere* b, float cos_dist)
+	{
+		std::lock_guard g(m);
+
+		collisions[{a, b}] = cos_dist;
+	}
+
+	std::unordered_map<CollisionPair, float>& get_collisions()
+	{
+		return collisions;
+	}
+
+private:
+	std::unordered_map<CollisionPair, float> collisions;
+	std::mutex m;
+};
+
 size_t exhaustive_cost(size_t inter_count, size_t intra_count)
 {
 	return intra_count * (2 * inter_count + intra_count - 1) / 2;
@@ -86,39 +109,39 @@ size_t descend_cost(size_t total_count)
 }
 
 void single_collide(VolSphere* a, VolSphere* b,
-	std::unordered_map<CollisionPair, float>& collisions)
+	CollisionSet& cs)
 {
 	float cos_dist;
 	if(a->intersects(*b, cos_dist)) {
-		collisions[{a, b}] = cos_dist;
+		cs.register_collision(a, b, cos_dist);
 	}
 }
 
 void exhaustive_collide(
 	const std::vector<VolSphere*>& inter,
 	const std::vector<VolSphere*>& intra,
-	std::unordered_map<CollisionPair, float>& collisions)
+	CollisionSet& cs)
 {
 	// Collisions between inter and intra:
 	for(auto a: inter) {
 		for(auto b: intra) {
-			single_collide(a, b, collisions);
+			single_collide(a, b, cs);
 		}
 	}
 
 	// Collisions between intras:
 	for(size_t i = 0; i < intra.size(); ++i) {
 		for(size_t j = i + 1; j < intra.size(); ++j) {
-			single_collide(intra[i], intra[j], collisions);
+			single_collide(intra[i], intra[j], cs);
 		}
 	}
 }
 
 template<class OctreeNode>
-void collision_filter(const OctreeNode& node, uint8_t depth,
-		std::vector<VolSphere*>&& inter,
-		std::vector<VolSphere*>&& intra,
-		std::unordered_map<CollisionPair, float>& collisions)
+void collision_filter(const OctreeNode* node, uint8_t depth,
+		const std::vector<VolSphere*>& inter,
+		const std::vector<VolSphere*>& intra,
+		TaskSet* ts, CollisionSet* cs)
 {
 	const size_t ex_cost = exhaustive_cost(inter.size(), intra.size());
 
@@ -127,9 +150,10 @@ void collision_filter(const OctreeNode& node, uint8_t depth,
 	// as there is no point in going down.
 	if(depth != 0 && descend_cost(inter.size() + intra.size()) <= ex_cost) {
 		std::vector<VolSphere*> cell_splits[8][2];
-		std::vector<VolSphere*> *input_lists[2] = {&inter, &intra};
+		const std::vector<VolSphere*> *input_lists[2] = {&inter, &intra};
 
-		auto cells = node.get_cells();
+		auto cells = node->get_cells();
+		using SubNode = typename std::remove_reference<decltype(cells[0])>::type;
 
 		size_t lower_cost = 0;
 		for(uint8_t i = 0; i < 8; ++i) {
@@ -151,15 +175,14 @@ void collision_filter(const OctreeNode& node, uint8_t depth,
 		// If the collision test cost in lower level is not
 		// higher than it would be in current level, descend.
 		if(lower_cost <= ex_cost) {
-			inter.clear();
-			intra.clear();
-
 			for(uint8_t i = 0; i < 8; ++i) {
-				collision_filter(cells[i], depth - 1,
+				ts->add_task(globalThreadPool, std::bind(
+					collision_filter<SubNode>,
+					&cells[i], uint8_t(depth - 1),
 					std::move(cell_splits[i][0]),
 					std::move(cell_splits[i][1]),
-					collisions
-				);
+					ts, cs
+				));
 			}
 			return;
 		}
@@ -168,7 +191,7 @@ void collision_filter(const OctreeNode& node, uint8_t depth,
 	// If execution reached here, it means it have decided
 	// it is not worthwhile to descend the tree anymore,
 	// so, performs exhaustive collision attempts.
-	exhaustive_collide(inter, intra, collisions);
+	exhaustive_collide(inter, intra, *cs);
 }
 
 // Takes a cube cell and splits in eight.
@@ -192,9 +215,9 @@ std::array<Octree::HalfCell, 8> split_cell(const OctreeCell& cell)
 
 
 		return Octree::HalfCell(
-			middle_walls[0][i], walls[0][i],
-			middle_walls[1][j], walls[1][j],
-			middle_walls[2][k], walls[2][k]
+			middle_walls[0][i], *walls[0][i],
+			middle_walls[1][j], *walls[1][j],
+			middle_walls[2][k], *walls[2][k]
 		);
 	});
 }
@@ -264,10 +287,14 @@ bool Hypercube::Cell::intersects(const VolSphere& sphere) const
 
 void Hypercube::collide(std::vector<VolSphere*>&& inter, std::vector<VolSphere*>&& intra)
 {
-	std::unordered_map<CollisionPair, float> collisions;
-	collision_filter(*this, MAX_DEPTH, std::move(inter), std::move(intra), collisions);
+	TaskSet ts;
+	CollisionSet cs;
 
-	for(const auto& c: collisions) {
+	collision_filter(this, MAX_DEPTH, inter, intra, &ts, &cs);
+
+	ts.get_future().wait();
+
+	for(const auto& c: cs.get_collisions()) {
 		c.first.notify_collision(c.second);
 	}
 }
