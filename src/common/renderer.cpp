@@ -69,16 +69,16 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
 		camera.reset(active->newCameraTransform());
 		camera.pushShader(&shader);
 
-        auto sorted_projs = std::async(&Projectile::cull_sort_from_camera, camera);
+		auto sorted_projs = std::async(&Projectile::cull_sort_from_camera, camera);
 
-        draw_meridians(camera);
+	        draw_meridians(camera);
 
 		for(auto &obj: objs) {
 			obj->draw(camera);
 		}
 
 		Projectile::draw_many(sorted_projs.get(), camera);
-        DustField::draw(camera, active->cam_hist.front());
+		DustField::draw(camera, active->cam_hist.front());
 
 		MiniMap::draw(active->_x, active->_y, this, active->t->transformation().transpose(), objs);
 	}

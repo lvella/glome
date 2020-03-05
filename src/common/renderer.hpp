@@ -65,4 +65,3 @@ protected:
 	static GLint shader_uniform_camera;
 	static GLint shader_uniform_projection;
 };
-

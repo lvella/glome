@@ -26,4 +26,3 @@ private:
 	Supernova nova;
 	std::vector<Spaghetti> fsms;
 };
-
