@@ -46,7 +46,6 @@ WorldDummy::WorldDummy()
 
 	objects.push_back(&nova);
 	objects.push_back(&cube);
-	objects.insert(objects.end(), ships.begin(), ships.end());
 
 	dynamic_objects.push_back(&nova);
 
@@ -63,6 +62,8 @@ WorldDummy::WorldDummy()
 		dynamic_objects.push_back(&fsm);
 		objects.push_back(&fsm);
 	}
+
+	objects.insert(objects.end(), ships.begin(), ships.end());
 }
 
 WorldDummy::~WorldDummy()

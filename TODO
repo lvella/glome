@@ -1,4 +1,3 @@
-- Fix engine fire appearance
 - Update objects in parallel
 - Use 2 quaternion as position/orientation representation
 - Make world updates independent of FPS
