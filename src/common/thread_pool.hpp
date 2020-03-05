@@ -2,6 +2,7 @@
 
 #include <atomic>
 #include <boost/context/fiber_fcontext.hpp>
+#include <exception>
 #include <limits>
 #include <thread>
 #include <future>
@@ -21,12 +22,18 @@ public:
 	~ThreadPool();
 
 private:
+	struct ResumeFiber
+	{
+		boost::context::fiber fiber;
+	};
+
 	void do_work();
 
 	struct ThreadExit {};
 	using QueueElement = std::variant<ThreadExit, Task>;
 
 	friend class TaskAdder;
+	friend class TaskSet;
 
 	template<class Func>
 	friend void parallel_run_and_wait(ThreadPool &tp, Func&& start_function);
@@ -35,6 +42,7 @@ private:
 
 	moodycamel::BlockingConcurrentQueue<QueueElement> queue;
 	std::vector<std::thread> threads;
+	std::vector<boost::context::fiber> original_fibers;
 };
 
 class TaskSet
@@ -49,13 +57,13 @@ private:
 			ts(ts)
 		{}
 
-		~SubtractOnExit()
+		~SubtractOnExit() noexcept(false)
 		{
 			uint32_t val = --ts.counter;
 			assert(val != std::numeric_limits<uint32_t>::max());
 
 			if(val == 0) {
-				std::move(ts.orignal_fiber).resume();
+				throw ThreadPool::ResumeFiber{std::move(ts.orignal_fiber)};
 			}
 		}
 
@@ -106,10 +114,14 @@ void parallel_run_and_wait(ThreadPool &tp, Func&& start_function)
 	namespace ctx = boost::context;
 	ctx::fiber thread_worker([&ts] (ctx::fiber&& original) {
 		ts.orignal_fiber = std::move(original);
-		TaskSet::SubtractOnExit{ts};
 
-		ts.tp.do_work();
-		return std::move(ts.orignal_fiber);
+		try {
+			TaskSet::SubtractOnExit{ts};
+			ts.tp.do_work();
+		} catch (ThreadPool::ResumeFiber &rf) {
+			return std::move(rf.fiber);
+		}
+		assert(0);
 	});
 	std::move(thread_worker).resume();
 }

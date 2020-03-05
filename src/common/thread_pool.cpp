@@ -14,11 +14,17 @@ ThreadPool::ThreadPool(unsigned size)
 	threads.reserve(size);
 	for(unsigned i = 0; i < size; ++i) {
 		threads.emplace_back([this] {
-			try {
-				do_work();
-			} catch (ctx::detail::forced_unwind e) {
-				std::cerr << "######" << std::endl;
-			}
+			ctx::fiber worker([this] (ctx::fiber&& orig) {
+				original_fibers.push_back(std::move(orig));
+
+				try {
+					do_work();
+				} catch (ResumeFiber &rf) {
+					return std::move(rf.fiber);
+				}
+				assert(0);
+			});
+			worker = std::move(worker).resume();
 		});
 	}
 }
