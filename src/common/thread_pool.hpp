@@ -8,7 +8,6 @@
 #include <variant>
 #include <iostream>
 
-#include <boost/context/fiber.hpp>
 #include <blockingconcurrentqueue.h>
 
 class ThreadPool
