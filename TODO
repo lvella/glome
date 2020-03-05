@@ -19,6 +19,7 @@
   - When collide with supernova
   - Make some cool death animation
 - Cull unseen objects
+- Possibly use GLM for linear algebra
 
 ===================================================
 
