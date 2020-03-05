@@ -1,10 +1,32 @@
+- Fix engine fire appearance
+- Update objects in parallel
+- Use 2 quaternion as position/orientation representation
+- Make world updates independent of FPS
+- Transfer momentum on collision between objects (ships, flying spagetti monsters)
+  - At least prevent them from intersecting, change their velocity away from one another
+- Fix supernova appearance:
+  - you can see the triangles (you must not)
+  - you can see briefly see the other side when it is half size (you must not)
+    - don't draw the opposite side to fix this
+- Add collision to supernova
+  - Kill player when collide, finishing the game
+  - Show and register score, then ask to try again
+- Bring code to C++11:
+  - Remove all new/delete
+- Sort objects when drawing each viewport
+- Kill flying spaghetti monsters
+  - When shot
+  - When collide with supernova
+  - Make some cool death animation
+- Cull unseen objects
+
+===================================================
+
 Main topics:
-- Collision (maybe something with GJK algorithm)
 - Physics
 - Special effects
-- Multiplayer - Leo doing
+- Multiplayer
 - Improve ship file format and exporter
-- Create space objects (asteroids, stars, etc)
 - To model more ships
 
 Visual:
