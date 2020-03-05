@@ -177,7 +177,7 @@ void collision_filter(TaskAdder& add_task,
 		// higher than it would be in current level, descend.
 		if(lower_cost <= ex_cost) {
 			for(uint8_t i = 0; i < 7; ++i) {
-				add_task(globalThreadPool, std::bind(
+				add_task(std::bind(
 					collision_filter<SubNode>,
 					std::ref(add_task),
 					&cells[i], uint8_t(depth - 1),
@@ -297,13 +297,15 @@ void Hypercube::collide(std::vector<VolSphere*>&& inter, std::vector<VolSphere*>
 {
 	CollisionSet cs;
 
-	parallel_run_and_wait([&] (TaskAdder &&add_task) {
-		collision_filter<Hypercube>(add_task,
-			this, MAX_DEPTH,
-			std::move(inter), std::move(intra),
-			&cs
-		);
-	});
+	parallel_run_and_wait(globalThreadPool,
+		[&] (TaskAdder &&add_task) {
+			collision_filter<Hypercube>(add_task,
+				this, MAX_DEPTH,
+				std::move(inter), std::move(intra),
+				&cs
+			);
+		}
+	);
 
 	for(const auto& c: cs.get_collisions()) {
 		c.first.notify_collision(c.second);

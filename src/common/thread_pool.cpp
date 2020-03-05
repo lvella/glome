@@ -5,7 +5,7 @@
 ThreadPool::ThreadPool(unsigned size)
 {
 	if(!size) {
-		size = std::thread::hardware_concurrency();
+		size = std::max(1u, std::thread::hardware_concurrency() - 1);
 	}
 
 	threads.reserve(size);
