@@ -12,6 +12,7 @@ AM_CPPFLAGS = \
 bin_PROGRAMS = glome
 
 glome_LDADD = $(top_srcdir)/src/common/libcommon.a \
+	-lboost_context \
 	$(SDL_LIBS) \
 	$(SDL_IMAGE_LIBS) \
 	$(GUICHAN_LIBS) \

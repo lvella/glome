@@ -37,7 +37,7 @@ DX_PS_FEATURE(OFF)
 DX_INIT_DOXYGEN(Navigna, Doxyfile.cfg, [docs])
 
 m4_include([m4/ax_boost_base.m4])
-AX_BOOST_BASE([1.42],,AC_MSG_FAILURE())
+AX_BOOST_BASE([1.67],,AC_MSG_FAILURE())
 
 #http://sources.redhat.com/automake/automake.html#Extending-aclocal
 # Check for OpenGL

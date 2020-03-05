@@ -1,6 +1,7 @@
 #pragma once
 
 #include <atomic>
+#include <boost/context/fiber_fcontext.hpp>
 #include <limits>
 #include <thread>
 #include <future>
@@ -20,10 +21,15 @@ public:
 	~ThreadPool();
 
 private:
+	void do_work();
+
 	struct ThreadExit {};
 	using QueueElement = std::variant<ThreadExit, Task>;
 
 	friend class TaskAdder;
+
+	template<class Func>
+	friend void parallel_run_and_wait(ThreadPool &tp, Func&& start_function);
 
 	void add_task(Task&& t);
 
@@ -49,7 +55,7 @@ private:
 			assert(val != std::numeric_limits<uint32_t>::max());
 
 			if(val == 0) {
-				ts.promise.set_value();
+				std::move(ts.orignal_fiber).resume();
 			}
 		}
 
@@ -57,8 +63,8 @@ private:
 	};
 
 	ThreadPool &tp;
-	std::promise<void> promise;
 	std::atomic_uint32_t counter{0};
+	boost::context::fiber orignal_fiber;
 
 	friend class TaskAdder;
 
@@ -93,13 +99,19 @@ template<class Func>
 void parallel_run_and_wait(ThreadPool &tp, Func&& start_function)
 {
 	TaskSet ts(tp);
-	{
-		ts.counter++;
-		TaskSet::SubtractOnExit guard(ts);
-		start_function(TaskAdder(ts));
-	}
 
-	ts.promise.get_future().get();
+	ts.counter++;
+	start_function(TaskAdder(ts));
+
+	namespace ctx = boost::context;
+	ctx::fiber thread_worker([&ts] (ctx::fiber&& original) {
+		ts.orignal_fiber = std::move(original);
+		TaskSet::SubtractOnExit{ts};
+
+		ts.tp.do_work();
+		return std::move(ts.orignal_fiber);
+	});
+	std::move(thread_worker).resume();
 }
 
 extern ThreadPool globalThreadPool;
