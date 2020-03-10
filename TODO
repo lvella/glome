@@ -7,10 +7,12 @@
   - you can see the triangles (you must not)
   - you can see briefly see the other side when it is half size (you must not)
     - don't draw the opposite side to fix this
+- Fix projectile appearance (it has a diagonal tear)
 - Add collision to supernova
   - Kill player when collide, finishing the game
   - Show and register score, then ask to try again
 - Bring code to C++11:
+  - Always use "override"
   - Remove all new/delete
 - Sort objects when drawing each viewport
 - Kill flying spaghetti monsters

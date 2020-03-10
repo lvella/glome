@@ -8,6 +8,7 @@
 #include "destroyer.hpp"
 #include "ship_stats.hpp"
 #include "projectile.hpp"
+#include "thread_pool.hpp"
 
 #include "world_dummy.hpp"
 
@@ -110,11 +111,22 @@ WorldDummy::update()
 		std::cout << "Octree culling avg " << sum_time/ ++count << "s\n";
 	}
 
-	// TODO: Update them in parallel...
-	for(auto obj: dynamic_objects)
-	{
-		obj->update();
-	}
+	constexpr size_t chunk_size = 20;
+
+	parallel_run_and_wait(globalThreadPool, [&] (auto&& add_task) {
+		for(size_t i = 0; i < dynamic_objects.size(); i += chunk_size) {
+			add_task([&, i] {
+				const size_t max = std::min(
+					i + chunk_size,
+					dynamic_objects.size()
+				);
+
+				for(size_t j = i; j < max; ++j) {
+					dynamic_objects[j]->update();
+				}
+			});
+		}
+	});
 
 	_render->audio_update();
 }
