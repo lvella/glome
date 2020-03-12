@@ -20,6 +20,9 @@
   - When collide with supernova
   - Make some cool death animation
 - Cull unseen objects
+- Make game run in solid 144 Hz
+  - Create a profile framework
+    - Generalize the one used for measuring octree
 - Possibly use GLM for linear algebra
 
 ===================================================
