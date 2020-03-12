@@ -44,4 +44,19 @@ void ThreadPool::add_task(Task&& t)
 	queue.enqueue(t);
 }
 
+void ThreadPool::try_execute_one_task()
+{
+	QueueElement e;
+	if(!queue.try_dequeue(e)) {
+		return;
+	}
+
+	try {
+		std::get<Task>(e)();
+	} catch (const std::bad_variant_access&) {
+		// WTF??? This is only possible if destructor has been called!
+		assert(false);
+	}
+}
+
 ThreadPool globalThreadPool;

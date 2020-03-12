@@ -18,6 +18,7 @@ public:
 	ThreadPool(unsigned size = 0);
 	~ThreadPool();
 
+	void try_execute_one_task();
 private:
 	struct ThreadExit {};
 	using QueueElement = std::variant<ThreadExit, Task>;
@@ -46,17 +47,12 @@ private:
 		{
 			uint32_t val = --ts.counter;
 			assert(val != std::numeric_limits<uint32_t>::max());
-
-			if(val == 0) {
-				ts.promise.set_value();
-			}
 		}
 
 		TaskSet &ts;
 	};
 
 	ThreadPool &tp;
-	std::promise<void> promise;
 	std::atomic_uint32_t counter{0};
 
 	friend class TaskAdder;
@@ -98,7 +94,12 @@ void parallel_run_and_wait(ThreadPool &tp, Func&& start_function)
 		start_function(TaskAdder(ts));
 	}
 
-	ts.promise.get_future().get();
+	// Run tasks from thread pool or busy waits, if there are none.
+	// TODO: devise some way of sleep waiting on both the task set
+	// and on thread pool queue.
+	while(ts.counter.load()) {
+		tp.try_execute_one_task();
+	}
 }
 
 extern ThreadPool globalThreadPool;
