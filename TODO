@@ -39,8 +39,8 @@ Optimization:
 camera history (STL containers). Remove them.
 
 Game Mechanics:
-- Add a shild that is depleted when shot
-- Add a bar that measures canons heat, so fire rate is slower when hot,
+- Add a shield that is depleted when shot
+- Add a bar that measures cannons heat, so fire rate is slower when hot,
 and halt when too hot;
 
 Menu:
