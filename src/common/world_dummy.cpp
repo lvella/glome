@@ -9,6 +9,7 @@
 #include "ship_stats.hpp"
 #include "projectile.hpp"
 #include "thread_pool.hpp"
+#include "time_accumulator.hpp"
 
 #include "world_dummy.hpp"
 
@@ -21,7 +22,7 @@ WorldDummy::WorldDummy()
 	ShipStats::shared_ptr stats(ShipStats::get());
 	Ship* s;
 
-	s = new Ship(Mesh::Types(Random::range(0, Mesh::UFO)), stats);//new Destroyer();
+	s = new Ship(Mesh::Types(Random::range(0, Mesh::UFO)), stats);
 	s->set_controller(Input::create_ship_controller(0));
 	players.push_back(s);
 	ships.push_back(s);
@@ -86,13 +87,30 @@ WorldDummy::~WorldDummy()
 void
 WorldDummy::update()
 {
-	static double sum_time = 0;
-	static size_t count = 0;
+	static TimeAccumulator update_ta("Update objects");
 	_ctrl->update();
 
 	{
-		auto start = std::chrono::steady_clock::now();
+		constexpr size_t chunk_size = 400;
+		TimeGuard timer(update_ta);
 
+		parallel_run_and_wait(globalThreadPool, [&] (auto&& add_task) {
+			for(size_t i = 0; i < dynamic_objects.size(); i += chunk_size) {
+				add_task([&, i] {
+					const size_t max = std::min(
+						i + chunk_size,
+						dynamic_objects.size()
+					);
+
+					for(size_t j = i; j < max; ++j) {
+						dynamic_objects[j]->update();
+					}
+				});
+			}
+		});
+	}
+
+	{
 		std::vector<VolSphere*> collision_objects;
 		collision_objects.reserve(fsms.size());
 		for(auto &fsm: fsms) {
@@ -103,30 +121,7 @@ WorldDummy::update()
 			Projectile::get_collision_volumes(),
 			std::move(collision_objects)
 		);
-
-		auto end = std::chrono::steady_clock::now();
-		std::chrono::duration<double> elapsed_seconds = end-start;
-
-		sum_time += elapsed_seconds.count();
-		std::cout << "Octree culling avg " << sum_time/ ++count << "s\n";
 	}
-
-	constexpr size_t chunk_size = 20;
-
-	parallel_run_and_wait(globalThreadPool, [&] (auto&& add_task) {
-		for(size_t i = 0; i < dynamic_objects.size(); i += chunk_size) {
-			add_task([&, i] {
-				const size_t max = std::min(
-					i + chunk_size,
-					dynamic_objects.size()
-				);
-
-				for(size_t j = i; j < max; ++j) {
-					dynamic_objects[j]->update();
-				}
-			});
-		}
-	});
 
 	_render->audio_update();
 }
