@@ -138,10 +138,10 @@ void exhaustive_collide(
 }
 
 template<class OctreeNode>
-void collision_filter(TaskAdder& add_task,
+void collision_filter(
 		const OctreeNode* node, uint8_t depth,
-		const std::vector<VolSphere*>& inter,
-		const std::vector<VolSphere*>& intra,
+		std::vector<VolSphere*>&& inter,
+		std::vector<VolSphere*>&& intra,
 		CollisionSet* cs)
 {
 	const size_t ex_cost = exhaustive_cost(inter.size(), intra.size());
@@ -176,22 +176,22 @@ void collision_filter(TaskAdder& add_task,
 		// If the collision test cost in lower level is not
 		// higher than it would be in current level, descend.
 		if(lower_cost <= ex_cost) {
-			for(uint8_t i = 0; i < 7; ++i) {
-				add_task(std::bind(
-					collision_filter<SubNode>,
-					std::ref(add_task),
-					&cells[i], uint8_t(depth - 1),
-					std::move(cell_splits[i][0]),
-					std::move(cell_splits[i][1]),
+			parallel_run_and_wait(globalThreadPool, [&] (TaskAdder add_task) {
+				for(uint8_t i = 0; i < 7; ++i) {
+					add_task([&, i] {collision_filter(
+						&cells[i], depth - 1,
+						std::move(cell_splits[i][0]),
+						std::move(cell_splits[i][1]),
+						cs
+					);});
+				}
+				collision_filter(
+					&cells[7], depth - 1,
+					std::move(cell_splits[7][0]),
+					std::move(cell_splits[7][1]),
 					cs
-				));
-			}
-			collision_filter(add_task,
-				&cells[7], uint8_t(depth - 1),
-				std::move(cell_splits[7][0]),
-				std::move(cell_splits[7][1]),
-				cs
-			);
+				);
+			});
 			return;
 		}
 	}
@@ -223,9 +223,9 @@ std::array<Octree::HalfCell, 8> split_cell(const OctreeCell& cell)
 
 
 		return Octree::HalfCell(
-			middle_walls[0][i], *walls[0][i],
-			middle_walls[1][j], *walls[1][j],
-			middle_walls[2][k], *walls[2][k]
+			middle_walls[0][i], walls[0][i],
+			middle_walls[1][j], walls[1][j],
+			middle_walls[2][k], walls[2][k]
 		);
 	});
 }
@@ -296,16 +296,7 @@ bool Hypercube::Cell::intersects(const VolSphere& sphere) const
 void Hypercube::collide(std::vector<VolSphere*>&& inter, std::vector<VolSphere*>&& intra)
 {
 	CollisionSet cs;
-
-	parallel_run_and_wait(globalThreadPool,
-		[&] (TaskAdder &&add_task) {
-			collision_filter<Hypercube>(add_task,
-				this, MAX_DEPTH,
-				std::move(inter), std::move(intra),
-				&cs
-			);
-		}
-	);
+	collision_filter(this, MAX_DEPTH, std::move(inter), std::move(intra), &cs);
 
 	for(const auto& c: cs.get_collisions()) {
 		c.first.notify_collision(c.second);

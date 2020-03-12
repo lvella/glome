@@ -66,7 +66,7 @@ public:
 	template<class Func>
 	void operator()(Func&& f)
 	{
-		uint32_t val = ++ts.counter;
+		ts.counter++;
 
 		ts.tp.add_task([f=std::move(f), &ts=ts](){
 			TaskSet::SubtractOnExit guard(ts);

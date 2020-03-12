@@ -20,9 +20,9 @@ namespace Octree {
 class HalfCell {
 public:
 	HalfCell(
-		const Vector4& wall0, const Vector4& opposite0,
-		const Vector4& wall1, const Vector4& opposite1,
-		const Vector4& wall2, const Vector4& opposite2
+		const Vector4& wall0, const Vector4* opposite0,
+		const Vector4& wall1, const Vector4* opposite1,
+		const Vector4& wall2, const Vector4* opposite2
 	):
 		walls {wall0, wall1, wall2},
 		opposites {opposite0, opposite1, opposite2}
@@ -32,14 +32,14 @@ public:
 
 	std::array<const Vector4*, 2> get_opposites(uint8_t i) const
 	{
-		return {&walls[i], &opposites[i]};
+		return {&walls[i], opposites[i]};
 	}
 
 	std::array<HalfCell, 8> get_cells() const;
 
 private:
 	std::array<Vector4, 3> walls;
-	std::array<Vector4, 3> opposites;
+	std::array<const Vector4*, 3> opposites;
 };
 
 // Hypercube rooted octree
