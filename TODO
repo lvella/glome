@@ -1,8 +1,9 @@
-- Update objects in parallel
-- Use 2 quaternion as position/orientation representation
+== Needs for FIKALAB game ==
+
 - Make world updates independent of FPS
 - Transfer momentum on collision between objects (ships, flying spagetti monsters)
   - At least prevent them from intersecting, change their velocity away from one another
+  - How to fit that to current crazy FSM movement?
 - Fix supernova appearance:
   - you can see the triangles (you must not)
   - you can see briefly see the other side when it is half size (you must not)
@@ -11,21 +12,37 @@
 - Add collision to supernova
   - Kill player when collide, finishing the game
   - Show and register score, then ask to try again
-- Bring code to C++11:
-  - Always use "override"
-  - Remove all new/delete
+    - Take care to make it compatible with VR UI
 - Sort objects when drawing each viewport
 - Kill flying spaghetti monsters
   - When shot
   - When collide with supernova
   - Make some cool death animation
-- Cull unseen objects
-- Make game run in solid 144 Hz
+- Make game run in solid 90 Hz
+  - make it 144 Hz, if possible
   - Create a profile framework
     - Generalize the one used for measuring octree
-- Possibly use GLM for linear algebra
+  - Cull unseen objects
+- Implement stereo rendering using OpenVR API
+- Handle headset input:
+  - Headset orientation changes camera view relative to ship position
+- Figure VR inputs
+  - Study the possibilities
+  - EVA movement-like maybe?
+  - 2 hand canons, maybe?
+    - laser targetting
+    - each cannon position given by each controller position
 
-===================================================
+== GENERAL IMPROVEMENTS (low priority) ==
+
+- Possibly use GLM for linear algebra
+- Bring code to C++11:
+  - Always use "override"
+  - Remove all new/delete
+- Use 2 quaternion as position/orientation representation
+- Port to Vulkan (maybe we can use it to improve performance)
+
+== OLD GLOME TODO (do not apply for FIKALAB) ==
 
 Main topics:
 - Physics
