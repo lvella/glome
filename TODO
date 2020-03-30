@@ -1,5 +1,6 @@
 == Needs for FIKALAB game ==
 
+- Support Windows build
 - Make world updates independent of FPS
 - Transfer momentum on collision between objects (ships, flying spagetti monsters)
   - At least prevent them from intersecting, change their velocity away from one another

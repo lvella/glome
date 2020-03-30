@@ -3,7 +3,6 @@
 #include <deque>
 #include <iostream>
 #include <GL/glew.h>
-#include <GL/glu.h>
 
 #include "math.hpp"
 #include "projectile.hpp"

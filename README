@@ -8,7 +8,6 @@ Navigate through the surface of a hypersphere and kill your enemies.
   autoconf
   libtool
   libgl1-mesa-dev
-  libglu1-mesa-dev
   libglew1.5-dev
   libsdl2-dev
   libboost-thread-dev >= 1.42
