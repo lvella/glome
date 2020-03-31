@@ -5,7 +5,9 @@ AC_INIT([Glome], [0.1], [support@fractal.com])
 AC_CONFIG_AUX_DIR([build-aux])
 
 AC_CONFIG_HEADERS([src/config.hpp])
-DATA_DIR=`${PWDCMD-pwd}`/data
+
+DATA_DIR=data
+
 AC_DEFINE_UNQUOTED([DATA_DIR], ["$DATA_DIR"] , [Data directory])
 
 m4_pattern_allow([^AX_])
