@@ -2,7 +2,7 @@
 
 #include <functional>
 #include <cassert>
-#include <cmath>
+#include "math.hpp"
 #include "object.hpp"
 
 // This class represents a sphere for the
@@ -16,10 +16,10 @@ class VolSphere: virtual private Object
     // The radius must be given in range [0, PI)
     VolSphere(float radius):
       radius(radius),
-      cos_great_dist(std::cos(radius + M_PI_2))
+      cos_great_dist(std::cos(radius + math::pi_2))
     {
       assert(radius >= 0);
-      assert(radius < M_PI);
+      assert(radius < math::pi);
     }
 
     // Tells if this intersects with a given great sphere.
@@ -38,7 +38,7 @@ class VolSphere: virtual private Object
       // The following algorithm fails if the sum of the radius of the
       // spheres is greater than or equal 180°. But in this case, both
       // spheres are always touching:
-      if((radius + other.radius) >= M_PI) {
+      if((radius + other.radius) >= math::pi) {
 	return true;
       }
 

@@ -5,6 +5,15 @@
 #include "matrix4.hpp"
 #include "vector3.hpp"
 
+// Mathematical constants and variations
+namespace math {
+	constexpr float pi = 3.141592653589793238462643383279502884L;
+	constexpr float pi_2 = pi * 0.5L;
+	constexpr float sqrt2 = 1.414213562373095048801688724209698079L;
+	constexpr float sqrt1_2 = 0.707106781186547524400844362104849039L;
+};
+
+
 // Rotations from viewpoint
 
 // This one is almost like glRotate, but in radians, and the vector must be normalized.

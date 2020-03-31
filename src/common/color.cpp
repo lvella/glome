@@ -1,5 +1,6 @@
-#include <cmath>
 #include "color.hpp"
+
+#include "math.hpp"
 
 namespace Color
 {
@@ -7,12 +8,12 @@ namespace Color
 Vector3 rgbFromHsv(float H, float S, float V)
 {
 	// Normalize H to 0 -- 2pi
-	H = fmodf(H, 2.0 * M_PI);
+	H = fmodf(H, 2.0 * math::pi);
 	if (H < 0.0)
-		H += 2.0 * M_PI;
+		H += 2.0 * math::pi;
 
 	float C = S * V;
-	float H_ = H / (M_PI / 3.0);
+	float H_ = H / (math::pi / 3.0);
 	float X = C * (1.0f - fabsf(fmodf(H_, 2.0f) - 1.0f));
 
 	Vector3 rgb;

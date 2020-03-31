@@ -1,12 +1,12 @@
+#include "projectile.hpp"
+
 #include <ctime>
-#include <cmath>
 #include <algorithm>
 #include <vector>
 
 #include "shader.hpp"
 #include "math.hpp"
 #include "textures.hpp"
-#include "projectile.hpp"
 
 using namespace std;
 
@@ -201,7 +201,7 @@ Projectile::Projectile(ShipController * s, const Matrix4 & from,
 	float speed):
     Object(from), VolSphere(0.004),
     ds(zw_matrix(-speed)), owner(s),
-    ttl(0), max_ttl((2 * M_PI - 0.05) / speed),
+    ttl(0), max_ttl((2 * math::pi - 0.05) / speed),
     max_ttl_2(max_ttl / 2), alpha(255u)
 {
 }

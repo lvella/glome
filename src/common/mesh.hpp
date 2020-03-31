@@ -1,9 +1,10 @@
 #pragma once
 
-#include <stdio.h>
+#include <cstdio>
 
 #include "shader.hpp"
 #include "vector3.hpp"
+#include "camera.hpp"
 
 class Mesh
 {

@@ -1,16 +1,18 @@
-#include <GL/glew.h>
+#include "mesh.hpp"
+
 #include <iostream>
 #include <sstream>
 #include <cassert>
 #include <map>
 #include <set>
 #include <utility>
+#include <GL/glew.h>
 
+#include "math.hpp"
 #include "config.hpp"
 #include "vector4.hpp"
 #include "world.hpp"
 #include "random.hpp"
-#include "mesh.hpp"
 
 using namespace std;
 
@@ -152,7 +154,7 @@ void Mesh::generate_uvsphere()
 	// Create vertices and link segments
 	for(int i = 0; i < SEGMENTS; ++i)
 	{
-		float a = i * (2.0 * M_PI / SEGMENTS);
+		float a = i * (2.0 * math::pi / SEGMENTS);
 		float x, y;
 
 		x = sin(a);
@@ -166,7 +168,7 @@ void Mesh::generate_uvsphere()
 				++e_idx;
 			}
 
-			float b = 0.15 + j * ((M_PI - 0.3) / (RINGS - 1));
+			float b = 0.15 + j * ((math::pi - 0.3) / (RINGS - 1));
 			float sb = sin(b);
 
 			v[v_idx++] = Vector4(sb * x, sb * y, cos(b), 0.0f);

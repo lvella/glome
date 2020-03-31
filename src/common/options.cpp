@@ -1,9 +1,10 @@
+#include "options.hpp"
+
 #include <cstdlib>
-#include <cmath>
-#include <stdio.h>
+#include <cstdio>
 #include <getopt.h>
 
-#include "options.hpp"
+#include "math.hpp"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ DEBUG_OPT bool showBotScreen = false;
 // TODO: numLocalPlayers...
 
 // Video options
-const float FOV = M_PI / 4.0f;
+const float FOV = math::pi / 4.0f;
 bool fullscreen = false;
 int width = 800;
 int height = 600;

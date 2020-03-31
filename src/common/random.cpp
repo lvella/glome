@@ -1,3 +1,5 @@
+#include "random.hpp"
+
 #include <fstream>
 #include <cstdlib>
 #include <random>
@@ -8,7 +10,7 @@
 #include <boost/random/uniform_smallint.hpp>
 #include <boost/random/variate_generator.hpp>
 
-#include "random.hpp"
+#include "math.hpp"
 
 namespace Random
 {
@@ -29,7 +31,7 @@ float zeroToOne()
 
 float arc()
 {
-	static boost::variate_generator<Generator*, boost::uniform_real<float> > dist(&gen, boost::uniform_real<float>(0.0f, 2 * M_PI));
+	static boost::variate_generator<Generator*, boost::uniform_real<float> > dist(&gen, boost::uniform_real<float>(0.0f, 2 * math::pi));
 	return dist();
 }
 

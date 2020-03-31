@@ -1,11 +1,11 @@
 #include "octree.hpp"
 
 #include <algorithm>
-#include <cmath>
 #include <mutex>
 #include <type_traits>
 #include <unordered_map>
 
+#include "math.hpp"
 #include "make_array.hpp"
 #include "thread_pool.hpp"
 
@@ -273,8 +273,8 @@ Hypercube::Cell::Cell(uint8_t center_axis, float center_value)
 			float dir = int8_t(j * 2) - 1;
 
 			Vector4 c{0, 0, 0, 0};
-			c[center_axis] = M_SQRT1_2 * center_value;
-			c[i] = M_SQRT1_2 * center_value * dir;
+			c[center_axis] = math::sqrt1_2 * center_value;
+			c[i] = math::sqrt1_2 * center_value * dir;
 
 			walls[ax_idx][j] = c;
 		}

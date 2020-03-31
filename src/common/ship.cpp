@@ -1,6 +1,7 @@
+#include "ship.hpp"
+
 #include <map>
 #include <algorithm>
-#include <cmath>
 #include <cassert>
 #include <cstdint>
 #include <iostream>
@@ -13,7 +14,6 @@
 #include "vector4.hpp"
 #include "matrix4.hpp"
 
-#include "ship.hpp"
 
 #include <iostream>
 
@@ -183,7 +183,7 @@ Ship::update()
 
 		_t = _t * zw_matrix(ctrl->speed) * yw_matrix(ctrl->speed_v) * xw_matrix(ctrl->speed_h)
 			 * xy_matrix(ctrl->speed_s) * yz_matrix(ctrl->v_tilt)
-			 * rotation(-ctrl->h_tilt, 0.0, M_SQRT2 / 2.0, M_SQRT2 / 2.0);
+			 * rotation(-ctrl->h_tilt, 0.0, math::sqrt2 / 2.0, math::sqrt2 / 2.0);
 
 
 		fx_engine.setIntensity(std::max(0.0f, rel_speed));

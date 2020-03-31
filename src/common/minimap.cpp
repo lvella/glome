@@ -1,4 +1,5 @@
-#include <cmath>
+#include "meridian.hpp"
+
 #include <cstdlib>
 #include <deque>
 #include <iostream>
@@ -8,7 +9,6 @@
 #include "projectile.hpp"
 #include "ship.hpp"
 #include "shader.hpp"
-#include "meridian.hpp"
 #include "renderer.hpp"
 #include "options.hpp"
 #include "textures.hpp"
@@ -69,7 +69,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center, std
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	// From now on, use the camera with transform stack to draw objects
-	camera.reset(yz_matrix(M_PI / 2) * center);
+	camera.reset(yz_matrix(math::pi_2) * center);
 	camera.pushShader(&map_projection);
 
 	// Draw shots
