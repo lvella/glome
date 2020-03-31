@@ -1,7 +1,6 @@
 #pragma once
 
 #include <array>
-#include <boost/container_hash/hash_fwd.hpp>
 #include <initializer_list>
 #include <vector>
 #include <unordered_map>
