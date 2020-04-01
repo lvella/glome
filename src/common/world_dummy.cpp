@@ -1,4 +1,4 @@
-#include <chrono>
+#include "world_dummy.hpp"
 
 #include "controller_local.hpp"
 #include "ai_controller.hpp"
@@ -9,13 +9,12 @@
 #include "ship_stats.hpp"
 #include "projectile.hpp"
 #include "thread_pool.hpp"
-#include "time_accumulator.hpp"
 
-#include "world_dummy.hpp"
 
 using namespace std;
 
-WorldDummy::WorldDummy()
+WorldDummy::WorldDummy():
+	profiler(5000ms)
 {
 	std::vector<Ship*> bot;
 	std::vector<Ship*> players;
@@ -87,11 +86,18 @@ WorldDummy::~WorldDummy()
 void
 WorldDummy::update()
 {
-	static TimeAccumulator update_ta("Update objects");
-	_ctrl->update();
+	profiler.maybe_print();
+
+	{
+		static TimeAccumulator& control_ta = profiler.newTimer("Parse input");
+		TimeGuard timer(control_ta);
+		_ctrl->update();
+	}
 
 	{
 		constexpr size_t chunk_size = 400;
+
+		static TimeAccumulator& update_ta = profiler.newTimer("Update objects");
 		TimeGuard timer(update_ta);
 
 		parallel_run_and_wait(globalThreadPool, [&] (auto&& add_task) {
@@ -111,6 +117,9 @@ WorldDummy::update()
 	}
 
 	{
+		static TimeAccumulator& octree_ta = profiler.newTimer("Octree collide");
+		TimeGuard timer(octree_ta);
+
 		std::vector<VolSphere*> collision_objects;
 		collision_objects.reserve(fsms.size());
 		for(auto &fsm: fsms) {
@@ -123,12 +132,18 @@ WorldDummy::update()
 		);
 	}
 
-	_render->audio_update();
+	{
+		static TimeAccumulator& audio_ta = profiler.newTimer("Update audio");
+		TimeGuard timer(audio_ta);
+		_render->audio_update();
+	}
 }
 
 void
 WorldDummy::draw()
 {
+	static TimeAccumulator& draw_ta = profiler.newTimer("Draw objects");
+	TimeGuard timer(draw_ta);
 	_render->draw(objects);
 }
 

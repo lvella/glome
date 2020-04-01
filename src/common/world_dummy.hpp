@@ -6,6 +6,7 @@
 #include "randomcube.hpp"
 #include "supernova.hpp"
 #include "spaghetti.hpp"
+#include "profiling.hpp"
 
 class WorldDummy : public WorldLocal
 {
@@ -17,6 +18,8 @@ public:
 	void draw();
 
 private:
+	ProfillingAggregator profiler;
+
 	Audio::World audio_world;
 
 	std::vector<Glome::Drawable*> objects;

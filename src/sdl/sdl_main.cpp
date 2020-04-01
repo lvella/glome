@@ -127,6 +127,8 @@ static void main_loop()
 
 int main(int argc, char **argv)
 {
+	std::ios::sync_with_stdio(false);
+
 	if (Options::parse_args(argc, argv))
 		return 1;
 
