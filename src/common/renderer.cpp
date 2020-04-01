@@ -1,4 +1,3 @@
-#include <future>
 #include "options.hpp"
 #include "meridian.hpp"
 #include "minimap.hpp"
@@ -69,7 +68,7 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
 		camera.reset(active->newCameraTransform());
 		camera.pushShader(&shader);
 
-		auto sorted_projs = std::async(&Projectile::cull_sort_from_camera, camera);
+		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
 
 	        draw_meridians(camera);
 
@@ -77,7 +76,7 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
 			obj->draw(camera);
 		}
 
-		Projectile::draw_many(sorted_projs.get(), camera);
+		Projectile::draw_many(sorted_projs, camera);
 		DustField::draw(camera, active->cam_hist.front());
 
 		MiniMap::draw(active->_x, active->_y, this, active->t->transformation().transpose(), objs);
