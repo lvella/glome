@@ -77,7 +77,7 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 	count = spaghetti_count * SEGMENTS;
 
 	std::vector<Vector4> bezier((spaghetti_count * 3)+2);
-	std::vector<Vector3> colors(spaghetti_count + 2);
+	std::vector<Vector3> colors(spaghetti_count + 3);
 
 	for(int i = 0; i < spaghetti_count; ++i) {
 		Vector4 &p0 = bezier[i*3];
@@ -92,7 +92,7 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 
 		Vector4 d = Random::direction();
 
-		// Those points are outside the glome's surface, lets see how it renders.
+		// Those points are outside the glome's hypersurface, lets see how it renders.
 		p0 = m + d * (radius / 2.0 * Random::zeroToOne());
 		p1 = m - d * (radius / 2.0 * Random::zeroToOne());
 
@@ -104,6 +104,8 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 
 	colors[spaghetti_count] = colors[0];
 	colors[spaghetti_count + 1] = colors[1];
+	colors[spaghetti_count + 2] = colors[2];
+
 
 	// Build the Vertex Buffer Object
 	{
