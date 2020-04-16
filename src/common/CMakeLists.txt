@@ -2,6 +2,10 @@ cmake_minimum_required(VERSION 3.10)
 
 project(glome_common)
 
+option(USE_PKG_CONFIG "Try to find pkg-config, which can be used to find OpenAL and Opusfile" ON)
+option(FIND_OPENAL "If using pkg-config, try to find OpenAL" ON)
+option(FIND_OPUSFILE "If using pkg-config, try to find Opusfile" ON)
+
 add_library(common STATIC
 	ai_controller.cpp
 	ai_controller.hpp
@@ -93,15 +97,18 @@ target_include_directories(common PUBLIC
 	"${glome_SOURCE_DIR}/external/concurrentqueue"
 )
 
-find_package(PkgConfig)
-if (PKG_CONFIG_FOUND)
-	pkg_check_modules(OPUSFILE REQUIRED IMPORTED_TARGET opusfile)
-	pkg_check_modules(OPENAL REQUIRED IMPORTED_TARGET openal)
+if(USE_PKG_CONFIG)
+	find_package(PkgConfig REQUIRED)
 
-	target_link_libraries(common PUBLIC
-		PkgConfig::OPUSFILE
-	        PkgConfig::OPENAL
-        )
+	if(FIND_OPUSFILE)
+		pkg_check_modules(OPUSFILE REQUIRED IMPORTED_TARGET opusfile)
+		target_link_libraries(common PUBLIC PkgConfig::OPUSFILE)
+	endif()
+
+	if(FIND_OPENAL)
+		pkg_check_modules(OPENAL REQUIRED IMPORTED_TARGET openal)
+		target_link_libraries(common PUBLIC PkgConfig::OPENAL)
+	endif()
 endif()
 
 find_package(Threads)
