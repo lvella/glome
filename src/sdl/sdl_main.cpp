@@ -143,5 +143,6 @@ int main(int argc, char **argv)
 	main_loop();
 
 	Game::shutdown();
-}
 
+	return 0;
+}
