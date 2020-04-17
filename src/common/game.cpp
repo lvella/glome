@@ -34,7 +34,7 @@ static std::unique_ptr<World> world;
 static std::unique_ptr<Paused> paused;
 
 void
-frame()
+frame(std::chrono::duration<float> dt)
 {
 	context->update();
 	context->draw();

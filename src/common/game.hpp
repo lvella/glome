@@ -1,5 +1,6 @@
 #pragma once
 
+#include <chrono>
 #include "runcontext.hpp"
 
 namespace Game
@@ -8,7 +9,7 @@ namespace Game
 	enum state {EXIT, MENU, WORLD};
 
 	/** Process and renders a game frame. */
-	void frame();
+	void frame(std::chrono::duration<float> dt);
 
 	void initialize();
 	void shutdown();

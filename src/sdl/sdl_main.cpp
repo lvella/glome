@@ -21,8 +21,6 @@
 
 #include "native.hpp"
 
-using namespace std;
-
 static bool v_sync_enabled = true;
 
 SDL_Window *window;
@@ -33,7 +31,7 @@ static void initialize_SDL()
 	/* SDL Startup */
 	if(SDL_Init(SDL_INIT_VIDEO | SDL_INIT_JOYSTICK) != 0)
 	{
-		cerr << "Unable to initialize SDL: " << SDL_GetError() << endl;
+		std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
 		exit(1);
 	}
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
@@ -64,8 +62,8 @@ static void initialize_gl_context()
 	// Using GLEW to get the OpenGL functions
 	GLenum err = glewInit();
 	if(err != GLEW_OK) {
-		cerr << "Unable to initialize GLEW:\n"
-		<< glewGetErrorString(err) << endl;
+		std::cerr << "Unable to initialize GLEW:\n"
+			<< glewGetErrorString(err) << std::endl;
 		exit(1);
 	}
 
@@ -75,7 +73,7 @@ static void initialize_gl_context()
 		#ifdef WIN32
 		MessageBoxA(NULL, msg, NULL, MB_OK);
 		#else
-		cerr << msg << endl;
+		std::cerr << msg << std::endl;
 		#endif
 		exit(1);
 	}
@@ -83,46 +81,46 @@ static void initialize_gl_context()
 	// Enable V-Sync
 	if(SDL_GL_SetSwapInterval(-1) < 0 && SDL_GL_SetSwapInterval(1) < 0) {
 		v_sync_enabled = false;
-		cout << "V-Sync disabled" << endl;
+		std::cout << "V-Sync disabled" << std::endl;
 	} else {
-		cout << "V-Sync enabled" << endl;
+		std::cout << "V-Sync enabled" << std::endl;
 	}
 }
 
 static void main_loop()
 {
-	typedef std::chrono::steady_clock Timer;
-	typedef std::chrono::duration<float> FloatSec;
+	using Timer = std::chrono::steady_clock;
 
 	const int FPS = 60;
 	uint64_t frame_count = 0;
 	bool running = true;
 
-	auto start = std::chrono::steady_clock::now();
-	auto ticks = start;
+	auto start = Timer::now();
+	auto prev_time = start;
 	while(running)
 	{
+		auto curr_time = Timer::now();
 		running = Input::handle();
-		Game::frame();
+		Game::frame(curr_time - prev_time);
 		SDL_GL_SwapWindow(window);
-		// Fix framerate
-		// TODO: deal with refresh rate different from 60 Hz
+
+		// Fix framerate at FPS
 		if(!v_sync_enabled) {
 			// TODO: maybe clk_div is useful here...
-			const std::chrono::duration<unsigned, std::ratio<1, FPS>> period(1);
-			auto now = Timer::now();
+			constexpr std::chrono::duration<unsigned, std::ratio<1, FPS>> period(1);
+			auto after_frame = std::chrono::steady_clock::now();
 
-			auto delay = period - (now - ticks);
+			auto delay = period - (after_frame - curr_time);
 			if(delay.count() > 0)
 				std::this_thread::sleep_for(delay);
-
-			ticks = now;
 		}
+		prev_time = curr_time;
 		++frame_count;
 	}
 
-	FloatSec time_running = Timer::now() - start;
-	cout << frame_count << " frames rendered at " << frame_count / time_running.count() << " FPS.\n";
+	std::chrono::duration<float> time_running = std::chrono::steady_clock::now() - start;
+	std::cout << frame_count << " frames rendered at "
+		<< frame_count / time_running.count() << " FPS.\n";
 }
 
 int main(int argc, char **argv)
