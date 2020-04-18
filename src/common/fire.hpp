@@ -1,15 +1,17 @@
 #pragma once
 
 #include "particle_system.hpp"
+#include "updatable.hpp"
+#include "drawable.hpp"
 
-class Fire : public ParticleSystem
+class Fire final: public ParticleSystem, public Updatable, public Glome::Drawable
 {
 public:
 	Fire(float radius);
-	virtual ~Fire(){}
 
-	void update();
-	void draw(Camera& c);
+	void update(float dt) override;
+	void draw(Camera& c) override;
+	void minimap_draw(Camera& c) override;
 	void setIntensity(float i);
 
 	static void initialize();
@@ -18,7 +20,6 @@ public:
 	static void set_width(int w);
 
 private:
-	Matrix4 velocity;
 	float scale_radius;
 	float origin_radius;
 	float intensity;

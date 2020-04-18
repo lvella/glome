@@ -30,10 +30,6 @@ Destroyer::Destroyer():
 	other_jet.setIntensity(1.0f);
 }
 
-Destroyer::~Destroyer()
-{
-}
-
 void Destroyer::draw(Camera &c)
 {
 	c.pushMultMat(_t);
@@ -43,8 +39,8 @@ void Destroyer::draw(Camera &c)
 	c.popMat();
 }
 
-void Destroyer::update()
+void Destroyer::update(float dt)
 {
-	Ship::update();
-	other_jet.update();
+	Ship::update(dt);
+	other_jet.update(dt);
 }

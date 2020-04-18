@@ -5,9 +5,8 @@
 class Updatable : virtual public Object
 {
 public:
-	Updatable() {};
-	virtual ~Updatable() {};
+	virtual ~Updatable() = default;
 
-	virtual void update() = 0;
+	virtual void update(float dt) = 0;
 };
 

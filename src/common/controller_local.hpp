@@ -3,7 +3,7 @@
 #include <functional>
 #include "controller.hpp"
 
-class ControllerLocal : public Controller
+class ControllerLocal: public Controller
 {
 public:
 	ControllerLocal(std::vector<Ship*>&& pp,
@@ -11,8 +11,8 @@ public:
 		 std::vector<AiController*>&& ai):
 		 Controller(std::move(pp), std::move(bp), std::move(ai))
 		 {}
-	virtual ~ControllerLocal() {};
-	virtual void update();
+	virtual ~ControllerLocal() = default;
+	void update(float dt) override;
 
 protected:
 

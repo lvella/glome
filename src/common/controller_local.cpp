@@ -7,15 +7,14 @@
 using namespace std;
 
 void
-ControllerLocal::update()
+ControllerLocal::update(float dt)
 {
 	int i;
 	for(i = 0; i < ai_controllers.size(); ++i)
 		ai_controllers[i]->act();
 
-	//Projectile::update_all(Vector4(0.0f, 0.0f, 0.0f, -1.0f));
 	for(i = 0; i < players.size(); ++i)
-		players[i]->update();
+		players[i]->update(dt);
 	/*for(i = 0; i < bots.size(); ++i)
 		bots[i]->update();*/
 

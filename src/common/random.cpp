@@ -31,31 +31,30 @@ float arc()
 	return dist(gen);
 }
 
-template<unsigned int DIM>
-Vector4 point_on_spheric_surface()
+template<typename Vector>
+Vector point_on_spheric_surface()
 {
-    static_assert(DIM > 0 && DIM <= 4, "Dimension does not fit in Vector4");
-
-    struct Proxy {
+	struct Proxy {
 		typedef float* iterator;
-		Proxy(int n) {
-            for(int i = DIM; i < 4; ++i)
-                v[i] = 0.0;
+
+		Proxy(size_t n) {
+			assert(n == Vector::size);
 		}
 
 		float* begin() {
-			return v.getVertex();
-		}
-		float* end() {
-			return v.getVertex() + DIM;
+			return v.data();
 		}
 
-		Vector4 v;
+		float* end() {
+			return v.data() + Vector::size;
+		}
+
+		Vector v;
 	};
 
-    static boost::variate_generator<Generator*, boost::uniform_on_sphere<float, Proxy> > dist(&gen, boost::uniform_on_sphere<float, Proxy>(DIM));
+	static boost::variate_generator<Generator*, boost::uniform_on_sphere<float, Proxy> > dist(&gen, boost::uniform_on_sphere<float, Proxy>(Vector::size));
 
-    return dist().v;
+	return dist().v;
 }
 
 float normalDistribution(float mean, float std_dev)
@@ -65,7 +64,7 @@ float normalDistribution(float mean, float std_dev)
 	return dist(gen);
 }
 
-Vector4 (* const direction)() = point_on_spheric_surface<3>;
-Vector4 (* const point)() = point_on_spheric_surface<4>;
+Vector3 (* const direction)() = point_on_spheric_surface<Vector3>;
+Vector4 (* const point)() = point_on_spheric_surface<Vector4>;
 
 }

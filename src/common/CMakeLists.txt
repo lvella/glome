@@ -61,8 +61,6 @@ add_library(common STATIC
 	projectile.hpp
 	random.cpp
 	random.hpp
-	randomcube.cpp
-	randomcube.hpp
 	renderer.cpp
 	renderer.hpp
 	shader.cpp

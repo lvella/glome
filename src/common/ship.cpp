@@ -120,7 +120,7 @@ Ship::draw(Camera& c)
 }
 
 void
-Ship::update()
+Ship::update(float dt)
 {
 	#ifdef STATS_TUNING
 	static float curr_scale = 1.0;
@@ -135,21 +135,22 @@ Ship::update()
 		float h = ctrl->h_tilt - ctrl->h_req;
 		float v = ctrl->v_tilt - ctrl->v_req;
 
-		/* Limit the turning speed to MAXD rads per frame. */
-		if(h > stats->max_rot_per_frame)
-			h = stats->max_rot_per_frame;
-		else if(h < -stats->max_rot_per_frame)
-			h = -stats->max_rot_per_frame;
-		if(v > stats->max_rot_per_frame)
-			v = stats->max_rot_per_frame;
-		else if(v < -stats->max_rot_per_frame)
-			v = -stats->max_rot_per_frame;
+		/* Limit the turning speed to max rads per second. */
+		float max_rot = dt * stats->max_rot_per_second;
+		if(h > max_rot)
+			h = max_rot;
+		else if(h < -max_rot)
+			h = -max_rot;
+		if(v > max_rot)
+			v = max_rot;
+		else if(v < -max_rot)
+			v = -max_rot;
 
 		ctrl->h_tilt -= h;
 		ctrl->v_tilt -= v;
 
 		float old_speed = ctrl->speed;
-		ctrl->speed += ctrl->accel;
+		ctrl->speed += dt * ctrl->accel;
 		if(ctrl->speed > 0.0f) {
 			ctrl->speed = 0.0f;
 			rel_speed = 0.0f;
@@ -162,32 +163,35 @@ Ship::update()
 
 		/* Shooting */
 		if(ctrl->heat > 0)
-			ctrl->heat -= stats->canon_cooldown_rate; // Cooldown rate
+			ctrl->heat -= dt * stats->canon_cooldown_rate; // Cooldown rate
 
-		int sps = (stats->max_fire_rate * 100 - ctrl->heat) / 100; // Firerate at maximum
+		float sps = stats->max_fire_rate - ctrl->heat; // Current firerate
 
-		ctrl->shot_count -= sps;
-		if(ctrl->shot_count < 0)
+		ctrl->shot_countdown -= dt * sps;
+		if(ctrl->shot_countdown < 0)
 		{
 			if(ctrl->shot)
 			{
-				//TODO: Put shots collision elsewhere, rather than the ship_controller
-				Projectile::shot(ctrl, _t * (ctrl->canon_shot_last ? l_canon : r_canon), stats->shot_speed - ctrl->speed);
-				ctrl->shot_count += 60;
+				Projectile::shot(ctrl,
+					_t * (ctrl->canon_shot_last ? l_canon : r_canon),
+					stats->shot_speed - ctrl->speed
+				);
+
+				ctrl->shot_countdown += 60;
 				ctrl->heat += stats->shot_power; // Shot heat, could be equivalent to damage
 				ctrl->canon_shot_last = !ctrl->canon_shot_last;
 			}
 			else
-				ctrl->shot_count = 0;
+				ctrl->shot_countdown = 0;
 		}
 
-		_t = _t * zw_matrix(ctrl->speed) * yw_matrix(ctrl->speed_v) * xw_matrix(ctrl->speed_h)
-			 * xy_matrix(ctrl->speed_s) * yz_matrix(ctrl->v_tilt)
-			 * rotation(-ctrl->h_tilt, 0.0, math::sqrt2 / 2.0, math::sqrt2 / 2.0);
+		_t = _t * zw_matrix(dt * ctrl->speed) * yw_matrix(dt * ctrl->speed_v) * xw_matrix(dt * ctrl->speed_h)
+			 * xy_matrix(dt * ctrl->speed_s) * yz_matrix(dt * ctrl->v_tilt)
+			 * rotation(-dt * ctrl->h_tilt, 0.0, math::sqrt1_2, math::sqrt1_2);
 
 
 		fx_engine.setIntensity(std::max(0.0f, rel_speed));
 	}
-	fx_engine.update();
+	fx_engine.update(dt);
 
 }

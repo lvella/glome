@@ -9,7 +9,7 @@ namespace Game
 	enum state {EXIT, MENU, WORLD};
 
 	/** Process and renders a game frame. */
-	void frame(std::chrono::duration<float> dt);
+	void frame(std::chrono::duration<float> frame_time);
 
 	void initialize();
 	void shutdown();

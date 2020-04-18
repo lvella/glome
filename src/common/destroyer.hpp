@@ -2,14 +2,13 @@
 
 #include "ship.hpp"
 
-class Destroyer: public Ship
+class Destroyer final: public Ship
 {
 public:
 	Destroyer();
-	virtual ~Destroyer();
 
-	virtual void draw(Camera &c);
-	virtual void update();
+	void draw(Camera &c) override;
+	void update(float dt) override;
 
 private:
 	Fire other_jet;

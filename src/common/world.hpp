@@ -12,12 +12,12 @@
 class World: public RunContext
 {
 public:
-	virtual ~World() {};
+	virtual ~World() = default;
 
-	void setup_display() { _render->setup_display(); }
-
-	virtual void draw() = 0;
-	virtual void update() = 0;
+	void setup_display() override
+	{
+		_render->setup_display();
+	}
 
 protected:
 	Octree::Hypercube collision_tree;

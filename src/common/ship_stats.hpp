@@ -18,7 +18,7 @@ struct STATS_PACKING ShipStats {
 
 	STATS_VOLATILE float scale;
 
-	STATS_VOLATILE float max_rot_per_frame; /* Maximum turning delta per frame */
+	STATS_VOLATILE float max_rot_per_second; /* Maximum turning delta per second */
 	STATS_VOLATILE float max_speed_forward;
 	STATS_VOLATILE float max_accel_forward;
 	STATS_VOLATILE float max_speed_vertical;
@@ -26,7 +26,7 @@ struct STATS_PACKING ShipStats {
 	STATS_VOLATILE float max_speed_spin;
 
 	STATS_VOLATILE float shot_speed; /* Speed of shot relative to the ship */
+	STATS_VOLATILE float canon_cooldown_rate; /* Heat cooldown per frame */
+	STATS_VOLATILE float max_fire_rate; /* Shots per second when cold */
 	STATS_VOLATILE int shot_power; /* Damage done and heat generated */
-	STATS_VOLATILE int canon_cooldown_rate; /* Heat cooldown per frame */
-	STATS_VOLATILE int max_fire_rate; /* Shots per second when cold */
 };

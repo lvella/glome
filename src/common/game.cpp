@@ -16,24 +16,27 @@ namespace Game
 RunContext* context;
 
 
-class Paused: public RunContext {
-	void setup_display() {
-	}
+class Paused final: public RunContext {
+	void setup_display() override
+	{}
 
-	void draw() {
-	}
+	void draw() override
+	{}
 
-	void update() {
-	}
+	void update(float) override
+	{}
 };
 
 static std::unique_ptr<World> world;
 static std::unique_ptr<Paused> paused;
 
 void
-frame(std::chrono::duration<float> dt)
+frame(std::chrono::duration<float> frame_time)
 {
-	context->update();
+	constexpr float max_physics_dt = 1.0 / 60.0;
+	const float dt = std::min(max_physics_dt, frame_time.count());
+
+	context->update(dt);
 	context->draw();
 }
 

@@ -48,9 +48,9 @@ private:
 	friend class Ship;
 
 	/** Shot */
-	int shot_count;
+	float shot_countdown;
+	float heat;
 	bool canon_shot_last;
-	int heat;
 	bool shot;
 
 	/** Movement */

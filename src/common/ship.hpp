@@ -13,9 +13,10 @@ class Ship : public Updatable, public Glome::Drawable
 {
 public:
 	Ship(Mesh::Types type, ShipStats::shared_ptr sstats);
-	virtual ~Ship() {};
-	virtual void draw(Camera& c);
-	virtual void update();
+	~Ship() = default;
+
+	virtual void draw(Camera& c) override;
+	virtual void update(float dt) override;
 	void load_guns(Mesh::Types type); //TODO: This method is similar to load_engines, change it!
 	void load_engines(Mesh::Types type);
 	void set_controller(ShipController* pctrl);

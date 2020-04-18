@@ -14,9 +14,7 @@ public:
 	    bots(std::move(bp)),
 	    ai_controllers(std::move(ai))
 	    {}
-	virtual ~Controller() {};
-
-	virtual void update() = 0;
+	virtual ~Controller() = default;
 
 protected:
 	std::vector<Ship*> players;

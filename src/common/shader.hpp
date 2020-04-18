@@ -30,12 +30,12 @@ public:
 
 	void set(const Vector2 &val) const
 	{
-		glUniform2fv(id, 1, val.getVertex());
+		glUniform2fv(id, 1, val.data());
 	}
 
 	void set(const Vector4 &val) const
 	{
-		glUniform4fv(id, 1, val.getVertex());
+		glUniform4fv(id, 1, val.data());
 	}
 
 	void set(const Matrix4 &val) const

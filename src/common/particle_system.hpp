@@ -4,8 +4,6 @@
 #include "shader.hpp"
 #include "object.hpp"
 #include "gl.hpp"
-#include "drawable.hpp"
-#include "updatable.hpp"
 #include "matrix4.hpp"
 
 /*** PARTICLE SYSTEM ***/
@@ -34,11 +32,11 @@ MMMMMMMMMMMMMMMMMMMMM: ..  .  .    ..MMMMMMMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMMMMM. ~..      7. =MMMMMMMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMMMMM7..~.   :.   .MMMMMMMMMMMMMMMMMMMMMMMM*/
 
-class ParticleSystem : public Updatable, public Glome::Drawable
+class ParticleSystem
 {
 public:
 	ParticleSystem(int np);
-	virtual	~ParticleSystem() = 0;
+	virtual ~ParticleSystem();
 	void depthSort(const Matrix4 &t);
 
 	static void initialize();
@@ -57,7 +55,7 @@ protected:
 	{
 		Vector4 position;
 		Vector4 color;
-		float radius; /* Radius, in radians */
+		float radius; /* in radians */
 	};
 
 	// Logical attributes not used directly in rendering

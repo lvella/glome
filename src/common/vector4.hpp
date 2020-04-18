@@ -11,6 +11,8 @@ class Vector3;
 class Vector4
 {
 public:
+	static constexpr size_t size = 4;
+
 	static const Vector4 ORIGIN;
     static const Vector4 UP;
     static const Vector4 FRONT;
@@ -90,8 +92,8 @@ public:
 		return sqrt(squared_length());
 	}
 
-	const float* getVertex() const {return v;}
-	float* getVertex() {return v;}
+	const float* data() const {return v;}
+	float* data() {return v;}
 
 	/** Function for writing to a stream. */
 	friend std::ostream& operator<<(std::ostream& o, const Vector4& v);

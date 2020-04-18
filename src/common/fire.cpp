@@ -34,7 +34,7 @@ Fire::Fire(float radius):
 		rattrs[i].radius = radius;
 		oattrs[i].active = false;
 	}
-	update();
+	update(0);
 }
 
 void Fire::initialize()
@@ -72,15 +72,15 @@ void Fire::setIntensity(float i)
 		return;
 
 	intensity = i;
-	velocity = zw_matrix(i * scale_radius * 0.4);
 	origin_radius = scale_radius * 0.8f + i * scale_radius * 0.3f;
 	target_count = 15 + i * (count - 15);
 }
 
-void Fire::update()
+void Fire::update(float dt)
 {
 	int new_count = actives_count;
 
+	auto velocity = zw_matrix(intensity * scale_radius * dt * 24.0);
 	for(int i = 0; i < count; ++i) {
 		OfflineAttributes &oattr = oattrs[i];
 
@@ -150,3 +150,5 @@ void Fire::draw(Camera& c)
 	glDisable(GL_TEXTURE_2D);
 }
 
+void Fire::minimap_draw(Camera& c)
+{}

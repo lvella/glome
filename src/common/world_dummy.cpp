@@ -46,7 +46,6 @@ WorldDummy::WorldDummy():
 	_ctrl = new ControllerLocal(vector<Ship*>(ships), std::move(bot), vector<AiController*>(ai_controls));
 
 	objects.push_back(&nova);
-	objects.push_back(&cube);
 
 	dynamic_objects.push_back(&nova);
 
@@ -84,14 +83,14 @@ WorldDummy::~WorldDummy()
 }
 
 void
-WorldDummy::update()
+WorldDummy::update(const float dt)
 {
 	profiler.maybe_print();
 
 	{
 		static TimeAccumulator& control_ta = profiler.newTimer("Parse input");
 		TimeGuard timer(control_ta);
-		_ctrl->update();
+		_ctrl->update(dt);
 	}
 
 	{
@@ -109,7 +108,7 @@ WorldDummy::update()
 					);
 
 					for(size_t j = i; j < max; ++j) {
-						dynamic_objects[j]->update();
+						dynamic_objects[j]->update(dt);
 					}
 				});
 			}

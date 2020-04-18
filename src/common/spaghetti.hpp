@@ -5,7 +5,7 @@
 #include "vol_sphere.hpp"
 #include "audio_source.hpp"
 
-class Spaghetti:
+class Spaghetti final:
   public Updatable,
   public Glome::Drawable,
   public Audio::Source,
@@ -15,10 +15,10 @@ public:
   Spaghetti(Audio::World &audio_world);
   Spaghetti(Spaghetti&& other) = default;
 
-  virtual ~Spaghetti();
+  ~Spaghetti();
 
   void draw(Camera& s) override;
-  void update() override;
+  void update(float dt) override;
 
   void collided_with(const VolSphere& other, float) override
   {
@@ -36,7 +36,9 @@ private:
     Vector4 color;
   };
 
-  Matrix4 velo;
+  Vector3 rot_axis;
+  float angular_speed;
+  float speed;
   GLuint vbo;
   GLsizei count;
 };

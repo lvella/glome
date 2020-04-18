@@ -6,15 +6,15 @@
 #include "mesh.hpp"
 
 // Supernova that expands and eats the whole world!
-class Supernova: public Glome::Drawable, public Updatable
+class Supernova final: public Glome::Drawable, public Updatable
 {
 public:
 	Supernova();
-	virtual ~Supernova();
+	~Supernova();
 
-	void update();
-	void draw(Camera &c);
-	void minimap_draw(Camera &c);
+	void update(float dt) override;
+	void draw(Camera &c) override;
+	void minimap_draw(Camera &c) override;
 
 private:
 	Vector2 slerp;

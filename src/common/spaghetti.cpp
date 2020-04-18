@@ -140,14 +140,10 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]), &vertices[0], GL_STATIC_DRAW);
 	}
 
-	// Define rotation direction
-	Vector4 dir3d = Random::direction();
-	velo = rotation(Random::normalDistribution(0.0, 0.02), dir3d[0], dir3d[1], dir3d[2]);
-
-	// Define translation speed
-	// TODO: understando this stuff better and improve it...
-	float speed = Random::normalDistribution(0.0008, 0.0004);
-	velo = velo * zw_matrix(speed);
+	// Define movement parameters
+	rot_axis = Random::direction();
+	angular_speed = Random::normalDistribution(0.0, 1.2);
+	float speed = Random::normalDistribution(0.048, 0.024);
 
 	// Define starting position
 	_t = xy_matrix(Random::arc())
@@ -174,8 +170,8 @@ void Spaghetti::draw(Camera& c)
 	c.pushMultMat(_t);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnableVertexAttribArray(s.colorAttr());
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnableVertexAttribArray(s.colorAttr());
 
 	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*) offsetof(Vertex, pos));
 	glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*) offsetof(Vertex, color));
@@ -185,6 +181,11 @@ void Spaghetti::draw(Camera& c)
 	c.popMat();
 }
 
-void Spaghetti::update() {
-  _t = _t * velo;
+void Spaghetti::update(float dt) {
+	Matrix4 velo = rotation(
+		dt * angular_speed,
+		rot_axis.x, rot_axis.y, rot_axis.z
+	) * zw_matrix(dt * speed);
+
+	_t = _t * velo;
 }

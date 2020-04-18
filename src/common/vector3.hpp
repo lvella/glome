@@ -5,6 +5,8 @@
 class Vector3
 {
 public:
+	static constexpr size_t size = 3;
+
 	Vector3()
 	{}
 
@@ -78,7 +80,8 @@ public:
 		return Vector4(2.0f*x/d, 2.0f*y/d, 2.0f*z/d, (x*x + y*y + z*z - 1.0f) / d);
 	}
 
-	const float* getVertex() const {return v;}
+	const float* data() const {return v;}
+	float* data() {return v;}
 
 	// STL-like interface
 	typedef float* iterator;
