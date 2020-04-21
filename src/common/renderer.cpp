@@ -53,7 +53,7 @@ Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)
 	}
 
 	// Set non-changing camera perspective
-	camera.setProjection(perspective(FOV, float(w) / float(h), 0.001f, 5.0f));
+	camera.setProjection(perspective(FOV, float(w) / float(h), 0.007f, 5.0f));
 	Fire::set_width(w);
 }
 
