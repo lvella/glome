@@ -12,8 +12,8 @@ varying float fog_coord;
 void main()
 {
   vec4 tmp = transform * position;
-  
-  // Ortographic projection to 3-D
+
+  // Stereographic projection to 3-D
   tmp.xyz = tmp.xyz / (1.0 - tmp.w);
   tmp.w = 1.0;
 
