@@ -34,7 +34,7 @@ void main()
   vec3 dfront = front.xyz - origin.xyz;
   vec3 dside = cross(dfront, origin.xyz);
   vec3 dup;
-  
+
   float vec_len = length(dside);
   // Due some empirical testing, this is satisfactory...
   if(vec_len > 0.000000001) {
@@ -55,7 +55,7 @@ void main()
 
   origin.xyz += dfront + dside + dup;
   gl_Position = projection * origin;
-  fog_coord = gl_Position.z;
+  fog_coord = gl_Position.w;
 
   v_texcoord = (position.xy + 1.0) * 0.5;
   v_color = color;

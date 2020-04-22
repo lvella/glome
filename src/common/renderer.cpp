@@ -53,7 +53,7 @@ Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)
 	}
 
 	// Set non-changing camera perspective
-	camera.setProjection(perspective(FOV, float(w) / float(h), 0.007f, 5.0f));
+	camera.setProjection(perspective(FOV, float(w) / float(h), 0.007f, 1.7f));
 	Fire::set_width(w);
 }
 
@@ -77,7 +77,7 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
 		}
 
 		Projectile::draw_many(sorted_projs, camera);
-		DustField::draw(camera, active->cam_hist.front());
+		//DustField::draw(camera, active->cam_hist.front());
 
 		MiniMap::draw(active->_x, active->_y, this, active->t->transformation().transpose(), objs);
 	}
