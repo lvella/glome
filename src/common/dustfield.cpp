@@ -23,9 +23,9 @@ struct Star
 
 const size_t DUST_SIZE = 200000;
 
-GLuint vbo;
-CamShader program;
-Uniform old_transform;
+static GLuint vbo;
+static CamShader program;
+static Uniform old_transform;
 
 /** Each star is drawn as a line. If the ship is stopped,
  * the both ends of the line are in the same point.

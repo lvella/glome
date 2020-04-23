@@ -75,7 +75,7 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
 		}
 
 		Projectile::draw_many(sorted_projs, camera);
-		//DustField::draw(camera, active->cam_hist.front());
+		DustField::draw(camera, active->cam_hist.front());
 
 		MiniMap::draw(active->_x, active->_y, this, active->t->transformation().transpose(), objs);
 	}
