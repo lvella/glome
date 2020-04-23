@@ -106,7 +106,7 @@ class CamShader final: public SpaceShader
 public:
 	static constexpr float FOV_Y = math::pi / 4.0f;
 	static constexpr float Z_NEAR = 0.007f;
-	static constexpr float Z_FAR = 1.7f;
+	static constexpr float Z_FAR = 2.1f;
 
 	static void initialize(float aspect_ratio);
 	static const Matrix4& getProjection()
