@@ -1,10 +1,11 @@
-#include <iostream>
-
 #include "shader.hpp"
-#include <string.h>
+
+#include <iostream>
 #include <string>
-#include <stdio.h>
-#include <errno.h>
+#include <cstring>
+#include <cstdio>
+#include <cerrno>
+
 #include "config.hpp"
 
 using namespace std;
@@ -36,7 +37,6 @@ Shader::~Shader()
 void Shader::setup_shader(const char *sources[])
 {
 	char *ptr;
-	char err[10000];
 	const char **iter;
 	const char *name;
 	int ret;
@@ -91,6 +91,7 @@ void Shader::setup_shader(const char *sources[])
 			glCompileShader(shader);
 			{
 				GLsizei length;
+				char err[10000];
 				glGetShaderInfoLog(shader, 10000, &length, err);
 				if(length)
 					cout << "Shader "<<name<<" compilation log:\n" << err << endl;
@@ -112,6 +113,7 @@ void Shader::setup_shader(const char *sources[])
 	glLinkProgram(prog);
 	{
 		GLsizei length;
+		char err[10000];
 		glGetProgramInfoLog(prog, 10000, &length, err);
 		if(length) {
 			cout << "Linkage log of [" << *sources;
