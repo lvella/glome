@@ -52,8 +52,6 @@ Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)
 		players.emplace_back(pp[i], (i%2) * w, height - (i/2 + 1) * h, w, h, audio_world);
 	}
 
-	// Set non-changing camera perspective
-	camera.setProjection(perspective(FOV, float(w) / float(h), 0.007f, 1.7f));
 	Fire::set_width(w);
 }
 

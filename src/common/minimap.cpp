@@ -14,11 +14,8 @@
 #include "textures.hpp"
 #include "minimap.hpp"
 
-using namespace std;
-using namespace Options;
-
 static Camera camera;
-static CamShader map_projection;
+static SpaceShader map_projection;
 
 static Shader hud;
 
@@ -84,6 +81,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center, std
 	glBindTexture(GL_TEXTURE_2D, tex_object);
 	rend->fill_minimap(objs, camera);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	camera.popShader();
 }
 
 void
@@ -99,7 +97,8 @@ MiniMap::initialize()
 		const float cx = 0.0f;
 		const float cy = 0.0f;
 
-		const float dx = 0.5f * width * sinf(FOV) / height;
+		const float dx = 0.5f * Options::width * sinf(CamShader::FOV_Y)
+			/ Options::height;
 
 		const float ppx0 = cx - dx;
 		const float ppy = cy + cosf(asinf(dx));

@@ -1,5 +1,5 @@
 varying float fog_coord;
-const float zFar = 1.7;
+uniform float zFar;
 
 void mix_fog(inout vec4 color)
 {

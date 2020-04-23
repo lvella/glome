@@ -49,7 +49,7 @@ void initialize()
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBufferData(GL_ARRAY_BUFFER, dust.size() * sizeof(Star), &dust[0], GL_STATIC_DRAW);
 
-	const char* src[] = {"dustfield.vert", "world.frag", "no_texture.frag", "dustfield_fog.frag", NULL};
+	const char* src[] = {"dustfield.vert", "world.frag", "no_texture.frag", "fog.frag", NULL};
 	program.setup_shader(src);
 	attrib_endpoint = glGetAttribLocation(program.program(), "endpoint");
 

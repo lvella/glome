@@ -4,8 +4,6 @@
 #include <cstdio>
 #include <getopt.h>
 
-#include "math.hpp"
-
 using namespace std;
 
 namespace Options
@@ -23,7 +21,6 @@ DEBUG_OPT bool showBotScreen = false;
 // TODO: numLocalPlayers...
 
 // Video options
-const float FOV = math::pi / 4.0f;
 bool fullscreen = false;
 int width = 800;
 int height = 600;

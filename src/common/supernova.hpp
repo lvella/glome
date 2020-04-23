@@ -29,6 +29,6 @@ private:
 	Uniform center;
 
 	Mesh* map_mesh;
-	CamShader map_shader;
+	SpaceShader map_shader;
 	Uniform map_slerp_arc;
 };

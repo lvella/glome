@@ -7,16 +7,6 @@ Camera::Camera()
 	reset(Matrix4::IDENTITY);
 }
 
-void Camera::setProjection(const Matrix4& p)
-{
-	PROJ_MAT = p;
-}
-
-const Matrix4& Camera::getProjection()
-{
-	return PROJ_MAT;
-}
-
 void Camera::reset(const Matrix4& invCam)
 {
 	mat_stack.resize(1);
@@ -39,11 +29,10 @@ void Camera::popMat()
 	//shader_stack.back()->setTransform(mat_stack.back());
 }
 
-void Camera::pushShader(const CamShader *s)
+void Camera::pushShader(const SpaceShader *s)
 {
 	shader_stack.push_back(s);
 	s->enable();
-	s->setProjection(Camera::PROJ_MAT);
 	s->setTransform(mat_stack.back());
 }
 
@@ -55,9 +44,7 @@ void Camera::popShader()
 	}
 }
 
-const Shader* Camera::getShader() const
+const SpaceShader* Camera::getShader() const
 {
 	return shader_stack.back();
 }
-
-Matrix4 Camera::PROJ_MAT;

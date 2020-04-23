@@ -19,19 +19,9 @@ struct ltstr
 };
 static std::map<const char*, GLuint, ltstr> loaded_shaders;
 
-Shader::Shader():
-	prog(0)
-{}
-
 Shader::Shader(const char *sources[])
 {
 	setup_shader(sources);
-}
-
-Shader::~Shader()
-{
-	if(prog)
-		glDeleteProgram(prog);
 }
 
 void Shader::setup_shader(const char *sources[])
@@ -123,18 +113,50 @@ void Shader::setup_shader(const char *sources[])
 		}
 	}
 
-	transform = getUniform("transform");
 	attr_color = glGetAttribLocation(prog, "color");
 	attr_texcoord = glGetAttribLocation(prog, "texcoord");
 }
 
-void CamShader::setup_shader(const char *sources[])
+Shader::~Shader()
 {
-	Shader::setup_shader(sources);
-	projection = getUniform("projection");
+	glDeleteProgram(prog);
 }
 
-void CamShader::setProjection(const Matrix4& proj) const
-{
-	projection.set(proj);
+Uniform Shader::getUniform(const char *name) const {
+	GLint ret = glGetUniformLocation(prog, name);
+	assert(ret != -1);
+	if(ret == -1) {
+		std::cerr << "Could not retrieve \"" << name
+			<< "\" uniform: " << glGetError() << std::endl;
+	}
+	return Uniform{ret};
 }
+
+void SpaceShader::setup_shader(const char *sources[])
+{
+	Shader::setup_shader(sources);
+	transform = getUniform("transform");
+}
+
+void CamShader::initialize(float aspect_ratio)
+{
+	proj_mat = perspective(FOV_Y, aspect_ratio, Z_NEAR, Z_FAR);
+	initialized = true;
+}
+
+void CamShader::setup_shader(const char *sources[])
+{
+	SpaceShader::setup_shader(sources);
+
+	assert(initialized);
+
+	// Must be enabled in order to set values.
+	enable();
+
+	// Set immutable uniforms.
+	getUniform("projection").set(proj_mat);
+	getUniform("zFar").set(Z_FAR);
+}
+
+Matrix4 CamShader::proj_mat;
+bool CamShader::initialized = false;

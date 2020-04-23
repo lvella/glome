@@ -11,9 +11,6 @@
 #include "dustfield.hpp"
 #include "audio.hpp"
 
-using namespace std;
-using namespace Options;
-
 namespace Game
 {
 RunContext* context;
@@ -50,9 +47,13 @@ initialize()
 
 	glEnable(GL_CULL_FACE);
 
-	Audio::initialize();
-
+	// Must be the first to initialize, so shaders
+	// can be created with the correct perspective
+	// matrix.
+	CamShader::initialize(float(Options::width) / float(Options::height));
 	Renderer::initialize();
+
+	Audio::initialize();
 
 	world.reset(new WorldDummy());
 	paused.reset(new Paused());

@@ -30,12 +30,13 @@ ParticleSystem::~ParticleSystem()
 
 void ParticleSystem::depthSort(const Matrix4 &t)
 {
-	const Matrix4& proj = Camera::getProjection();
+	const Matrix4& proj = CamShader::getProjection();
 
 	for(int i = 0; i < count; ++i) {
 		if(oattrs[i].active) {
-			// I like to believe the compiler will optimize the stuff bellow and only
-			// perform the needed computation, like with lazy evaluation.
+			// I like to believe the compiler will optimize the
+			// stuff bellow and only perform the needed
+			// computation, like with lazy evaluation.
 			oattrs[i].cam_dist = (proj * (t * rattrs[i].position).stereo_proj()).z;
 		}
 	}

@@ -16,7 +16,6 @@ extern DEBUG_OPT int numBots;
 extern DEBUG_OPT bool showBotScreen;
 
 // Video options
-extern const float FOV;
 extern bool fullscreen;
 extern int width;
 extern int height;
