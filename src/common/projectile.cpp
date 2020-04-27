@@ -30,6 +30,7 @@ void Projectile::initialize()
 	    "projectile.vert",
 	    "world.frag",
 	    "texture.frag",
+	    "world_fog.frag",
 	    "fog.frag",
 	    NULL
 	};

@@ -24,6 +24,6 @@ void main()
   tmp.w = 1.0;
 
   gl_Position = projection * tmp;
-  fog_coord = gl_Position.z * 8.0;
+  fog_coord = gl_Position.w * 6.0;
   v_color = vec4(1.0, 1.0, 1.0, 1.0);
 }

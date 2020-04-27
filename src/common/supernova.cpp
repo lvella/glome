@@ -12,7 +12,7 @@ Supernova::Supernova():
 	// TODO: initialize this stuff only once
 	bg_noise = create_noise_texture(800, 600, 1.0f / 50.0f, Vector2(Random::arc(), Random::arc()) * 20.0f);
 
-	const char *source[] = {"supernova.vert", "supernova.frag", "fog.frag", "noise3D.frag", NULL};
+	const char *source[] = {"supernova.vert", "supernova.frag", "world_fog.frag", "fog.frag", "noise3D.frag", NULL};
 	shader.setup_shader(source);
 	slerp_arc = shader.getUniform("slerp_arc");
 	center = shader.getUniform("center");
