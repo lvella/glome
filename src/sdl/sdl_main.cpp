@@ -108,7 +108,9 @@ static void main_loop()
 {
 	using Timer = std::chrono::steady_clock;
 
-	const int FPS = 60;
+	constexpr unsigned FIXED_FPS = 60;
+	static_assert(FIXED_FPS > Game::MIN_FPS);
+
 	uint64_t frame_count = 0;
 	bool running = true;
 
@@ -121,10 +123,13 @@ static void main_loop()
 		Game::frame(curr_time - prev_time);
 		SDL_GL_SwapWindow(window);
 
-		// Fix framerate at FPS
+		// Fix framerate at FIXED_FPS
 		if(!v_sync_enabled) {
 			// TODO: maybe clk_div is useful here...
-			constexpr std::chrono::duration<unsigned, std::ratio<1, FPS>> period(1);
+			constexpr std::chrono::duration<unsigned,
+				std::ratio<1, FIXED_FPS>
+			> period(1);
+
 			auto after_frame = std::chrono::steady_clock::now();
 
 			auto delay = period - (after_frame - curr_time);

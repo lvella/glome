@@ -13,7 +13,7 @@ public:
 	static void shot(ShipController *s, const Matrix4& from, float speed);
 	static void draw_many(const std::vector<Projectile*>& shots, Camera& cam);
 	static void draw_in_minimap();
-	static void update_all();
+	static void update_all(float dt);
 	static std::vector<VolSphere*> get_collision_volumes();
 	static std::vector<Projectile*> cull_sort_from_camera(const Camera& cam);
 
@@ -25,7 +25,7 @@ public:
 private:
 	Projectile(ShipController *s, const Matrix4& from, float speed);
 	void draw(Camera& cam);
-	void update();
+	void update(float dt);
 	inline bool is_dead() const
 	{
 		// Maximum Time To Live
@@ -37,11 +37,11 @@ private:
 		ttl = max_ttl;
 	}
 
-	Matrix4 ds;
 	ShipController *owner;
-	unsigned short ttl;
-	unsigned short max_ttl;
-	unsigned short max_ttl_2;
+	float speed;
+	float ttl;
+	float max_ttl;
+	float max_ttl_2;
 	unsigned char alpha;
 
 	typedef std::list<Projectile> SList;

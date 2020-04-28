@@ -5,6 +5,7 @@
 
 namespace Game
 {
+	constexpr unsigned MIN_FPS = 50;
 	extern RunContext* context;
 	enum state {EXIT, MENU, WORLD};
 

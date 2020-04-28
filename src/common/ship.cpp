@@ -162,27 +162,34 @@ Ship::update(float dt)
 		}
 
 		/* Shooting */
-		if(ctrl->heat > 0)
-			ctrl->heat -= dt * stats->canon_cooldown_rate; // Cooldown rate
+		ctrl->heat = std::max(0.0f, ctrl->heat - dt * stats->canon_cooldown_rate);
 
-		float sps = stats->max_fire_rate - ctrl->heat; // Current firerate
+		if(ctrl->shot_countdown > 0.0) {
+			ctrl->shot_countdown -= dt;
+		}
 
-		ctrl->shot_countdown -= dt * sps;
-		if(ctrl->shot_countdown < 0)
+		if(ctrl->shot_countdown <= 0.0f)
 		{
-			if(ctrl->shot)
+			if(ctrl->shot && ctrl->heat < stats->max_heat)
 			{
+				const float speed = stats->shot_speed - ctrl->speed;
+
+				// Adjust bullet position w.r.t. the exact time the bullet
+				// should have been shot, but compensate to the first update,
+				// bringing the bullet closer to the canon:
+				const float offset = speed * (ctrl->shot_countdown + dt);
+
 				Projectile::shot(ctrl,
-					_t * (ctrl->canon_shot_last ? l_canon : r_canon),
-					stats->shot_speed - ctrl->speed
+					_t * (ctrl->canon_shot_last ? l_canon : r_canon)
+					* zw_matrix(offset), speed
 				);
 
-				ctrl->shot_countdown += 60;
+				ctrl->shot_countdown += stats->canon_fire_interval;
 				ctrl->heat += stats->shot_power; // Shot heat, could be equivalent to damage
 				ctrl->canon_shot_last = !ctrl->canon_shot_last;
 			}
 			else
-				ctrl->shot_countdown = 0;
+				ctrl->shot_countdown = 0.0;
 		}
 
 		_t = _t * zw_matrix(dt * ctrl->speed) * yw_matrix(dt * ctrl->speed_v)

@@ -78,13 +78,13 @@ void Projectile::shot(ShipController * s, const Matrix4 & from, float speed)
 	shots.push_front(Projectile{s, from, speed});
 }
 
-void Projectile::update_all()
+void Projectile::update_all(float dt)
 {
-	shots.remove_if([](Projectile& p) {
+	shots.remove_if([dt](Projectile& p) {
 		if(p.is_dead()) {
 			return true;
 		}
-		p.update();
+		p.update(dt);
 		return false;
 	});
 
@@ -201,8 +201,8 @@ void Projectile::draw_in_minimap()
 Projectile::Projectile(ShipController * s, const Matrix4 & from,
 	float speed):
     Object(from), VolSphere(0.004),
-    ds(zw_matrix(-speed)), owner(s),
-    ttl(0), max_ttl((2 * math::pi - 0.05) / speed),
+    speed(speed), owner(s),
+    ttl(0.0), max_ttl((2 * math::pi - 0.05) / speed),
     max_ttl_2(max_ttl / 2), alpha(255u)
 {
 }
@@ -214,10 +214,11 @@ void Projectile::draw(Camera & c)
 	c.popMat();
 }
 
-void Projectile::update()
+void Projectile::update(float dt)
 {
-	++ttl;
-	alpha = ttl < (max_ttl_2) ? 255u : 255u - (ttl - max_ttl_2) * 200 / max_ttl_2;
+	ttl += dt;
+	alpha = ttl < (max_ttl_2) ?
+		255u : 255u - uint8_t((ttl - max_ttl_2) * 200.0 / max_ttl_2);
 
-	_t = _t * ds;
+	_t = _t * zw_matrix(-speed * dt);
 }

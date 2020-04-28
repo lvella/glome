@@ -18,6 +18,6 @@ ControllerLocal::update(float dt)
 	/*for(i = 0; i < bots.size(); ++i)
 		bots[i]->update();*/
 
-	Projectile::update_all();
+	Projectile::update_all(dt);
 }
 
