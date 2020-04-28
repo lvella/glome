@@ -13,7 +13,10 @@ using namespace Options;
 void
 Renderer::initialize()
 {
-	const char *sources[] = { "world.vert", "world.frag", "world_fog.frag", "no_texture.frag", "fog.frag", NULL };
+	const char *sources[] = {
+		"world.vert", "world.frag", "world_fog.frag",
+		"no_texture.frag", "fog.frag", NULL
+	};
 
 	shader.setup_shader(sources);
 }
@@ -28,8 +31,6 @@ Renderer::setup_display()
 	glAlphaFunc(GL_NOTEQUAL, 0.0f);
 	glViewport(0, 0, width, height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	//TODO: load anti-alias settings from configuration
 }
 
 Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)
