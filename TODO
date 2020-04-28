@@ -8,7 +8,10 @@
 - Fix supernova appearance:
   - you can see briefly see the other side when it is half size (you must not)
     - don't draw the opposite side to fix this
-- Reevaluate usage of GL_LINE_SMOOTH
+- Implemente either one of the antialias:
+  - Multisample;
+  - Line shader trick
+    - https://vitaliburkov.wordpress.com/2016/09/17/simple-and-fast-high-quality-antialiased-lines-with-opengl/
 - Add collision to supernova
   - Kill player when collide, finishing the game
   - Show and register score, then ask to try again
@@ -40,6 +43,7 @@
   - Splash into supernova
   - others?
 - Visual effect of cannon fire when shooting
+- Fix destroyer's double flame positions
 
 == GENERAL IMPROVEMENTS (low priority) ==
 
