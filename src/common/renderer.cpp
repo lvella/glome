@@ -37,9 +37,6 @@ Renderer::setup_display()
 	glLineWidth(1.5f);
 	glEnable(GL_LINE_SMOOTH);
 	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-	glEnable(GL_POLYGON_SMOOTH);
 }
 
 Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)

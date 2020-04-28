@@ -6,10 +6,9 @@
   - At least prevent them from intersecting, change their velocity away from one another
   - How to fit that to current crazy FSM movement?
 - Fix supernova appearance:
-  - you can see the triangles (you must not)
   - you can see briefly see the other side when it is half size (you must not)
     - don't draw the opposite side to fix this
-- Fix projectile appearance (it has a diagonal tear)
+- Reevaluate usage of GL_LINE_SMOOTH
 - Add collision to supernova
   - Kill player when collide, finishing the game
   - Show and register score, then ask to try again
