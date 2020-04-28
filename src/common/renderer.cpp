@@ -29,14 +29,7 @@ Renderer::setup_display()
 	glViewport(0, 0, width, height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	// Things that are not in OpenGL ES:
-	//TODO: use #ifdefs
 	//TODO: load anti-alias settings from configuration
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-	glLineWidth(1.5f);
-	glEnable(GL_LINE_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
 }
 
 Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)

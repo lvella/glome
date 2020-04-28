@@ -47,6 +47,8 @@ initialize()
 
 	glEnable(GL_CULL_FACE);
 
+	glLineWidth(1.5f);
+
 	// Must be the first to initialize, so shaders
 	// can be created with the correct perspective
 	// matrix.

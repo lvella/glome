@@ -34,22 +34,6 @@ static void initialize_SDL()
 		std::cerr << "Unable to initialize SDL: " << SDL_GetError() << std::endl;
 		exit(1);
 	}
-	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-
-	{
-		Uint32 video_flags = SDL_WINDOW_OPENGL;
-		if(Options::fullscreen)
-			video_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
-
-		window = SDL_CreateWindow(
-	        "Glome",
-	        SDL_WINDOWPOS_UNDEFINED,
-    	    SDL_WINDOWPOS_UNDEFINED,
-			Options::width,
-			Options::height,
-			video_flags);
-	}
-	glcontext = SDL_GL_CreateContext(window);
 
 	SDL_ShowCursor(SDL_ENABLE);
 	SDL_JoystickEventState(SDL_ENABLE);
@@ -59,6 +43,26 @@ static void initialize_SDL()
 
 static void initialize_gl_context()
 {
+	//TODO: load anti-alias settings from configuration
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLEBUFFERS, 1);
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+
+	{
+		Uint32 video_flags = SDL_WINDOW_OPENGL;
+		if(Options::fullscreen)
+			video_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+
+		window = SDL_CreateWindow(
+		"Glome",
+		SDL_WINDOWPOS_UNDEFINED,
+		SDL_WINDOWPOS_UNDEFINED,
+			Options::width,
+			Options::height,
+			video_flags);
+	}
+	glcontext = SDL_GL_CreateContext(window);
+
 	// Using GLEW to get the OpenGL functions
 	GLenum err = glewInit();
 	if(err != GLEW_OK) {
@@ -76,6 +80,19 @@ static void initialize_gl_context()
 		std::cerr << msg << std::endl;
 		#endif
 		exit(1);
+	}
+
+	// Enable multisample, if available
+	{
+		int has_multisample;
+		SDL_GL_GetAttribute(SDL_GL_MULTISAMPLEBUFFERS, &has_multisample);
+
+		int sample_size;
+		SDL_GL_GetAttribute(SDL_GL_MULTISAMPLESAMPLES, &sample_size);
+
+		if(has_multisample && sample_size > 1) {
+			glEnable(GL_MULTISAMPLE);
+		}
 	}
 
 	// Enable V-Sync
