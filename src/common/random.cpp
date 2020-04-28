@@ -2,37 +2,33 @@
 
 #include <fstream>
 #include <cstdlib>
+#include <limits>
 #include <random>
-#include <boost/random/mersenne_twister.hpp>
 #include <boost/random/uniform_on_sphere.hpp>
-#include <boost/random/uniform_01.hpp>
-#include <boost/random/uniform_real.hpp>
-#include <boost/random/uniform_smallint.hpp>
 #include <boost/random/variate_generator.hpp>
 
 #include "math.hpp"
 
 namespace Random
 {
-typedef boost::mt19937 Generator;
+typedef std::mt19937 Generator;
 Generator gen((std::random_device())());
 
 int range(int a, int b)
 {
-	boost::variate_generator<Generator*, boost::uniform_smallint<> > dist(&gen, boost::uniform_smallint<>(a, b));
-	return dist();
+	std::uniform_int_distribution<> dist(a, b);
+	return dist(gen);
 }
 
 float zeroToOne()
 {
-	static boost::variate_generator<Generator*, boost::uniform_01<float> > dist(&gen, boost::uniform_01<float>());
-	return dist();
+	return std::generate_canonical<float, std::numeric_limits<float>::digits>(gen);
 }
 
 float arc()
 {
-	static boost::variate_generator<Generator*, boost::uniform_real<float> > dist(&gen, boost::uniform_real<float>(0.0f, 2 * math::pi));
-	return dist();
+	static std::uniform_real_distribution<float> dist(0.0f, 2 * math::pi);
+	return dist(gen);
 }
 
 template<unsigned int DIM>
