@@ -33,12 +33,15 @@ auto ShipStats::get() -> shared_ptr
 
 	ret->scale = 1.0f;
 
-	ret->max_rot_per_second = 1.8;
-	ret->max_speed_forward = 0.09;
-	ret->max_accel_forward = 0.012;
-	ret->max_speed_vertical = 0.024;
-	ret->max_speed_horizontal = 0.024;
-	ret->max_speed_spin = 1.2;
+	ret->rot_factor = 0.6; // rad / s
+	ret->max_accel_rot = 108.0; // rad / s²
+
+	ret->max_speed_forward = 0.09; // rad / s
+	ret->max_accel_forward = 1.44; // rad / s²
+
+	ret->max_speed_vertical = 0.024; // rad / s
+	ret->max_speed_horizontal = 0.024; // rad / s
+	ret->max_speed_spin = 1.2; // rad / s
 
 	ret->shot_speed = 0.02;
 	ret->shot_power = 82;

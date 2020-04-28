@@ -18,9 +18,12 @@ struct STATS_PACKING ShipStats {
 
 	STATS_VOLATILE float scale;
 
-	STATS_VOLATILE float max_rot_per_second; /* Maximum turning delta per second */
+	STATS_VOLATILE float rot_factor;
+	STATS_VOLATILE float max_accel_rot;
+
 	STATS_VOLATILE float max_speed_forward;
 	STATS_VOLATILE float max_accel_forward;
+
 	STATS_VOLATILE float max_speed_vertical;
 	STATS_VOLATILE float max_speed_horizontal;
 	STATS_VOLATILE float max_speed_spin;

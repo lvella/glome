@@ -1,5 +1,6 @@
 #pragma once
 
+#include <iostream>
 #include "ship_stats.hpp"
 
 class Ship;
@@ -11,12 +12,12 @@ public:
 
 	inline void rotate_h(float rx)
 	{
-		h_req = rx / 100.0;
+		h_req = rx * stats->rot_factor;
 	}
 
 	inline void rotate_v(float ry)
 	{
-		v_req = -ry / 100.0;
+		v_req = -ry * stats->rot_factor;
 	}
 
 	inline void move_v(float y)

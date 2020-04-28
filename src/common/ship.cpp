@@ -136,7 +136,7 @@ Ship::update(float dt)
 		float v = ctrl->v_tilt - ctrl->v_req;
 
 		/* Limit the turning speed to max rads per second. */
-		float max_rot = dt * stats->max_rot_per_second;
+		float max_rot = dt * stats->max_accel_rot;
 		if(h > max_rot)
 			h = max_rot;
 		else if(h < -max_rot)
@@ -185,10 +185,10 @@ Ship::update(float dt)
 				ctrl->shot_countdown = 0;
 		}
 
-		_t = _t * zw_matrix(dt * ctrl->speed) * yw_matrix(dt * ctrl->speed_v) * xw_matrix(dt * ctrl->speed_h)
-			 * xy_matrix(dt * ctrl->speed_s) * yz_matrix(dt * ctrl->v_tilt)
-			 * rotation(-dt * ctrl->h_tilt, 0.0, math::sqrt1_2, math::sqrt1_2);
-
+		_t = _t * zw_matrix(dt * ctrl->speed) * yw_matrix(dt * ctrl->speed_v)
+			* xw_matrix(dt * ctrl->speed_h)
+			* xy_matrix(dt * ctrl->speed_s) * yz_matrix(dt * ctrl->v_tilt)
+			* rotation(-dt * ctrl->h_tilt, 0.0, math::sqrt1_2, math::sqrt1_2);
 
 		fx_engine.setIntensity(std::max(0.0f, rel_speed));
 	}
