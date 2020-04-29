@@ -54,7 +54,7 @@ void Supernova::update(float dt)
 	slerp[1] = cosf(size);
 
 	// Spin
-	_t = _t * xy_matrix(slerp[1] * dt * 0.12);
+	_t = _t * xy_matrix(slerp[1] * dt * 0.4);
 }
 
 void Supernova::draw(Camera &c)
