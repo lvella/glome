@@ -145,7 +145,7 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 	angular_speed = Random::normalDistribution(0.0, 1.2);
 	speed = Random::normalDistribution(0.048, 0.024);
 
-	// Define starting position
+	// Define starting position and orientation
 	_t = xy_matrix(Random::arc())
 	  * xz_matrix(Random::arc())
 	  * yz_matrix(Random::arc())
