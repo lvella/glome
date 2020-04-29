@@ -41,10 +41,10 @@ public:
 	}
 
 	Vector4 operator+=(const Vector4& ref)
-  {
+	{
 		(*this) = *this + ref;
 		return *this;
-  }
+	}
 
 	Vector4 operator-(const Vector4& ref) const
 	{
