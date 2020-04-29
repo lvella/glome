@@ -33,7 +33,7 @@ static std::unique_ptr<Paused> paused;
 void
 frame(std::chrono::duration<float> frame_time)
 {
-	constexpr float max_physics_dt = 1.0 / 60.0;
+	constexpr float max_physics_dt = 1.0 / MIN_FPS;
 	const float dt = std::min(max_physics_dt, frame_time.count());
 
 	context->update(dt);
