@@ -13,6 +13,7 @@
   - Show and register score, then ask to try again
     - Take care to make it compatible with VR UI
 - Sort objects when drawing each viewport
+  - Use distance to the nearest surface
 - Kill flying spaghetti monsters
   - When shot
   - When collide with supernova

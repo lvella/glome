@@ -20,6 +20,13 @@ configure_file(src/config.hpp.in src/config.hpp)
 add_subdirectory(src/common)
 add_subdirectory(src/sdl)
 
+include(CheckIPOSupported)
+check_ipo_supported(RESULT HAS_IPO)
+if(HAS_IPO)
+  set_property(TARGET common PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+  set_property(TARGET glome PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
 target_include_directories(common PUBLIC
 	"${PROJECT_BINARY_DIR}/src"
 	"${PROJECT_SOURCE_DIR}/src/sdl"
