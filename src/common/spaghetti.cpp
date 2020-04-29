@@ -143,7 +143,7 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 	// Define movement parameters
 	rot_axis = Random::direction();
 	angular_speed = Random::normalDistribution(0.0, 1.2);
-	float speed = Random::normalDistribution(0.048, 0.024);
+	speed = Random::normalDistribution(0.048, 0.024);
 
 	// Define starting position
 	_t = xy_matrix(Random::arc())
