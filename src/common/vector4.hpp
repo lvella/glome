@@ -14,8 +14,8 @@ public:
 	static constexpr size_t size = 4;
 
 	static const Vector4 ORIGIN;
-    static const Vector4 UP;
-    static const Vector4 FRONT;
+	static const Vector4 UP;
+	static const Vector4 FRONT;
 
 	Vector4()
 	{}
@@ -49,6 +49,25 @@ public:
 	Vector4 operator-(const Vector4& ref) const
 	{
 		return Vector4(x-ref.x, y-ref.y, z-ref.z, w-ref.w);
+	}
+
+	Vector4 operator-() const
+	{
+		return Vector4(-x, -y, -z, -w);
+	}
+
+	/** Quaternion multiplication.
+	 *
+	 * Straight from wikipedia.
+	 */
+	Vector4 operator*(const Vector4& q)
+	{
+		return Vector4(
+			x*q.x - y*q.y - z*q.z - w*q.w,
+			x*q.y + y*q.x + z*q.w - w*q.z,
+			x*q.z - y*q.w + z*q.x + w*q.y,
+			x*q.w + y*q.z - z*q.y + w*q.x
+		);
 	}
 
 	Vector4 operator*(float s) const

@@ -19,6 +19,7 @@ public:
 
 	Renderer(const std::vector<Ship*>& pp, Audio::World &audio_world);
 
+	void update(float dt);
 	void draw(const std::vector<Glome::Drawable*> &objs);
 	void setup_display();
 	void fill_minimap(const std::vector<Glome::Drawable*> &objs, Camera &cam);
@@ -32,7 +33,7 @@ protected:
 			Audio::Listener(&audio_world),
 			t(target), _x(x), _y(y), _w(w), _h(h)
 		{
-			cam_hist.resize(10, cam_offset);
+			cam_hist.push_back({1.0f / 6.0f, cam_offset});
 		}
 
 		void enable()
@@ -42,13 +43,19 @@ protected:
 
 		virtual const Matrix4 &transformation() const override
 		{
-			return cam_hist.front();
+			assert(!cam_hist.empty());
+			return cam_hist.front().t;
 		}
 
-		inline Matrix4 newCameraTransform();
+		void update(float dt);
+
+		struct PathPoint {
+			float dt;
+			Matrix4 t;
+		};
 
 		Ship* t;
-		std::deque<Matrix4> cam_hist;
+		std::deque<PathPoint> cam_hist;
 
 		int _x, _y, _w, _h;
 

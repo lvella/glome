@@ -15,15 +15,14 @@ Vector4::Vector4(const Vector3 &other, float wl)
 	w = wl;
 }
 
-
 std::ostream&
 operator<<(std::ostream& o, const Vector4& v)
 {
-  o << v.v[0];
-  for(size_t j = 1; j < 4; ++j)
-    {
-      o << ", " << v.v[j];
-    }
-  o << '\n';
-  return o;
+	o << v.v[0];
+	for(size_t j = 1; j < 4; ++j)
+	{
+		o << ", " << v.v[j];
+	}
+	o << '\n';
+	return o;
 }

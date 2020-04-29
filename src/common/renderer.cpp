@@ -47,6 +47,14 @@ Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)
 }
 
 void
+Renderer::update(float dt)
+{
+	for(Viewport& v: players) {
+		v.update(dt);
+	}
+}
+
+void
 Renderer::draw(const vector<Glome::Drawable*>& objs)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -54,7 +62,7 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
 	for(active = begin(players); active != end(players); ++active) {
 		active->enable();
 
-		camera.reset(active->newCameraTransform());
+		camera.reset(active->transformation());
 		camera.pushShader(&shader);
 
 		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
@@ -66,7 +74,7 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
 		}
 
 		Projectile::draw_many(sorted_projs, camera);
-		DustField::draw(camera, active->cam_hist.front());
+		DustField::draw(camera, active->transformation());
 
 		MiniMap::draw(active->_x, active->_y, this, active->t->transformation().transpose(), objs);
 	}
@@ -88,21 +96,27 @@ Renderer::audio_update()
 {
 	for(auto &p :players)
 	{
-		p.Audio::Listener::update(p.cam_hist.front());
+		p.Audio::Listener::update(p.transformation());
 	}
 }
 
-inline Matrix4
-Renderer::Viewport::newCameraTransform()
+void
+Renderer::Viewport::update(float dt)
 {
-	Matrix4 ret;
+	cam_hist.push_back({dt, cam_offset * t->transformation().transpose()});
 
-	ret = cam_hist.front();
+	while(cam_hist.front().dt <= dt) {
+		dt -= cam_hist.front().dt;
+		cam_hist.pop_front();
+		assert(cam_hist.size() > 1);
+	}
 
-	cam_hist.pop_front();
-	cam_hist.push_back(cam_offset * t->transformation().transpose());
+	PathPoint& start = cam_hist.front();
+	PathPoint& end = cam_hist[1];
+	float slerp_factor = dt / start.dt; // range [0, 1]
 
-	return ret;
+	start.t = slerp(start.t, end.t, slerp_factor);
+	start.dt -= dt;
 }
 
 CamShader Renderer::shader;

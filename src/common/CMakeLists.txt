@@ -59,6 +59,8 @@ add_library(common STATIC
 	particle_system.hpp
 	projectile.cpp
 	projectile.hpp
+	qrot.cpp
+	qrot.hpp
 	random.cpp
 	random.hpp
 	renderer.cpp

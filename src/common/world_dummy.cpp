@@ -136,6 +136,7 @@ WorldDummy::update(const float dt)
 		TimeGuard timer(audio_ta);
 		_render->audio_update();
 	}
+	_render->update(dt);
 }
 
 void

@@ -1,5 +1,7 @@
-#include "matrix4.hpp"
 #include "math.hpp"
+
+#include "matrix4.hpp"
+#include "qrot.hpp"
 
 Matrix4
 rotation(float angle, float x, float y, float z) {
@@ -120,4 +122,10 @@ cross(const Vector4 &a, const Vector4 &b, const Vector4 &c)
 		+ c.x * a.y * b.z - a.x * c.y * b.z
 		- b.x * a.y * c.z + a.x * b.y * c.z
 	);
+}
+
+Matrix4 slerp(const Matrix4& a, const Matrix4& b, float t)
+{
+	QRot{a};
+	return a;
 }

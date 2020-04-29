@@ -32,6 +32,7 @@ Matrix4 zw_matrix(float angle);
 Matrix4 yw_matrix(float angle);
 
 Vector4 cross(const Vector4 &a, const Vector4 &b, const Vector4 &c);
+Matrix4 slerp(const Matrix4& a, const Matrix4& b, float t);
 
 // Generic vector stuff
 template <class T>
