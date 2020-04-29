@@ -176,7 +176,7 @@ Ship::update(float dt)
 
 				// Adjust bullet position w.r.t. the exact time the bullet
 				// should have been shot, but compensate to the first update,
-				// bringing the bullet closer to the canon:
+				// bringing the bullet closer to the cannon:
 				const float offset = speed * (ctrl->shot_countdown + dt);
 
 				Projectile::shot(ctrl,
