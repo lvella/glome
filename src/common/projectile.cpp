@@ -15,8 +15,6 @@ static GLuint tex_projectile;
 static GLuint vbo;
 static GLuint texture;
 static GLint uniform_has_tex;
-static GLint uniform_camera;
-static GLint uniform_projection;
 static CamShader program_bullet;
 
 static GLuint minimap_vbo;
@@ -66,10 +64,6 @@ void Projectile::initialize()
 	program_bullet.setup_shader(source);
 	uniform_has_tex =
 	    glGetUniformLocation(program_bullet.program(), "has_tex");
-	uniform_camera =
-	    glGetUniformLocation(program_bullet.program(), "camera");
-	uniform_projection =
-	    glGetUniformLocation(program_bullet.program(), "projection");
 }
 
 void Projectile::shot(ShipController * s, const Matrix4 & from, float speed)

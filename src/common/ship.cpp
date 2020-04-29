@@ -68,11 +68,14 @@ Ship::load_guns(Mesh::Types type)
 		ret = fread(&nguns, sizeof(nguns), 1, fd);
 		assert(ret == 1);
 
-		ret = fread(&l_canon[0][0], sizeof(float), 16, fd);
+		Matrix4 mat;
+		ret = fread(&mat[0][0], sizeof(float), 16, fd);
 		assert (ret == 16);
+		l_canon = mat.transpose();
 
-		ret = fread(&r_canon[0][0], sizeof(float), 16, fd);
+		ret = fread(&mat[0][0], sizeof(float), 16, fd);
 		assert (ret == 16);
+		r_canon = mat.transpose();
 	}
 	fclose(fd);
 }
