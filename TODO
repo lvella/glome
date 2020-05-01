@@ -1,7 +1,6 @@
 == Needs for FIKALAB game ==
 
 - Support Windows build
-- Make world updates independent of FPS
 - BUG: Fix quantum tunelling of bullets
   - Bullets pass straight through some FSMs.
     - Can be time step discontinuity problem, for small FSMs.
