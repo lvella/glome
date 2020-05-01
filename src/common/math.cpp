@@ -134,5 +134,5 @@ QRot nlerp(const QRot& a, const QRot& b, float t)
 
 Vector4 nlerp(const Vector4& a, const Vector4& b, float t)
 {
-	return (a * (1.0f - t) + b * t).normalized();
+	return (a + (b - a) * t).normalized();
 }
