@@ -13,12 +13,10 @@ using namespace Options;
 void
 Renderer::initialize()
 {
-	const char *sources[] = {
-		"world.vert", "world.frag", "world_fog.frag",
-		"no_texture.frag", "fog.frag", NULL
-	};
-
-	shader.setup_shader(sources);
+	shader.setup_shader({
+		"world/world.vert", "world/world.frag", "world/world_fog.frag",
+		"common/no_texture.frag", "world/fog.frag"
+	});
 }
 
 void

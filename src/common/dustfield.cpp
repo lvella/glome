@@ -36,28 +36,26 @@ GLint attrib_endpoint;
 
 void initialize()
 {
-    std::vector<Star> dust(DUST_SIZE);
+	std::vector<Star> dust(DUST_SIZE);
 
-    for(auto &e: dust)
-    {
-        e.endpoints[0].pos = e.endpoints[1].pos = Random::point();
-        e.endpoints[0].end = 0.0f;
-        e.endpoints[1].end = 1.0f;
-    }
+	for(auto &e: dust)
+	{
+		e.endpoints[0].pos = e.endpoints[1].pos = Random::point();
+		e.endpoints[0].end = 0.0f;
+		e.endpoints[1].end = 1.0f;
+	}
 
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, dust.size() * sizeof(Star), &dust[0], GL_STATIC_DRAW);
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, dust.size() * sizeof(Star), &dust[0], GL_STATIC_DRAW);
 
-	const char* src[] = {
-	    "dustfield.vert",
-	    "world.frag",
-	    "no_texture.frag",
-	    "dustfield_fog.frag",
-	    "fog.frag",
-	    NULL
-	};
-	program.setup_shader(src);
+	program.setup_shader({
+		"world/dustfield.vert",
+		"world/world.frag",
+		"common/no_texture.frag",
+		"world/dustfield_fog.frag",
+		"world/fog.frag"
+	});
 	attrib_endpoint = glGetAttribLocation(program.program(), "endpoint");
 
 	old_transform = program.getUniform("old_transform");

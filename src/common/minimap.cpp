@@ -129,12 +129,19 @@ MiniMap::initialize()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 	}
 
-	const char* src_proj[] = {"minimap.vert", "map_stuff.vert", "minimap.frag", "texture.frag", NULL};
-	map_projection.setup_shader(src_proj);
+	map_projection.setup_shader({
+		"minimap/minimap.vert",
+		"minimap/map_stuff.vert",
+		"minimap/minimap.frag",
+		"common/texture.frag"
+	});
 	proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
 
-	const char* src_hud[] = {"hud.vert", "map_stuff.vert", "minimap.frag", "texture.frag", NULL};
-	hud.setup_shader(src_hud);
+	hud.setup_shader({
+		"minimap/hud.vert",
+		"minimap/map_stuff.vert",
+		"minimap/minimap.frag",
+		"common/texture.frag"
+	});
 	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
 }
-

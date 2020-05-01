@@ -8,8 +8,6 @@
 
 #include "config.hpp"
 
-using namespace std;
-
 struct ltstr
 {
   bool operator()(const char* s1, const char* s2) const
@@ -19,31 +17,22 @@ struct ltstr
 };
 static std::map<const char*, GLuint, ltstr> loaded_shaders;
 
-Shader::Shader(const char *sources[])
+Shader::Shader(const SourceVector& sources)
 {
 	setup_shader(sources);
 }
 
-void Shader::setup_shader(const char *sources[])
+void Shader::setup_shader(const SourceVector& sources)
 {
-	char *ptr;
-	const char **iter;
-	const char *name;
 	int ret;
 
-	FILE *fl;
 	GLint len;
 	GLint type;
 	GLuint shader;
 
-	assert(sources);
-	assert(*sources);
 	prog = glCreateProgram();
 
-	iter = sources;
-	while(*iter != NULL)
-	{
-		name = *iter;
+	for(const char* name: sources) {
 		if(loaded_shaders.find(name) == loaded_shaders.end())
 		{
 			if(strrchr(name, '.')[1] == 'v')
@@ -55,38 +44,40 @@ void Shader::setup_shader(const char *sources[])
 				type = GL_FRAGMENT_SHADER;
 			}
 
-			string path(DATA_DIR);
+			std::string path(DATA_DIR);
 			path += "/shaders/";
 			path += name;
 
-			fl = fopen(path.c_str(), "r");
+			FILE* fl = fopen(path.c_str(), "r");
 			if(!fl)
 			{
-				cout <<"Could not open file \""<<name<<"\": "<<strerror(errno)<<endl;
+				std::cout <<"Could not open file \""<<name<<"\": "<<strerror(errno)<<std::endl;
 				break;
 			}
 			fseek(fl, 0, SEEK_END);
 			len = ftell(fl);
 			fseek(fl, 0, SEEK_SET);
-			ptr = new char [len];
+			std::vector<char> buff(len);
 
-			ret = fread(ptr, 1, len, fl);
+			ret = fread(buff.data(), 1, len, fl);
 			if(ret != len)
 			{
-				cout<<"Could not read whole file: "<<strerror(errno)<< endl;
+				std::cout<<"Could not read whole file: "<<strerror(errno)<< std::endl;
 			}
 			fclose(fl);
 			shader = glCreateShader(type);
-			glShaderSource(shader, 1, (const GLchar**)&ptr, &len);
+			{
+				char *ptr = buff.data();
+				glShaderSource(shader, 1, (const GLchar**)&ptr, &len);
+			}
 			glCompileShader(shader);
 			{
 				GLsizei length;
 				char err[10000];
 				glGetShaderInfoLog(shader, 10000, &length, err);
 				if(length)
-					cout << "Shader "<<name<<" compilation log:\n" << err << endl;
+					std::cout << "Shader "<<name<<" compilation log:\n" << err << std::endl;
 			}
-			delete [] ptr;
 			loaded_shaders.insert(std::pair<const char*, GLuint>(name, shader));
 		}
 		else
@@ -95,8 +86,6 @@ void Shader::setup_shader(const char *sources[])
 		}
 
 		glAttachShader(prog, shader);
-		++iter;
-
 	}
 	// We expect every shader to have a "position" attribute, to be the reference attribute
 	glBindAttribLocation(prog, 0, "position");
@@ -106,10 +95,13 @@ void Shader::setup_shader(const char *sources[])
 		char err[10000];
 		glGetProgramInfoLog(prog, 10000, &length, err);
 		if(length) {
-			cout << "Linkage log of [" << *sources;
-			for(iter = sources + 1; *iter; ++iter)
-				cout << ", " << *iter;
-			cout << "]:\n" << err << '\n';
+			std::cout << "Linkage log of [";
+			const char* sep = "";
+			for(auto name: sources) {
+				std::cout << sep << name;
+				sep = ", ";
+			}
+			std::cout << "]:\n" << err << '\n';
 		}
 	}
 
@@ -132,7 +124,7 @@ Uniform Shader::getUniform(const char *name) const {
 	return Uniform{ret};
 }
 
-void SpaceShader::setup_shader(const char *sources[])
+void SpaceShader::setup_shader(const SourceVector& sources)
 {
 	Shader::setup_shader(sources);
 	transform = getUniform("transform");
@@ -144,7 +136,7 @@ void CamShader::initialize(float aspect_ratio)
 	initialized = true;
 }
 
-void CamShader::setup_shader(const char *sources[])
+void CamShader::setup_shader(const SourceVector& sources)
 {
 	SpaceShader::setup_shader(sources);
 

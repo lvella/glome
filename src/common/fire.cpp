@@ -39,8 +39,13 @@ Fire::Fire(float radius):
 
 void Fire::initialize()
 {
-	const char* src[] = {"fire.vert", "world.frag", "point_texture.frag", "world_fog.frag", "fog.frag", NULL};
-	program_fire.setup_shader(src);
+	program_fire.setup_shader({
+		"world/fire.vert",
+		"world/world.frag",
+		"world/point_texture.frag",
+		"world/world_fog.frag",
+		"world/fog.frag"
+	});
 	attrib_radius = glGetAttribLocation(program_fire.program(), "radius");
 
 	program_fire.enable();

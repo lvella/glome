@@ -16,7 +16,7 @@ void main()
 	tmp.w = -slerp_arc.y;
 
  	vec3 v = project_vertex(transform * tmp);
- 	
+
 	gl_Position = vec4(v.xy, -v.z, 1.0);
 
 	v_color = color_blend(color, v.z);

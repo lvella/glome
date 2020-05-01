@@ -5,6 +5,7 @@
 #include "vector2.hpp"
 #include "math.hpp"
 
+#include <vector>
 #include <map>
 
 class Uniform
@@ -56,11 +57,13 @@ private:
 class Shader
 {
 public:
+	using SourceVector = std::vector<const char*>;
+
 	Shader() = default;
-	Shader(const char *sources[]);
+	Shader(const SourceVector& sources);
 	virtual ~Shader();
 
-	virtual void setup_shader(const char *sources[]);
+	virtual void setup_shader(const SourceVector& sources);
 
 	void enable() const {
 		glUseProgram(prog);
@@ -95,7 +98,7 @@ class SpaceShader: public Shader
 {
 public:
 	virtual ~SpaceShader() = default;
-	virtual void setup_shader(const char *sources[]) override;
+	virtual void setup_shader(const SourceVector& sources) override;
 
 	void setTransform(const Matrix4& t) const
 	{
@@ -119,7 +122,7 @@ public:
 		return proj_mat;
 	}
 
-	void setup_shader(const char *sources[]) override;
+	virtual void setup_shader(const SourceVector& sources) override;
 
 private:
 	static Matrix4 proj_mat;

@@ -24,15 +24,6 @@ Projectile::SList Projectile::shots;
 
 void Projectile::initialize()
 {
-	const char *source[] = {
-	    "projectile.vert",
-	    "world.frag",
-	    "texture.frag",
-	    "world_fog.frag",
-	    "fog.frag",
-	    NULL
-	};
-
 	{
 		const float data[] = {
 			1.0f, 0.78f, 0.59f,
@@ -61,9 +52,16 @@ void Projectile::initialize()
 
 	create_spherical_texture(64, texture);
 
-	program_bullet.setup_shader(source);
-	uniform_has_tex =
-	    glGetUniformLocation(program_bullet.program(), "has_tex");
+	program_bullet.setup_shader({
+		"world/projectile.vert",
+		"world/world.frag",
+		"common/texture.frag",
+		"world/world_fog.frag",
+		"world/fog.frag"
+	});
+
+	uniform_has_tex = glGetUniformLocation(
+		program_bullet.program(), "has_tex");
 }
 
 void Projectile::shot(ShipController * s, const Matrix4 & from, float speed)
