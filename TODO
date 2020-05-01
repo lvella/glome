@@ -2,8 +2,11 @@
 
 - Support Windows build
 - Make world updates independent of FPS
-- Fix quantum tunelling of bullets
-  - Bullets pass straight through small FSMs.
+- BUG: Fix quantum tunelling of bullets
+  - Bullets pass straight through some FSMs.
+    - Can be time step discontinuity problem, for small FSMs.
+    - Can be something wrong with the FSM radius.
+    - Can be something wrong with the octree in some places.
 - Transfer momentum on collision between objects (ships, flying spagetti monsters)
   - At least prevent them from intersecting, change their velocity away from one another
   - How to fit that to current crazy FSM movement?
