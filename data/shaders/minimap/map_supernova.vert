@@ -1,7 +1,6 @@
 attribute vec4 position;
 attribute vec4 color;
 
-uniform mat4 transform;
 uniform vec2 slerp_arc;
 
 varying vec4 v_color;
@@ -15,7 +14,7 @@ void main()
 	vec4 tmp = slerp_arc.x * position;
 	tmp.w = -slerp_arc.y;
 
- 	vec3 v = project_vertex(transform * tmp);
+ 	vec3 v = project_vertex(tmp);
 
 	gl_Position = vec4(v.xy, -v.z, 1.0);
 

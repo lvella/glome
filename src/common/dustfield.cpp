@@ -51,6 +51,7 @@ void initialize()
 
 	program.setup_shader({
 		"world/dustfield.vert",
+		"world/modelview.vert",
 		"world/world.frag",
 		"common/no_texture.frag",
 		"world/dustfield_fog.frag",

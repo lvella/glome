@@ -127,7 +127,7 @@ Uniform Shader::getUniform(const char *name) const {
 void SpaceShader::setup_shader(const SourceVector& sources)
 {
 	Shader::setup_shader(sources);
-	transform = getUniform("transform");
+	transform = getUniform("transformation");
 }
 
 void CamShader::initialize(float aspect_ratio)

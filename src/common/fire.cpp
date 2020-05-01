@@ -41,6 +41,7 @@ void Fire::initialize()
 {
 	program_fire.setup_shader({
 		"world/fire.vert",
+		"world/modelview.vert",
 		"world/world.frag",
 		"world/point_texture.frag",
 		"world/world_fog.frag",

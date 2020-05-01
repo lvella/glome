@@ -54,6 +54,7 @@ void Projectile::initialize()
 
 	program_bullet.setup_shader({
 		"world/projectile.vert",
+		"world/modelview.vert",
 		"world/world.frag",
 		"common/texture.frag",
 		"world/world_fog.frag",

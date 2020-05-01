@@ -14,6 +14,7 @@ Supernova::Supernova():
 
 	shader.setup_shader({
 		"world/supernova.vert",
+		"world/modelview.vert",
 		"world/supernova.frag",
 		"world/world_fog.frag",
 		"world/fog.frag",

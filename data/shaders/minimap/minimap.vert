@@ -2,7 +2,6 @@ attribute vec4 position;
 attribute vec4 texcoord;
 attribute vec4 color;
 
-uniform mat4 transform;
 uniform bool has_tex;
 
 varying vec2 v_texcoord;
@@ -17,11 +16,11 @@ void main()
   vec3 v;
 
   if(has_tex) {
-  	v = project_vertex(transform * center);
+  	v = project_vertex(center);
     v.xy = v.xy + position.xy * 0.045;
     v_texcoord = (1.0 + position.xy) * 0.5;
   } else {
-    v = project_vertex(transform * position);
+    v = project_vertex(position);
     v_texcoord = texcoord.st;
   }
 

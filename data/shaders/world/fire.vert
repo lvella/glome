@@ -1,4 +1,3 @@
-uniform mat4 transform;
 uniform mat4 projection;
 uniform float half_width;
 
@@ -9,12 +8,9 @@ attribute float radius;
 varying vec4 v_color;
 varying float fog_coord;
 
-// Maps a 4-D unit vector to euclidian 3-D space
-void proj3d(inout vec4 v)
-{
-  v.xyz = v.xyz / (1.0 - v.w);
-  v.w = 1.0;
-}
+// External functions
+vec4 to_4d_eye(in vec4 v);
+vec4 proj3d(in vec4 v);
 
 // Given a radius and the W coordinate of the 4-D center of a sphere,
 // calculate the new diameter after 4-D → 3-D projection
@@ -29,13 +25,12 @@ float radius_map(float r, float w)
 
 void main()
 {
-  vec4 border;
-  vec4 center = transform * position;
+  vec4 center = to_4d_eye(position);
   float proj_radius = radius_map(radius, center.w);
 
-  proj3d(center);
+  center = proj3d(center);
 
-  border = projection * vec4(center.x + proj_radius, center.yzw);
+  vec4 border = projection * vec4(center.x + proj_radius, center.yzw);
   gl_Position = center = projection * center;
 
   gl_PointSize = abs(center.x / center.w - border.x / border.w) * half_width;

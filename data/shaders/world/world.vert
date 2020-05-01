@@ -1,5 +1,4 @@
 // Input
-uniform mat4 transform;
 uniform mat4 projection;
 
 attribute vec4 position;
@@ -9,15 +8,14 @@ attribute vec4 color;
 varying vec4 v_color;
 varying float fog_coord;
 
+// External function:
+vec4 to_3d_eye(in vec4 v);
+
 void main()
 {
-  vec4 tmp = transform * position;
+  vec4 pos = to_3d_eye(position);
 
-  // Stereographic projection to 3-D
-  tmp.xyz = tmp.xyz / (1.0 - tmp.w);
-  tmp.w = 1.0;
-
-  gl_Position = projection * tmp;
+  gl_Position = projection * pos;
   fog_coord = gl_Position.w;
 
   v_color = color;

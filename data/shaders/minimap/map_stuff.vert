@@ -1,7 +1,11 @@
+uniform mat4 transformation;
+
 vec3 project_vertex(vec4 vert) {
 	const float two_by_pi = 0.63661977236758134307553505349005744813783858296183;
 	vec3 ret;
 	float r, R;
+
+	vert = transformation * vert;
 
 	ret = vert.xyz / (1.0 - vert.w);
 	R = length(ret);
