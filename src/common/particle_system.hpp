@@ -63,13 +63,13 @@ protected:
 	{
 		OfflineAttributes():
 			active(false),
-			energy(0),
+			energy(0.0f),
 			cam_dist(0.0f)
 		{}
 
-		bool active; /* Particle is alive or not */
-		int energy;	/* Energy of the particle */
+		float energy;	/* Energy of the particle */
 		float cam_dist;
+		bool active; /* Particle is alive or not */
 	};
 
 	RenderAttributes *rattrs;

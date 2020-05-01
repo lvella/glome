@@ -6,7 +6,7 @@
 
 #include "fire.hpp"
 
-static const int FIRE_LIFE = 20;
+static constexpr float FIRE_LIFE = 1.0f/3.0f; // s
 
 static CamShader program_fire;
 static GLint attrib_radius;
@@ -93,7 +93,7 @@ void Fire::update(float dt)
 		if(oattr.active) {
 			RenderAttributes &rattr = rattrs[i];
 
-			if(oattr.energy-- <= 0) {
+			if(oattr.energy <= 0.0) {
 				if(new_count > target_count) {
 					oattr.active = false;
 					--new_count;
@@ -106,9 +106,10 @@ void Fire::update(float dt)
 				oattr.energy = FIRE_LIFE * (1.0f - r);
 				rattr.color = Vector4(1.0f, 0.7f, 0.0f, 0.0f) * r + Vector4(0.3f, 0.4f, 1.0f, 0.0f) * (1.0 - r);
 			} else {
+				oattr.energy -= dt;
 				rattr.position = velocity * rattr.position;
 			}
-			rattr.color[3] = oattr.energy / float(FIRE_LIFE);
+			rattr.color[3] = oattr.energy / FIRE_LIFE;
 		}
 	}
 
