@@ -56,6 +56,8 @@
   - Always use "override"
   - Remove all new/delete
 - Use 2 quaternion as position/orientation representation
+  - A little bit of this done inside renderer
+  - Make dustfield independent of FPS
 - Port to Vulkan (maybe we can use it to improve performance)
 
 == OLD GLOME TODO (do not apply for FIKALAB) ==

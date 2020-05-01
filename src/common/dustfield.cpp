@@ -63,11 +63,14 @@ void initialize()
 	old_transform = program.getUniform("old_transform");
 }
 
-void draw(Camera& cam, const Matrix4 &old_cam_transform)
+static Matrix4 old_cam_transform;
+
+void draw(Camera& cam)
 {
     cam.pushShader(&program);
 
     old_transform.set(old_cam_transform);
+    old_cam_transform = cam.transformation();
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
