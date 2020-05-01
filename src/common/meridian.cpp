@@ -40,31 +40,31 @@ draw_meridians(Camera &c)
   glDrawArrays(GL_LINES, 0, 360);
 
   Matrix4 t = xz_matrix(math::pi_2);
-  c.pushMultMat(t);
+  c.pushMultQRot(t);
   glVertexAttrib4f(s->colorAttr(), .0f, 1.f, 1.0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);
   c.popMat();
 
   t *= yz_matrix(math::pi_2);
-  c.pushMultMat(t);
+  c.pushMultQRot(t);
   glVertexAttrib4f(s->colorAttr(), 1.0f, .0f, 1.0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);
   c.popMat();
 
   t *= xw_matrix(-math::pi_2);
-  c.pushMultMat(t);
+  c.pushMultQRot(t);
   glVertexAttrib4f(s->colorAttr(), 1.0f, .0f, .0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);
   c.popMat();
 
   t *= yw_matrix(-math::pi_2);
-  c.pushMultMat(t);
+  c.pushMultQRot(t);
   glVertexAttrib4f(s->colorAttr(), .0f, .0f, 1.0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);
   c.popMat();
 
   t *= yz_matrix(math::pi_2);
-  c.pushMultMat(t);
+  c.pushMultQRot(t);
   glVertexAttrib4f(s->colorAttr(), .0f, 1.0f, 0.0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);
   c.popMat();

@@ -18,10 +18,11 @@ public:
 	QRot()
 	{}
 
-	explicit QRot(const Vector4& l, const Vector4& r):
+	explicit constexpr QRot(const Vector4& l, const Vector4& r):
 		l(l), r(r)
 	{}
-	explicit QRot(const Matrix4& rot_mat);
+
+	/*explicit*/ QRot(const Matrix4& rot_mat);
 
 	Matrix4 toMatrix4() const;
 
@@ -38,6 +39,11 @@ public:
 		return l * other * r;
 	}
 
+	QRot inverse() const
+	{
+		return QRot(l.conjugate(), r.conjugate());
+	}
+
 	Vector4 position() const {
 		// Equivalent to (l * Vector4::ORIGIN):
 		const Vector4 tmp(l.w, -l.z, l.y, -l.x);
@@ -48,6 +54,14 @@ public:
 	void loadToUniform(GLint uniform) const {
 		static_assert(offsetof(QRot, r) == offsetof(QRot, l) + sizeof(QRot::l));
 		glUniform4fv(uniform, 2, &l.x);
+	}
+
+	static constexpr QRot IDENTITY()
+	{
+		return QRot{
+			Vector4(1, 0, 0, 0),
+			Vector4(1, 0, 0, 0)
+		};
 	}
 
 	Vector4 l;

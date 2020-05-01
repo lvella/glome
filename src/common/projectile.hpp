@@ -10,7 +10,7 @@ class Projectile: virtual public Object, public VolSphere
 {
 public:
 	static void initialize();
-	static void shot(ShipController *s, const Matrix4& from, float speed);
+	static void shot(ShipController *s, const QRot& from, float speed);
 	static void draw_many(const std::vector<Projectile*>& shots, Camera& cam);
 	static void draw_in_minimap();
 	static void update_all(float dt);
@@ -23,7 +23,7 @@ public:
 	}
 
 private:
-	Projectile(ShipController *s, const Matrix4& from, float speed);
+	Projectile(ShipController *s, const QRot& from, float speed);
 	void draw(Camera& cam);
 	void update(float dt);
 	inline bool is_dead() const

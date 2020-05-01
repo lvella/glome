@@ -12,9 +12,9 @@ public:
 
 	// TODO: make the thing to follow the ship here...
 	// TODO: create an "update()" method
-	void reset(const Matrix4& invCam);
+	void reset(const QRot& invCam);
 
-	void pushMultMat(const Matrix4& t);
+	void pushMultQRot(const QRot& t);
 	void popMat();
 
 	void pushShader(const SpaceShader *s);

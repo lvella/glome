@@ -116,7 +116,7 @@ Ship::load_engines(Mesh::Types type)
 void
 Ship::draw(Camera& c)
 {
-	c.pushMultMat(_t);
+	c.pushMultQRot(_t);
 	mesh->draw(c);
 	fx_engine.draw(c);
 	c.popMat();

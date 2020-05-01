@@ -5,7 +5,7 @@ extern GLuint square_vbo;
 void Glome::Drawable::minimap_draw(Camera& c)
 {
 	const Shader *s = c.getShader();
-	c.pushMultMat(_t);
+	c.pushMultQRot(_t);
 
 	glVertexAttrib3f(s->colorAttr(), 1.0f, 0.0f, 0.0f);
 	glBindBuffer(GL_ARRAY_BUFFER, square_vbo);

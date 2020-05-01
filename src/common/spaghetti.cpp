@@ -167,7 +167,7 @@ Spaghetti::~Spaghetti()
 void Spaghetti::draw(Camera& c)
 {
 	auto &s = *c.getShader();
-	c.pushMultMat(_t);
+	c.pushMultQRot(_t);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

@@ -29,7 +29,7 @@ static GLint hud_has_tex;
 GLuint square_vbo;
 
 void
-MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center, std::vector<Glome::Drawable*> objs)
+MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center, std::vector<Glome::Drawable*> objs)
 {
 	const int b = 10;
 	const int l = 10;
@@ -66,7 +66,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center, std
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	// From now on, use the camera with transform stack to draw objects
-	camera.reset(yz_matrix(math::pi_2) * center);
+	camera.reset(QRot(yz_matrix(math::pi_2)) * center);
 	camera.pushShader(&map_projection);
 
 	// Draw shots

@@ -4,22 +4,22 @@
 
 Camera::Camera()
 {
-	reset(Matrix4::IDENTITY());
+	reset(QRot::IDENTITY());
 }
 
-void Camera::reset(const Matrix4& invCam)
+void Camera::reset(const QRot& invCam)
 {
 	qrot_stack.resize(1);
-	qrot_stack[0] = QRot(invCam);
+	qrot_stack[0] = invCam;
 
 	shader_stack.resize(0);
 }
 
-void Camera::pushMultMat(const Matrix4& t)
+void Camera::pushMultQRot(const QRot& t)
 {
 	assert(!shader_stack.empty());
 
-	qrot_stack.push_back(qrot_stack.back() * QRot(t));
+	qrot_stack.push_back(qrot_stack.back() * t);
 	shader_stack.back()->setTransform(qrot_stack.back());
 }
 

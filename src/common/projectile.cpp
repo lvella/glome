@@ -66,7 +66,7 @@ void Projectile::initialize()
 		program_bullet.program(), "has_tex");
 }
 
-void Projectile::shot(ShipController * s, const Matrix4 & from, float speed)
+void Projectile::shot(ShipController * s, const QRot& from, float speed)
 {
 	// TODO: find a non-hackish way to use emplace_front...
 	shots.push_front(Projectile{s, from, speed});
@@ -192,8 +192,7 @@ void Projectile::draw_in_minimap()
 	}
 }
 
-Projectile::Projectile(ShipController * s, const Matrix4 & from,
-	float speed):
+Projectile::Projectile(ShipController * s, const QRot& from, float speed):
     Object(from), VolSphere(0.004),
     speed(speed), owner(s),
     ttl(0.0), max_ttl((2 * math::pi - 0.05) / speed),
@@ -203,7 +202,7 @@ Projectile::Projectile(ShipController * s, const Matrix4 & from,
 
 void Projectile::draw(Camera & c)
 {
-	c.pushMultMat(_t);
+	c.pushMultQRot(_t);
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	c.popMat();
 }

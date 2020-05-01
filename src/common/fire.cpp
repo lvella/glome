@@ -130,7 +130,7 @@ void Fire::update(float dt)
 void Fire::draw(Camera& c)
 {
 	c.pushShader(&program_fire);
-	c.pushMultMat(_t);
+	c.pushMultQRot(_t);
 
 	depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

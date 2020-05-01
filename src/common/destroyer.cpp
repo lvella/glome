@@ -32,7 +32,7 @@ Destroyer::Destroyer():
 
 void Destroyer::draw(Camera &c)
 {
-	c.pushMultMat(_t);
+	c.pushMultQRot(_t);
 	mesh->draw(c);
 	fx_engine.draw(c);
 	other_jet.draw(c);

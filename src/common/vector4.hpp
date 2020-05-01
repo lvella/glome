@@ -19,13 +19,9 @@ public:
 
 	Vector4() = default;
 
-	inline Vector4(float xl, float yl, float zl, float wl)
-	{
-		x = xl;
-		y = yl;
-		z = zl;
-		w = wl;
-	}
+	constexpr Vector4(float xl, float yl, float zl, float wl):
+		x(xl), y(yl), z(zl), w(wl)
+	{}
 
 	Vector4(const Vector3 &other, float wl=0.0f);
 
@@ -82,6 +78,12 @@ public:
 	float& operator[](size_t elem)
 	{
 		return v[elem];
+	}
+
+	/** Quaternion conjugate. */
+	Vector4 conjugate() const
+	{
+		return Vector4(x, -y, -z, -w);
 	}
 
 	Vector4 normalized()
