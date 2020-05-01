@@ -8,7 +8,7 @@
 #include "camera.hpp"
 #include "drawable.hpp"
 #include "shader.hpp"
-#include "matrix4.hpp"
+#include "qrot.hpp"
 #include "math.hpp"
 #include "ship.hpp"
 
@@ -33,6 +33,9 @@ protected:
 			Audio::Listener(&audio_world),
 			t(target), _x(x), _y(y), _w(w), _h(h)
 		{
+			curr_mat = cam_offset.toMatrix4();
+			curr_qrot = cam_offset;
+			//curr_qrot = QRot(xw_matrix(2.0) * xy_matrix(-.9) * yz_matrix(1.));
 			cam_hist.push_back({1.0f / 6.0f, cam_offset});
 		}
 
@@ -43,24 +46,25 @@ protected:
 
 		virtual const Matrix4 &transformation() const override
 		{
-			assert(!cam_hist.empty());
-			return cam_hist.front().t;
+			return curr_mat;
 		}
 
 		void update(float dt);
 
 		struct PathPoint {
 			float dt;
-			Matrix4 t;
+			QRot t;
 		};
 
 		Ship* t;
+		Matrix4 curr_mat;
+		QRot curr_qrot;
 		std::deque<PathPoint> cam_hist;
 
 		int _x, _y, _w, _h;
 
 		// Camera position relative to target...
-		static const Matrix4 cam_offset;
+		static const QRot cam_offset;
 	};
 
 	std::vector<Viewport> players;

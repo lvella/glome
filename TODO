@@ -2,6 +2,8 @@
 
 - Support Windows build
 - Make world updates independent of FPS
+- Fix quantum tunelling of bullets
+  - Bullets pass straight through small FSMs.
 - Transfer momentum on collision between objects (ships, flying spagetti monsters)
   - At least prevent them from intersecting, change their velocity away from one another
   - How to fit that to current crazy FSM movement?

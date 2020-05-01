@@ -14,11 +14,21 @@ class QRot
 {
 public:
 	QRot() = default;
+	explicit QRot(const Vector4& l, const Vector4& r):
+		l(l), r(r)
+	{}
 	explicit QRot(const Matrix4& rot_mat);
 
-	Matrix4 toMatrix4();
+	Matrix4 toMatrix4() const;
 
-private:
+	QRot operator*(const QRot& other) const
+	{
+		return QRot(
+			l * other.l,
+			other.r * r
+		);
+	}
+
 	Vector4 l;
 	Vector4 r;
 };

@@ -4,6 +4,7 @@
 
 #include "matrix4.hpp"
 #include "vector3.hpp"
+#include "qrot.hpp"
 
 // Mathematical constants and variations
 namespace math {
@@ -32,7 +33,14 @@ Matrix4 zw_matrix(float angle);
 Matrix4 yw_matrix(float angle);
 
 Vector4 cross(const Vector4 &a, const Vector4 &b, const Vector4 &c);
-Matrix4 slerp(const Matrix4& a, const Matrix4& b, float t);
+
+/** Normalized linear interpolation.
+ *
+ * This link says NLERP is a good enough replacement for SLERP:
+ * http://number-none.com/product/Understanding%20Slerp,%20Then%20Not%20Using%20It/
+ */
+QRot nlerp(const QRot& a, const QRot& b, float t);
+Vector4 nlerp(const Vector4& a, const Vector4& b, float t);
 
 // Generic vector stuff
 template <class T>

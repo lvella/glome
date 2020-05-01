@@ -60,7 +60,7 @@ public:
 	 *
 	 * Straight from wikipedia.
 	 */
-	Vector4 operator*(const Vector4& q)
+	Vector4 operator*(const Vector4& q) const
 	{
 		return Vector4(
 			x*q.x - y*q.y - z*q.z - w*q.w,

@@ -103,25 +103,28 @@ Renderer::audio_update()
 void
 Renderer::Viewport::update(float dt)
 {
-	cam_hist.push_back({dt, cam_offset * t->transformation().transpose()});
+	cam_hist.push_back({dt, cam_offset * QRot(t->transformation().transpose())});
 
 	while(cam_hist.front().dt <= dt) {
 		dt -= cam_hist.front().dt;
+		curr_qrot = cam_hist.front().t;
+
 		cam_hist.pop_front();
-		assert(cam_hist.size() > 1);
+		assert(!cam_hist.empty());
 	}
 
-	PathPoint& start = cam_hist.front();
-	PathPoint& end = cam_hist[1];
-	float slerp_factor = dt / start.dt; // range [0, 1]
+	PathPoint& next = cam_hist.front();
+	const float slerp_factor = dt / next.dt; // range [0, 1]
 
-	start.t = slerp(start.t, end.t, slerp_factor);
-	start.dt -= dt;
+	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
+	next.dt -= dt;
+
+	curr_mat = curr_qrot.toMatrix4();
 }
 
 CamShader Renderer::shader;
-const Matrix4 Renderer::Viewport::cam_offset(
-		yz_matrix(0.2) *
-		zw_matrix(-0.015) *
-		yw_matrix(-0.01)
-	);
+const QRot Renderer::Viewport::cam_offset(QRot(
+	yz_matrix(0.2) *
+	zw_matrix(-0.015) *
+	yw_matrix(-0.01)
+));

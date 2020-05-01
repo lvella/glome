@@ -124,8 +124,15 @@ cross(const Vector4 &a, const Vector4 &b, const Vector4 &c)
 	);
 }
 
-Matrix4 slerp(const Matrix4& a, const Matrix4& b, float t)
+QRot nlerp(const QRot& a, const QRot& b, float t)
 {
-	QRot{a};
-	return a;
+	return QRot(
+		nlerp(a.l, b.l, t),
+		nlerp(a.r, b.r, t)
+	);
+}
+
+Vector4 nlerp(const Vector4& a, const Vector4& b, float t)
+{
+	return (a * (1.0f - t) + b * t).normalized();
 }

@@ -80,7 +80,7 @@ found:
 	r[(j+3)%4] = tmp[3];
 }
 
-Matrix4 QRot::toMatrix4()
+Matrix4 QRot::toMatrix4() const
 {
 	return Matrix4(
 		// Left isoclinic:
