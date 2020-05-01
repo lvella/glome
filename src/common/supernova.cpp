@@ -38,7 +38,7 @@ Supernova::Supernova():
 			1, 0, 0, 0,
 			0, 1, 0, 0,
 			0, 0, 0, 1,
-			0, 0, 1, 0
+			0, 0, -1, 0
 	);
 
 	Vector4 rot_dir = Random::direction();

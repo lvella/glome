@@ -273,7 +273,7 @@ void Mesh::generate_icosphere()
 					{9, 8, 1},
 			};
 			for(int i = 0; i < 20; ++i) {
-				face_subdivide(SUB, FACES[i][2], FACES[i][1], FACES[i][0]);
+				face_subdivide(SUB, FACES[i][0], FACES[i][1], FACES[i][2]);
 			}
 
 			assert(iv == sizeof(v) / sizeof(Vector4));
