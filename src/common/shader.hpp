@@ -43,6 +43,11 @@ public:
 		val.loadTo(id);
 	}
 
+	void set(const QRot& val) const
+	{
+		glUniform4fv(id, 2, &val.m[0][0]);
+	}
+
 private:
 	// Lightweight object, should have no other attribute.
 	GLint id = -1;

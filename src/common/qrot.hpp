@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cstddef>
+
 #include "matrix4.hpp"
 #include "vector4.hpp"
 
@@ -13,7 +15,9 @@
 class QRot
 {
 public:
-	QRot() = default;
+	QRot()
+	{}
+
 	explicit QRot(const Vector4& l, const Vector4& r):
 		l(l), r(r)
 	{}
@@ -29,6 +33,15 @@ public:
 		);
 	}
 
-	Vector4 l;
-	Vector4 r;
+	union {
+		struct {
+			Vector4 l;
+			Vector4 r;
+		};
+		float m[2][4];
+	};
 };
+
+// Guarantees that the array accessor is matches the Vectors:
+static_assert(offsetof(QRot, l) == offsetof(QRot, m[0]));
+static_assert(offsetof(QRot, r) == offsetof(QRot, m[1]));
