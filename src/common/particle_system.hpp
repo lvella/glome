@@ -37,7 +37,7 @@ class ParticleSystem
 public:
 	ParticleSystem(int np);
 	virtual ~ParticleSystem();
-	void depthSort(const Matrix4 &t);
+	void depthSort(const QRot &t);
 
 	static void initialize();
 protected:

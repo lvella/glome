@@ -132,6 +132,7 @@ MiniMap::initialize()
 	map_projection.setup_shader({
 		"minimap/minimap.vert",
 		"minimap/map_stuff.vert",
+		"common/quaternion.vert",
 		"minimap/minimap.frag",
 		"common/texture.frag"
 	});

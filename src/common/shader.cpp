@@ -101,7 +101,7 @@ void Shader::setup_shader(const SourceVector& sources)
 				std::cout << sep << name;
 				sep = ", ";
 			}
-			std::cout << "]:\n" << err << '\n';
+			std::cout << "]:\n" << err << std::endl;
 		}
 	}
 

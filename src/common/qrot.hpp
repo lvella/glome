@@ -33,15 +33,23 @@ public:
 		);
 	}
 
-	union {
-		struct {
-			Vector4 l;
-			Vector4 r;
-		};
-		float m[2][4];
-	};
-};
+	Vector4 operator*(const Vector4& other) const
+	{
+		return l * other * r;
+	}
 
-// Guarantees that the array accessor is matches the Vectors:
-static_assert(offsetof(QRot, l) == offsetof(QRot, m[0]));
-static_assert(offsetof(QRot, r) == offsetof(QRot, m[1]));
+	Vector4 position() const {
+		// Equivalent to (l * Vector4::ORIGIN):
+		const Vector4 tmp(l.w, -l.z, l.y, -l.x);
+
+		return tmp * r;
+	};
+
+	void loadToUniform(GLint uniform) const {
+		static_assert(offsetof(QRot, r) == offsetof(QRot, l) + sizeof(QRot::l));
+		glUniform4fv(uniform, 2, &l.x);
+	}
+
+	Vector4 l;
+	Vector4 r;
+};

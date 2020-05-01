@@ -6,7 +6,7 @@
 class Object
 {
 public:
-	explicit Object(const Matrix4& init = Matrix4::IDENTITY): _t(init) {}
+	explicit Object(const Matrix4& init = Matrix4::IDENTITY()): _t(init) {}
 	virtual ~Object() = 0;
 
 	const Matrix4 &transformation() const { return _t; }

@@ -14,8 +14,9 @@ void
 Renderer::initialize()
 {
 	shader.setup_shader({
-		"world/world.vert", "world/modelview.vert", "world/world.frag",
-		"world/world_fog.frag", "common/no_texture.frag", "world/fog.frag"
+		"world/world.vert", "world/modelview.vert", "common/quaternion.vert",
+		"world/world.frag", "world/world_fog.frag",
+		"common/no_texture.frag", "world/fog.frag"
 	});
 }
 

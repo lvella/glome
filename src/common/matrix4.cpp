@@ -27,18 +27,6 @@ THE SOFTWARE.
 */
 #include "matrix4.hpp"
 
-  const Matrix4 Matrix4::ZERO(
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0 );
-
-    const Matrix4 Matrix4::IDENTITY(
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1 );
-
     //-----------------------------------------------------------------------
     inline static Real MINOR(const Matrix4& m,
         const size_t r0, const size_t r1, const size_t r2,

@@ -28,7 +28,7 @@ ParticleSystem::~ParticleSystem()
 	glDeleteBuffers(2, buffobjs);
 }
 
-void ParticleSystem::depthSort(const Matrix4 &t)
+void ParticleSystem::depthSort(const QRot &t)
 {
 	const Matrix4& proj = CamShader::getProjection();
 

@@ -46,7 +46,7 @@ public:
 
 	void set(const QRot& val) const
 	{
-		glUniform4fv(id, 2, &val.m[0][0]);
+		val.loadToUniform(id);
 	}
 
 private:
@@ -100,7 +100,7 @@ public:
 	virtual ~SpaceShader() = default;
 	virtual void setup_shader(const SourceVector& sources) override;
 
-	void setTransform(const Matrix4& t) const
+	void setTransform(const QRot& t) const
 	{
 		transform.set(t);
 	}

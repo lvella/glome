@@ -17,8 +17,7 @@ public:
 	static const Vector4 UP;
 	static const Vector4 FRONT;
 
-	Vector4()
-	{}
+	Vector4() = default;
 
 	inline Vector4(float xl, float yl, float zl, float wl)
 	{
@@ -95,11 +94,7 @@ public:
 		return -sqrtf(1.0f - x*x - y*y - z*z);
 	}
 
-	Vector4 stereo_proj() const
-	{
-		float factor = 1.0f - w;
-		return Vector4(x/factor, y/factor, z/factor, 1.0f);
-	}
+	Vector3 stereo_proj() const;
 
 	float squared_length() const
 	{

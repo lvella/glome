@@ -52,6 +52,7 @@ void initialize()
 	program.setup_shader({
 		"world/dustfield.vert",
 		"world/modelview.vert",
+		"common/quaternion.vert",
 		"world/world.frag",
 		"common/no_texture.frag",
 		"world/dustfield_fog.frag",
@@ -62,7 +63,7 @@ void initialize()
 	old_transform = program.getUniform("old_transform");
 }
 
-static Matrix4 old_cam_transform;
+static QRot old_cam_transform;
 
 void draw(Camera& cam)
 {

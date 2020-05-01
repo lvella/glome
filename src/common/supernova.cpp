@@ -15,6 +15,7 @@ Supernova::Supernova():
 	shader.setup_shader({
 		"world/supernova.vert",
 		"world/modelview.vert",
+		"common/quaternion.vert",
 		"world/supernova.frag",
 		"world/world_fog.frag",
 		"world/fog.frag",
@@ -28,6 +29,7 @@ Supernova::Supernova():
 	map_shader.setup_shader({
 		"minimap/map_supernova.vert",
 		"minimap/map_stuff.vert",
+		"common/quaternion.vert",
 		"minimap/minimap.frag",
 		"common/no_texture.frag"
 	});
@@ -35,10 +37,10 @@ Supernova::Supernova():
 
 	// Better place to start...
 	_t = Matrix4(
-			1, 0, 0, 0,
-			0, 1, 0, 0,
-			0, 0, 0, 1,
-			0, 0, -1, 0
+		1, 0, 0, 0,
+		0, 1, 0, 0,
+		0, 0, 0, 1,
+		0, 0, -1, 0
 	);
 
 	Vector4 rot_dir = Random::direction();
@@ -75,19 +77,19 @@ void Supernova::draw(Camera &c)
 	{
 		// Calculate the center of the projected sphere, to use in the yellow gloom effect.
 		// TODO: For a better effect, increase the LOD if the player gets close enough.
-		float center_angle = acosf(-c.transformation()[3][3]);
+		Vector4 pos = c.transformation().position();
+		float center_angle = acosf(pos.w);
 		float p1d = sinf(center_angle + size) / (1.0f - cosf(center_angle + size));
 		float p2d = sinf(center_angle - size) / (1.0f - cosf(center_angle - size));
 		float dist = (p1d + p2d) / 2.0f;
 		float r = (p2d - p1d) / 2.0f;
 
-		Vector4 vcenter = c.transformation().position().stereo_proj();
-		float len = sqrtf(vcenter.x*vcenter.x + vcenter.y*vcenter.y + vcenter.z*vcenter.z);
-		vcenter *= dist / len;
+		Vector3 vcenter = pos.stereo_proj();
+		float len = vcenter.length();
+		vcenter = vcenter * (dist / len);
 
 		// TODO: For better performance, use a different shader when r < 0.
-		vcenter.w = powf(1.4f, -r) * 0.3f;
-		center.set(vcenter);
+		center.set(Vector4(vcenter, powf(1.4f, -r) * 0.3f));
 	}
 
 	slerp_arc.set(slerp);

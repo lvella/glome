@@ -1,9 +1,11 @@
 // Input
-uniform mat4 transformation;
+uniform vec4 transformation[2];
+
+vec4 quat_rotate(in vec4 rotation[2], in vec4 p);
 
 vec4 to_4d_eye(in vec4 v)
 {
-	return transformation * v;
+	return quat_rotate(transformation, v);
 }
 
 // Maps a 4-D unit vector to euclidian 3-D space

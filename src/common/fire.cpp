@@ -42,6 +42,7 @@ void Fire::initialize()
 	program_fire.setup_shader({
 		"world/fire.vert",
 		"world/modelview.vert",
+		"common/quaternion.vert",
 		"world/world.frag",
 		"world/point_texture.frag",
 		"world/world_fog.frag",
@@ -131,7 +132,7 @@ void Fire::draw(Camera& c)
 	c.pushShader(&program_fire);
 	c.pushMultMat(_t);
 
-    depthSort(c.transformation());
+	depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * actives_count, idx, GL_STREAM_DRAW);
 

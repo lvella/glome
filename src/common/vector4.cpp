@@ -26,3 +26,8 @@ operator<<(std::ostream& o, const Vector4& v)
 	o << '\n';
 	return o;
 }
+
+Vector3 Vector4::stereo_proj() const
+{
+	return Vector3(x, y, z) * (1.0/(1.0f - w));
+}

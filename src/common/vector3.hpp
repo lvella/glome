@@ -1,6 +1,7 @@
 #pragma once
 
 #include "vector4.hpp"
+#include <cmath>
 
 class Vector3
 {
@@ -65,14 +66,14 @@ public:
 		return Vector3(x * s, y * s, z * s);
 	}
 
-	Vector3 operator*(const Vector3& o) const
-	{
-		return Vector3(x * o.x, y * o.y, z * o.z);
-	}
-
 	float dot(const Vector3& o) const
 	{
 		return x * o.x + y * o.y + z * o.z;
+	}
+
+	float length() const
+	{
+		return std::sqrt(this->dot(*this));
 	}
 
 	Vector4 inverse_stereo_proj() const {

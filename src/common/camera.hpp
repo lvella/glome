@@ -26,11 +26,11 @@ public:
 	// video card... must spare a few video memory writes.
 	//void flush();
 
-	const Matrix4& transformation() const {
-		return mat_stack.back();
+	const QRot& transformation() const {
+		return qrot_stack.back();
 	}
 
 private:
 	std::vector<const SpaceShader *> shader_stack;
-	std::vector<Matrix4> mat_stack;
+	std::vector<QRot> qrot_stack;
 };
