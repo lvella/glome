@@ -45,10 +45,10 @@ auto ShipStats::get() -> shared_ptr
 
 	ret->shot_speed = 1.2; // rad / s
 
-	ret->canon_cooldown_rate = 4.2f; // J / s
+	ret->canon_cooldown_rate = 420.0f; // J / s
 	ret->canon_fire_interval = 1.0f/15.0f; // s
-	ret->max_heat = 900.f; // J
-	ret->shot_power = 0.82; // J
+	ret->max_heat = 1500.f; // J
+	ret->shot_power = 82.0f; // J
 
 	return ret;
 }
