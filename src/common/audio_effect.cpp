@@ -5,45 +5,43 @@
 #include <vector>
 #include <string>
 #include <iostream>
-#include <sstream>
 #include <map>
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <utility>
 
-#include "config.hpp"
+#include "data_file.hpp"
 #include "audio_source.hpp"
 #include "audio_effect.hpp"
 
 using namespace Audio;
-using namespace std;
+using namespace std::string_literals;
 
-static map<string, Effect*> effects;
+static std::map<std::string, Effect*> effects;
 
 Effect::Effect():
 	m_Buffer(0),
 	ref_count(1)
 {}
 
-Effect::Effect(const string& rFilename, iter iterator):
+Effect::Effect(const std::string& rFilename, iter iterator):
 	m_Buffer(0),
 	ref_count(1),
 	it(iterator)
 {
-   OggOpusFile* of;
+	OggOpusFile* of;
 
-   int err_code;
-	stringstream dir;
+	int err_code;
 
-	dir << DATA_DIR << "/sound/" << rFilename << ".opus";
-   string fname = dir.str();
-   of = op_open_file(fname.c_str(), &err_code);
+	auto fname = get_data_path("sound/"s + rFilename + ".opus"s);
+	of = op_open_file(fname.c_str(), &err_code);
 
 	if(!err_code) {
-      num_samples = LoadAndClear(of);
+		num_samples = LoadAndClear(of);
 	} else {
-      cerr << "Error while loading file \"" << fname << "\".\n";
-   }
+		std::cout << "Error while loading file \"" << fname << "\"." << std::endl;
+		exit(1);
+	}
 }
 
 Effect::~Effect() {
@@ -80,9 +78,9 @@ size_t Effect::LoadAndClear(OggOpusFile *of)
 }
 
 Effect*
-Effect::getEffect(const string& soundid)
+Effect::getEffect(const std::string& soundid)
 {
-	pair<iter,bool> p = effects.insert(make_pair(soundid, (Effect*) NULL));
+	std::pair<iter,bool> p = effects.insert(make_pair(soundid, (Effect*) NULL));
 	if (p.second)
 		p.first->second = new Effect(soundid, p.first);
 	++p.first->second->ref_count;

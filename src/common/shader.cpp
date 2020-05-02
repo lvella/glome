@@ -3,10 +3,11 @@
 #include <iostream>
 #include <string>
 #include <cstring>
-#include <cstdio>
 #include <cerrno>
 
-#include "config.hpp"
+#include "data_file.hpp"
+
+using namespace std::string_literals;
 
 struct ltstr
 {
@@ -24,8 +25,6 @@ Shader::Shader(const SourceVector& sources)
 
 void Shader::setup_shader(const SourceVector& sources)
 {
-	int ret;
-
 	GLint len;
 	GLint type;
 	GLuint shader;
@@ -44,27 +43,18 @@ void Shader::setup_shader(const SourceVector& sources)
 				type = GL_FRAGMENT_SHADER;
 			}
 
-			std::string path(DATA_DIR);
-			path += "/shaders/";
-			path += name;
+			auto fl = load_data_file("shaders/"s + name);
+			fl.seekg(0, fl.end);
+			len = fl.tellg();
+			fl.seekg(0, fl.beg);
 
-			FILE* fl = fopen(path.c_str(), "r");
-			if(!fl)
-			{
-				std::cout <<"Could not open file \""<<name<<"\": "<<strerror(errno)<<std::endl;
-				break;
-			}
-			fseek(fl, 0, SEEK_END);
-			len = ftell(fl);
-			fseek(fl, 0, SEEK_SET);
 			std::vector<char> buff(len);
-
-			ret = fread(buff.data(), 1, len, fl);
-			if(ret != len)
+			if(!fl.read(buff.data(), buff.size()))
 			{
 				std::cout<<"Could not read whole file: "<<strerror(errno)<< std::endl;
 			}
-			fclose(fl);
+			fl.close();
+
 			shader = glCreateShader(type);
 			{
 				char *ptr = buff.data();

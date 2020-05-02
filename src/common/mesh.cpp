@@ -1,7 +1,6 @@
 #include "mesh.hpp"
 
 #include <iostream>
-#include <sstream>
 #include <cassert>
 #include <map>
 #include <set>
@@ -9,10 +8,10 @@
 #include <GL/glew.h>
 
 #include "math.hpp"
-#include "config.hpp"
 #include "vector4.hpp"
 #include "world.hpp"
 #include "random.hpp"
+#include "data_file.hpp"
 
 using namespace std;
 
@@ -78,37 +77,29 @@ void Mesh::fill_VBO(const std::vector<VertexData>& vdata, float scale) {
 void Mesh::load_from_file(const char* name)
 {
 	uint16_t ilen, vlen;
-
-	int ret;
-	FILE *fd;
+	bool ret;
 
 	std::cout << "Loading mesh " << name << std::endl;
+	auto fd = load_data_file("models/"s + name + ".wire"s);
 
 	// Load mesh file and put it into the list of meshs if does not exists
 	{
 		unsigned int mesh_pos;
-		std::stringstream dir;
-		dir << DATA_DIR << "/models/" << name << ".wire";
-		fd = fopen(dir.str().c_str(), "rb");
-		/* Read header of file */
-		ret = fread(&mesh_pos, sizeof(unsigned int), 1, fd);
-		assert(ret == 1);
-
-		/* Pointer file to mesh position */
-		fseek(fd, mesh_pos, SEEK_SET);
-		assert(fd != NULL);
+		ret = fd.read_binary(&mesh_pos);
+		assert(ret);
+		fd.seekg(mesh_pos);
 	}
 
 	{
 		// Reading 3-D vertex coordinates(12bytes) and colorRGBA values(16bytes)
 		// format: <x, y, z> <r, g, b, a>
 		//#TODO: Make the inverse projection to 4-D using the 3-D vector, to scale objects easily
-		ret = fread(&vlen, sizeof(vlen), 1, fd);
-		assert(ret == 1);
+		ret = fd.read_binary(&vlen);
+		assert(ret);
 
 		std::vector<VertexData> vdata(vlen);
-		ret = fread(&vdata[0], sizeof(VertexData), vlen, fd);
-		assert(ret == vlen);
+		ret = fd.read_binary(vdata.data(), vlen);
+		assert(ret);
 
 		// Create vertex buffer
 		fill_VBO(vdata);
@@ -121,18 +112,18 @@ void Mesh::load_from_file(const char* name)
 	{
 		// Reading edges coordinates (8bytes)
 		// format:  <v_index0 , v_index1>
-		ret = fread(&ilen, sizeof(ilen), 1, fd);
-		assert(ret == 1);
-		// Create index buffer
-		uint16_t ibolen = ilen * 2 * sizeof(uint16_t);
-		uint16_t idata[ibolen];
-		ret = fread(idata, 2 * sizeof(uint16_t), ilen, fd);
-		assert(ret == ilen);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ibolen, idata, GL_STATIC_DRAW);
-	}
+		ret = fd.read_binary(&ilen);
+		assert(ret);
 
-	fclose(fd);
+		// Create index buffer
+		std::vector<uint16_t> idata(ilen * 2);
+
+		ret = fd.read_binary(idata.data(), idata.size());
+		assert(ret);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, idata.size() * sizeof(idata[0]), idata.data(), GL_STATIC_DRAW);
+	}
 
 	len = ilen * 2;
 	primitive_type = GL_LINES;

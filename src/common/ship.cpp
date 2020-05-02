@@ -5,12 +5,10 @@
 #include <cassert>
 #include <cstdint>
 #include <iostream>
-#include <sstream>
 
 #include "math.hpp"
 #include "projectile.hpp"
-#include "config.hpp"
-
+#include "data_file.hpp"
 #include "vector4.hpp"
 #include "matrix4.hpp"
 
@@ -45,39 +43,34 @@ Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
 void
 Ship::load_guns(Mesh::Types type)
 {
-	int ret;
-	FILE *fd;
+	bool ret;
 
 	const char* name = mesh_filename[int(type)];
+	auto fd = load_data_file("models/"s + name + ".wire"s);
 	{
+		/* Read from file header */
+		fd.seekg(4);
 		unsigned int gun_pos;
-		std::stringstream dir;
-		dir << DATA_DIR << "/models/" << name << ".wire";
-		fd = fopen(dir.str().c_str(), "rb");
-		/* Read header of file */
-		fseek(fd, 4, SEEK_SET);
-		ret = fread(&gun_pos, sizeof(unsigned int), 1, fd);
-		assert(ret == 1);
+		ret = fd.read_binary(&gun_pos);
+		assert(ret);
 		/* Pointer file to gun position */
-		fseek(fd, gun_pos, SEEK_SET);
-		assert(fd != NULL);
+		fd.seekg(gun_pos);
 	}
 
 	{
 		// Reading Guns Matrix
-		ret = fread(&nguns, sizeof(nguns), 1, fd);
-		assert(ret == 1);
+		ret = fd.read_binary(&nguns);
+		assert(ret);
 
 		Matrix4 mat;
-		ret = fread(&mat[0][0], sizeof(float), 16, fd);
-		assert (ret == 16);
+		ret = fd.read_binary(&mat);
+		assert (ret);
 		l_canon = QRot(mat.transpose());
 
-		ret = fread(&mat[0][0], sizeof(float), 16, fd);
-		assert (ret == 16);
+		ret = fd.read_binary(&mat);
+		assert (ret);
 		r_canon = QRot(mat.transpose());
 	}
-	fclose(fd);
 }
 
 void

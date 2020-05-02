@@ -28,6 +28,8 @@ add_library(common STATIC
 	controller_local.hpp
 	controller_remote.cpp
 	controller_remote.hpp
+	data_file.cpp
+	data_file.hpp
 	destroyer.cpp
 	destroyer.hpp
 	drawable.cpp

@@ -1,7 +1,7 @@
-#include <iostream>
+#include "menu.hpp"
+
 #include <vector>
 #include <string>
-#include <sstream>
 #include <SDL.h>
 #include <guichan.hpp>
 #include <guichan/opengl/openglgraphics.hpp>
@@ -12,8 +12,7 @@
 #include "game.hpp"
 #include "options.hpp"
 #include "config.hpp"
-
-#include "menu.hpp"
+#include "data_file.hpp"
 
 using namespace std;
 using namespace Options;
@@ -107,14 +106,13 @@ namespace Menu
 		graphics = new gcn::OpenGLGraphics(width, height);
 		graphics->setTargetPlane(width, height);
 
-		std::stringstream normal,highlight,menufont;
-		normal << DATA_DIR << "/normal.png";
-		highlight << DATA_DIR << "/highlight.png";
-		menufont << DATA_DIR << "/menufont.png";
+		auto normal = get_data_path("normal.png");
+		auto highlight = get_data_path("highlight.png");
+		auto menufont = get_data_path("menufont.png");
 
-		font_normal = new gcn::ImageFont(normal.str().c_str(), " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-		font_highlight = new gcn::ImageFont(highlight.str().c_str(), " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
-		font_menu = new gcn::ImageFont(menufont.str().c_str(), " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+		font_normal = new gcn::ImageFont(normal.c_str(), " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+		font_highlight = new gcn::ImageFont(highlight.c_str(), " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
+		font_menu = new gcn::ImageFont(menufont.c_str(), " abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789");
 		gcn::Widget::setGlobalFont(font_menu);
 
 		gui = new gcn::Gui();
