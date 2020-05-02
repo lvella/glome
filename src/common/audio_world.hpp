@@ -12,7 +12,7 @@ namespace Audio {
 	class World {
 		void addListener(Listener *l);
 
-		void updateFromListener(size_t listener, const Matrix4& transform);
+		void updateFromListener(size_t listener, const QRot& transform);
 
 		std::unordered_set<Source*> sources;
 		std::vector<Listener*> listeners;

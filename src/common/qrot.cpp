@@ -96,3 +96,9 @@ Matrix4 QRot::toMatrix4() const
 		r.w,  r.z, -r.y,  r.x
 	);
 }
+
+std::ostream& operator<<(std::ostream& o, const QRot& v)
+{
+	o << "L: " << v.l << "R: " << v.r << '\n';
+	return o;
+}

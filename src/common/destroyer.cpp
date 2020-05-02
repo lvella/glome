@@ -26,7 +26,7 @@ Destroyer::Destroyer():
 
 	Matrix4 lolo;
 	memcpy(&lolo, &lala, sizeof(Matrix4));
-	other_jet.set_transformation(lolo);
+	other_jet.set_transformation(QRot(lolo));
 	other_jet.setIntensity(1.0f);
 }
 

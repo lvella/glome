@@ -36,13 +36,7 @@ Supernova::Supernova():
 	map_slerp_arc = map_shader.getUniform("slerp_arc");
 
 	// Better place to start...
-	Vector4 rot_dir = Random::direction();
-	_t = Matrix4(
-		1, 0, 0, 0,
-		0, 1, 0, 0,
-		0, 0, 0, 1,
-		0, 0, -1, 0
-	) * rotation(Random::arc(), rot_dir.x, rot_dir.y, rot_dir.z);
+	_t = zw_qrot(-math::pi_2) * qrotation(Random::arc(), Random::direction());
 
 	update(0);
 }
@@ -64,7 +58,7 @@ void Supernova::update(float dt)
 	slerp[1] = cosf(size);
 
 	// Spin
-	_t = _t * xy_matrix(slerp[1] * dt * 0.4);
+	_t = _t * xy_qrot(slerp[1] * dt * 0.4);
 }
 
 void Supernova::draw(Camera &c)

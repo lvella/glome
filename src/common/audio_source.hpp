@@ -2,7 +2,7 @@
 
 #include <vector>
 #include <AL/al.h>
-#include "matrix4.hpp"
+#include "qrot.hpp"
 #include "vector4.hpp"
 #include "vector3.hpp"
 #include "audio_sound.hpp"
@@ -69,7 +69,7 @@ namespace Audio {
                alDeleteSources(1, &al_source);
          }
 
-         void update(Source *s, const Matrix4& transform) {
+         void update(Source *s, const QRot& transform) {
             Vector3 pos = (transform * s->position()).stereo_proj();
             Vector3 velo = (pos - prev_pos) * 60;
 
@@ -91,7 +91,7 @@ namespace Audio {
          }
       }
 
-      void updateFromListener(size_t listener, const Matrix4& curr)
+      void updateFromListener(size_t listener, const QRot& curr)
       {
          listeners_source[listener].update(this, curr);
       }

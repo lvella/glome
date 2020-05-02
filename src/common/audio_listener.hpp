@@ -1,6 +1,6 @@
 #pragma once
 
-#include "matrix4.hpp"
+#include "qrot.hpp"
 #include "audio_world.hpp"
 
 namespace Audio {
@@ -15,9 +15,9 @@ namespace Audio {
 
 		virtual ~Listener() = default;
 
-		void update(const Matrix4& transform);
+		void update(const QRot& transform);
 
-		virtual const Matrix4 &transformation() const = 0;
+		virtual const QRot &transformation() const = 0;
 
 	private:
 		Listener &operator=(Listener&) = default;

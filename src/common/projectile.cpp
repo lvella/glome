@@ -213,5 +213,5 @@ void Projectile::update(float dt)
 	alpha = ttl < (max_ttl_2) ?
 		255u : 255u - uint8_t((ttl - max_ttl_2) * 200.0 / max_ttl_2);
 
-	_t = _t * zw_matrix(-speed * dt);
+	_t = _t * zw_qrot(-speed * dt);
 }

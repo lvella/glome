@@ -66,7 +66,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center, std::v
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	// From now on, use the camera with transform stack to draw objects
-	camera.reset(QRot(yz_matrix(math::pi_2)) * center);
+	camera.reset(yz_qrot(math::pi_2) * center);
 	camera.pushShader(&map_projection);
 
 	// Draw shots

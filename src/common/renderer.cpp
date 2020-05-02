@@ -117,13 +117,11 @@ Renderer::Viewport::update(float dt)
 
 	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
 	next.dt -= dt;
-
-	curr_mat = curr_qrot.toMatrix4();
 }
 
 CamShader Renderer::shader;
-const QRot Renderer::Viewport::cam_offset(QRot(
-	yz_matrix(0.2) *
-	zw_matrix(-0.015) *
-	yw_matrix(-0.01)
-));
+const QRot Renderer::Viewport::cam_offset(
+	yz_qrot(0.2) *
+	zw_qrot(-0.015) *
+	yw_qrot(-0.01)
+);

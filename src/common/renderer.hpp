@@ -33,7 +33,6 @@ protected:
 			Audio::Listener(&audio_world),
 			t(target), _x(x), _y(y), _w(w), _h(h)
 		{
-			curr_mat = cam_offset.toMatrix4();
 			curr_qrot = cam_offset;
 			//curr_qrot = QRot(xw_matrix(2.0) * xy_matrix(-.9) * yz_matrix(1.));
 			cam_hist.push_back({1.0f / 6.0f, cam_offset});
@@ -44,9 +43,9 @@ protected:
 			glViewport(_x, _y, _w, _h);
 		}
 
-		virtual const Matrix4 &transformation() const override
+		virtual const QRot &transformation() const override
 		{
-			return curr_mat;
+			return curr_qrot;
 		}
 
 		void update(float dt);
@@ -57,7 +56,6 @@ protected:
 		};
 
 		Ship* t;
-		Matrix4 curr_mat;
 		QRot curr_qrot;
 		std::deque<PathPoint> cam_hist;
 

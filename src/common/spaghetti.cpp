@@ -71,7 +71,7 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 	const size_t spaghetti_count = roundf(radius * density);
 
 	// Displacement along radius
-	const Matrix4 R_DISP = xw_matrix(radius);
+	const QRot R_DISP = xw_qrot(radius);
 
 	// Number of line segments to draw
 	count = spaghetti_count * SEGMENTS;
@@ -85,9 +85,9 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 		Vector4 &p1 = bezier[i*3 + 2];
 
 		m =
-			xy_matrix(Random::arc()) *
-			xz_matrix(Random::arc()) *
-			yz_matrix(Random::arc()) *
+			xy_qrot(Random::arc()) *
+			xz_qrot(Random::arc()) *
+			yz_qrot(Random::arc()) *
 			R_DISP * Vector4::ORIGIN;
 
 		Vector4 d = Random::direction();
@@ -146,12 +146,12 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 	speed = Random::normalDistribution(0.048, 0.024);
 
 	// Define starting position and orientation
-	_t = xy_matrix(Random::arc())
-	  * xz_matrix(Random::arc())
-	  * yz_matrix(Random::arc())
-	  * xw_matrix(Random::arc())
-	  * yw_matrix(Random::arc())
-	  * zw_matrix(Random::arc());
+	_t = xy_qrot(Random::arc())
+	  * xz_qrot(Random::arc())
+	  * yz_qrot(Random::arc())
+	  * xw_qrot(Random::arc())
+	  * yw_qrot(Random::arc())
+	  * zw_qrot(Random::arc());
 
 	// Configure humming sound effect
 	static Audio::Effect *hum_sound = Audio::Effect::getEffect("spaghetti");
@@ -182,10 +182,10 @@ void Spaghetti::draw(Camera& c)
 }
 
 void Spaghetti::update(float dt) {
-	Matrix4 velo = rotation(
+	QRot velo = qrotation(
 		dt * angular_speed,
-		rot_axis.x, rot_axis.y, rot_axis.z
-	) * zw_matrix(dt * speed);
+		rot_axis
+	) * zw_qrot(dt * speed);
 
 	_t = _t * velo;
 }

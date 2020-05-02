@@ -87,7 +87,7 @@ void Fire::update(float dt)
 {
 	int new_count = actives_count;
 
-	auto velocity = zw_matrix(intensity * scale_radius * dt * 24.0);
+	auto velocity = zw_qrot(intensity * scale_radius * dt * 24.0);
 	for(int i = 0; i < count; ++i) {
 		OfflineAttributes &oattr = oattrs[i];
 

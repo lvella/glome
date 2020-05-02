@@ -39,31 +39,31 @@ draw_meridians(Camera &c)
 	glVertexAttrib4f(s->colorAttr(), 1.0f, 1.0f, 0.0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);
 
-  Matrix4 t = xz_matrix(math::pi_2);
+  QRot t = xz_qrot(math::pi_2);
   c.pushMultQRot(t);
   glVertexAttrib4f(s->colorAttr(), .0f, 1.f, 1.0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);
   c.popMat();
 
-  t *= yz_matrix(math::pi_2);
+  t *= yz_qrot(math::pi_2);
   c.pushMultQRot(t);
   glVertexAttrib4f(s->colorAttr(), 1.0f, .0f, 1.0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);
   c.popMat();
 
-  t *= xw_matrix(-math::pi_2);
+  t *= xw_qrot(-math::pi_2);
   c.pushMultQRot(t);
   glVertexAttrib4f(s->colorAttr(), 1.0f, .0f, .0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);
   c.popMat();
 
-  t *= yw_matrix(-math::pi_2);
+  t *= yw_qrot(-math::pi_2);
   c.pushMultQRot(t);
   glVertexAttrib4f(s->colorAttr(), .0f, .0f, 1.0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);
   c.popMat();
 
-  t *= yz_matrix(math::pi_2);
+  t *= yz_qrot(math::pi_2);
   c.pushMultQRot(t);
   glVertexAttrib4f(s->colorAttr(), .0f, 1.0f, 0.0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);

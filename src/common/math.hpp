@@ -14,15 +14,17 @@ namespace math {
 	constexpr float sqrt1_2 = 0.707106781186547524400844362104849039L;
 };
 
-
-// Rotations from viewpoint
-
-// This one is almost like glRotate, but in radians, and the vector must be normalized.
-Matrix4 rotation(float angle, float x, float y, float z);
-
 // Almost like gluPerspective, but in radians...
 Matrix4 perspective(float fovy, float aspect, float zNear, float zFar);
 
+// Rotations from viewpoint
+
+// These two are almost like glRotate, but in
+// radians, and the vector must be normalized.
+Matrix4 rotation(float angle, float x, float y, float z);
+QRot qrotation(float angle, Vector3 axis);
+
+// "3-D Rotations" from viewpoint
 Matrix4 xy_matrix(float angle);
 Matrix4 xz_matrix(float angle);
 Matrix4 yz_matrix(float angle);
@@ -31,6 +33,16 @@ Matrix4 yz_matrix(float angle);
 Matrix4 xw_matrix(float angle);
 Matrix4 zw_matrix(float angle);
 Matrix4 yw_matrix(float angle);
+
+// "3-D Rotations" from viewpoint
+QRot xy_qrot(float angle);
+QRot xz_qrot(float angle);
+QRot yz_qrot(float angle);
+
+// "Translations" from viewpoint
+QRot xw_qrot(float angle);
+QRot zw_qrot(float angle);
+QRot yw_qrot(float angle);
 
 Vector4 cross(const Vector4 &a, const Vector4 &b, const Vector4 &c);
 

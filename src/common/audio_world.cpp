@@ -9,7 +9,7 @@ void World::addListener(Listener *l) {
 	}
 }
 
-void World::updateFromListener(size_t listener, const Matrix4& transform) {
+void World::updateFromListener(size_t listener, const QRot& transform) {
 	for(Source *s: sources) {
 		s->updateFromListener(listener, transform);
 	}

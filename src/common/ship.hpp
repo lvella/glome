@@ -36,14 +36,13 @@ protected:
 	ShipStats::shared_ptr stats;
 
 	// Gun properties
-	Matrix4 r_canon, l_canon;
+	QRot r_canon, l_canon;
 	uint16_t nguns;
 
 	// Engine properties
-	float rel_speed;
-	Matrix4 velocity;
-	uint16_t nengines;
 	Fire fx_engine;
+	float rel_speed;
+	uint16_t nengines;
 
 	// Shield properties
 	uint16_t life;

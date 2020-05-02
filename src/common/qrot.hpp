@@ -22,7 +22,7 @@ public:
 		l(l), r(r)
 	{}
 
-	/*explicit*/ QRot(const Matrix4& rot_mat);
+	explicit QRot(const Matrix4& rot_mat);
 
 	Matrix4 toMatrix4() const;
 
@@ -32,6 +32,12 @@ public:
 			l * other.l,
 			other.r * r
 		);
+	}
+
+	QRot &operator*=(const QRot& other)
+	{
+		*this = *this * other;
+		return *this;
 	}
 
 	Vector4 operator*(const Vector4& other) const
@@ -67,3 +73,5 @@ public:
 	Vector4 l;
 	Vector4 r;
 };
+
+std::ostream& operator<<(std::ostream& o, const QRot& r);

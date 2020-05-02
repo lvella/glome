@@ -4,6 +4,19 @@
 #include "qrot.hpp"
 
 Matrix4
+perspective(float fovy, float aspect, float zNear, float zFar)
+{
+	float f = 1.0f / tan(fovy / 2.0);
+	float dif = zNear - zFar;
+	return Matrix4(
+		f/aspect, 0.0f, 0.0f, 0.0f,
+		0.0f, f, 0.0f, 0.0f,
+		0.0f, 0.0f, (zFar + zNear) / dif, 2.0 * zFar * zNear / dif,
+		0.0f, 0.0f, -1.0f, 0.0f
+	);
+}
+
+Matrix4
 rotation(float angle, float x, float y, float z) {
 	const float c = cos(angle);
 	const float s = sin(angle);
@@ -17,17 +30,13 @@ rotation(float angle, float x, float y, float z) {
 	);
 }
 
-Matrix4
-perspective(float fovy, float aspect, float zNear, float zFar)
+QRot qrotation(float angle, Vector3 axis)
 {
-	float f = 1.0f / tan(fovy / 2.0);
-	float dif = zNear - zFar;
-	return Matrix4(
-		f/aspect, 0.0f, 0.0f, 0.0f,
-		0.0f, f, 0.0f, 0.0f,
-		0.0f, 0.0f, (zFar + zNear) / dif, 2.0 * zFar * zNear / dif,
-		0.0f, 0.0f, -1.0f, 0.0f
-	);
+	const float h = 0.5 * angle;
+	const float c = cos(h);
+	const float s = sin(h);
+	const Vector4 q(c, s * axis.z, -s * axis.y, s * axis.x);
+	return QRot(q, Vector4(q.x, q.y, q.z, -q.w));
 }
 
 Matrix4
@@ -99,6 +108,60 @@ yw_matrix(float angle) {
 		0,c,0,-s,
 		0,0,1,0,
 		0,s,0,c
+	);
+}
+
+QRot xy_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const Vector4 q(cos(h), sin(h), 0, 0);
+	return QRot(q, q);
+}
+
+QRot xz_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const Vector4 q(cos(h), 0, sin(h), 0);
+	return QRot(q, q);
+}
+
+QRot yz_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const float c = cos(h);
+	const float s = sin(h);
+	return QRot(
+		Vector4(c, 0, 0, s),
+		Vector4(c, 0, 0, -s)
+	);
+}
+
+QRot xw_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const Vector4 q(cos(h), 0, 0, sin(h));
+	return QRot(q, q);
+}
+
+QRot zw_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const float c = cos(h);
+	const float s = sin(h);
+	return QRot(
+		Vector4(c, s, 0, 0),
+		Vector4(c, -s, 0, 0)
+	);
+}
+
+QRot yw_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const float c = cos(h);
+	const float s = sin(h);
+	return QRot(
+		Vector4(c, 0, -s, 0),
+		Vector4(c, 0, s, 0)
 	);
 }
 
