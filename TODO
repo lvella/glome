@@ -7,22 +7,22 @@
     - Can be time step discontinuity problem, for small FSMs.
     - Can be something wrong with the FSM radius.
     - Can be something wrong with the octree in some places.
-- Transfer momentum on collision between objects (ships, flying spagetti monsters)
-  - At least prevent them from intersecting, change their velocity away from one another
-  - How to fit that to current crazy FSM movement?
-- Fix supernova appearance:
-  - you can see briefly see the other side when it is half size (you must not)
-    - don't draw the opposite side to fix this
 - Add collision to supernova
   - Kill player when collide, finishing the game
   - Show and register score, then ask to try again
     - Take care to make it compatible with VR UI
-- Sort objects when drawing each viewport
-  - Use distance to the nearest surface
 - Kill flying spaghetti monsters
   - When shot
   - When collide with supernova
   - Make some cool death animation
+- Transfer momentum on collision between objects (ships, flying spagetti monsters)
+  - At least prevent them from intersecting, change their velocity away from one another
+  - How to fit that to current crazy FSM movement?
+- Sort objects when drawing each viewport
+  - Use distance to the nearest surface
+- Fix supernova appearance:
+  - you can see briefly see the other side when it is half size (you must not)
+    - don't draw the opposite side to fix this
 - Make game run in solid 90 Hz
   - make it 144 Hz, if possible
   - Create a profile framework
