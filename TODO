@@ -1,7 +1,7 @@
 == Needs for FIKALAB game ==
 
 - Support Windows build
-- BUG: Fix fire when stopping.
+- BUG: Fix engine fire degeneration over time
 - BUG: Fix quantum tunelling of bullets
   - Bullets pass straight through some FSMs.
     - Can be time step discontinuity problem, for small FSMs.
@@ -53,13 +53,11 @@
 
 - Bring exporter up to date with current blender
 - Export meshes with CMake
-- Possibly use GLM for linear algebra
 - Bring code to C++11:
   - Always use "override"
   - Remove all new/delete
-- Use 2 quaternion as position/orientation representation
-  - A little bit of this done inside renderer
-  - Make dustfield independent of FPS
+- Make dustfield independent of FPS
+  - Reuse camera history code
 - Port to Vulkan (maybe we can use it to improve performance)
 
 == OLD GLOME TODO (do not apply for FIKALAB) ==
