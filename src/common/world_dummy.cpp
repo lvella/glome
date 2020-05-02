@@ -50,7 +50,7 @@ WorldDummy::WorldDummy():
 	dynamic_objects.push_back(&nova);
 
 	// Create flying spaghetti monsters
-	const size_t NUM_FSMS = 5;//000;
+	const size_t NUM_FSMS = 5000;
 	fsms.reserve(NUM_FSMS);
 	for(size_t i = 0; i < NUM_FSMS; ++i) {
 		fsms.emplace_back(audio_world);
