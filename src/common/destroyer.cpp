@@ -26,13 +26,13 @@ Destroyer::Destroyer():
 
 	Matrix4 lolo;
 	memcpy(&lolo, &lala, sizeof(Matrix4));
-	other_jet.set_transformation(QRot(lolo));
+	other_jet.set_t(QRot(lolo));
 	other_jet.setIntensity(1.0f);
 }
 
 void Destroyer::draw(Camera &c)
 {
-	c.pushMultQRot(_t);
+	c.pushMultQRot(get_t());
 	mesh->draw(c);
 	fx_engine.draw(c);
 	other_jet.draw(c);

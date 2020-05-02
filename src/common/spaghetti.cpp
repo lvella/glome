@@ -146,12 +146,14 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 	speed = Random::normalDistribution(0.048, 0.024);
 
 	// Define starting position and orientation
-	_t = xy_qrot(Random::arc())
+	set_t(
+	    xy_qrot(Random::arc())
 	  * xz_qrot(Random::arc())
 	  * yz_qrot(Random::arc())
 	  * xw_qrot(Random::arc())
 	  * yw_qrot(Random::arc())
-	  * zw_qrot(Random::arc());
+	  * zw_qrot(Random::arc())
+	);
 
 	// Configure humming sound effect
 	static Audio::Effect *hum_sound = Audio::Effect::getEffect("spaghetti");
@@ -167,7 +169,7 @@ Spaghetti::~Spaghetti()
 void Spaghetti::draw(Camera& c)
 {
 	auto &s = *c.getShader();
-	c.pushMultQRot(_t);
+	c.pushMultQRot(get_t());
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -187,5 +189,5 @@ void Spaghetti::update(float dt) {
 		rot_axis
 	) * zw_qrot(dt * speed);
 
-	_t = _t * velo;
+	mul_t(velo);
 }

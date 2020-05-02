@@ -108,7 +108,7 @@ void Fire::update(float dt)
 				}
 
 				float r = origin_radius;
-				rattr.position = _t * rand_in_sphere(r);
+				rattr.position = get_t() * rand_in_sphere(r);
 				r /= origin_radius;
 				oattr.energy = FIRE_LIFE * (1.0f - r);
 				rattr.color = Vector4(1.0f, 0.7f, 0.0f, 0.0f) * r + Vector4(0.3f, 0.4f, 1.0f, 0.0f) * (1.0 - r);
@@ -130,7 +130,7 @@ void Fire::update(float dt)
 void Fire::draw(Camera& c)
 {
 	c.pushShader(&program_fire);
-	c.pushMultQRot(_t);
+	c.pushMultQRot(get_t());
 
 	depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

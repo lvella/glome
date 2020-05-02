@@ -121,7 +121,7 @@ Ship::load_engines(Mesh::Types type)
 void
 Ship::draw(Camera& c)
 {
-	c.pushMultQRot(_t);
+	c.pushMultQRot(get_t());
 	mesh->draw(c);
 	fx_engine.draw(c);
 	c.popMat();
@@ -188,7 +188,8 @@ Ship::update(float dt)
 				const float offset = speed * (ctrl->shot_countdown + dt);
 
 				Projectile::shot(ctrl,
-					_t * (ctrl->canon_shot_last ? l_canon : r_canon)
+					get_t()
+					* (ctrl->canon_shot_last ? l_canon : r_canon)
 					* zw_qrot(offset), speed
 				);
 
@@ -201,12 +202,13 @@ Ship::update(float dt)
 				ctrl->shot_countdown = 0.0;
 		}
 
-		_t = _t * zw_qrot(dt * ctrl->speed) * yw_qrot(dt * ctrl->speed_v)
+		mul_t(zw_qrot(dt * ctrl->speed) * yw_qrot(dt * ctrl->speed_v)
 			* xw_qrot(dt * ctrl->speed_h)
 			* xy_qrot(dt * ctrl->speed_s) * yz_qrot(dt * ctrl->v_tilt)
 			* qrotation(-dt * ctrl->h_tilt,
 				Vector3(0.0, math::sqrt1_2, math::sqrt1_2)
-			);
+			)
+		);
 
 		fx_engine.setIntensity(std::max(0.0f, rel_speed));
 	}

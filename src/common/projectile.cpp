@@ -95,7 +95,7 @@ void Projectile::update_all(float dt)
 		{
 			size_t i = 0;
 			for (auto& e: shots) {
-				minimap_buf[i++] = e.transformation().position();
+				minimap_buf[i++] = e.position();
 			}
 		}
 
@@ -141,7 +141,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 	to_sort.reserve(shots.size());
 
 	for(auto & shot: shots) {
-		Vector4 pos = cam.transformation() * shot._t.position();
+		Vector4 pos = cam.transformation() * shot.position();
 		if (pos[2] <= 0) {
 			to_sort.emplace_back(&shot, pos.squared_length());
 		}
@@ -202,7 +202,7 @@ Projectile::Projectile(ShipController * s, const QRot& from, float speed):
 
 void Projectile::draw(Camera & c)
 {
-	c.pushMultQRot(_t);
+	c.pushMultQRot(get_t());
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	c.popMat();
 }
@@ -213,5 +213,5 @@ void Projectile::update(float dt)
 	alpha = ttl < (max_ttl_2) ?
 		255u : 255u - uint8_t((ttl - max_ttl_2) * 200.0 / max_ttl_2);
 
-	_t = _t * zw_qrot(-speed * dt);
+	mul_t(zw_qrot(-speed * dt));
 }

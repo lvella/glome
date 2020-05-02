@@ -1,6 +1,7 @@
 == Needs for FIKALAB game ==
 
 - Support Windows build
+- BUG: Fix fire when stopping.
 - BUG: Fix quantum tunelling of bullets
   - Bullets pass straight through some FSMs.
     - Can be time step discontinuity problem, for small FSMs.

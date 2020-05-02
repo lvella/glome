@@ -75,7 +75,7 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
 		Projectile::draw_many(sorted_projs, camera);
 		DustField::draw(camera);
 
-		MiniMap::draw(active->_x, active->_y, this, active->t->transformation().inverse(), objs);
+		MiniMap::draw(active->_x, active->_y, this, active->t->get_t().inverse(), objs);
 	}
 }
 
@@ -102,7 +102,7 @@ Renderer::audio_update()
 void
 Renderer::Viewport::update(float dt)
 {
-	cam_hist.push_back({dt, cam_offset * t->transformation().inverse()});
+	cam_hist.push_back({dt, cam_offset * t->get_t().inverse()});
 
 	while(cam_hist.front().dt <= dt) {
 		dt -= cam_hist.front().dt;

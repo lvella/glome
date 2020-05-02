@@ -36,7 +36,7 @@ Supernova::Supernova():
 	map_slerp_arc = map_shader.getUniform("slerp_arc");
 
 	// Better place to start...
-	_t = zw_qrot(-math::pi_2) * qrotation(Random::arc(), Random::direction());
+	set_t(zw_qrot(-math::pi_2) * qrotation(Random::arc(), Random::direction()));
 
 	update(0);
 }
@@ -58,14 +58,14 @@ void Supernova::update(float dt)
 	slerp[1] = cosf(size);
 
 	// Spin
-	_t = _t * xy_qrot(slerp[1] * dt * 0.4);
+	mul_t(xy_qrot(slerp[1] * dt * 0.4));
 }
 
 void Supernova::draw(Camera &c)
 {
 	c.pushShader(&shader);
 
-	c.pushMultQRot(_t);
+	c.pushMultQRot(get_t());
 
 	{
 		// Calculate the center of the projected sphere, to use in the yellow gloom effect.
@@ -101,7 +101,7 @@ void Supernova::draw(Camera &c)
 void Supernova::minimap_draw(Camera &c)
 {
 	c.pushShader(&map_shader);
-	c.pushMultQRot(_t);
+	c.pushMultQRot(get_t());
 
 	map_slerp_arc.set(slerp);
 	glVertexAttrib3f(map_shader.colorAttr(), 1.0f, 1.0f, 1.0f);
