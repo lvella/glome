@@ -1,7 +1,7 @@
 == Needs for FIKALAB game ==
 
-- Support Windows build
-- BUG: Fix engine fire degeneration over time
+- Support Windows build (Rui)
+- BUG: Fix engine fire degeneration over time (Vella)
 - BUG: Fix quantum tunelling of bullets
   - Bullets pass straight through some FSMs.
     - Can be time step discontinuity problem, for small FSMs.
@@ -27,7 +27,7 @@
   - make it 144 Hz, if possible
   - Create a profile framework
     - Generalize the one used for measuring octree
-  - Cull unseen objects
+  - Cull unseen objects (Helder)
 - Implement stereo rendering using OpenVR API
 - Handle headset input:
   - Headset orientation changes camera view relative to ship position
@@ -37,6 +37,7 @@
   - 2 hand canons, maybe?
     - laser targetting
     - each cannon position given by each controller position
+- Change ship design to fit VR
 - Sound effects:
   - Shot
   - Hit
@@ -44,7 +45,6 @@
   - Flying spagetti monster
   - Splash into supernova
   - others?
-- Visual effect of cannon fire when shooting
 - Fix destroyer's double flame positions
 - Visual cue of cannon heat
   - Maybe remove cannon heat stuff?
@@ -55,12 +55,14 @@
 - Export meshes with CMake
 - Bring code to C++11:
   - Always use "override"
-  - Remove all new/delete
+  - Remove all new/delete (Diogo)
 - Make dustfield independent of FPS
   - Reuse camera history code
 - Port to Vulkan (maybe we can use it to improve performance)
 
 == OLD GLOME TODO (do not apply for FIKALAB) ==
+
+- Visual effect of cannon fire when shooting
 
 Main topics:
 - Physics
