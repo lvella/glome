@@ -60,7 +60,7 @@ void Fire::initialize()
 	glEnable(GL_POINT_SPRITE);
 
 	// Without this in GLES
-    glEnable(GL_PROGRAM_POINT_SIZE);
+	glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
 void Fire::set_width(int w)
