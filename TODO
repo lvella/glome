@@ -1,8 +1,7 @@
 == Needs for FIKALAB game ==
 
 - Support Windows build (Rui)
-- BUG: Fix engine fire degeneration over time (Vella)
-- BUG: Fix quantum tunelling of bullets
+- BUG: Fix quantum tunelling of bullets (Vella)
   - Bullets pass straight through some FSMs.
     - Can be time step discontinuity problem, for small FSMs.
     - Can be something wrong with the FSM radius.
