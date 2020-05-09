@@ -25,8 +25,6 @@ public:
 
 	explicit QRot(const Matrix4& rot_mat);
 
-	Matrix4 toMatrix4() const;
-
 	QRot operator*(const QRot& other) const
 	{
 		return QRot(

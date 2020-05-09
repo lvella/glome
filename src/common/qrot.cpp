@@ -87,23 +87,6 @@ found:
 	r[(j+3)%4] = tmp[3];
 }
 
-Matrix4 QRot::toMatrix4() const
-{
-	return Matrix4(
-		// Left isoclinic:
-		l.x, -l.y, -l.z, -l.w,
-		l.y,  l.x, -l.w,  l.z,
-		l.z,  l.w,  l.x, -l.y,
-		l.w, -l.z,  l.y,  l.x
-	) * Matrix4(
-		// Right isoclinic:
-		r.x, -r.y, -r.z, -r.w,
-		r.y,  r.x,  r.w, -r.z,
-		r.z, -r.w,  r.x,  r.y,
-		r.w,  r.z, -r.y,  r.x
-	);
-}
-
 std::ostream& operator<<(std::ostream& o, const QRot& v)
 {
 	o << "L: " << v.l << "R: " << v.r << '\n';

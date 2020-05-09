@@ -18,21 +18,7 @@ namespace math {
 Matrix4 perspective(float fovy, float aspect, float zNear, float zFar);
 
 // Rotations from viewpoint
-
-// These two are almost like glRotate, but in
-// radians, and the vector must be normalized.
-Matrix4 rotation(float angle, float x, float y, float z);
 QRot qrotation(float angle, Vector3 axis);
-
-// "3-D Rotations" from viewpoint
-Matrix4 xy_matrix(float angle);
-Matrix4 xz_matrix(float angle);
-Matrix4 yz_matrix(float angle);
-
-// "Translations" from viewpoint
-Matrix4 xw_matrix(float angle);
-Matrix4 zw_matrix(float angle);
-Matrix4 yw_matrix(float angle);
 
 // "3-D Rotations" from viewpoint
 QRot xy_qrot(float angle);
