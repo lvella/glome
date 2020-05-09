@@ -86,14 +86,14 @@ public:
 		return Vector4(x, -y, -z, -w);
 	}
 
-	Vector4 normalized()
+	Vector4 normalized() const
 	{
-		return (*this) * (1.0 / length());
+		return (*this) * (1.0f / length());
 	}
 
 	float calc_norm_w() const
 	{
-		return -sqrtf(1.0f - x*x - y*y - z*z);
+		return -std::sqrt(1.0f - x*x - y*y - z*z);
 	}
 
 	Vector3 stereo_proj() const;
@@ -105,7 +105,7 @@ public:
 
 	float length() const
 	{
-		return sqrt(squared_length());
+		return std::sqrt(squared_length());
 	}
 
 	const float* data() const {return v;}
