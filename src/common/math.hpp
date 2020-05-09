@@ -44,8 +44,6 @@ QRot xw_qrot(float angle);
 QRot zw_qrot(float angle);
 QRot yw_qrot(float angle);
 
-Vector4 cross(const Vector4 &a, const Vector4 &b, const Vector4 &c);
-
 /** Normalized linear interpolation.
  *
  * This link says NLERP is a good enough replacement for SLERP:

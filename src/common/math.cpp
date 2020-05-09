@@ -165,28 +165,6 @@ QRot yw_qrot(float angle)
 	);
 }
 
-Vector4
-cross(const Vector4 &a, const Vector4 &b, const Vector4 &c)
-{
-	return Vector4(
-		c.y * b.z * a.w - b.y * c.z * a.w -
-		c.y * a.z * b.w + a.y * c.z * b.w +
-		b.y * a.z * c.w - a.y * b.z * c.w,
-
-		- c.x * b.z * a.w + b.x * c.z * a.w
-		+ c.x * a.z * b.w - a.x * c.z * b.w
-		- b.x * a.z * c.w + a.x * b.z * c.w,
-
-		c.x * b.y * a.w - b.x * c.y * a.w -
-		c.x * a.y * b.w + a.x * c.y * b.w +
-		b.x * a.y * c.w - a.x * b.y * c.w,
-
-		- c.x * b.y * a.z + b.x * c.y * a.z
-		+ c.x * a.y * b.z - a.x * c.y * b.z
-		- b.x * a.y * c.z + a.x * b.y * c.z
-	);
-}
-
 QRot nlerp(const QRot& a, const QRot& b, float t)
 {
 	return QRot(
