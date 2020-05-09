@@ -18,8 +18,9 @@ public:
 	QRot()
 	{}
 
-	explicit constexpr QRot(const Vector4& l, const Vector4& r):
-		l(l), r(r)
+	explicit constexpr QRot(const Vector4& l, const Vector4& r, bool normalize = true):
+		l(normalize ? l.normalized(): l),
+		r(normalize ? r.normalized(): r)
 	{}
 
 	explicit QRot(const Matrix4& rot_mat);
@@ -29,15 +30,14 @@ public:
 	QRot operator*(const QRot& other) const
 	{
 		return QRot(
-			l * other.l,
-			other.r * r
+			(l * other.l).normalized(),
+			(other.r * r).normalized()
 		);
 	}
 
 	QRot &operator*=(const QRot& other)
 	{
-		*this = *this * other;
-		return *this;
+		return (*this = *this * other);
 	}
 
 	Vector4 operator*(const Vector4& other) const
@@ -47,7 +47,7 @@ public:
 
 	QRot inverse() const
 	{
-		return QRot(l.conjugate(), r.conjugate());
+		return QRot(l.conjugate(), r.conjugate(), false);
 	}
 
 	Vector4 position() const {
@@ -66,7 +66,8 @@ public:
 	{
 		return QRot{
 			Vector4(1, 0, 0, 0),
-			Vector4(1, 0, 0, 0)
+			Vector4(1, 0, 0, 0),
+			false
 		};
 	}
 

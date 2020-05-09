@@ -115,14 +115,14 @@ QRot xy_qrot(float angle)
 {
 	const float h = 0.5 * angle;
 	const Vector4 q(std::cos(h), std::sin(h), 0, 0);
-	return QRot(q, q);
+	return QRot(q, q, false);
 }
 
 QRot xz_qrot(float angle)
 {
 	const float h = 0.5 * angle;
 	const Vector4 q(std::cos(h), 0, std::sin(h), 0);
-	return QRot(q, q);
+	return QRot(q, q, false);
 }
 
 QRot yz_qrot(float angle)
@@ -132,7 +132,8 @@ QRot yz_qrot(float angle)
 	const float s = std::sin(h);
 	return QRot(
 		Vector4(c, 0, 0, s),
-		Vector4(c, 0, 0, -s)
+		Vector4(c, 0, 0, -s),
+		false
 	);
 }
 
@@ -140,7 +141,7 @@ QRot xw_qrot(float angle)
 {
 	const float h = 0.5 * angle;
 	const Vector4 q(std::cos(h), 0, 0, std::sin(h));
-	return QRot(q, q);
+	return QRot(q, q, false);
 }
 
 QRot zw_qrot(float angle)
@@ -150,7 +151,8 @@ QRot zw_qrot(float angle)
 	const float s = std::sin(h);
 	return QRot(
 		Vector4(c, s, 0, 0),
-		Vector4(c, -s, 0, 0)
+		Vector4(c, -s, 0, 0),
+		false
 	);
 }
 
@@ -161,7 +163,8 @@ QRot yw_qrot(float angle)
 	const float s = std::sin(h);
 	return QRot(
 		Vector4(c, 0, -s, 0),
-		Vector4(c, 0, s, 0)
+		Vector4(c, 0, s, 0),
+		false
 	);
 }
 
@@ -169,7 +172,8 @@ QRot nlerp(const QRot& a, const QRot& b, float t)
 {
 	return QRot(
 		nlerp(a.l, b.l, t),
-		nlerp(a.r, b.r, t)
+		nlerp(a.r, b.r, t),
+		false
 	);
 }
 
