@@ -1,7 +1,11 @@
 == Needs for FIKALAB game ==
 
 - Support Windows build (Rui)
-- BUG: Fix quantum tunelling of bullets (Vella)
+- Kill flying spaghetti monsters (Vella)
+  - When shot
+  - When collide with supernova
+  - Make some cool death animation
+- BUG: Fix quantum tunelling of bullets
   - Bullets pass straight through some FSMs.
     - Can be time step discontinuity problem, for small FSMs.
     - Can be something wrong with the FSM radius.
@@ -10,10 +14,6 @@
   - Kill player when collide, finishing the game
   - Show and register score, then ask to try again
     - Take care to make it compatible with VR UI
-- Kill flying spaghetti monsters
-  - When shot
-  - When collide with supernova
-  - Make some cool death animation
 - Transfer momentum on collision between objects (ships, flying spagetti monsters)
   - At least prevent them from intersecting, change their velocity away from one another
   - How to fit that to current crazy FSM movement?
