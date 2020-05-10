@@ -4,6 +4,7 @@
 #include <deque>
 #include <iostream>
 #include <GL/glew.h>
+#include <memory>
 
 #include "math.hpp"
 #include "projectile.hpp"
@@ -29,7 +30,8 @@ static GLint hud_has_tex;
 GLuint square_vbo;
 
 void
-MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center, std::vector<Glome::Drawable*> objs)
+MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
+	const std::vector<Glome::Drawable*>& objs)
 {
 	const int b = 10;
 	const int l = 10;

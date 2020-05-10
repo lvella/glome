@@ -1,3 +1,4 @@
+#include "drawable.hpp"
 #include "options.hpp"
 #include "meridian.hpp"
 #include "minimap.hpp"
@@ -32,7 +33,7 @@ Renderer::setup_display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)
+Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world)
 {
 	assert(pp.size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
 	int h = height / (pp.size() > 2 ? 2 : 1);
@@ -54,7 +55,7 @@ Renderer::update(float dt)
 }
 
 void
-Renderer::draw(const vector<Glome::Drawable*>& objs)
+Renderer::draw(vector<Glome::Drawable*>&& objs)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -66,7 +67,7 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
 
 		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
 
-	        draw_meridians(camera);
+		draw_meridians(camera);
 
 		for(auto &obj: objs) {
 			obj->draw(camera);
@@ -75,17 +76,21 @@ Renderer::draw(const vector<Glome::Drawable*>& objs)
 		Projectile::draw_many(sorted_projs, camera);
 		DustField::draw(camera);
 
-		MiniMap::draw(active->_x, active->_y, this, active->t->get_t().inverse(), objs);
+		MiniMap::draw(active->_x, active->_y, this,
+			active->transformation().inverse(), objs
+		);
 	}
 }
 
 void
 Renderer::fill_minimap(const vector<Glome::Drawable*>& objs, Camera &cam)
 {
+	std::shared_ptr<Glome::Drawable> curr = active->t.lock();
+
 	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
 	// Probably so insignificant it is not worth the effort.
 	for(auto &obj: objs) {
-		if(obj != active->t)
+		if(obj != curr.get())
 			obj->minimap_draw(cam);
 	}
 }
@@ -102,7 +107,14 @@ Renderer::audio_update()
 void
 Renderer::Viewport::update(float dt)
 {
-	cam_hist.push_back({dt, cam_offset * t->get_t().inverse()});
+	QRot new_trans;
+	if(auto ptr = t.lock()) {
+		new_trans = cam_offset * ptr->get_t().inverse();
+	} else {
+		new_trans = cam_hist.front().t;
+	}
+
+	cam_hist.push_back({dt, new_trans});
 
 	while(cam_hist.front().dt <= dt) {
 		dt -= cam_hist.front().dt;

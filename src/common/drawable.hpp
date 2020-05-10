@@ -4,6 +4,7 @@
 #include "camera.hpp"
 #include "object.hpp"
 
+// TODO: either remove this namespace, or add it to everything else
 namespace Glome
 {
 	class Drawable : virtual public Object

@@ -1,6 +1,7 @@
 #pragma once
 
 #include <deque>
+#include <memory>
 #include <vector>
 
 #include "audio_world.hpp"
@@ -17,19 +18,22 @@ class Renderer
 public:
 	static void initialize();
 
-	Renderer(const std::vector<Ship*>& pp, Audio::World &audio_world);
+	Renderer(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world);
 
 	void update(float dt);
-	void draw(const std::vector<Glome::Drawable*> &objs);
+	void draw(std::vector<Glome::Drawable*>&& objs);
 	void setup_display();
-	void fill_minimap(const std::vector<Glome::Drawable*> &objs, Camera &cam);
+	void fill_minimap(const std::vector<Glome::Drawable*>& objs, Camera& cam);
 
 	void audio_update();
 
 protected:
 	struct Viewport: public Audio::Listener
 	{
-		Viewport(Ship* target, int x, int y, int w, int h, Audio::World &audio_world):
+		Viewport(std::weak_ptr<Ship> target,
+			int x, int y, int w, int h,
+			Audio::World &audio_world
+		):
 			Audio::Listener(&audio_world),
 			t(target), _x(x), _y(y), _w(w), _h(h)
 		{
@@ -55,7 +59,7 @@ protected:
 			QRot t;
 		};
 
-		Ship* t;
+		std::weak_ptr<Ship> t;
 		QRot curr_qrot;
 		std::deque<PathPoint> cam_hist;
 

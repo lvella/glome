@@ -183,11 +183,13 @@ void Spaghetti::draw(Camera& c)
 	c.popMat();
 }
 
-void Spaghetti::update(float dt) {
+bool Spaghetti::update(float dt, UpdatableAdder& adder) {
 	QRot velo = qrotation(
 		dt * angular_speed,
 		rot_axis
 	) * zw_qrot(dt * speed);
 
 	mul_t(velo);
+
+	return true;
 }

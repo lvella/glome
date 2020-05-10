@@ -12,7 +12,7 @@ public:
 	Supernova();
 	~Supernova();
 
-	void update(float dt) override;
+	bool update(float dt, UpdatableAdder &) override;
 	void draw(Camera &c) override;
 	void minimap_draw(Camera &c) override;
 

@@ -24,10 +24,6 @@ add_library(common STATIC
 	camera.hpp
 	color.cpp
 	color.hpp
-	controller_local.cpp
-	controller_local.hpp
-	controller_remote.cpp
-	controller_remote.hpp
 	data_file.cpp
 	data_file.hpp
 	destroyer.cpp
@@ -89,9 +85,10 @@ add_library(common STATIC
 	vector3.hpp
 	vector4.cpp
 	vector4.hpp
+	world.cpp
+	world.hpp
 	world_dummy.cpp
 	world_dummy.hpp
-	world_local.hpp
 )
 
 target_include_directories(common PUBLIC

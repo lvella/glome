@@ -16,12 +16,11 @@ public:
 	~Ship() = default;
 
 	virtual void draw(Camera& c) override;
-	virtual void update(float dt) override;
+	virtual bool update(float dt, UpdatableAdder&) override;
 	void load_guns(Mesh::Types type); //TODO: This method is similar to load_engines, change it!
 	void load_engines(Mesh::Types type);
 	void set_controller(ShipController* pctrl);
 	ShipController* ctrl;
-	AiController* aux;
 
 	#ifdef STATS_TUNING
 	float get_scale() {

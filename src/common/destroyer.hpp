@@ -8,7 +8,7 @@ public:
 	Destroyer();
 
 	void draw(Camera &c) override;
-	void update(float dt) override;
+	bool update(float dt, UpdatableAdder& adder) override;
 
 private:
 	Fire other_jet;

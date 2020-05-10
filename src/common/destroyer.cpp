@@ -39,8 +39,10 @@ void Destroyer::draw(Camera &c)
 	c.popMat();
 }
 
-void Destroyer::update(float dt)
+bool Destroyer::update(float dt, UpdatableAdder& adder)
 {
-	Ship::update(dt);
-	other_jet.update(dt);
+	bool ret = Ship::update(dt, adder);
+	other_jet.update(dt, adder);
+
+	return ret;
 }

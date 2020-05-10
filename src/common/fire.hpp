@@ -9,7 +9,7 @@ class Fire final: public ParticleSystem, public Updatable, public Glome::Drawabl
 public:
 	Fire(float radius);
 
-	void update(float dt) override;
+	bool update(float dt, UpdatableAdder&) override;
 	void draw(Camera& c) override;
 	void minimap_draw(Camera& c) override;
 	void setIntensity(float i);

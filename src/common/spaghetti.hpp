@@ -18,7 +18,7 @@ public:
   ~Spaghetti();
 
   void draw(Camera& s) override;
-  void update(float dt) override;
+  bool update(float dt, UpdatableAdder& adder) override;
 
   void collided_with(const VolSphere& other, float) override
   {

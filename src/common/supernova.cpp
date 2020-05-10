@@ -37,8 +37,6 @@ Supernova::Supernova():
 
 	// Better place to start...
 	set_t(zw_qrot(-math::pi_2) * qrotation(Random::arc(), Random::direction()));
-
-	update(0);
 }
 
 Supernova::~Supernova()
@@ -47,18 +45,20 @@ Supernova::~Supernova()
 	Mesh::release_mesh(mesh);
 }
 
-void Supernova::update(float dt)
+bool Supernova::update(float dt, UpdatableAdder&)
 {
 	// Based on http://math.stackexchange.com/a/99171/7721
 	// Expanding rate; 0 is collapsed at origin, M_PI is
 	// collapsed at opposite pole.
 	size += dt * 0.03;
 
-	slerp[0] = sinf(size);
-	slerp[1] = cosf(size);
+	slerp[0] = std::sin(size);
+	slerp[1] = std::cos(size);
 
 	// Spin
 	mul_t(xy_qrot(slerp[1] * dt * 0.4));
+
+	return true;
 }
 
 void Supernova::draw(Camera &c)

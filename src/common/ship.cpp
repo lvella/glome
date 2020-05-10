@@ -10,8 +10,6 @@
 #include "projectile.hpp"
 #include "data_file.hpp"
 #include "vector4.hpp"
-#include "matrix4.hpp"
-
 
 #include <iostream>
 
@@ -120,8 +118,8 @@ Ship::draw(Camera& c)
 	c.popMat();
 }
 
-void
-Ship::update(float dt)
+bool
+Ship::update(float dt, UpdatableAdder& adder)
 {
 	#ifdef STATS_TUNING
 	static float curr_scale = 1.0;
@@ -205,6 +203,7 @@ Ship::update(float dt)
 
 		fx_engine.setIntensity(std::max(0.0f, rel_speed));
 	}
-	fx_engine.update(dt);
+	fx_engine.update(dt, adder);
 
+	return true;
 }
