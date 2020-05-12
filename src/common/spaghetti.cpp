@@ -5,12 +5,15 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <typeinfo>
+
 #include "object.hpp"
 #include "math.hpp"
 #include "random.hpp"
 #include "vector4.hpp"
 #include "color.hpp"
 #include "audio_effect.hpp"
+#include "projectile.hpp"
 
 using namespace Glome;
 
@@ -183,7 +186,12 @@ void Spaghetti::draw(Camera& c)
 	c.popMat();
 }
 
-bool Spaghetti::update(float dt, UpdatableAdder& adder) {
+bool Spaghetti::update(float dt, UpdatableAdder& adder)
+{
+	if(dead) {
+		return false;
+	}
+
 	QRot velo = qrotation(
 		dt * angular_speed,
 		rot_axis
@@ -192,4 +200,12 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder) {
 	mul_t(velo);
 
 	return true;
+}
+
+
+void Spaghetti::collided_with(const VolSphere& other, float)
+{
+	if(typeid(other) == typeid(const Projectile&)) {
+		dead = true;
+	}
 }

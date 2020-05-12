@@ -20,10 +20,7 @@ public:
   void draw(Camera& s) override;
   bool update(float dt, UpdatableAdder& adder) override;
 
-  void collided_with(const VolSphere& other, float) override
-  {
-    // TODO: implement
-  }
+  void collided_with(const VolSphere& other, float) override;
 
 private:
 
@@ -41,4 +38,5 @@ private:
   float speed;
   GLuint vbo;
   GLsizei count;
+  bool dead = false;
 };
