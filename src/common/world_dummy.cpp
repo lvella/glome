@@ -1,13 +1,8 @@
 #include "world_dummy.hpp"
 
-#include "ai_controller.hpp"
 #include "input.hpp"
 #include "options.hpp"
 #include "random.hpp"
-#include "destroyer.hpp"
-#include "ship_stats.hpp"
-#include "projectile.hpp"
-#include "thread_pool.hpp"
 #include <memory>
 
 

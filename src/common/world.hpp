@@ -40,8 +40,8 @@ protected:
 private:
 	ProfillingAggregator profiler;
 
-	std::list<std::shared_ptr<Updatable>> updatable_list;
-	std::list<std::weak_ptr<VolSphere>> collidable_list;
-	std::list<std::weak_ptr<Glome::Drawable>> drawable_list;
+	std::vector<std::shared_ptr<Updatable>> updatables;
+	std::vector<std::weak_ptr<VolSphere>> collidables;
+	std::vector<std::weak_ptr<Glome::Drawable>> drawables;
 };
 
