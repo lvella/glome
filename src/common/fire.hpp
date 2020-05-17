@@ -23,6 +23,7 @@ private:
 	float scale_radius;
 	float origin_radius;
 	float intensity;
+	float speed;
 
 	uint16_t target_count;
 

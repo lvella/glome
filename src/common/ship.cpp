@@ -30,6 +30,8 @@ Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
 		stats(std::move(sstats))
 {
 	mesh = Mesh::get_mesh(type);
+	set_radius(mesh->get_radius());
+
 	load_guns(type);
 	load_engines(type);
 

@@ -78,15 +78,20 @@ void Fire::setIntensity(float i)
 		return;
 
 	intensity = i;
-	origin_radius = scale_radius * 0.8f + i * scale_radius * 0.3f;
+	origin_radius = scale_radius * 0.7f + i * scale_radius * 0.3f;
 	target_count = 15 + i * (count - 15);
+
+	speed = intensity * scale_radius * 24.0;
+
+	const float radius = std::max(scale_radius, speed * FIRE_LIFE);
+	set_radius(radius);
 }
 
 bool Fire::update(float dt, UpdatableAdder&)
 {
 	int new_count = actives_count;
 
-	auto velocity = zw_qrot(intensity * scale_radius * dt * 24.0);
+	auto velocity = zw_qrot(speed * dt);
 	for(int i = 0; i < count; ++i) {
 		OfflineAttributes &oattr = oattrs[i];
 
@@ -107,7 +112,7 @@ bool Fire::update(float dt, UpdatableAdder&)
 				}
 
 				float r = origin_radius;
-				rattr.position = get_t() * rand_in_sphere(r);
+				rattr.position = rand_in_sphere(r);
 				r /= origin_radius;
 				oattr.energy = FIRE_LIFE * (1.0f - r);
 				rattr.color = Vector4(1.0f, 0.7f, 0.0f, 0.0f) * r

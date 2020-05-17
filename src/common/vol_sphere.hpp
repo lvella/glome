@@ -7,19 +7,31 @@
 
 // This class represents a sphere for the
 // purposes of collision detection.
+
+// TODO: make object center different from sphere center.
+// This is useful for asymetric stuff, like engine fire.
 class VolSphere: virtual private Object
 {
   public:
-    // Build a sphere from center and radius. As usual
-    // for the spheric space, the center must be normalized,
-    // and the radius, as any distance, must be given in radians.
-    // The radius must be given in range [0, PI)
-    VolSphere(float radius):
-      radius(radius),
-      cos_great_dist(std::cos(radius + math::pi_2))
+    VolSphere() = default;
+
+    // Build a sphere from radius.
+    // See set_radius().
+    VolSphere(float radius)
     {
-      assert(radius >= 0);
-      assert(radius < math::pi);
+      set_radius(radius);
+    }
+
+    // Set sphere radius. As usual for this game space,
+    // the radius, as any distance, must be given in radians.
+    // The radius must be given in range [0, PI)
+    void set_radius(float r)
+    {
+      assert(r >= 0);
+      assert(r < math::pi);
+
+      radius = r;
+      cos_great_dist = std::cos(r + math::pi_2);
     }
 
     // Tells if this intersects with a given great sphere.

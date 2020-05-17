@@ -72,11 +72,12 @@ Renderer::draw(vector<Glome::Drawable*>&& objs)
 		vector<std::pair<float, Glome::Drawable*>> sorted;
 		sorted.reserve(objs.size());
 		for(Glome::Drawable* ptr: objs) {
-			float dist = cam_pos.dot(ptr->position());
+			float dist = std::acos(cam_pos.dot(ptr->position()))
+				- ptr->get_radius();
 			sorted.push_back({dist, ptr});
 		}
 		std::sort(sorted.begin(), sorted.end(), [] (auto& a, auto& b) {
-			return a.first < b.first;
+			return a.first > b.first;
 		});
 
 		auto sorted_projs = Projectile::cull_sort_from_camera(camera);

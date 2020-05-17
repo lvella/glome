@@ -64,10 +64,22 @@ void Mesh::fill_VBO(const std::vector<VertexData>& vdata, float scale) {
 
 	std::vector<VertexData4D> transformed(vdata.size());
 
+	// Radius of the bounding sphere centered on origin.
+	// TODO: find the best fitting sphere.
+	// TODO 2: load the best fitting sphere from file.
+	float cos_radius = 1.0f;
+
 	for(unsigned i = 0; i < vdata.size(); ++i) {
 		transformed[i].pos = (vdata[i].pos * scale).inverse_stereo_proj();
 		transformed[i].color = vdata[i].color;
+
+		float cos_dist = -transformed[i].pos.w;
+		if(cos_dist < cos_radius) {
+			cos_radius = cos_dist;
+		}
 	}
+
+	radius = std::acos(cos_radius);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData4D) * transformed.size(),
@@ -186,6 +198,7 @@ void Mesh::generate_uvsphere()
 	len = 2 * e_idx;
 	primitive_type = GL_LINES;
 	has_colorbuf = false;
+	radius = 1.0f;
 }
 
 // based on http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
@@ -342,6 +355,7 @@ void Mesh::generate_icosphere()
 	primitive_type = GL_TRIANGLES;
 
 	has_colorbuf = false;
+	radius = 1.0f;
 }
 
 void

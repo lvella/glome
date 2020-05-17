@@ -13,6 +13,11 @@ public:
 
 	~Mesh();
 
+	float get_radius()
+	{
+		return radius;
+	}
+
 	void draw(Camera& c);
 
 	static Mesh* get_mesh(Types type);
@@ -44,7 +49,9 @@ private:
 
 	Mesh(Types type);
 
-	#ifdef STATS_TUNING
+	float radius;
+
+#ifdef STATS_TUNING
 	std::vector<VertexData> mesh_data;
 public:
 	void rescale(float scale) {
