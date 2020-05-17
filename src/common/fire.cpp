@@ -122,6 +122,11 @@ bool Fire::update(float dt, UpdatableAdder&)
 
 	actives_count = new_count;
 
+	return true;
+}
+
+void Fire::draw(Camera& c)
+{
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	// TODO: take inactive particles out of the way, and only copy relevant data
@@ -130,19 +135,12 @@ bool Fire::update(float dt, UpdatableAdder&)
 		rattrs, GL_STREAM_DRAW
 	);
 
-	return true;
-}
-
-void Fire::draw(Camera& c)
-{
 	c.pushShader(&program_fire);
 	c.pushMultQRot(get_t());
 
 	depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * actives_count, idx, GL_STREAM_DRAW);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
 	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex_particle);

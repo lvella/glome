@@ -188,7 +188,8 @@ Ship::update(float dt, UpdatableAdder& adder)
 				ctrl->heat += stats->shot_power;
 
 				ctrl->shot_countdown += stats->canon_fire_interval;
-				ctrl->canon_shot_last = !ctrl->canon_shot_last;			}
+				ctrl->canon_shot_last = !ctrl->canon_shot_last;
+			}
 			else
 				ctrl->shot_countdown = 0.0;
 		}
