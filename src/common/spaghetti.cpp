@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <mutex>
 #include <typeinfo>
 
 #include "object.hpp"
@@ -140,7 +141,8 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 
 		glGenBuffers(1, &vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]), &vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]),
+			&vertices[0], GL_STATIC_DRAW);
 	}
 
 	// Define movement parameters
@@ -166,6 +168,7 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 
 Spaghetti::~Spaghetti()
 {
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 	glDeleteBuffers(1, &vbo);
 }
 

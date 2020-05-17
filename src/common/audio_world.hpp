@@ -1,9 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <unordered_set>
 #include <vector>
-#include "audio_source.hpp"
-#include "audio_listener.hpp"
+
+#include "qrot.hpp"
 
 namespace Audio {
 	class Listener;
@@ -14,7 +15,7 @@ namespace Audio {
 
 		void updateFromListener(size_t listener, const QRot& transform);
 
-		std::unordered_set<Source*> sources;
+		std::vector<std::weak_ptr<Source>> sources;
 		std::vector<Listener*> listeners;
 
 		friend class Source;

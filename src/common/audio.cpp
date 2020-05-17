@@ -1,8 +1,8 @@
+#include "audio.hpp"
+
 #include <iostream>
 #include <AL/al.h>
 #include <AL/alc.h>
-
-#include "audio.hpp"
 
 static ALCdevice* al_device;
 static ALCcontext* al_context;

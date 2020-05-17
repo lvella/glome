@@ -1,19 +1,21 @@
 #pragma once
 
+
 #include <vector>
 #include <AL/al.h>
+#include <memory>
 #include "qrot.hpp"
 #include "vector4.hpp"
 #include "vector3.hpp"
-#include "audio_sound.hpp"
 #include "audio_world.hpp"
+#include "audio_sound.hpp"
 
 namespace Audio {
    class Sound;
    class World;
 
    /** Sound source in the 3-sphere. */
-   class Source {
+   class Source: std::enable_shared_from_this<Source> {
 
    public:
       Source(World *w);
@@ -22,11 +24,7 @@ namespace Audio {
       Source(Source&) = delete;
       Source &operator=(Source&) = delete;
 
-      /* But movable */
-      Source(Source &&other);
-      Source &operator=(Source&&);
-
-      virtual ~Source();
+      virtual ~Source() = default;
 
       /** Plays a sound from this source */
       void play(Sound &sound, bool loop=false, float offset=0);

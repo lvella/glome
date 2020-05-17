@@ -9,11 +9,12 @@
 #include "octree.hpp"
 #include "runcontext.hpp"
 #include "profiling.hpp"
+#include "audio_world.hpp"
 
 /** Every game mode should derive this class.
  * TODO: Based upon similarities between the game modes, refactor this class to hold what is common.
  */
-class World: public RunContext, public UpdatableAdder
+class World: public RunContext, public UpdatableAdder, public Audio::World
 {
 public:
 	World();

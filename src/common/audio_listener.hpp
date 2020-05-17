@@ -4,8 +4,6 @@
 #include "audio_world.hpp"
 
 namespace Audio {
-	class World;
-
 	class Listener {
 	public:
 		Listener(World* w);

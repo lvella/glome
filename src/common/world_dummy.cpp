@@ -1,10 +1,12 @@
 #include "world_dummy.hpp"
 
+#include <memory>
+
 #include "input.hpp"
 #include "options.hpp"
 #include "random.hpp"
-#include <memory>
-
+#include "supernova.hpp"
+#include "spaghetti.hpp"
 
 using namespace std;
 
@@ -46,7 +48,7 @@ WorldDummy::WorldDummy()
 		players.insert(players.end(), bot.begin(),
 			bot.begin() + min(bot.size(), 4 - players.size()));
 	}
-	_render = new Renderer(std::move(players), audio_world);
+	_render = new Renderer(std::move(players), *this);
 
 	// Create supernova
 	add_updatable(std::make_shared<Supernova>());
@@ -54,7 +56,7 @@ WorldDummy::WorldDummy()
 	// Create flying spaghetti monsters
 	const size_t NUM_FSMS = 5000;
 	for(size_t i = 0; i < NUM_FSMS; ++i) {
-		add_updatable(std::make_shared<Spaghetti>(audio_world));
+		add_updatable(std::make_shared<Spaghetti>(*this));
 	}
 }
 

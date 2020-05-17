@@ -81,6 +81,7 @@ add_library(common STATIC
 	textures.hpp
 	thread_pool.cpp
 	thread_pool.hpp
+	utils.hpp
 	vector2.hpp
 	vector3.hpp
 	vector4.cpp

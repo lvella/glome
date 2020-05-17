@@ -1,3 +1,5 @@
+#include "audio_effect.hpp"
+
 #include <cstdlib>
 #include <cstdio>
 #include <cerrno>
@@ -12,7 +14,6 @@
 
 #include "data_file.hpp"
 #include "audio_source.hpp"
-#include "audio_effect.hpp"
 
 using namespace Audio;
 using namespace std::string_literals;

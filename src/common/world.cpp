@@ -5,6 +5,7 @@
 #include "drawable.hpp"
 #include "projectile.hpp"
 #include "thread_pool.hpp"
+#include "utils.hpp"
 
 using namespace std::chrono_literals;
 
@@ -18,28 +19,6 @@ static void try_add(std::vector<std::weak_ptr<T>>& v, const std::shared_ptr<Upda
 	auto cast_obj = std::dynamic_pointer_cast<T>(obj);
 	if(cast_obj) {
 		v.emplace_back(cast_obj);
-	}
-}
-
-template<typename T, typename F>
-static void remove_if(std::vector<T>& v, F&& func)
-{
-	auto curr = v.begin();
-	auto last_empty = v.begin();
-	auto end = v.end();
-	while(curr != end) {
-		if(!func(*curr)) {
-			if(curr != last_empty) {
-				*last_empty = std::move(*curr);
-			}
-			++last_empty;
-		}
-
-		++curr;
-	}
-
-	if(last_empty != curr) {
-		v.resize(last_empty - v.begin());
 	}
 }
 
@@ -96,15 +75,9 @@ void World::update(float dt)
 		sptrs.reserve(collidables.size());
 		ptrs.reserve(collidables.size());
 
-		remove_if(collidables, [&](auto& wptr) {
-			auto obj = wptr.lock();
-			if(!obj) {
-				return true;
-			}
-
-			ptrs.push_back(obj.get());
-			sptrs.push_back(std::move(obj));
-			return false;
+		clean_and_for_each_valid(collidables, [&](auto&& ptr) {
+			ptrs.push_back(ptr.get());
+			sptrs.push_back(std::move(ptr));
 		});
 
 		collision_tree.collide(
@@ -131,15 +104,9 @@ void World::draw()
 	objects.reserve(drawables.size());
 	sobjects.reserve(drawables.size());
 
-	remove_if(drawables, [&](auto& wptr) {
-		auto obj = wptr.lock();
-		if(!obj) {
-			return true;
-		}
-
-		objects.push_back(obj.get());
-		sobjects.push_back(std::move(obj));
-		return false;
+	clean_and_for_each_valid(drawables, [&](auto&& ptr) {
+		objects.push_back(ptr.get());
+		sobjects.push_back(std::move(ptr));
 	});
 
 	_render->draw(std::move(objects));

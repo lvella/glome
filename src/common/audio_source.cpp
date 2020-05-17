@@ -1,5 +1,7 @@
-#include <cassert>
 #include "audio_source.hpp"
+
+#include <cassert>
+#include "audio_listener.hpp"
 
 using namespace Audio;
 
@@ -13,30 +15,7 @@ Source::Source(World *w):
       listeners_source.emplace_back(this);
    }
 
-   world->sources.insert(this);
-}
-
-Source::Source(Source&& other)
-{
-   *this = std::move(other);
-   world->sources.insert(this);
-}
-
-Source &
-Source::operator=(Source&& o)
-{
-   gain = o.gain;
-   pitch = o.pitch;
-   world = o.world;
-
-   listeners_source = std::move(o.listeners_source);
-
-   return *this;
-}
-
-Source::~Source()
-{
-   world->sources.erase(this);
+   world->sources.push_back(weak_from_this());
 }
 
 void
