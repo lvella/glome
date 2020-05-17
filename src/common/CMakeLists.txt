@@ -22,6 +22,7 @@ add_library(common STATIC
 	audio_world.hpp
 	camera.cpp
 	camera.hpp
+	collidable.hpp
 	color.cpp
 	color.hpp
 	data_file.cpp

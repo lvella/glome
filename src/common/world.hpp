@@ -5,6 +5,7 @@
 
 #include "renderer.hpp"
 #include "drawable.hpp"
+#include "collidable.hpp"
 #include "ship.hpp"
 #include "octree.hpp"
 #include "runcontext.hpp"
@@ -42,7 +43,7 @@ private:
 	ProfillingAggregator profiler;
 
 	std::vector<std::shared_ptr<Updatable>> updatables;
-	std::vector<std::weak_ptr<VolSphere>> collidables;
+	std::vector<std::weak_ptr<Collidable>> collidables;
 	std::vector<std::weak_ptr<Glome::Drawable>> drawables;
 };
 

@@ -112,10 +112,10 @@ void Projectile::update_all(float dt)
 	}
 }
 
-std::vector<VolSphere *>
+std::vector<Collidable *>
 Projectile::get_collision_volumes()
 {
-	std::vector<VolSphere *> ret(shots.size());
+	std::vector<Collidable *> ret(shots.size());
 	std::transform(shots.begin(), shots.end(), ret.begin(),
 		[](Projectile& p) {
 			return &p;

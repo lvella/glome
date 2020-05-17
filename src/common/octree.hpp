@@ -7,7 +7,7 @@
 #include <boost/functional/hash.hpp>
 
 #include "vector4.hpp"
-#include "vol_sphere.hpp"
+#include "collidable.hpp"
 
 namespace Octree {
 
@@ -27,7 +27,7 @@ public:
 		opposites {opposite0, opposite1, opposite2}
 	{}
 
-	bool intersects(const VolSphere& sphere) const;
+	bool intersects(const Collidable& sphere) const;
 
 	std::array<const Vector4*, 2> get_opposites(uint8_t i) const
 	{
@@ -52,7 +52,7 @@ private:
 	class Cell {
 	public:
 		Cell(uint8_t center_axis, float center_value);
-		bool intersects(const VolSphere& sphere) const;
+		bool intersects(const Collidable& sphere) const;
 
 		std::array<const Vector4*, 2> get_opposites(uint8_t i) const
 		{
@@ -66,7 +66,7 @@ private:
 	};
 
 public:
-	void collide(std::vector<VolSphere*>&& inter, std::vector<VolSphere*>&& intra);
+	void collide(std::vector<Collidable*>&& inter, std::vector<Collidable*>&& intra);
 
 	const Cell* get_cells() const
 	{

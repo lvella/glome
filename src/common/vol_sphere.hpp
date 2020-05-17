@@ -67,8 +67,6 @@ class VolSphere: virtual private Object
       return radius;
     }
 
-    virtual void collided_with(const VolSphere& other, float cos_dist) = 0;
-
   private:
     float radius;
 

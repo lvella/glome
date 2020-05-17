@@ -2,25 +2,24 @@
 
 #include "updatable.hpp"
 #include "drawable.hpp"
-#include "vol_sphere.hpp"
+#include "collidable.hpp"
 #include "audio_source.hpp"
 
 class Spaghetti final:
   public Updatable,
   public Glome::Drawable,
   public Audio::Source,
-  public VolSphere
+  public Collidable
 {
 public:
   Spaghetti(Audio::World &audio_world);
-  Spaghetti(Spaghetti&& other) = default;
 
   ~Spaghetti();
 
   void draw(Camera& s) override;
   bool update(float dt, UpdatableAdder& adder) override;
 
-  void collided_with(const VolSphere& other, float) override;
+  void collided_with(const Collidable& other, float) override;
 
 private:
 

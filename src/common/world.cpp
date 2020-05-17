@@ -70,8 +70,8 @@ void World::update(float dt)
 		static TimeAccumulator& octree_ta = profiler.newTimer("Octree collide");
 		TimeGuard timer(octree_ta);
 
-		std::vector<std::shared_ptr<VolSphere>> sptrs;
-		std::vector<VolSphere*> ptrs;
+		std::vector<std::shared_ptr<Collidable>> sptrs;
+		std::vector<Collidable*> ptrs;
 		sptrs.reserve(collidables.size());
 		ptrs.reserve(collidables.size());
 

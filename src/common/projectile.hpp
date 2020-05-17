@@ -3,10 +3,10 @@
 #include <list>
 #include "matrix4.hpp"
 #include "vector4.hpp"
-#include "vol_sphere.hpp"
+#include "collidable.hpp"
 #include "ship_controller.hpp"
 
-class Projectile: virtual public Object, public VolSphere
+class Projectile final: virtual public Object, public Collidable
 {
 public:
 	static void initialize();
@@ -14,10 +14,10 @@ public:
 	static void draw_many(const std::vector<Projectile*>& shots, Camera& cam);
 	static void draw_in_minimap();
 	static void update_all(float dt);
-	static std::vector<VolSphere*> get_collision_volumes();
+	static std::vector<Collidable*> get_collision_volumes();
 	static std::vector<Projectile*> cull_sort_from_camera(const Camera& cam);
 
-	void collided_with(const VolSphere& other, float) override
+	void collided_with(const Collidable& other, float) override
 	{
 		die();
 	}
