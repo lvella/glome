@@ -4,6 +4,7 @@ project(glome_sdl)
 
 option(FIND_SDL2 "Try to find SDL2" ON)
 option(FIND_GLEW "Try to find GLEW" ON)
+option(FIND_OPENGL "Try to find OPENGL" ON)
 
 add_executable(glome
 	input.cpp
@@ -15,8 +16,10 @@ add_executable(glome
 	sdl_main.cpp
 )
 
-find_package(OpenGL REQUIRED)
-target_link_libraries(glome common ${OPENGL_LIBRARIES})
+if(FIND_OPENGL)
+	find_package(OpenGL REQUIRED)
+	target_link_libraries(glome common ${OPENGL_LIBRARIES})
+endif()
 
 if(FIND_SDL2)
 	find_package(SDL2 REQUIRED)

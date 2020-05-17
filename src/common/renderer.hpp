@@ -13,6 +13,9 @@
 #include "math.hpp"
 #include "ship.hpp"
 
+#define FUSTRUM_CULLING
+
+
 class Renderer
 {
 public:
@@ -26,6 +29,8 @@ public:
 	void fill_minimap(const std::vector<Glome::Drawable*>& objs, Camera& cam);
 
 	void audio_update();
+
+	void createViewingFustrum(const std::vector<Glome::Drawable*> &objs);
 
 protected:
 	struct Viewport: public Audio::Listener

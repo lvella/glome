@@ -79,7 +79,15 @@ public:
 	{
 		return v[elem];
 	}
-
+	
+	bool operator==(const Vector4& other) const
+	{
+		return this->x == other.x 
+			&& this->y == other.y
+			&& this->z == other.z
+			&& this->w == other.w;
+	}
+	
 	/** Quaternion conjugate. */
 	Vector4 conjugate() const
 	{

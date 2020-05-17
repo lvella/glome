@@ -34,7 +34,7 @@ Effect::Effect(const std::string& rFilename, iter iterator):
 
 	int err_code;
 
-	auto fname = get_data_path("sound/"s + rFilename + ".opus"s);
+	auto fname = get_data_path("sound/"s + rFilename + ".opus"s).string();
 	of = op_open_file(fname.c_str(), &err_code);
 
 	if(!err_code) {

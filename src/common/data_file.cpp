@@ -8,10 +8,10 @@
 #include <iostream>
 #include <tuple>
 
-static std::tuple<std::filesystem::path, DataFile>
+static std::tuple<std::experimental::filesystem::path, DataFile>
 assemble_and_check_path(const std::string& path)
 {
-	std::filesystem::path full_path(DATA_DIR);
+	std::experimental::filesystem::path full_path(DATA_DIR);
 	full_path /= path;
 
 	errno = 0;
@@ -38,7 +38,7 @@ assemble_and_check_path(const std::string& path)
 }
 
 
-std::filesystem::path get_data_path(const std::string& rel_path)
+std::experimental::filesystem::path get_data_path(const std::string& rel_path)
 {
 	return std::get<0>(assemble_and_check_path(rel_path));
 }

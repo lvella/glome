@@ -30,6 +30,20 @@ QRot xw_qrot(float angle);
 QRot zw_qrot(float angle);
 QRot yw_qrot(float angle);
 
+// These two are almost like glRotate, but in
+// radians, and the vector must be normalized.
+Matrix4 rotation(float angle, float x, float y, float z);
+
+// "3-D Rotations" from viewpoint
+Matrix4 xy_matrix(float angle);
+Matrix4 xz_matrix(float angle);
+Matrix4 yz_matrix(float angle);
+
+// "Translations" from viewpoint
+Matrix4 xw_matrix(float angle);
+Matrix4 zw_matrix(float angle);
+Matrix4 yw_matrix(float angle);
+
 /** Normalized linear interpolation.
  *
  * This link says NLERP is a good enough replacement for SLERP:
