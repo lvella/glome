@@ -7,6 +7,7 @@
 #include "dustfield.hpp"
 
 #include "renderer.hpp"
+#include <algorithm>
 
 using namespace std;
 using namespace Options;
@@ -65,19 +66,32 @@ Renderer::draw(vector<Glome::Drawable*>&& objs)
 		camera.reset(active->transformation());
 		camera.pushShader(&shader);
 
+		const QRot inv_trans = active->transformation().inverse();
+		const Vector4 cam_pos = inv_trans.position();
+
+		vector<std::pair<float, Glome::Drawable*>> sorted;
+		sorted.reserve(objs.size());
+		for(Glome::Drawable* ptr: objs) {
+			float dist = cam_pos.dot(ptr->position());
+			sorted.push_back({dist, ptr});
+		}
+		std::sort(sorted.begin(), sorted.end(), [] (auto& a, auto& b) {
+			return a.first < b.first;
+		});
+
 		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
 
 		draw_meridians(camera);
 
-		for(auto &obj: objs) {
-			obj->draw(camera);
+		for(auto &pair: sorted) {
+			pair.second->draw(camera);
 		}
 
 		Projectile::draw_many(sorted_projs, camera);
 		DustField::draw(camera);
 
 		MiniMap::draw(active->_x, active->_y, this,
-			active->transformation().inverse(), objs
+			inv_trans, objs
 		);
 	}
 }
