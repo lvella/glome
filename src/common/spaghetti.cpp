@@ -15,6 +15,7 @@
 #include "color.hpp"
 #include "audio_effect.hpp"
 #include "projectile.hpp"
+#include "supernova.hpp"
 
 using namespace Glome;
 
@@ -206,9 +207,15 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder)
 }
 
 
-void Spaghetti::collided_with(const Collidable& other, float)
+void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 {
 	if(typeid(other) == typeid(const Projectile&)) {
 		dead = true;
+	}
+
+	if(typeid(other) == typeid(const Supernova&)) {
+		if(cos_dist >= cos(other.get_radius() - get_radius())) {
+			dead = true;
+		}
 	}
 }

@@ -31,7 +31,7 @@ class VolSphere: virtual private Object
       assert(r < math::pi);
 
       radius = r;
-      cos_great_dist = std::cos(r + math::pi_2);
+      cos_great_dist = std::cos(std::min(r + math::pi_2, math::pi));
     }
 
     // Tells if this intersects with a given great sphere.
