@@ -16,8 +16,6 @@
 - Transfer momentum on collision between objects (ships, flying spagetti monsters)
   - At least prevent them from intersecting, change their velocity away from one another
   - How to fit that to current crazy FSM movement?
-- Sort objects when drawing each viewport
-  - Use distance to the nearest surface
 - Fix supernova appearance:
   - you can see briefly see the other side when it is half size (you must not)
     - don't draw the opposite side to fix this
