@@ -38,7 +38,6 @@ protected:
 			t(target), _x(x), _y(y), _w(w), _h(h)
 		{
 			curr_qrot = cam_offset;
-			//curr_qrot = QRot(xw_matrix(2.0) * xy_matrix(-.9) * yz_matrix(1.));
 			cam_hist.push_back({1.0f / 6.0f, cam_offset});
 		}
 
