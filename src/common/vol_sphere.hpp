@@ -1,7 +1,6 @@
 #pragma once
 
 #include <functional>
-#include <cassert>
 #include "math.hpp"
 #include "object.hpp"
 
@@ -25,14 +24,7 @@ class VolSphere: virtual private Object
     // Set sphere radius. As usual for this game space,
     // the radius, as any distance, must be given in radians.
     // The radius must be given in range [0, PI)
-    void set_radius(float r)
-    {
-      assert(r >= 0);
-      assert(r < math::pi);
-
-      radius = r;
-      cos_great_dist = std::cos(std::min(r + math::pi_2, math::pi));
-    }
+    void set_radius(float r);
 
     // Tells if this intersects with a given great sphere.
     bool intersects_great_sphere(const Vector4& center) const
@@ -41,32 +33,8 @@ class VolSphere: virtual private Object
     }
 
     // Tells if two given sphere intersects
-    bool intersects(const VolSphere& other, float &cos_dist) const
-    {
-      // Calculates the cossine of the angle between the center of
-      // the two spheres.
-      cos_dist = this->position().dot(other.position());
-
-      // The following algorithm fails if the sum of the radius of the
-      // spheres is greater than or equal 180°. But in this case, both
-      // spheres are always touching:
-      if((radius + other.radius) >= math::pi) {
-	return true;
-      }
-
-      // Calculates the cossine of the sum of the radius.
-      float touching_radius = std::cos(radius + other.radius);
-
-      // True if distance between centers is smaller or equal
-      // the radius touching distance
-      return cos_dist >= touching_radius;
-    }
-
-    bool intersects(const VolSphere& other) const
-    {
-      float cos_dist;
-      return intersects(other, cos_dist);
-    }
+    bool intersects(const VolSphere& other, float &cos_dist) const;
+    bool intersects(const VolSphere& other) const;
 
     // Tells if a given point is contained in the sphere
     bool contains(const Vector4 &p) const

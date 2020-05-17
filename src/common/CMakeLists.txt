@@ -87,6 +87,8 @@ add_library(common STATIC
 	vector3.hpp
 	vector4.cpp
 	vector4.hpp
+	vol_sphere.cpp
+	vol_sphere.hpp
 	world.cpp
 	world.hpp
 	world_dummy.cpp
