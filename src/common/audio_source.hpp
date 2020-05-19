@@ -39,6 +39,12 @@ namespace Audio {
          setAllProp(AL_PITCH, p);
       }
 
+   protected:
+      World* getAudioWorld()
+      {
+         return world;
+      }
+
    private:
       struct SourceForListener {
          SourceForListener(Source *s)

@@ -15,7 +15,7 @@
 /** Every game mode should derive this class.
  * TODO: Based upon similarities between the game modes, refactor this class to hold what is common.
  */
-class World: public RunContext, public UpdatableAdder, public Audio::World
+class World: public RunContext, public Audio::World
 {
 public:
 	World();
@@ -31,7 +31,7 @@ public:
 	void draw() override;
 
 protected:
-	virtual void add_updatable(std::shared_ptr<Updatable> new_obj) override;
+	void add_updatable(std::shared_ptr<Updatable>&& new_obj);
 
 	Octree::Hypercube collision_tree;
 

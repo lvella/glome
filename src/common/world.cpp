@@ -22,7 +22,7 @@ static void try_add(std::vector<std::weak_ptr<T>>& v, const std::shared_ptr<Upda
 	}
 }
 
-void World::add_updatable(std::shared_ptr<Updatable> new_obj)
+void World::add_updatable(std::shared_ptr<Updatable>&& new_obj)
 {
 	try_add(collidables, new_obj);
 	try_add(drawables, new_obj);
@@ -40,6 +40,22 @@ void World::update(float dt)
 		static TimeAccumulator& update_ta = profiler.newTimer("Update objects");
 		TimeGuard timer(update_ta);
 
+		for(unsigned i = 0; i < ai_controls.size(); ++i) {
+			ai_controls[i]->act();
+		}
+		Projectile::update_all(dt);
+
+		class: public UpdatableAdder
+		{
+		public:
+			void add_elems_to_world(World& e)
+			{
+				for(auto& sptr: new_elems) {
+					e.add_updatable(std::move(sptr));
+				}
+			}
+		} adder;
+
 		parallel_run_and_wait(globalThreadPool, [&] (auto&& add_task) {
 			for(size_t i = 0; i < updatables.size(); i += chunk_size) {
 				add_task([&, i] {
@@ -49,7 +65,7 @@ void World::update(float dt)
 					);
 
 					for(size_t j = i; j < max; ++j) {
-						if(!updatables[j]->update(dt, *this)) {
+						if(!updatables[j]->update(dt, adder)) {
 							updatables[j].reset();
 						}
 					}
@@ -60,10 +76,7 @@ void World::update(float dt)
 			return !elem;
 		});
 
-		for(unsigned i = 0; i < ai_controls.size(); ++i) {
-			ai_controls[i]->act();
-		}
-		Projectile::update_all(dt);
+		adder.add_elems_to_world(*this);
 	}
 
 	{

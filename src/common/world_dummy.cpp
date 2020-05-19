@@ -54,7 +54,7 @@ WorldDummy::WorldDummy()
 	add_updatable(std::make_shared<Supernova>());
 
 	// Create flying spaghetti monsters
-	const size_t NUM_FSMS = 5000;
+	const size_t NUM_FSMS = 500;//5000;
 	for(size_t i = 0; i < NUM_FSMS; ++i) {
 		add_updatable(std::make_shared<Spaghetti>(*this));
 	}

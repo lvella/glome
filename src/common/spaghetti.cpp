@@ -203,6 +203,10 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder)
 
 	mul_t(velo);
 
+	if(spawn) {
+		adder.add_updatable(std::move(spawn));
+	}
+
 	return true;
 }
 
@@ -210,7 +214,9 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder)
 void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 {
 	if(typeid(other) == typeid(const Projectile&)) {
-		dead = true;
+		//dead = true;
+		spawn = std::make_shared<Spaghetti>(*getAudioWorld());
+		spawn->set_t(get_t());
 	}
 
 	if(typeid(other) == typeid(const Supernova&)) {

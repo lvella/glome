@@ -4,6 +4,7 @@
 #include "drawable.hpp"
 #include "collidable.hpp"
 #include "audio_source.hpp"
+#include <memory>
 
 class Spaghetti final:
   public Updatable,
@@ -38,4 +39,6 @@ private:
   GLuint vbo;
   GLsizei count;
   bool dead = false;
+
+  std::shared_ptr<Spaghetti> spawn;
 };
