@@ -1,3 +1,5 @@
+#version 150 core
+
 varying float fog_coord;
 uniform float zFar;
 

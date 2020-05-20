@@ -1,3 +1,5 @@
+#version 150 core
+
 //
 // Description : Array and textureless GLSL 2D/3D/4D simplex 
 //               noise functions.

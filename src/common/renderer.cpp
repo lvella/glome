@@ -27,9 +27,7 @@ Renderer::setup_display()
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	glEnable(GL_ALPHA_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glAlphaFunc(GL_NOTEQUAL, 0.0f);
 	glViewport(0, 0, width, height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }

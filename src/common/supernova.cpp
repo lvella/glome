@@ -90,12 +90,9 @@ void Supernova::draw(Camera &c)
 
 	slerp_arc.set(slerp);
 
-	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, bg_noise);
 
 	mesh->draw(c);
-
-	glDisable(GL_TEXTURE_2D);
 
 	c.popMat();
 	c.popShader();

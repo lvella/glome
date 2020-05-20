@@ -1,3 +1,5 @@
+#version 150 core
+
 vec4 quat_mul(in vec4 a, in vec4 b)
 {
 	return vec4(

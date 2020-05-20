@@ -1,3 +1,5 @@
+#version 150 core
+
 attribute vec4 position;
 attribute vec4 texcoord;
 attribute vec4 color;

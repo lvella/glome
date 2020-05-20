@@ -1,3 +1,5 @@
+#version 150 core
+
 // Input
 uniform mat4 projection;
 uniform vec4 old_transform[2];

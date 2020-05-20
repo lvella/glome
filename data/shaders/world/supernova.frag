@@ -1,3 +1,5 @@
+#version 150 core
+
 uniform vec4 center;
 uniform vec2 slerp_arc;
 uniform sampler2D texbase;

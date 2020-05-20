@@ -52,6 +52,11 @@ initialize()
 
 	glLineWidth(1.5f);
 
+	GLuint VertexArrayID;
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+	glEnableVertexAttribArray(0);
+
 	// Must be the first to initialize, so shaders
 	// can be created with the correct perspective
 	// matrix.

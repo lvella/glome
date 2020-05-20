@@ -1,3 +1,5 @@
+#version 150 core
+
 uniform vec4 transformation[2];
 
 vec4 quat_rotate(in vec4 rotation[2], in vec4 p);

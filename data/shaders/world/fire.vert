@@ -1,3 +1,5 @@
+#version 150 core
+
 uniform mat4 projection;
 uniform float half_width;
 

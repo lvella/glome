@@ -136,7 +136,7 @@ MiniMap::initialize()
 		"minimap/map_stuff.vert",
 		"common/quaternion.vert",
 		"minimap/minimap.frag",
-		"common/texture.frag"
+		"common/luminance_alpha_texture.frag"
 	});
 	proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
 
@@ -144,7 +144,7 @@ MiniMap::initialize()
 		"minimap/hud.vert",
 		"minimap/map_stuff.vert",
 		"minimap/minimap.frag",
-		"common/texture.frag"
+		"common/luminance_alpha_texture.frag"
 	});
 	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
 }

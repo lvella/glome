@@ -46,8 +46,8 @@ void create_circle_texture(int w, float p, int a0, int a1, GLuint& tex, bool gen
 			}
 		}
 
-		glTexImage2D(GL_TEXTURE_2D, level++, GL_LUMINANCE_ALPHA, w, w, 0,
-				GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)texture);
+		glTexImage2D(GL_TEXTURE_2D, level++, GL_RG, w, w, 0,
+				GL_RG, GL_UNSIGNED_BYTE, (GLvoid*)texture);
 
 	} while(gen_mipmap && w > 1);
 
@@ -76,7 +76,7 @@ void create_spherical_texture(int size, GLuint& tex)
 
 	glGenTextures(1, &tex);
 	glBindTexture(GL_TEXTURE_2D, tex);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE_ALPHA, size, size, 0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RG, size, size, 0, GL_RG, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
 	glBindTexture(GL_TEXTURE_2D, 0);
 
@@ -118,7 +118,7 @@ GLuint create_noise_texture(int w, int h, float scale, const Vector2& offset)
 		}
 	}
 	delete[] fbuffer;
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_LUMINANCE, w, h, 0, GL_LUMINANCE, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, w, h, 0, GL_RED, GL_UNSIGNED_BYTE, (GLvoid*)buffer);
 	delete[] buffer;
 
 	return tex;

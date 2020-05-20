@@ -48,6 +48,11 @@ static void initialize_gl_context()
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+	/*SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);*/
+
 	{
 		Uint32 video_flags = SDL_WINDOW_OPENGL;
 		if(Options::fullscreen)
@@ -64,6 +69,7 @@ static void initialize_gl_context()
 	glcontext = SDL_GL_CreateContext(window);
 
 	// Using GLEW to get the OpenGL functions
+	//glewExperimental = true;
 	GLenum err = glewInit();
 	if(err != GLEW_OK) {
 		std::cerr << "Unable to initialize GLEW:\n"
@@ -71,9 +77,9 @@ static void initialize_gl_context()
 		exit(1);
 	}
 
-	if(! GLEW_VERSION_2_1)
+	if(! GLEW_VERSION_3_2)
 	{
-		const char *msg = "Glome requires at least OpenGL 2.1";
+		const char *msg = "Glome requires at least OpenGL 3.2";
 		#ifdef WIN32
 		MessageBoxA(NULL, msg, NULL, MB_OK);
 		#else
@@ -81,6 +87,22 @@ static void initialize_gl_context()
 		#endif
 		exit(1);
 	}
+
+	int major, minor, mask;
+	glGetIntegerv(GL_MAJOR_VERSION, &major);
+	glGetIntegerv(GL_MINOR_VERSION, &minor);
+	glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &mask);
+
+	std::cout << "OpenGL version: " << major << '.' << minor;
+	if(mask & GL_CONTEXT_CORE_PROFILE_BIT) {
+		std::cout << " Core Profile";
+	} else if(mask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT) {
+		std::cout << " Compatibility Profile";
+	}
+	std::cout << std::endl;
+
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
 
 	// Enable multisample, if available
 	{

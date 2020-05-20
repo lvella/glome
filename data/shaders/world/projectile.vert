@@ -1,3 +1,5 @@
+#version 150 core
+
 // Input
 attribute vec4 position;
 attribute vec4 color;

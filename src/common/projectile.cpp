@@ -57,7 +57,7 @@ void Projectile::initialize()
 		"world/modelview.vert",
 		"common/quaternion.vert",
 		"world/world.frag",
-		"common/texture.frag",
+		"common/luminance_alpha_texture.frag",
 		"world/world_fog.frag",
 		"world/fog.frag"
 	});
@@ -190,6 +190,7 @@ void Projectile::draw_in_minimap()
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 		glDrawArrays(GL_POINTS, 0, shots.size());
 	}
+
 }
 
 Projectile::Projectile(ShipController * s, const QRot& from, float speed):
@@ -205,6 +206,7 @@ void Projectile::draw(Camera & c)
 	c.pushMultQRot(get_t());
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	c.popMat();
+
 }
 
 void Projectile::update(float dt)
