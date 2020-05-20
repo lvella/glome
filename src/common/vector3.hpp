@@ -76,6 +76,11 @@ public:
 		return std::sqrt(this->dot(*this));
 	}
 
+	Vector3 normalized() const
+	{
+		return *this * (1.0f / length());
+	}
+
 	Vector4 inverse_stereo_proj() const {
 		float d = 1.0f + x*x + y*y + z*z;
 		return Vector4(2.0f*x/d, 2.0f*y/d, 2.0f*z/d, (x*x + y*y + z*z - 1.0f) / d);

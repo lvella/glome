@@ -17,15 +17,15 @@ namespace math {
 // Almost like gluPerspective, but in radians...
 Matrix4 perspective(float fovy, float aspect, float zNear, float zFar);
 
-// Rotations from viewpoint
+// Rotations around a 3-D axis from the origin point
 QRot qrotation(float angle, Vector3 axis);
 
-// "3-D Rotations" from viewpoint
+// "3-D Rotations" from the origin point
 QRot xy_qrot(float angle);
 QRot xz_qrot(float angle);
 QRot yz_qrot(float angle);
 
-// "Translations" from viewpoint
+// "Translations" from the origin point
 QRot xw_qrot(float angle);
 QRot zw_qrot(float angle);
 QRot yw_qrot(float angle);
@@ -37,6 +37,23 @@ QRot yw_qrot(float angle);
  */
 QRot nlerp(const QRot& a, const QRot& b, float t);
 Vector4 nlerp(const Vector4& a, const Vector4& b, float t);
+
+/** Rotates unit vector "from" towards vector "to", by an amount of "angle".
+ *
+ * "from" and "to" must not be collinear
+ */
+template<typename V>
+V rotate_unit_vec_towards(const V& from, const V& to, float angle)
+{
+	// We need an orthogonal basis made up of "from" and an orthogonal
+	// vector in the direction of "to". So we calculate de rejection of "to"
+	// w.r.t "from", and normalize.
+	const V& a = from;
+	const V b = (to - from * to.dot(from)).normalized();
+
+	// a and b forms an orthonormal basis, so just rotate a in direction of b
+	return a * std::cos(angle) + b * std::sin(angle);
+}
 
 // Generic vector stuff
 template <class T>

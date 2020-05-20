@@ -9,7 +9,7 @@
 
 // TODO: make object center different from sphere center.
 // This is useful for asymetric stuff, like engine fire.
-class VolSphere: virtual private Object
+class VolSphere: virtual public Object
 {
   public:
     VolSphere() = default;

@@ -27,38 +27,38 @@ template <class T>
 static T
 CalculateBezierPoint(float t, T *p)
 {
-    float u = 1.0 - t;
-    float tt = t * t;
-    float uu = u * u;
-    float uuu = uu * u;
-    float ttt = tt * t;
+	float u = 1.0 - t;
+	float tt = t * t;
+	float uu = u * u;
+	float uuu = uu * u;
+	float ttt = tt * t;
 
-    T v = p[0] * uuu; //first term
-    v += p[1] * (3 * uu * t); //second term
-    v += p[2] * (3 * u * tt); //third term
-    v += p[3] * ttt; //fourth term
+	T v = p[0] * uuu; //first term
+	v += p[1] * (3 * uu * t); //second term
+	v += p[2] * (3 * u * tt); //third term
+	v += p[3] * ttt; //fourth term
 
-    return v;
+	return v;
 }
 
 // From http://paulbourke.net/miscellaneous/interpolation/
 template <class T>
 static T
 CubicInterpolate(
-   T y0, T y1,
-   T y2, T y3,
-   float mu)
+	T y0, T y1,
+	T y2, T y3,
+	float mu)
 {
-   T a0,a1,a2,a3;
-   float mu2;
+	T a0,a1,a2,a3;
+	float mu2;
 
-   mu2 = mu*mu;
-   a0 = y3 - y2 - y0 + y1;
-   a1 = y0 - y1 - a0;
-   a2 = y2 - y0;
-   a3 = y1;
+	mu2 = mu*mu;
+	a0 = y3 - y2 - y0 + y1;
+	a1 = y0 - y1 - a0;
+	a2 = y2 - y0;
+	a3 = y1;
 
-   return (a0*mu*mu2 + a1*mu2 + a2*mu + a3);
+	return (a0*mu*mu2 + a1*mu2 + a2*mu + a3);
 }
 
 Spaghetti::Spaghetti(Audio::World &audio_world):
@@ -153,12 +153,12 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 
 	// Define starting position and orientation
 	set_t(
-	    xy_qrot(Random::arc())
-	  * xz_qrot(Random::arc())
-	  * yz_qrot(Random::arc())
-	  * xw_qrot(Random::arc())
-	  * yw_qrot(Random::arc())
-	  * zw_qrot(Random::arc())
+		  xy_qrot(Random::arc())
+		* xz_qrot(Random::arc())
+		* yz_qrot(Random::arc())
+		* xw_qrot(Random::arc())
+		* yw_qrot(Random::arc())
+		* zw_qrot(Random::arc())
 	);
 
 	// Configure humming sound effect
@@ -203,8 +203,9 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder)
 
 	mul_t(velo);
 
-	if(spawn) {
-		adder.add_updatable(std::move(spawn));
+	while(!spawn.empty()) {
+		adder.add_updatable(std::move(spawn.back()));
+		spawn.pop_back();
 	}
 
 	return true;
@@ -214,9 +215,11 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder)
 void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 {
 	if(typeid(other) == typeid(const Projectile&)) {
-		//dead = true;
-		spawn = std::make_shared<Spaghetti>(*getAudioWorld());
-		spawn->set_t(get_t());
+		const Vector4 impact_point = rotate_unit_vec_towards(
+			position(), other.position(), get_radius()
+		);
+
+		//chip(impact_point);
 	}
 
 	if(typeid(other) == typeid(const Supernova&)) {

@@ -40,5 +40,5 @@ private:
   GLsizei count;
   bool dead = false;
 
-  std::shared_ptr<Spaghetti> spawn;
+  std::vector<std::shared_ptr<Updatable>> spawn;
 };
