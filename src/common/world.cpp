@@ -43,7 +43,6 @@ void World::update(float dt)
 		for(unsigned i = 0; i < ai_controls.size(); ++i) {
 			ai_controls[i]->act();
 		}
-		Projectile::update_all(dt);
 
 		class: public UpdatableAdder
 		{
@@ -77,6 +76,9 @@ void World::update(float dt)
 		});
 
 		adder.add_elems_to_world(*this);
+
+		// Projectile must be updated after ships, because they may have fired.
+		Projectile::update_all(dt);
 	}
 
 	{
