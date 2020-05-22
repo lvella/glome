@@ -1,11 +1,11 @@
 #version 150 core
 
-attribute vec4 position;
-attribute vec4 color;
+in vec4 position;
+in vec4 color;
 
 uniform vec2 slerp_arc;
 
-varying vec4 v_color;
+out vec4 v_color;
 
 vec3 project_vertex(vec4 vert);
 vec4 color_blend(vec4 color, float z);

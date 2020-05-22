@@ -3,12 +3,12 @@
 // Input
 uniform mat4 projection;
 
-attribute vec4 position;
-attribute vec4 color;
+in vec4 position;
+in vec4 color;
 
 // Output
-varying vec4 v_color;
-varying float fog_coord;
+out vec4 v_color;
+out float fog_coord;
 
 // External function:
 vec4 to_3d_eye(in vec4 v);

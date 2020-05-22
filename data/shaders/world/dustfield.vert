@@ -4,12 +4,12 @@
 uniform mat4 projection;
 uniform vec4 old_transform[2];
 
-attribute float endpoint;
-attribute vec4 position;
+in float endpoint;
+in vec4 position;
 
 // Output
-varying vec4 v_color;
-varying float fog_coord;
+out vec4 v_color;
+out float fog_coord;
 
 // External functions
 vec4 to_4d_eye(in vec4 v);

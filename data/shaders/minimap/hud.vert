@@ -1,11 +1,11 @@
 #version 150 core
 
-attribute vec4 position;
-attribute vec4 texcoord;
-attribute vec4 color;
+in vec4 position;
+in vec4 texcoord;
+in vec4 color;
 
-varying vec2 v_texcoord;
-varying vec4 v_color;
+out vec2 v_texcoord;
+out vec4 v_color;
 
 // Simplest no projection shader.
 // Just for HUD.

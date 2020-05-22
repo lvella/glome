@@ -1,6 +1,6 @@
 #version 150 core
 
-varying float fog_coord;
+in float fog_coord;
 uniform float zFar;
 
 float fog_alpha();

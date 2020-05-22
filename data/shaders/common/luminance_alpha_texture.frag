@@ -1,6 +1,6 @@
 #version 150 core
 
-varying vec2 v_texcoord;
+in vec2 v_texcoord;
 uniform sampler2D texbase;
 uniform bool has_tex;
 

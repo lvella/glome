@@ -4,9 +4,11 @@ uniform vec4 center;
 uniform vec2 slerp_arc;
 uniform sampler2D texbase;
 
-varying vec3 normal;
-varying vec3 frag_pos;
-varying vec3 direction;
+in vec3 normal;
+in vec3 frag_pos;
+in vec3 direction;
+
+out vec4 frag_color;
 
 void mix_fog(inout vec4 color);
 float snoise(vec3 v);
@@ -36,5 +38,5 @@ void main()
 		mix_fog(color);
 	}
 
-	gl_FragColor = color;
+	frag_color = color;
 }
