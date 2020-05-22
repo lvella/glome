@@ -178,7 +178,7 @@ static void main_loop()
 		++frame_count;
 	}
 
-	std::chrono::duration<float> time_running = std::chrono::steady_clock::now() - start;
+	std::chrono::duration<float> time_running = Timer::now() - start;
 	std::cout << frame_count << " frames rendered at "
 		<< frame_count / time_running.count() << " FPS.\n";
 }
