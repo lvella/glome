@@ -25,8 +25,6 @@ public:
 	void setup_display();
 	void fill_minimap(const std::vector<Glome::Drawable*>& objs, Camera& cam);
 
-	void audio_update();
-
 protected:
 	struct Viewport: public Audio::Listener
 	{

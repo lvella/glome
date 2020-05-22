@@ -50,6 +50,7 @@ Renderer::update(float dt)
 {
 	for(Viewport& v: players) {
 		v.update(dt);
+		v.Audio::Listener::update(dt, v.transformation());
 	}
 }
 
@@ -105,15 +106,6 @@ Renderer::fill_minimap(const vector<Glome::Drawable*>& objs, Camera &cam)
 	for(auto &obj: objs) {
 		if(obj != curr.get())
 			obj->minimap_draw(cam);
-	}
-}
-
-void
-Renderer::audio_update()
-{
-	for(auto &p :players)
-	{
-		p.Audio::Listener::update(p.transformation());
 	}
 }
 

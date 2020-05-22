@@ -61,8 +61,7 @@ CubicInterpolate(
 	return (a0*mu*mu2 + a1*mu2 + a2*mu + a3);
 }
 
-Spaghetti::Spaghetti(Audio::World &audio_world):
-	Audio::Source(&audio_world),
+Spaghetti::Spaghetti():
 	VolSphere(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f)))
 {
 	// Random spaghetti propertiers:
@@ -164,7 +163,7 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 	// Configure humming sound effect
 	static Audio::Effect *hum_sound = Audio::Effect::getEffect("spaghetti");
 	//setGain(1.0);
-	play(*hum_sound, true, Random::zeroToOne());
+	play(hum_sound, true, Random::zeroToOne());
 }
 
 Spaghetti::~Spaghetti()

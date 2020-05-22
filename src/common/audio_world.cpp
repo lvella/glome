@@ -14,9 +14,18 @@ void World::addListener(Listener *l)
 	});
 }
 
-void World::updateFromListener(size_t listener, const QRot& transform)
+void World::updateFromListener(float dt, size_t listener, const QRot& transform)
 {
 	clean_and_for_each_valid(sources, [&] (auto&& ptr) {
-		ptr->updateFromListener(listener, transform);
+		ptr->updateFromListener(dt, listener, transform);
 	});
+}
+
+void World::try_add_source(const std::shared_ptr<Object>& obj)
+{
+	auto source = std::dynamic_pointer_cast<Source>(obj);
+	if(source) {
+		sources.emplace_back(source);
+		source->setWorld(this);
+	}
 }

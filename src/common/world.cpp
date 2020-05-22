@@ -2,15 +2,18 @@
 
 #include <memory>
 
+#include "audio_world.hpp"
 #include "drawable.hpp"
 #include "projectile.hpp"
 #include "thread_pool.hpp"
 #include "utils.hpp"
+#include "audio_source.hpp"
 
 using namespace std::chrono_literals;
 
 World::World():
-	profiler(5000ms)
+	profiler(5000ms),
+	threads_sync(globalThreadPool.get_num_threads())
 {}
 
 template<typename T>
@@ -26,6 +29,7 @@ void World::add_updatable(std::shared_ptr<Updatable>&& new_obj)
 {
 	try_add(collidables, new_obj);
 	try_add(drawables, new_obj);
+	Audio::World::try_add_source(new_obj);
 
 	updatables.emplace_back(std::move(new_obj));
 }
@@ -35,8 +39,6 @@ void World::update(float dt)
 	profiler.maybe_print();
 
 	{
-		constexpr size_t chunk_size = 400;
-
 		static TimeAccumulator& update_ta = profiler.newTimer("Update objects");
 		TimeGuard timer(update_ta);
 
@@ -44,22 +46,12 @@ void World::update(float dt)
 			ai_controls[i]->act();
 		}
 
-		class: public UpdatableAdder
-		{
-		public:
-			void add_elems_to_world(World& e)
-			{
-				for(auto& sptr: new_elems) {
-					e.add_updatable(std::move(sptr));
-				}
-			}
-		} adder;
-
-		parallel_run_and_wait(globalThreadPool, [&] (auto&& add_task) {
-			for(size_t i = 0; i < updatables.size(); i += chunk_size) {
+		Adder adder;
+		globalThreadPool.parallel_run_and_wait([&] (auto&& add_task) {
+			for(size_t i = 0; i < updatables.size(); i += CHUNCK_SIZE) {
 				add_task([&, i] {
 					const size_t max = std::min(
-						i + chunk_size,
+						i + CHUNCK_SIZE,
 						updatables.size()
 					);
 
@@ -71,10 +63,15 @@ void World::update(float dt)
 				});
 			}
 		});
+
+		// TODO: this stuff below is slow, there should be a better way...
+		globalThreadPool.run_in_all_other_threads([this] (unsigned i) {
+			threads_sync[i] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
+		});
+
 		remove_if(updatables, [](auto& elem){
 			return !elem;
 		});
-
 		adder.add_elems_to_world(*this);
 
 		// Projectile must be updated after ships, because they may have fired.
@@ -102,17 +99,22 @@ void World::update(float dt)
 	}
 
 	{
-		static TimeAccumulator& audio_ta = profiler.newTimer("Update audio");
+		static TimeAccumulator& audio_ta = profiler.newTimer("Update renderer with audio");
 		TimeGuard timer(audio_ta);
-		_render->audio_update();
+		_render->update(dt);
 	}
-	_render->update(dt);
 }
 
 void World::draw()
 {
 	static TimeAccumulator& draw_ta = profiler.newTimer("Draw objects");
 	TimeGuard timer(draw_ta);
+
+	for(auto& sync: threads_sync) {
+		glWaitSync(sync, 0, GL_TIMEOUT_IGNORED);
+		glDeleteSync(sync);
+		sync = 0;
+	}
 
 	std::vector<Glome::Drawable*> objects;
 	std::vector<std::shared_ptr<Glome::Drawable>> sobjects;

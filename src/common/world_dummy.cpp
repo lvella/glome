@@ -7,6 +7,7 @@
 #include "random.hpp"
 #include "supernova.hpp"
 #include "spaghetti.hpp"
+#include "thread_pool.hpp"
 
 using namespace std;
 
@@ -53,11 +54,28 @@ WorldDummy::WorldDummy()
 	// Create supernova
 	add_updatable(std::make_shared<Supernova>());
 
-	// Create flying spaghetti monsters
-	const size_t NUM_FSMS = 5000;
-	for(size_t i = 0; i < NUM_FSMS; ++i) {
-		add_updatable(std::make_shared<Spaghetti>(*this));
-	}
+	// Create flying spaghetti monsters in parallel
+	constexpr size_t NUM_FSMS = 5000;
+	Adder adder;
+	globalThreadPool.parallel_run_and_wait([&] (auto&& add_task) {
+		for(size_t i = 0; i < NUM_FSMS; i += CHUNCK_SIZE) {
+			add_task([&, i] {
+				const size_t max = std::min(
+					i + CHUNCK_SIZE,
+					NUM_FSMS
+				);
+
+				for(size_t j = i; j < max; ++j) {
+					adder.add_updatable(
+						std::make_shared<Spaghetti>()
+					);
+				}
+			});
+		}
+	});
+	adder.add_elems_to_world(*this);
+
+	std::cout << "World initialized!" << std::endl;
 }
 
 WorldDummy::~WorldDummy()

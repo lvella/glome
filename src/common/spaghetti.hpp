@@ -13,8 +13,7 @@ class Spaghetti final:
   public Collidable
 {
 public:
-  Spaghetti(Audio::World &audio_world);
-
+  Spaghetti();
   ~Spaghetti();
 
   void draw(Camera& s) override;
@@ -23,11 +22,6 @@ public:
   void collided_with(const Collidable& other, float) override;
 
 private:
-
-  Vector4 position() const override {
-    return Object::position();
-  }
-
   struct Vertex {
     Vector4 pos;
     Vector4 color;

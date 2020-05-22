@@ -18,6 +18,8 @@
 #include "options.hpp"
 #include "game.hpp"
 #include "jsinput.hpp"
+#include "thread_pool.hpp"
+#include "random.hpp"
 
 #include "native.hpp"
 
@@ -25,6 +27,7 @@ static bool v_sync_enabled = true;
 
 SDL_Window *window;
 SDL_GLContext glcontext;
+std::vector<SDL_GLContext> threads_glcontexts;
 
 static void initialize_SDL()
 {
@@ -51,7 +54,8 @@ static void initialize_gl_context()
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-	/*SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS, SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);*/
+
+	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
 
 	{
 		Uint32 video_flags = SDL_WINDOW_OPENGL;
@@ -66,10 +70,22 @@ static void initialize_gl_context()
 			Options::height,
 			video_flags);
 	}
+
+	// Create one SDL context per thread
+	threads_glcontexts.resize(globalThreadPool.get_num_threads());
+	for(auto& t_ctx: threads_glcontexts) {
+		t_ctx = SDL_GL_CreateContext(window);
+	}
+
+	// Main thread context
 	glcontext = SDL_GL_CreateContext(window);
 
+	// Setup one context per thread
+	globalThreadPool.run_in_all_other_threads([](unsigned idx) {
+		SDL_GL_MakeCurrent(window, threads_glcontexts[idx]);
+	});
+
 	// Using GLEW to get the OpenGL functions
-	//glewExperimental = true;
 	GLenum err = glewInit();
 	if(err != GLEW_OK) {
 		std::cerr << "Unable to initialize GLEW:\n"

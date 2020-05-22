@@ -31,6 +31,18 @@ public:
 	void draw() override;
 
 protected:
+	constexpr static size_t CHUNCK_SIZE = 200;
+	class Adder: public UpdatableAdder
+	{
+	public:
+		void add_elems_to_world(World& e)
+		{
+			for(auto& sptr: new_elems) {
+				e.add_updatable(std::move(sptr));
+			}
+		}
+	};
+
 	void add_updatable(std::shared_ptr<Updatable>&& new_obj);
 
 	Octree::Hypercube collision_tree;
@@ -41,6 +53,8 @@ protected:
 
 private:
 	ProfillingAggregator profiler;
+
+	std::vector<GLsync> threads_sync;
 
 	std::vector<std::shared_ptr<Updatable>> updatables;
 	std::vector<std::weak_ptr<Collidable>> collidables;
