@@ -17,6 +17,19 @@ ParticleSystem::ParticleSystem(int np):
 	}
 
 	glGenBuffers(2, buffobjs);
+
+	// Initializing buffers to maximum size:
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER,
+		sizeof(RenderAttributes) * count,
+		rattrs, GL_STREAM_DRAW
+	);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER,
+		sizeof(uint16_t) * count,
+		idx, GL_STREAM_DRAW
+	);
 }
 
 ParticleSystem::~ParticleSystem()
