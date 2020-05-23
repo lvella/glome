@@ -51,7 +51,6 @@ protected:
 	std::vector<AiController*> ai_controls;
 
 private:
-
 	std::vector<GLsync> threads_sync;
 
 	std::vector<std::shared_ptr<Updatable>> updatables;

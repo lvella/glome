@@ -8,10 +8,24 @@
 #include <future>
 #include <functional>
 #include <variant>
-#include <boost/thread/latch.hpp>
 #include <iostream>
 
 #include <blockingconcurrentqueue.h>
+
+// TODO: replace with std::latch from C++20
+class Latch {
+public:
+	Latch(unsigned count):
+		counter(count)
+	{}
+
+	void count_down_and_wait();
+
+private:
+	std::mutex m;
+	std::condition_variable cond;
+	unsigned counter;
+};
 
 class ThreadPool
 {
@@ -121,7 +135,9 @@ void ThreadPool::parallel_run_and_wait(Func&& start_function)
 template<class Func>
 void ThreadPool::run_in_all_other_threads(Func&& function)
 {
-	auto latch = std::make_shared<boost::latch>(threads.size() + 1);
+	// Don't try do use a latch, either boost, std or your own
+	// without std::make_shared. It doesn't work. You've been warned.
+	auto latch = std::make_shared<Latch>(threads.size() + 1);
 
 	for(unsigned i = 0; i < threads.size(); ++i) {
 		add_task([=, &function] {

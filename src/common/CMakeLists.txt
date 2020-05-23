@@ -116,5 +116,5 @@ if(USE_PKG_CONFIG)
 	endif()
 endif()
 
-find_package(Boost REQUIRED COMPONENTS thread)
-target_link_libraries(common PUBLIC Boost::thread)
+find_package(Threads)
+target_link_libraries(common PUBLIC ${CMAKE_THREAD_LIBS_INIT})

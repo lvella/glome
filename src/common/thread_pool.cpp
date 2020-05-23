@@ -2,6 +2,21 @@
 #include <thread>
 #include <variant>
 
+void Latch::count_down_and_wait()
+{
+	std::unique_lock lock(m);
+	if(counter <= 1) [[unlikely]] {
+		counter = 0;
+		lock.unlock();
+		cond.notify_all();
+		return;
+	}
+	--counter;
+	do {
+		cond.wait(lock);
+	} while(counter > 0);
+}
+
 ThreadPool::ThreadPool(unsigned size)
 {
 	if(!size) {
