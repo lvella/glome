@@ -51,7 +51,7 @@ void Shader::setup_shader(const char *sources[])
 	prog = glCreateProgram();
 
 	iter = sources;
-	while(*iter != NULL)
+	while(*iter != nullptr)
 	{
 		name = *iter;
 		if(loaded_shaders.find(name) == loaded_shaders.end())

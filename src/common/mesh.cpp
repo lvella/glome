@@ -14,15 +14,15 @@
 
 using namespace std;
 
-static Mesh* mesh_list[Mesh::MESH_COUNT] = {NULL};
+static Mesh* mesh_list[Mesh::MESH_COUNT] = {nullptr};
 
 const char* mesh_filename[Mesh::MESH_COUNT] =
 	{
 		"hunter",
 		"destroyer",
 		"ufo",
-		NULL, // icosphere
-		NULL, // uvsphere
+		nullptr, // icosphere
+		nullptr, // uvsphere
 	};
 
 Mesh::~Mesh()
@@ -94,7 +94,7 @@ void Mesh::load_from_file(const char* name)
 
 		/* Pointer file to mesh position */
 		fseek(fd, mesh_pos, SEEK_SET);
-		assert(fd != NULL);
+		assert(fd != nullptr);
 	}
 
 	{
@@ -371,9 +371,9 @@ Mesh::draw(Camera& c)
 		stride = 0;
 	}
 
-	glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, stride, NULL);
+	glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, stride, nullptr);
 
-	glDrawElements(primitive_type, len, GL_UNSIGNED_SHORT, NULL);
+	glDrawElements(primitive_type, len, GL_UNSIGNED_SHORT, nullptr);
 
 	if(has_colorbuf)
 		glDisableVertexAttribArray(s->colorAttr());

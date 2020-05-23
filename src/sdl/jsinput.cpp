@@ -17,7 +17,7 @@ namespace Js
 unordered_map<int, input_callback* > inputs;
 pair< int, std::function<void (int, float, float)> > motion_func;
 
-static SDL_Joystick* js = NULL;
+static SDL_Joystick* js = nullptr;
 
 void
 initialize(int js_id)
@@ -31,7 +31,7 @@ initialize(int js_id)
 	}
 	else
 	{
-		js = NULL;
+		js = nullptr;
 	}
 }
 

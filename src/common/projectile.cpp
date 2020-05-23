@@ -31,7 +31,7 @@ void Projectile::initialize()
 	    "world.frag",
 	    "texture.frag",
 	    "fog.frag",
-	    NULL
+	    nullptr
 	};
 
 	{
@@ -192,7 +192,7 @@ void Projectile::draw_in_minimap()
 	if (shots.size() > 0) {
 		assert(minimap_buf.size() >= shots.size());
 		glBindBuffer(GL_ARRAY_BUFFER, minimap_vbo);
-		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, NULL);
+		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glDrawArrays(GL_POINTS, 0, shots.size());
 	}
 }

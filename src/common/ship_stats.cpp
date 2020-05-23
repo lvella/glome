@@ -19,7 +19,7 @@ auto ShipStats::get() -> shared_ptr
 	int fd = open("ship_params.bin", O_CREAT | O_RDWR, S_IRUSR | S_IWUSR);
 	ftruncate(fd, sizeof(ShipStats));
 
-	void *ptr = mmap(NULL, sizeof(ShipStats),
+	void *ptr = mmap(nullptr, sizeof(ShipStats),
 			 PROT_READ | PROT_WRITE, MAP_SHARED, fd, 0);
 	close(fd);
 

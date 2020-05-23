@@ -82,7 +82,7 @@ size_t Effect::LoadAndClear(OggOpusFile *of)
 Effect*
 Effect::getEffect(const string& soundid)
 {
-	pair<iter,bool> p = effects.insert(make_pair(soundid, (Effect*) NULL));
+	pair<iter,bool> p = effects.insert(make_pair(soundid, (Effect*) nullptr));
 	if (p.second)
 		p.first->second = new Effect(soundid, p.first);
 	++p.first->second->ref_count;

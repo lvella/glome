@@ -12,14 +12,14 @@ Supernova::Supernova():
 	// TODO: initialize this stuff only once
 	bg_noise = create_noise_texture(800, 600, 1.0f / 50.0f, Vector2(Random::arc(), Random::arc()) * 20.0f);
 
-	const char *source[] = {"supernova.vert", "supernova.frag", "fog.frag", "noise3D.frag", NULL};
+	const char *source[] = {"supernova.vert", "supernova.frag", "fog.frag", "noise3D.frag", nullptr};
 	shader.setup_shader(source);
 	slerp_arc = shader.getUniform("slerp_arc");
 	center = shader.getUniform("center");
 	shader.enable();
 	shader.getUniform("texbase").set(0);
 
-	const char *map_src[] = {"map_supernova.vert", "map_stuff.vert", "minimap.frag", "no_texture.frag", NULL};
+	const char *map_src[] = {"map_supernova.vert", "map_stuff.vert", "minimap.frag", "no_texture.frag", nullptr};
 	map_shader.setup_shader(map_src);
 	map_slerp_arc = map_shader.getUniform("slerp_arc");
 
