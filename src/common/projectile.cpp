@@ -20,7 +20,7 @@ static GLint uniform_projection;
 static CamShader program_bullet;
 
 static GLuint minimap_vbo;
-static std::vector < Vector4 > minimap_buf;
+static std::vector<Vector4> minimap_buf;
 
 Projectile::SList Projectile::shots;
 
@@ -142,7 +142,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 			return dist > other.dist;
 	}};
 
-	std::vector < Sortable > to_sort;
+	std::vector<Sortable> to_sort;
 	to_sort.reserve(shots.size());
 
 	for(auto & shot: shots) {
@@ -153,7 +153,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 	}
 	std::sort(to_sort.begin(), to_sort.end());
 
-	std::vector < Projectile * >ret;
+	std::vector<Projectile*>ret;
 	ret.reserve(to_sort.size());
 	for (auto & e:to_sort) {
 		ret.push_back(e.proj);
@@ -162,7 +162,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 	return ret;
 }
 
-void Projectile::draw_many(const std::vector < Projectile * >&shots, Camera & c)
+void Projectile::draw_many(const std::vector<Projectile*>& shots, Camera & c)
 {
 	if (shots.size() != 0) {
 		c.pushShader(&program_bullet);

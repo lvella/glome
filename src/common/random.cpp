@@ -17,19 +17,19 @@ Generator gen((std::random_device())());
 
 int range(int a, int b)
 {
-	boost::variate_generator<Generator*, boost::uniform_smallint<> > dist(&gen, boost::uniform_smallint<>(a, b));
+	boost::variate_generator<Generator*, boost::uniform_smallint<>> dist(&gen, boost::uniform_smallint<>(a, b));
 	return dist();
 }
 
 float zeroToOne()
 {
-	static boost::variate_generator<Generator*, boost::uniform_01<float> > dist(&gen, boost::uniform_01<float>());
+	static boost::variate_generator<Generator*, boost::uniform_01<float>> dist(&gen, boost::uniform_01<float>());
 	return dist();
 }
 
 float arc()
 {
-	static boost::variate_generator<Generator*, boost::uniform_real<float> > dist(&gen, boost::uniform_real<float>(0.0f, 2 * M_PI));
+	static boost::variate_generator<Generator*, boost::uniform_real<float>> dist(&gen, boost::uniform_real<float>(0.0f, 2 * M_PI));
 	return dist();
 }
 
@@ -55,7 +55,7 @@ Vector4 point_on_spheric_surface()
 		Vector4 v;
 	};
 
-    static boost::variate_generator<Generator*, boost::uniform_on_sphere<float, Proxy> > dist(&gen, boost::uniform_on_sphere<float, Proxy>(DIM));
+    static boost::variate_generator<Generator*, boost::uniform_on_sphere<float, Proxy>> dist(&gen, boost::uniform_on_sphere<float, Proxy>(DIM));
 
     return dist().v;
 }

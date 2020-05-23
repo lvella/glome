@@ -7,9 +7,9 @@
 class Controller : public Updatable
 {
 public:
-	Controller(std::vector< Ship* >&& pp,
-		   std::vector< Ship* >&& bp,
-	    std::vector< AiController* >&& ai):
+	Controller(std::vector<Ship*>&& pp,
+		   std::vector<Ship*>&& bp,
+	    std::vector<AiController*>&& ai):
 	    players(std::move(pp)),
 	    bots(std::move(bp)),
 	    ai_controllers(std::move(ai))

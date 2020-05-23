@@ -18,8 +18,8 @@ namespace Kb
 /*
 * Map: < SDLKEY , PAIR(controller_id, callback_function) >
 */
-unordered_map<int, input_callback* > inputs;
-pair< int, std::function<void (int, float, float)> > motion_func;
+unordered_map<int, input_callback*> inputs;
+pair<int, std::function<void(int, float, float)>> motion_func;
 
 void
 register_button(int keycode, input_callback* id_fcallback)
@@ -37,7 +37,7 @@ register_motion(int cid, std::function<void (int, float, float)> func)
 bool
 button_event(SDL_Event e)
 {
-	std::unordered_map<int , input_callback* >::iterator it;
+	std::unordered_map<int, input_callback*>::iterator it;
 	int k;
 	bool state;
 

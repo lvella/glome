@@ -14,8 +14,8 @@ namespace Js
 /*
 * Map: < SDLKEY , PAIR(controller_id, callback_function) >
 */
-unordered_map<int, input_callback* > inputs;
-pair< int, std::function<void (int, float, float)> > motion_func;
+unordered_map<int, input_callback*> inputs;
+pair<int, std::function<void(int, float, float)>> motion_func;
 
 static SDL_Joystick* js = NULL;
 
@@ -87,7 +87,7 @@ axis_event(const SDL_JoyAxisEvent &e)
 bool
 button_event(const SDL_JoyButtonEvent &e)
 {
-	std::unordered_map<int , input_callback* >::iterator it;
+	std::unordered_map<int, input_callback*>::iterator it;
 	int k;
 	bool state;
 

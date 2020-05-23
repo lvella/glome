@@ -51,7 +51,7 @@ void read_controllers_settings()
 	{
 		ifs >> input_type >> controller_id >> number_of_functions;
 
-		std::pair <int, ShipController* > temp;
+		std::pair<int, ShipController*> temp;
 		temp.first = controller_id;
 		temp.second = new ShipController();
 		ship_controllers.insert(temp);
