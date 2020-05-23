@@ -29,10 +29,10 @@
 #define PROTOCOL_SIZE sizeof(protocol)
 #define MAX_NAME_LEN 16 //get from another place
 
-typedef unsigned char  uchar;
-typedef unsigned short ushort;
-typedef unsigned int   uint;
-typedef unsigned long  ulong;
+using uchar = unsigned char;
+using ushort = unsigned short;
+using uint = unsigned int;
+using ulong = unsigned long;
 
 struct protocol
 {

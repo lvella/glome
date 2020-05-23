@@ -5,7 +5,7 @@
 namespace Input
 {
 
-typedef std::function<void (int, float)> pfunction;
+using pfunction = std::function<void (int, float)>;
 
 struct input_callback
 {

@@ -10,11 +10,11 @@
 
 using boost::asio::ip::udp;
 
-typedef std::function<protocol*(std::string*)> unmarshall_fnc_t;
-typedef std::function<char*(protocol*)> marshall_fnc_t;
-typedef std::function<uchar(std::string*)> protocol_parser_fnc_t;
-typedef std::function<void(protocol*, udp::endpoint)> protocol_handler_fnc_t;
-typedef std::map<uchar, protocol_handler_fnc_t> handler_map_t;
+using unmarshall_fnc_t = std::function<protocol*(std::string*)>;
+using marshall_fnc_t = std::function<char*(protocol*)>;
+using protocol_parser_fnc_t = std::function<uchar(std::string*)>;
+using protocol_handler_fnc_t = std::function<void(protocol*, udp::endpoint)>;
+using handler_map_t = std::map<uchar, protocol_handler_fnc_t>;
 
 class udp_comm
 {

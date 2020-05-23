@@ -12,7 +12,7 @@
 
 namespace Random
 {
-typedef boost::mt19937 Generator;
+using Generator = boost::mt19937;
 Generator gen((std::random_device())());
 
 int range(int a, int b)
@@ -39,7 +39,7 @@ Vector4 point_on_spheric_surface()
     static_assert(DIM > 0 && DIM <= 4, "Dimension does not fit in Vector4");
 
     struct Proxy {
-		typedef float* iterator;
+		using iterator = float*;
 		Proxy(int n) {
             for(int i = DIM; i < 4; ++i)
                 v[i] = 0.0;

@@ -23,7 +23,7 @@ namespace Audio
 		virtual ~Effect(void);
 
 		protected:
-		typedef std::map<std::string, Effect*>::iterator iter;
+		using iter = std::map<std::string, Effect*>::iterator;
 
 		/** Builds an effect from a Ogg Opus file. */
 		Effect(const std::string& rFilename, iter iterator);

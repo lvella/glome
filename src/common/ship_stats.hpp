@@ -13,7 +13,7 @@
 #endif
 
 struct STATS_PACKING ShipStats {
-	typedef std::shared_ptr<ShipStats> shared_ptr;
+	using shared_ptr = std::shared_ptr<ShipStats>;
 	static shared_ptr get();
 
 	STATS_VOLATILE float scale;

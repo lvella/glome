@@ -58,7 +58,7 @@ public:
 	const float* getVertex() const {return v;}
 
 	// STL-like interface
-	typedef float* iterator;
+	using iterator = float*;
 
 	iterator begin() {
 		return v;
