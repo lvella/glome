@@ -16,7 +16,7 @@ public:
 	    {}
 	virtual ~Controller() {};
 
-	virtual void update() = 0;
+	void update() override = 0;
 
 protected:
 	std::vector<Ship*> players;

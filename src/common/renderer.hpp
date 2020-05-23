@@ -40,7 +40,7 @@ protected:
 			glViewport(_x, _y, _w, _h);
 		}
 
-		virtual const Matrix4 &transformation() const override
+		const Matrix4 &transformation() const override
 		{
 			return cam_hist.front();
 		}

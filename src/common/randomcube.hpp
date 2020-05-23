@@ -9,7 +9,7 @@ public:
 	RandomCube();
 	virtual ~RandomCube();
 
-	void update();
-	void draw(Camera& s);
+	void update() override;
+	void draw(Camera& s) override;
 	void randomize();
 };

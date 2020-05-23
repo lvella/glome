@@ -39,7 +39,7 @@ namespace Audio
 		size_t LoadAndClear(OggOpusFile *of);
 
 		/** Plays the sound in a OpenAL source. */
-		virtual void selfPlay(ALuint src, bool loop, float offset=0) override;
+		void selfPlay(ALuint src, bool loop, float offset=0) override;
 
 		private:
 		ALuint m_Buffer;

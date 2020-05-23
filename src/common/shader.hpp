@@ -95,7 +95,7 @@ protected:
 class CamShader: public Shader
 {
 public:
-	virtual void setup_shader(const char *sources[]);
+	void setup_shader(const char *sources[]) override;
 	void setProjection(const Matrix4& proj) const;
 
 protected:

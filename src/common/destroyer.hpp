@@ -8,8 +8,8 @@ public:
 	Destroyer();
 	virtual ~Destroyer();
 
-	virtual void draw(Camera &c);
-	virtual void update();
+	void draw(Camera &c) override;
+	void update() override;
 
 private:
 	Fire other_jet;

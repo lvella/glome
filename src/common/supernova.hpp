@@ -12,9 +12,9 @@ public:
 	Supernova();
 	virtual ~Supernova();
 
-	void update();
-	void draw(Camera &c);
-	void minimap_draw(Camera &c);
+	void update() override;
+	void draw(Camera &c) override;
+	void minimap_draw(Camera &c) override;
 
 private:
 	Vector2 slerp;

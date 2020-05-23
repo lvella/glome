@@ -16,8 +16,8 @@ public:
 
 	void setup_display() { _render->setup_display(); }
 
-	virtual void draw() = 0;
-	virtual void update() = 0;
+	void draw() override = 0;
+	void update() override = 0;
 
 protected:
 	Octree::Hypercube collision_tree;
