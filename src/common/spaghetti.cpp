@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <memory>
 #include <mutex>
 #include <typeinfo>
 
@@ -114,7 +115,7 @@ Spaghetti::Spaghetti():
 	// Build the Vertex Buffer Object
 	{
 		std::vector<Vertex> vertices;
-		vertices.reserve(count);
+		vertices.reserve(++count);
 
 		for(int i = 0; i < spaghetti_count; ++i) {
 			Vector4 *curve = &bezier[(i*3)+1];
@@ -136,13 +137,13 @@ Spaghetti::Spaghetti():
 				vertices.push_back(Vertex{v, Vector4(color, 1.0)});
 			}
 		}
-
+		vertices.push_back(vertices[0]);
 		assert(vertices.size() == count);
 
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]),
-			&vertices[0], GL_STATIC_DRAW);
+		p_vbo = std::make_shared<BufferObject>();
+		glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+		glBufferData(GL_ARRAY_BUFFER, count * sizeof(vertices[0]),
+			vertices.data(), GL_STATIC_DRAW);
 	}
 
 	// Define movement parameters
@@ -166,25 +167,19 @@ Spaghetti::Spaghetti():
 	play(hum_sound, true, Random::zeroToOne());
 }
 
-Spaghetti::~Spaghetti()
-{
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDeleteBuffers(1, &vbo);
-}
-
 void Spaghetti::draw(Camera& c)
 {
 	auto &s = *c.getShader();
 	c.pushMultQRot(get_t());
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glEnableVertexAttribArray(s.colorAttr());
 
 	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*) offsetof(Vertex, pos));
 	glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*) offsetof(Vertex, color));
 
-	glDrawArrays(GL_LINE_LOOP, 0, count);
+	glDrawArrays(GL_LINE_STRIP, 0, count);
 
 	c.popMat();
 }
@@ -218,12 +213,62 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 			position(), other.position(), get_radius()
 		);
 
-		//chip(impact_point);
+		chip(get_t().inverse() * impact_point);
 	}
 
 	if(typeid(other) == typeid(const Supernova&)) {
 		if(cos_dist >= cos(other.get_radius() - get_radius())) {
 			dead = true;
 		}
+	}
+}
+
+void Spaghetti::chip(const Vector4& impact_point)
+{
+	// Sanity check
+	assert(count > 2);
+	if(count <= 3) {
+		dead = true;
+		return;
+	}
+
+	// Retrieve VBO:
+	glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+	Vertex *vdata = reinterpret_cast<Vertex*>(
+		glMapBufferRange(GL_ARRAY_BUFFER, 0,
+			count * sizeof(Vertex), GL_MAP_READ_BIT
+		)
+	);
+
+	// Retrieve IBO:
+	std::vector<uint16_t> idata(count);
+	if(ibo) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER,
+			0, idata.size() * sizeof(idata[0]), idata.data());
+	} else {
+		for(uint16_t i = 0; i < idata.size() - 1; ++i) {
+			idata[i] = i;
+		}
+		idata.back() = 0;
+	}
+
+	// TODO: to be continued
+	// Calculate distances.
+
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+
+	// TODO: to be continued
+	// Slice the spaghetti
+	// count = ...
+
+	if(!ibo) {
+		std::cout << "NOW USING IBO!" << std::endl;
+		ibo = BufferObject();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(idata[0]),
+			idata.data(), GL_STATIC_DRAW);
+	} else {
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, count, idata.data());
 	}
 }

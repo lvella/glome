@@ -20,6 +20,7 @@ add_library(common STATIC
 	audio_source.hpp
 	audio_world.cpp
 	audio_world.hpp
+	buffer_object.hpp
 	camera.cpp
 	camera.hpp
 	collidable.hpp
