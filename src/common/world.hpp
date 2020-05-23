@@ -9,7 +9,6 @@
 #include "ship.hpp"
 #include "octree.hpp"
 #include "runcontext.hpp"
-#include "profiling.hpp"
 #include "audio_world.hpp"
 
 /** Every game mode should derive this class.
@@ -40,7 +39,6 @@ protected:
 	std::vector<AiController*> ai_controls;
 
 private:
-	ProfillingAggregator profiler;
 
 	std::vector<std::shared_ptr<Updatable>> updatables;
 	std::vector<std::weak_ptr<Collidable>> collidables;

@@ -78,3 +78,5 @@ private:
 	std::chrono::steady_clock::time_point last_print;
 	std::list<TimeAccumulator> tas;
 };
+
+extern ProfillingAggregator globalProfiler;

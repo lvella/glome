@@ -6,11 +6,9 @@
 #include "projectile.hpp"
 #include "thread_pool.hpp"
 #include "utils.hpp"
+#include "profiling.hpp"
 
-using namespace std::chrono_literals;
-
-World::World():
-	profiler(5000ms)
+World::World()
 {}
 
 template<typename T>
@@ -32,12 +30,10 @@ void World::add_updatable(std::shared_ptr<Updatable>&& new_obj)
 
 void World::update(float dt)
 {
-	profiler.maybe_print();
-
 	{
 		constexpr size_t chunk_size = 400;
 
-		static TimeAccumulator& update_ta = profiler.newTimer("Update objects");
+		static TimeAccumulator& update_ta = globalProfiler.newTimer("Update objects");
 		TimeGuard timer(update_ta);
 
 		for(unsigned i = 0; i < ai_controls.size(); ++i) {
@@ -82,7 +78,7 @@ void World::update(float dt)
 	}
 
 	{
-		static TimeAccumulator& octree_ta = profiler.newTimer("Octree collide");
+		static TimeAccumulator& octree_ta = globalProfiler.newTimer("Octree collide");
 		TimeGuard timer(octree_ta);
 
 		std::vector<std::shared_ptr<Collidable>> sptrs;
@@ -102,16 +98,16 @@ void World::update(float dt)
 	}
 
 	{
-		static TimeAccumulator& audio_ta = profiler.newTimer("Update audio");
+		static TimeAccumulator& audio_ta = globalProfiler.newTimer("Update renderer with audio");
 		TimeGuard timer(audio_ta);
 		_render->audio_update();
+		_render->update(dt);
 	}
-	_render->update(dt);
 }
 
 void World::draw()
 {
-	static TimeAccumulator& draw_ta = profiler.newTimer("Draw objects");
+	static TimeAccumulator& draw_ta = globalProfiler.newTimer("Draw objects");
 	TimeGuard timer(draw_ta);
 
 	std::vector<Glome::Drawable*> objects;
