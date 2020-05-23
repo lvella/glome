@@ -10,6 +10,7 @@
 #include "random.hpp"
 #include "dustfield.hpp"
 #include "audio.hpp"
+#include "profiling.hpp"
 
 namespace Game
 {
@@ -33,6 +34,10 @@ static std::unique_ptr<Paused> paused;
 void
 frame(std::chrono::duration<float> frame_time)
 {
+	globalProfiler.maybe_print();
+	static TimeAccumulator& frame_ta = globalProfiler.newTimer("Full frame");
+
+	TimeGuard timer(frame_ta);
 	constexpr float max_physics_dt = 1.0 / MIN_FPS;
 	const float dt = std::min(max_physics_dt, frame_time.count());
 

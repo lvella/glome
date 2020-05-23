@@ -56,6 +56,8 @@ add_library(common STATIC
 	options.hpp
 	particle_system.cpp
 	particle_system.hpp
+	profiling.cpp
+	profiling.hpp
 	projectile.cpp
 	projectile.hpp
 	qrot.cpp
