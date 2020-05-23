@@ -1,6 +1,5 @@
 == Needs for FIKALAB game ==
 
-- Fix Windows/Wine appearance on NVIDIA.
 - Fix performance regression.
 - Support Windows build (Rui)
 - Kill flying spaghetti monsters (Vella)
