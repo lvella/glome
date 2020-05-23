@@ -7,9 +7,10 @@
 class DataFile: public std::ifstream
 {
 public:
-	using std::ifstream::ifstream;
+	DataFile(const std::filesystem::path& path):
+		std::ifstream(path, std::ios::in | std::ios::binary)
+	{}
 
-	// Fuck C++: it forces me to implement the move constructor.
 	DataFile(DataFile&& other):
 		std::ifstream(std::move(other))
 	{}
