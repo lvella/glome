@@ -125,11 +125,6 @@ bool Fire::update(float dt, UpdatableAdder&)
 
 	actives_count = new_count;
 
-	// Update vertex buffer
-	// TODO: take inactive particles out of the way, and only copy relevant data
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(RenderAttributes) * count, rattrs);
-
 	return true;
 }
 
@@ -144,6 +139,7 @@ void Fire::draw(Camera& c)
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(uint16_t) * actives_count, idx);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(RenderAttributes) * count, rattrs); /// TEST
 
 	glBindTexture(GL_TEXTURE_2D, tex_particle);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
