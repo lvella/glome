@@ -3,6 +3,17 @@
 #include <vector>
 #include <memory>
 
+class NonCopyable {
+public:
+	NonCopyable() = default;
+
+	NonCopyable(NonCopyable&&) = default;
+	NonCopyable& operator=(NonCopyable&&) = default;
+
+	NonCopyable(const NonCopyable&) = delete;
+	NonCopyable& operator=(const NonCopyable&) = delete;
+};
+
 template<typename T, typename F>
 void remove_if(std::vector<T>& v, F&& func)
 {

@@ -34,6 +34,7 @@ void World::add_updatable(std::shared_ptr<Updatable>&& new_obj)
 
 void World::update(float dt)
 {
+	LatchWaiter waiter;
 	{
 		static TimeAccumulator& update_ta = globalProfiler.newTimer("Update objects");
 		TimeGuard timer(update_ta);
@@ -60,8 +61,7 @@ void World::update(float dt)
 			}
 		});
 
-		// TODO: this stuff below is slow, there should be a better way...
-		globalThreadPool.run_in_all_other_threads([this] (unsigned i) {
+		waiter = globalThreadPool.run_in_all_pool_threads([this] (unsigned i) {
 			threads_sync[i] = glFenceSync(GL_SYNC_GPU_COMMANDS_COMPLETE, 0);
 		});
 

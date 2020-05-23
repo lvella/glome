@@ -81,7 +81,7 @@ static void initialize_gl_context()
 	glcontext = SDL_GL_CreateContext(window);
 
 	// Setup one context per thread
-	globalThreadPool.run_in_all_other_threads([](unsigned idx) {
+	globalThreadPool.run_in_all_pool_threads([](unsigned idx) {
 		SDL_GL_MakeCurrent(window, threads_glcontexts[idx]);
 	});
 

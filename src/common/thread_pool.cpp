@@ -17,6 +17,14 @@ void Latch::count_down_and_wait()
 	} while(counter > 0);
 }
 
+void Latch::wait()
+{
+	std::unique_lock lock(m);
+	while(counter > 0) {
+		cond.wait(lock);
+	}
+}
+
 ThreadPool::ThreadPool(unsigned size)
 {
 	if(!size) {

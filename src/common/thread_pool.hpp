@@ -12,6 +12,8 @@
 
 #include <blockingconcurrentqueue.h>
 
+#include "utils.hpp"
+
 // TODO: replace with std::latch from C++20
 class Latch {
 public:
@@ -20,11 +22,37 @@ public:
 	{}
 
 	void count_down_and_wait();
+	void wait();
 
 private:
 	std::mutex m;
 	std::condition_variable cond;
 	unsigned counter;
+};
+
+class LatchWaiter: public NonCopyable {
+public:
+	LatchWaiter() = default;
+	LatchWaiter(std::shared_ptr<Latch>&& l):
+		latch(std::move(l))
+	{}
+
+	LatchWaiter& operator=(LatchWaiter&&) = default;
+
+	~LatchWaiter()
+	{
+		wait();
+	}
+
+	void wait()
+	{
+		if(latch) {
+			latch->wait();
+		}
+	}
+
+private:
+	std::shared_ptr<Latch> latch;
 };
 
 class ThreadPool
@@ -39,7 +67,7 @@ public:
 	void parallel_run_and_wait(Func&& start_function);
 
 	template<class Func>
-	void run_in_all_other_threads(Func&& function);
+	LatchWaiter run_in_all_pool_threads(Func&& function);
 
 	unsigned get_num_threads() const
 	{
@@ -128,26 +156,30 @@ void ThreadPool::parallel_run_and_wait(Func&& start_function)
 	}
 }
 
-// Executes function in all threads except the caller.
+// Executes function in every pool thread (not on the caller).
 // Function receives an unique value among all threads, from 0 to get_num_threads() - 1.
-// Blocks all threads until all have executed the function, then return.
-// Acts as a barrier.
+// Blocks pool threads until all have executed the function.
+//
+// Can be used as a barrier.
+//
+// Immediatelly returns an object that waits threads to finish upon destruction.
 template<class Func>
-void ThreadPool::run_in_all_other_threads(Func&& function)
+LatchWaiter ThreadPool::run_in_all_pool_threads(Func&& function)
 {
 	// Don't try do use a latch, either boost, std or your own
 	// without std::make_shared. It doesn't work. You've been warned.
-	auto latch = std::make_shared<Latch>(threads.size() + 1);
+	auto latch = std::make_shared<Latch>(threads.size());
 
 	for(unsigned i = 0; i < threads.size(); ++i) {
-		add_task([=, &function] {
+		// Must copy all captures because
+		// the lambda may outlive the call.
+		add_task([=] {
 			function(i);
-
 			latch->count_down_and_wait();
 		});
 	}
 
-	latch->count_down_and_wait();
+	return LatchWaiter{std::move(latch)};
 }
 
 extern ThreadPool globalThreadPool;
