@@ -1,6 +1,8 @@
 #pragma once
 
 #include <list>
+
+#include "camera.hpp"
 #include "matrix4.hpp"
 #include "vector4.hpp"
 #include "vol_sphere.hpp"

@@ -1,11 +1,9 @@
-#include <iostream>
+#include <map>
+#include <cstring>
+
+#include "config.hpp"
 
 #include "shader.hpp"
-#include <string.h>
-#include <string>
-#include <stdio.h>
-#include <errno.h>
-#include "config.hpp"
 
 using namespace std;
 

@@ -1,8 +1,8 @@
 #pragma once
 
-#include <functional>
 #include <cassert>
 #include <cmath>
+
 #include "object.hpp"
 
 // This class represents a sphere for the

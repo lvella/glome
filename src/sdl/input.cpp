@@ -1,10 +1,9 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include <utility>
 #include <string>
+#include <cassert>
 
-#include <assert.h>
 #include <SDL.h>
 
 #include "config.hpp"

@@ -1,4 +1,5 @@
 #include <future>
+
 #include "options.hpp"
 #include "meridian.hpp"
 #include "minimap.hpp"

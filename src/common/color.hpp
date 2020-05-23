@@ -1,4 +1,5 @@
 #pragma once
+
 #include "vector3.hpp"
 
 namespace Color

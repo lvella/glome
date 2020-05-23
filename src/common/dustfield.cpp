@@ -1,5 +1,5 @@
 #include <vector>
-#include <cstddef>
+
 #include "vector4.hpp"
 #include "random.hpp"
 #include "shader.hpp"

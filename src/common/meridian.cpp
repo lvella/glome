@@ -1,4 +1,5 @@
-#include <math.h>
+#include <cmath>
+
 #include "gl.hpp"
 #include "math.hpp"
 #include "world.hpp"

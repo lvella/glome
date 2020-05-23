@@ -1,4 +1,3 @@
-#include <cstdlib>
 #include <unordered_map>
 
 #include "input.hpp"

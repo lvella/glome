@@ -1,6 +1,3 @@
-#include <iostream>
-#include <list>
-
 #include "object.hpp"
 #include "protocol.hpp"
 #include "udp_server.hpp"

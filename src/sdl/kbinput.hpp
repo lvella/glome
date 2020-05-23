@@ -1,12 +1,9 @@
 #pragma once
 
-#include <iostream>
-#include <utility>
 #include <functional>
 
 #include <SDL.h>
 
-#include "events.hpp"
 #include "input_callback.hpp"
 
 namespace Input

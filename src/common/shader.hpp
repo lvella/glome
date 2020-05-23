@@ -3,7 +3,6 @@
 #include "gl.hpp"
 #include "matrix4.hpp"
 #include "vector2.hpp"
-#include <map>
 
 class Uniform
 {

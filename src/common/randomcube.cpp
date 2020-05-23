@@ -1,5 +1,5 @@
-#include <stdlib.h>
-#include <math.h>
+#include <cmath>
+
 #include "object.hpp"
 #include "math.hpp"
 #include "random.hpp"
