@@ -15,6 +15,7 @@ add_executable(glome
 	sdl_main.cpp
 )
 
+set(OpenGL_GL_PREFERENCE GLVND)
 find_package(OpenGL REQUIRED)
 target_link_libraries(glome common ${OPENGL_LIBRARIES})
 
