@@ -92,7 +92,7 @@ initialize()
 	std::function<void (int, float)> funcs[] = {game_pause, shoot, move_up, move_down,
 	move_left, move_right, move_spinl,
 	move_spinr, move_forward, move_backward};
-	for(i = 0; i < QTTY; ++i)
+	for(i = 0; i < size_t(Event::QTTY); ++i)
 		pfunctions_to_inputs[i] = funcs[i];
 
 	read_controllers_settings();

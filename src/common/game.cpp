@@ -64,7 +64,7 @@ initialize()
 	//Menu::initialize();
 	initialize_meridians();
 
-	switch_state(WORLD);
+	switch_state(State::WORLD);
 }
 
 void
@@ -73,17 +73,17 @@ shutdown()
 	Audio::shutdown();
 }
 
-void switch_state(state s)
+void switch_state(State s)
 {
 	switch(s)
 	{
-	case EXIT:
+	case State::EXIT:
 		//running = true;
 		break;
-	case MENU:
+	case State::MENU:
 		context = paused.get();
 		break;
-	case WORLD:
+	case State::WORLD:
 		context = world.get();
 		break;
 	}

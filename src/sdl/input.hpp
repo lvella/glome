@@ -29,20 +29,20 @@ namespace Input
 
 	inline float normalize_button(int e)
 	{
-		switch(e)
+		switch(Event(e))
 		{
-		case SHOOT:
-		case MOVE_BACKWARD:
-		case MOVE_RIGHT:
-		case MOVE_UP:
-		case MOVE_SPINL:
+		case Event::SHOOT:
+		case Event::MOVE_BACKWARD:
+		case Event::MOVE_RIGHT:
+		case Event::MOVE_UP:
+		case Event::MOVE_SPINL:
 			return 1.0;
-		case MOVE_DOWN:
-		case MOVE_LEFT:
-		case MOVE_SPINR:
-		case MOVE_FORWARD:
+		case Event::MOVE_DOWN:
+		case Event::MOVE_LEFT:
+		case Event::MOVE_SPINR:
+		case Event::MOVE_FORWARD:
 			return -1.0;
-		case PAUSE:
+		case Event::PAUSE:
 			return 1.0;
 		default:
 			return 0.0;
@@ -104,7 +104,7 @@ namespace Input
 	{
 		static bool paused = false;
 		if(a > 0.5f) {
-			Game::switch_state(paused ? Game::WORLD : Game::MENU);
+			Game::switch_state(paused ? Game::State::WORLD : Game::State::MENU);
 			paused = !paused;
 
 			SDL_SetRelativeMouseMode(SDL_bool(!paused));

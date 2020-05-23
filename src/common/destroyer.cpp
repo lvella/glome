@@ -2,7 +2,7 @@
 #include "destroyer.hpp"
 
 Destroyer::Destroyer():
-	Ship(Mesh::DESTROYER, ShipStats::get()),
+	Ship(Mesh::Type::DESTROYER, ShipStats::get()),
 	other_jet(0.0006f)
 {
 	float lala[] = {

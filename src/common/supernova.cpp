@@ -6,8 +6,8 @@
 
 Supernova::Supernova():
 	size(0.0f),
-	mesh(Mesh::get_mesh(Mesh::ICOSPHERE)),
-	map_mesh(Mesh::get_mesh(Mesh::UVSPHERE))
+	mesh(Mesh::get_mesh(Mesh::Type::ICOSPHERE)),
+	map_mesh(Mesh::get_mesh(Mesh::Type::UVSPHERE))
 {
 	// TODO: initialize this stuff only once
 	bg_noise = create_noise_texture(800, 600, 1.0f / 50.0f, Vector2(Random::arc(), Random::arc()) * 20.0f);

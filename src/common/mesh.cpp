@@ -14,9 +14,9 @@
 
 using namespace std;
 
-static Mesh* mesh_list[Mesh::MESH_COUNT] = {NULL};
+static Mesh* mesh_list[size_t(Mesh::Type::MESH_COUNT)] = {NULL};
 
-const char* mesh_filename[Mesh::MESH_COUNT] =
+const char* mesh_filename[size_t(Mesh::Type::MESH_COUNT)] =
 	{
 		"hunter",
 		"destroyer",
@@ -30,10 +30,10 @@ Mesh::~Mesh()
 	glDeleteBuffers(2, bufobjs);
 }
 
-Mesh::Mesh(Types type):
+Mesh::Mesh(Type type):
 	ref_count(1)
 {
-	assert(size_t(type) < MESH_COUNT);
+	assert(size_t(type) < size_t(Type::MESH_COUNT));
 
 	const char* name = mesh_filename[int(type)];
 
@@ -43,10 +43,10 @@ Mesh::Mesh(Types type):
 		load_from_file(name);
 	} else {
 		switch (type) { // when there are more than one procedural type
-		case ICOSPHERE:
+		case Type::ICOSPHERE:
 			generate_icosphere();
 			break;
-		case UVSPHERE:
+		case Type::UVSPHERE:
 			generate_uvsphere();
 			break;
 		default:
@@ -380,7 +380,7 @@ Mesh::draw(Camera& c)
 }
 
 Mesh*
-Mesh::get_mesh(Types type)
+Mesh::get_mesh(Type type)
 {
 	Mesh *&m = mesh_list[int(type)];
 	if(m)
