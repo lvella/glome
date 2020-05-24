@@ -14,7 +14,7 @@ public:
 		 Controller(std::move(pp), std::move(bp), std::move(ai))
 		 {}
 	virtual ~ControllerLocal() {};
-	virtual void update();
+	void update() override;
 
 protected:
 
