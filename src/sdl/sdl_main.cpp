@@ -73,7 +73,7 @@ static void initialize_gl_context()
 	{
 		const char *msg = "Glome requires at least OpenGL 2.1";
 		#ifdef WIN32
-		MessageBoxA(NULL, msg, NULL, MB_OK);
+		MessageBoxA(nullptr, msg, nullptr, MB_OK);
 		#else
 		cerr << msg << endl;
 		#endif

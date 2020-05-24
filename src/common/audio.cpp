@@ -9,13 +9,13 @@ static ALCcontext* al_context;
 
 void Audio::initialize()
 {
-   al_device = alcOpenDevice(NULL);
-   if(al_device == NULL) {
+   al_device = alcOpenDevice(nullptr);
+   if(al_device == nullptr) {
       std::cerr << "Warning: OpenAL device could not be opened. Audio is disabled!\n";
       return;
    }
 
-   al_context = alcCreateContext(al_device, NULL);
+   al_context = alcCreateContext(al_device, nullptr);
    alcMakeContextCurrent(al_context);
 
    // TODO: properly configure AL_SPEED_OF_SOUND

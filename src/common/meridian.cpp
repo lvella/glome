@@ -36,7 +36,7 @@ draw_meridians(Camera &c)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, 0, NULL);
+  glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 	glVertexAttrib4f(s->colorAttr(), 1.0f, 1.0f, 0.0f, 1.0f);
   glDrawArrays(GL_LINES, 0, 360);

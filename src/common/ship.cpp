@@ -33,7 +33,7 @@ Ship::Ship(Mesh::Type type, ShipStats::shared_ptr sstats):
 
 	rel_speed = 0.0f;
 
-	ctrl = NULL;
+	ctrl = nullptr;
 }
 
 void
@@ -54,7 +54,7 @@ Ship::load_guns(Mesh::Type type)
 		assert(ret == 1);
 		/* Pointer file to gun position */
 		fseek(fd, gun_pos, SEEK_SET);
-		assert(fd != NULL);
+		assert(fd != nullptr);
 	}
 
 	{
@@ -90,7 +90,7 @@ Ship::load_engines(Mesh::Type type)
 		assert(ret == 1);
 		/* Poiter file to engine position */
 		fseek(fd, engine_pos, SEEK_SET);
-		assert(fd != NULL);
+		assert(fd != nullptr);
 	}
 
 	{
@@ -123,7 +123,7 @@ Ship::update()
 		mesh->rescale(curr_scale);
 	}
 	#endif
-	if(ctrl != NULL)
+	if(ctrl != nullptr)
 	{
 		/* Turning */
 		float h = ctrl->h_tilt - ctrl->h_req;

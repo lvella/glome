@@ -50,7 +50,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center, std
 	glVertexAttrib4f(hud.colorAttr(), 0.06f, 0.64f, 0.12f, 0.55f);
 
 	glBindBuffer(GL_ARRAY_BUFFER, square_vbo);
-	glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, nullptr);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
@@ -129,11 +129,11 @@ MiniMap::initialize()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 	}
 
-	const char* src_proj[] = {"minimap.vert", "map_stuff.vert", "minimap.frag", "texture.frag", NULL};
+	const char* src_proj[] = {"minimap.vert", "map_stuff.vert", "minimap.frag", "texture.frag", nullptr};
 	map_projection.setup_shader(src_proj);
 	proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
 
-	const char* src_hud[] = {"hud.vert", "map_stuff.vert", "minimap.frag", "texture.frag", NULL};
+	const char* src_hud[] = {"hud.vert", "map_stuff.vert", "minimap.frag", "texture.frag", nullptr};
 	hud.setup_shader(src_hud);
 	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
 }
