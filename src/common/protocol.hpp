@@ -5,29 +5,27 @@
 #include <memory>
 #include <string>
 
-// Isso fica temporariamente..
-#define QUIT 0
-#define TURN 1
-#define MOVE_F 2
-#define MOVE_B 3
-#define SHOT 4
-#define UP 5
-#define DOWN 6
-#define LEFT 7
-#define RIGHT 8
-#define SPIN_L 9
-#define SPIN_R 10
-#define COMMAND_BEGIN 0
-#define COMMAND_END 1
-#define JOIN_GAME 11
-#define NEW_SHIP 12
-#define INIT_POS 13
-#define UPDATE_SHIP 14
-#define SHIP_POS 15
-//
+static constexpr unsigned QUIT = 0;
+static constexpr unsigned TURN = 1;
+static constexpr unsigned MOVE_F = 2;
+static constexpr unsigned MOVE_B = 3;
+static constexpr unsigned SHOT = 4;
+static constexpr unsigned UP = 5;
+static constexpr unsigned DOWN = 6;
+static constexpr unsigned LEFT = 7;
+static constexpr unsigned RIGHT = 8;
+static constexpr unsigned SPIN_L = 9;
+static constexpr unsigned SPIN_R = 10;
+static constexpr unsigned COMMAND_BEGIN = 0;
+static constexpr unsigned COMMAND_END = 1;
+static constexpr unsigned JOIN_GAME = 11;
+static constexpr unsigned NEW_SHIP = 12;
+static constexpr unsigned INIT_POS = 13;
+static constexpr unsigned UPDATE_SHIP = 14;
+static constexpr unsigned SHIP_POS = 15;
 
-#define PROTOCOL_SIZE sizeof(protocol)
-#define MAX_NAME_LEN 16 //get from another place
+static constexpr unsigned PROTOCOL_SIZE = sizeof(protocol);
+static constexpr unsigned MAX_NAME_LEN = 16; //get from another place
 
 typedef unsigned char  uchar;
 typedef unsigned short ushort;
