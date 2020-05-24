@@ -1,9 +1,5 @@
 #pragma once
 
-#include <string>
-#include <vector>
-#include <cstdio>
-
 namespace Menu
 {
 	void initialize();

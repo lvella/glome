@@ -1,7 +1,6 @@
 #pragma once
 
 #include "matrix4.hpp"
-#include "camera.hpp"
 
 class Object
 {

@@ -1,12 +1,10 @@
 #pragma once
 
-#include <functional>
 #include <unordered_map>
+
 #include <SDL.h>
-#include <iostream>
 
 #include "ship_controller.hpp"
-#include "input_callback.hpp"
 #include "events.hpp"
 #include "game.hpp"
 

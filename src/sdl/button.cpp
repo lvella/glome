@@ -1,7 +1,4 @@
 #include "button.hpp"
-#include "menu.hpp"
-#include "native.hpp"
-
 
 NButton::NButton(const std::string& caption) :
 	Button(caption),

@@ -1,9 +1,5 @@
-#include <map>
-#include <algorithm>
 #include <cmath>
 #include <cassert>
-#include <cstdint>
-#include <iostream>
 #include <sstream>
 
 #include "math.hpp"
@@ -14,8 +10,6 @@
 #include "matrix4.hpp"
 
 #include "ship.hpp"
-
-#include <iostream>
 
 using namespace std;
 using namespace Glome;

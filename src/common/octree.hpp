@@ -1,10 +1,11 @@
 #pragma once
 
 #include <array>
-#include <boost/container_hash/hash_fwd.hpp>
 #include <initializer_list>
 #include <vector>
 #include <unordered_map>
+
+#include <boost/container_hash/hash_fwd.hpp>
 #include <boost/functional/hash.hpp>
 
 #include "vector4.hpp"

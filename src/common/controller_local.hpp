@@ -1,6 +1,8 @@
 #pragma once
 
 #include <functional>
+#include <vector>
+
 #include "controller.hpp"
 
 class ControllerLocal : public Controller

@@ -1,8 +1,6 @@
-#include <cstdlib>
 #include <unordered_map>
 
 #include "options.hpp"
-
 #include "input.hpp"
 #include "kbinput.hpp"
 

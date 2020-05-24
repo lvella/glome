@@ -1,10 +1,6 @@
-#include <iostream>
-
 #include "input.hpp"
 #include "controller_local.hpp"
 #include "projectile.hpp"
-
-using namespace std;
 
 void
 ControllerLocal::update()

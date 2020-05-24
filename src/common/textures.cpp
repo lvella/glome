@@ -1,9 +1,6 @@
 #include <cstdlib>
 #include <cmath>
 
-#include <fstream>
-#include <iostream>
-
 #include "simplexnoise1234.hpp"
 #include "textures.hpp"
 

@@ -1,10 +1,8 @@
 #include "spaghetti.hpp"
 
-#include <iostream>
-#include <cstdlib>
 #include <cmath>
 #include <cassert>
-#include <algorithm>
+
 #include "object.hpp"
 #include "math.hpp"
 #include "random.hpp"

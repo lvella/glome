@@ -1,6 +1,6 @@
 #pragma once
+
 #include <guichan.hpp>
-#include <iostream>
 
 class NButton : public gcn::Button
 {

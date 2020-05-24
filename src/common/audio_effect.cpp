@@ -1,15 +1,8 @@
-#include <cstdlib>
-#include <cstdio>
-#include <cerrno>
-#include <list>
 #include <vector>
-#include <string>
-#include <iostream>
 #include <sstream>
 #include <map>
 #include <AL/al.h>
 #include <AL/alc.h>
-#include <utility>
 
 #include "config.hpp"
 #include "audio_source.hpp"
@@ -57,7 +50,7 @@ size_t Effect::LoadAndClear(OggOpusFile *of)
    // Generate audio buffer
    alGenBuffers(1, &m_Buffer);
    if(alGetError() == AL_NO_ERROR) {
-      std::vector<opus_int16> buf(1024*1024);
+      vector<opus_int16> buf(1024*1024);
       int ret;
 
       do {

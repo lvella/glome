@@ -1,7 +1,5 @@
 #include <cmath>
-#include <cstdlib>
-#include <deque>
-#include <iostream>
+
 #include <GL/glew.h>
 #include <GL/glu.h>
 

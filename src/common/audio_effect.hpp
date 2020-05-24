@@ -2,7 +2,7 @@
 
 #include <map>
 #include <opus/opusfile.h>
-#include <iostream>
+
 #include "audio_sound.hpp"
 
 namespace Audio

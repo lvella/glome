@@ -1,10 +1,10 @@
-#include <GL/glew.h>
-#include <iostream>
 #include <sstream>
 #include <cassert>
 #include <map>
 #include <set>
 #include <utility>
+
+#include <GL/glew.h>
 
 #include "config.hpp"
 #include "vector4.hpp"

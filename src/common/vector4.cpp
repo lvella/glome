@@ -1,5 +1,3 @@
-#include <iostream>
-
 #include "vector4.hpp"
 #include "vector3.hpp"
 
