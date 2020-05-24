@@ -3,7 +3,6 @@
 #include <fstream>
 #include <cstdlib>
 #include <limits>
-#include <random>
 #include <boost/random/uniform_on_sphere.hpp>
 #include <boost/random/variate_generator.hpp>
 
@@ -11,7 +10,6 @@
 
 namespace Random
 {
-typedef std::mt19937 Generator;
 Generator gen((std::random_device())());
 
 int range(int a, int b)

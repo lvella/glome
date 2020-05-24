@@ -5,7 +5,9 @@
 #include <list>
 #include <iostream>
 
-class TimeAccumulator
+#include "utils.hpp"
+
+class TimeAccumulator: public NonCopyable
 {
 public:
 	TimeAccumulator(std::string name):
@@ -62,7 +64,7 @@ public:
 	void maybe_print()
 	{
 		auto now = std::chrono::steady_clock::now();
-		if(now - last_print >= print_period) {
+		if(now - last_print >= print_period && !tas.empty()) {
 			last_print = now;
 
 			std::cout << "\nTimings:\n";

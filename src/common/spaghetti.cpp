@@ -5,8 +5,10 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <limits>
 #include <memory>
 #include <mutex>
+#include <random>
 #include <typeinfo>
 
 #include "object.hpp"
@@ -17,6 +19,7 @@
 #include "audio_effect.hpp"
 #include "projectile.hpp"
 #include "supernova.hpp"
+#include "profiling.hpp"
 
 using namespace Glome;
 
@@ -63,7 +66,8 @@ CubicInterpolate(
 }
 
 Spaghetti::Spaghetti():
-	VolSphere(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f)))
+	VolSphere(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f))),
+	frailty(Random::normalDistribution(50.0 * SEGMENTS, 25.0 * SEGMENTS), SEGMENTS)
 {
 	// Random spaghetti propertiers:
 	const float radius = get_radius();
@@ -140,9 +144,11 @@ Spaghetti::Spaghetti():
 		vertices.push_back(vertices[0]);
 		assert(vertices.size() == count);
 
+		vbuf_size = count;
+
 		p_vbo = std::make_shared<BufferObject>();
 		glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
-		glBufferData(GL_ARRAY_BUFFER, count * sizeof(vertices[0]),
+		glBufferData(GL_ARRAY_BUFFER, vbuf_size * sizeof(vertices[0]),
 			vertices.data(), GL_STATIC_DRAW);
 	}
 
@@ -173,13 +179,20 @@ void Spaghetti::draw(Camera& c)
 	c.pushMultQRot(get_t());
 
 	glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glEnableVertexAttribArray(s.colorAttr());
 
-	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*) offsetof(Vertex, pos));
-	glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*) offsetof(Vertex, color));
+	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE,
+		sizeof(Vertex), (GLvoid*) offsetof(Vertex, pos));
+	glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE,
+		sizeof(Vertex), (GLvoid*) offsetof(Vertex, color));
 
-	glDrawArrays(GL_LINE_STRIP, 0, count);
+	if(ibo) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glDrawElements(GL_LINE_STRIP, count, GL_UNSIGNED_SHORT, NULL);
+
+	} else {
+		glDrawArrays(GL_LINE_STRIP, 0, count);
+	}
 
 	c.popMat();
 }
@@ -223,22 +236,40 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 	}
 }
 
+class Fragment final:
+	public Updatable,
+	public Drawable
+{
+public:
+	Fragment(const QRot& orig_transformation,
+		float orig_angular_speed,
+		float orig_speed,
+		const std::shared_ptr<BufferObject>& p_vbo,
+		uint16_t start, uint16_t size)
+	{}
+
+	bool update(float dt, UpdatableAdder& adder) override
+	{
+		return false;
+	}
+
+	void draw(Camera& c) override
+	{}
+};
+
+static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
+
 void Spaghetti::chip(const Vector4& impact_point)
 {
+	TimeGuard timer(chip_time);
+	constexpr uint16_t separator = std::numeric_limits<uint16_t>::max();
+
 	// Sanity check
 	assert(count > 2);
 	if(count <= 3) {
 		dead = true;
 		return;
 	}
-
-	// Retrieve VBO:
-	glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
-	Vertex *vdata = reinterpret_cast<Vertex*>(
-		glMapBufferRange(GL_ARRAY_BUFFER, 0,
-			count * sizeof(Vertex), GL_MAP_READ_BIT
-		)
-	);
 
 	// Retrieve IBO:
 	std::vector<uint16_t> idata(count);
@@ -253,22 +284,132 @@ void Spaghetti::chip(const Vector4& impact_point)
 		idata.back() = 0;
 	}
 
-	// TODO: to be continued
-	// Calculate distances.
+	std::vector<std::pair<float, unsigned>> cos_dists;
+	cos_dists.reserve(count);
+	{
+		// Retrieve VBO:
+		std::vector<Vertex> vdata(vbuf_size);
+		glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+		glGetBufferSubData(GL_ARRAY_BUFFER,
+			0, vdata.size() * sizeof(vdata[0]), vdata.data());
 
-	glUnmapBuffer(GL_ARRAY_BUFFER);
+		/*glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+		Vertex *vdata = reinterpret_cast<Vertex*>(
+			glMapBufferRange(GL_ARRAY_BUFFER, 0,
+				count * sizeof(Vertex), GL_MAP_READ_BIT
+			)
+		);*/
 
-	// TODO: to be continued
-	// Slice the spaghetti
-	// count = ...
+		for(unsigned i = 0; i < idata.size(); ++i) {
+			if(idata[i] == separator) [[unlikely]] {
+				continue;
+			}
+			float d = vdata[idata[i]].pos.dot(impact_point);
+			cos_dists.push_back({d, i});
+		}
+
+		/*glUnmapBuffer(GL_ARRAY_BUFFER);*/
+	}
+	std::sort(cos_dists.begin(), cos_dists.end(), [] (auto& a, auto& b) {
+		return a.first > b.first;
+	});
+
+	// Each damage unit strips a fragment from the spaghetti.
+	unsigned damage = std::max(1l, std::lround(bullet_damage(Random::gen)));
+	auto sorted_iter = cos_dists.begin();
+	for(unsigned i = 0; i < damage; ++i)
+	{
+		// Skip all vertices that have already been broken-off
+		while(sorted_iter != cos_dists.end()
+			&& idata[sorted_iter->second] == separator)
+		{
+			++sorted_iter;
+		}
+		if(sorted_iter == cos_dists.end()) {
+			// We cycled the entire list there is no vertex left.
+			// We are done damaging.
+			break;
+		}
+
+		const unsigned closest_vert = sorted_iter->second;
+
+		// Number of segments in the fragment:
+		unsigned num_segs = std::max(1l, std::lround(frailty(Random::gen)));
+
+		// Find where the fragment may start
+		int start = closest_vert;
+		unsigned max_segs = 0;
+		for(unsigned j = 0; j < num_segs; ++j) {
+			int prev = start--;
+			if(start == -1) {
+				start = idata.size()-1;
+			}
+
+			if(idata[start] == separator || start == closest_vert)
+			{
+				start = prev;
+				break;
+			}
+			++max_segs;
+		}
+
+		// Find where the fragment may end
+		int end = closest_vert;
+		for(unsigned j = 0; j < num_segs; ++j) {
+			int prev = end++;
+			if(end == idata.size()) {
+				end = 0;
+			}
+
+			if(idata[end] == separator || end == closest_vert)
+			{
+				end = prev;
+				break;
+			}
+			++max_segs;
+		}
+
+		// There must be at least two vertices in this fragment
+		// Solitary vertices may happen in this algorithm. The ones
+		// not caught here are filtered later, when compacting
+		// the new IBO.
+		if(end == start) {
+			idata[end] = separator;
+			continue;
+		}
+
+		if(max_segs > num_segs) {
+			// Choose where to start the fragment:
+			start += Random::range(0, max_segs - num_segs);
+		} else {
+			// Limit the segment size:
+			num_segs = max_segs;
+		}
+
+		// Create the fragment.
+		spawn.push_back(std::make_shared<Fragment>(
+			get_t(), angular_speed, speed,
+			p_vbo, idata[start], num_segs + 1
+		));
+
+		// Remove vertices internal to the fragment:
+		for(++start; start < end; ++start) {
+			idata[start] = separator;
+		}
+	}
+
+	// Filter blank spaces in the IBO
+	// TODO...
 
 	if(!ibo) {
-		std::cout << "NOW USING IBO!" << std::endl;
 		ibo = BufferObject();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(idata[0]),
 			idata.data(), GL_STATIC_DRAW);
 	} else {
-		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, count, idata.data());
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0,
+			count * sizeof(idata[0]), idata.data());
 	}
 }
+
+std::normal_distribution<> Spaghetti::bullet_damage(10.0, 6.0);
