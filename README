@@ -1,5 +1,11 @@
 Navigate through the surface of a hypersphere and kill your enemies.
+
+* This repository has the following project as git submodule:
+  https://github.com/cameron314/concurrentqueue
   
+-> Download it by running:
+git submodule update --init
+
 * Necessary packages (used in Debian 6, Ubuntu 11.04, Mint 12):
   build-essential
   automake (This and below only if you do not have "configure" script generated)
