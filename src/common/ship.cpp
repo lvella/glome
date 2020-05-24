@@ -20,7 +20,7 @@
 using namespace std;
 using namespace Glome;
 
-extern const char* mesh_filename[Mesh::MESH_COUNT];
+extern const char* mesh_filename[size_t(Mesh::Type::MESH_COUNT)];
 
 void
 Ship::set_controller(ShipController* pctrl)
@@ -29,7 +29,7 @@ Ship::set_controller(ShipController* pctrl)
 	ctrl->stats = stats.get();
 }
 
-Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
+Ship::Ship(Mesh::Type type, ShipStats::shared_ptr sstats):
 		fx_engine(0.001f),
 		stats(std::move(sstats))
 {
@@ -43,12 +43,12 @@ Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
 }
 
 void
-Ship::load_guns(Mesh::Types type)
+Ship::load_guns(Mesh::Type type)
 {
 	int ret;
 	FILE *fd;
 
-	const char* name = mesh_filename[int(type)];
+	const char* name = mesh_filename[size_t(type)];
 	{
 		unsigned int gun_pos;
 		std::stringstream dir;
@@ -78,7 +78,7 @@ Ship::load_guns(Mesh::Types type)
 }
 
 void
-Ship::load_engines(Mesh::Types type)
+Ship::load_engines(Mesh::Type type)
 {
 	int ret;
 	FILE *fd;

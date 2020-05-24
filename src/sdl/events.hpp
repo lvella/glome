@@ -1,8 +1,8 @@
 #pragma once
 
-enum events
+enum class Event
 {
-	PAUSE = 0,
+	PAUSE,
 	SHOOT,
 	MOVE_UP,
 	MOVE_DOWN,

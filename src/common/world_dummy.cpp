@@ -22,7 +22,7 @@ WorldDummy::WorldDummy()
 	ShipStats::shared_ptr stats(ShipStats::get());
 	Ship* s;
 
-	s = new Ship(Mesh::Types(Random::range(0, Mesh::UFO)), stats);
+	s = new Ship(Mesh::Type(Random::range(0, size_t(Mesh::Type::UFO))), stats);
 	s->set_controller(Input::create_ship_controller(0));
 	players.push_back(s);
 	ships.push_back(s);
@@ -31,7 +31,7 @@ WorldDummy::WorldDummy()
 	{
 		AiController *ctrl_ai;
 
-		s = new Ship(Mesh::Types(Random::range(0, Mesh::UFO)), stats);
+		s = new Ship(Mesh::Type(Random::range(0, size_t(Mesh::Type::UFO))), stats);
 		ctrl_ai = new AiController();
 		s->set_controller(ctrl_ai);
 		ai_controls.push_back(ctrl_ai);

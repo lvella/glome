@@ -8,13 +8,13 @@
 class Mesh
 {
 public:
-	enum Types {HUNTER, DESTROYER, UFO, ICOSPHERE, UVSPHERE, MESH_COUNT};
+	enum class Type {HUNTER, DESTROYER, UFO, ICOSPHERE, UVSPHERE, MESH_COUNT};
 
 	~Mesh();
 
 	void draw(Camera& c);
 
-	static Mesh* get_mesh(Types type);
+	static Mesh* get_mesh(Type type);
 	static void release_mesh(Mesh* m);
 
 private:
@@ -41,7 +41,7 @@ private:
 	GLenum primitive_type;
 	bool has_colorbuf;
 
-	Mesh(Types type);
+	Mesh(Type type);
 
 	#ifdef STATS_TUNING
 	std::vector<VertexData> mesh_data;

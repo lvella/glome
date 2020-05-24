@@ -5,7 +5,7 @@
 namespace Game
 {
 	extern RunContext* context;
-	enum state {EXIT, MENU, WORLD};
+	enum class State {EXIT, MENU, WORLD};
 
 	/** Process and renders a game frame. */
 	void frame();
@@ -14,5 +14,5 @@ namespace Game
 	void shutdown();
 
 	/** Switches between game states. */
-	void switch_state(state s);
+	void switch_state(State s);
 }
