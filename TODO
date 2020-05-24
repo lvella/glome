@@ -21,9 +21,8 @@
     - don't draw the opposite side to fix this
 - Make game run in solid 90 Hz
   - make it 144 Hz, if possible
-  - Create a profile framework
-    - Generalize the one used for measuring octree
   - Cull unseen objects (Helder)
+  - Update audio in parallel with drawing
 - Implement stereo rendering using OpenVR API
 - Handle headset input:
   - Headset orientation changes camera view relative to ship position
