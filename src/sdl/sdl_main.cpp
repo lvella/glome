@@ -91,8 +91,8 @@ static void initialize_gl_context()
 
 static void main_loop()
 {
-	typedef std::chrono::steady_clock Timer;
-	typedef std::chrono::duration<float> FloatSec;
+	using Timer = std::chrono::steady_clock;
+	using FloatSec = std::chrono::duration<float>;
 
 	const int FPS = 60;
 	uint64_t frame_count = 0;

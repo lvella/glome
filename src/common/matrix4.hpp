@@ -34,7 +34,7 @@
 #include "gl.hpp"
 #include "vector4.hpp"
 
-typedef float Real;
+using Real = float;
 
 /** Class encapsulating a standard 4x4 homogeneous matrix.
     @remarks

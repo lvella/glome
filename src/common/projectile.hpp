@@ -44,6 +44,6 @@ private:
 	unsigned short max_ttl_2;
 	unsigned char alpha;
 
-	typedef std::list<Projectile> SList;
+	using SList = std::list<Projectile>;
 	static SList shots;
 };
