@@ -476,7 +476,7 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 	}
 
 	// Filter blank spaces in the IBO
-	unsigned remaining_segs = 1000; //filter_IBO_segments(idata);
+	unsigned remaining_segs = filter_IBO_segments(idata);
 	std::cout << "Remaining segs: " << remaining_segs << std::endl;
 
 	if(!ibo) {
@@ -517,6 +517,7 @@ unsigned Spaghetti::filter_IBO_segments(std::vector<uint16_t>& idata)
 		prev = Role::ORDINARY_VERTEX;
 	}
 
+	unsigned new_size = 1;
 	unsigned segment_count = 0;
 
 	unsigned dest = 0;
@@ -525,6 +526,7 @@ unsigned Spaghetti::filter_IBO_segments(std::vector<uint16_t>& idata)
 			if(prev == Role::ORDINARY_VERTEX) {
 				idata[dest] = separator;
 				dest = (dest + 1) % unique_count;
+				++new_size;
 
 				prev = Role::SEPARATOR;
 			} else if(prev == Role::FIRST_VERTEX) {
@@ -534,6 +536,7 @@ unsigned Spaghetti::filter_IBO_segments(std::vector<uint16_t>& idata)
 		} else {
 			idata[dest] = idata[i];
 			dest = (dest + 1) % unique_count;
+			++new_size;
 
 			if(prev == Role::SEPARATOR) {
 				prev = Role::FIRST_VERTEX;
@@ -544,7 +547,7 @@ unsigned Spaghetti::filter_IBO_segments(std::vector<uint16_t>& idata)
 		}
 	}
 
-	idata.resize(dest);
+	idata.resize(new_size);
 	if(!idata.empty()) {
 		idata.back() = idata[0];
 	}
