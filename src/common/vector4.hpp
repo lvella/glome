@@ -75,6 +75,9 @@ public:
 		return (*this) = (*this) * s;
 	}
 
+	/** Quaternion square root. */
+	Vector4 sqrt() const;
+
 	float& operator[](size_t elem)
 	{
 		return v[elem];

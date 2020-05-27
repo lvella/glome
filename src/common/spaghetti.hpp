@@ -22,13 +22,17 @@ public:
 
   void collided_with(const Collidable& other, float) override;
 
-private:
   struct Vertex {
     Vector4 pos;
     Vector4 color;
   };
 
-  void chip(const Vector4& impact_point);
+private:
+  static constexpr uint16_t separator = std::numeric_limits<uint16_t>::max();
+
+  void chip(UpdatableAdder& adder, const Vector4& impact_point);
+  unsigned filter_IBO_segments(std::vector<uint16_t>& idata);
+
   static std::normal_distribution<> bullet_damage;
 
   Vector3 rot_axis;
@@ -45,5 +49,5 @@ private:
 
   bool dead = false;
 
-  std::vector<std::shared_ptr<Updatable>> spawn;
+  std::vector<Vector4> bullet_impact;
 };

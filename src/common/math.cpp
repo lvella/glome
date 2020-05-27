@@ -95,3 +95,11 @@ Vector4 nlerp(const Vector4& a, const Vector4& b, float t)
 {
 	return (a + (b - a) * t).normalized();
 }
+
+QRot rotation_between_unit_vecs(const Vector4& from, const Vector4& to)
+{
+	return QRot(
+		(to * from.conjugate()).sqrt(),
+		(from.conjugate() * to).sqrt()
+	);
+}

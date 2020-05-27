@@ -15,6 +15,17 @@ Vector4::Vector4(const Vector3 &other, float wl)
 	w = wl;
 }
 
+Vector4 Vector4::sqrt() const
+{
+	auto v = Vector3{y, z, w}.normalized()
+		* std::sqrt((1.0f - x) * 0.5f);
+	return Vector4{
+		std::sqrt((1.0f + x) * 0.5f),
+		v.x, v.y, v.z
+	};
+}
+
+
 std::ostream&
 operator<<(std::ostream& o, const Vector4& v)
 {

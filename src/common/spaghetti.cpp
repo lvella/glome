@@ -66,9 +66,13 @@ CubicInterpolate(
 }
 
 Spaghetti::Spaghetti():
-	VolSphere(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f))),
-	frailty(Random::normalDistribution(50.0 * SEGMENTS, 25.0 * SEGMENTS), SEGMENTS)
+	VolSphere(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f)))
 {
+	{
+		float frailty_mean = Random::normalDistribution(1.5 * SEGMENTS, 0.5 * SEGMENTS);
+		frailty = std::normal_distribution<>{frailty_mean, frailty_mean * 0.1};
+	}
+
 	// Random spaghetti propertiers:
 	const float radius = get_radius();
 	const float density = std::max(1500.0f, Random::normalDistribution(6000.0f, 2000.0f));
@@ -78,6 +82,7 @@ Spaghetti::Spaghetti():
 
 	// Number of cubic Bézier curves
 	const size_t spaghetti_count = roundf(radius * density);
+	std::cout << "spaghetti_count " << spaghetti_count << std::endl;
 
 	// Displacement along radius
 	const QRot R_DISP = xw_qrot(radius);
@@ -208,11 +213,11 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder)
 		rot_axis
 	) * zw_qrot(dt * speed);
 
-	mul_t(velo);
+	//mul_t(velo);
 
-	while(!spawn.empty()) {
-		adder.add_updatable(std::move(spawn.back()));
-		spawn.pop_back();
+	while(!bullet_impact.empty()) {
+		chip(adder, bullet_impact.back());
+		bullet_impact.pop_back();
 	}
 
 	return true;
@@ -226,7 +231,7 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 			position(), other.position(), get_radius()
 		);
 
-		chip(get_t().inverse() * impact_point);
+		bullet_impact.push_back(get_t().inverse() * impact_point);
 	}
 
 	if(typeid(other) == typeid(const Supernova&)) {
@@ -245,31 +250,93 @@ public:
 		float orig_angular_speed,
 		float orig_speed,
 		const std::shared_ptr<BufferObject>& p_vbo,
-		uint16_t start, uint16_t size)
-	{}
+		const std::vector<Spaghetti::Vertex>& vdata,
+		uint16_t start, uint16_t size
+	):
+		p_vbo(p_vbo)
+	{
+		Vector4 new_origin = center_of_mass(vdata, start, size);
+
+		offset = rotation_between_unit_vecs(
+			Vector4::ORIGIN,
+			new_origin
+		);
+
+		set_t(orig_transformation * offset.inverse());
+
+		if(start + size > vdata.size()) {
+			draw_count = 2;
+			starts[0] = start;
+			sizes[0] = vdata.size() - start;
+
+			starts[1] = 0;
+			sizes[1] = size - sizes[0];
+		} else {
+			draw_count = 1;
+			starts[0] = start;
+			sizes[0] = size;
+		}
+	}
 
 	bool update(float dt, UpdatableAdder& adder) override
 	{
-		return false;
+		ttl -= dt;
+		return ttl > 0.0;
 	}
 
 	void draw(Camera& c) override
-	{}
+	{
+		auto &s = *c.getShader();
+		c.pushMultQRot(get_t() * offset);
+
+		glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+		glEnableVertexAttribArray(s.colorAttr());
+
+		glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE,
+			sizeof(Spaghetti::Vertex),
+			(GLvoid*) offsetof(Spaghetti::Vertex, pos));
+
+		glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE,
+			sizeof(Spaghetti::Vertex),
+			(GLvoid*) offsetof(Spaghetti::Vertex, color));
+
+		glMultiDrawArrays(GL_LINE_STRIP, starts, sizes, draw_count);
+
+		c.popMat();
+	}
+
+private:
+	Vector4 center_of_mass(
+		const std::vector<Spaghetti::Vertex>& vdata,
+		uint16_t start, uint16_t size
+	) const;
+
+	QRot offset;
+	std::shared_ptr<BufferObject> p_vbo;
+	uint8_t draw_count;
+	GLint starts[2];
+	GLsizei sizes[2];
+
+	float ttl = 3.0;
 };
 
 static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
 
-void Spaghetti::chip(const Vector4& impact_point)
+void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 {
 	TimeGuard timer(chip_time);
-	constexpr uint16_t separator = std::numeric_limits<uint16_t>::max();
 
 	// Sanity check
+	// Must have at least 2 vertices
 	assert(count > 2);
-	if(count <= 3) {
+	if(count <= 2) {
 		dead = true;
 		return;
 	}
+
+	// The last element og the IBO repeats the first,
+	// so subtract one.
+	const unsigned unique_count = count - 1;
 
 	// Retrieve IBO:
 	std::vector<uint16_t> idata(count);
@@ -278,44 +345,37 @@ void Spaghetti::chip(const Vector4& impact_point)
 		glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER,
 			0, idata.size() * sizeof(idata[0]), idata.data());
 	} else {
-		for(uint16_t i = 0; i < idata.size() - 1; ++i) {
+		for(uint16_t i = 0; i < unique_count; ++i) {
 			idata[i] = i;
 		}
 		idata.back() = 0;
 	}
 
 	std::vector<std::pair<float, unsigned>> cos_dists;
-	cos_dists.reserve(count);
-	{
-		// Retrieve VBO:
-		std::vector<Vertex> vdata(vbuf_size);
-		glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
-		glGetBufferSubData(GL_ARRAY_BUFFER,
-			0, vdata.size() * sizeof(vdata[0]), vdata.data());
+	cos_dists.reserve(unique_count);
 
-		/*glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
-		Vertex *vdata = reinterpret_cast<Vertex*>(
-			glMapBufferRange(GL_ARRAY_BUFFER, 0,
-				count * sizeof(Vertex), GL_MAP_READ_BIT
-			)
-		);*/
+	// Retrieve VBO:
+	// Last vetex is no longer used after IBO is created, so subtract one.
+	std::vector<Vertex> vdata(vbuf_size - 1);
+	glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+	glGetBufferSubData(GL_ARRAY_BUFFER,
+		0, vdata.size() * sizeof(vdata[0]), vdata.data());
 
-		for(unsigned i = 0; i < idata.size(); ++i) {
-			if(idata[i] == separator) [[unlikely]] {
-				continue;
-			}
-			float d = vdata[idata[i]].pos.dot(impact_point);
-			cos_dists.push_back({d, i});
+	for(unsigned i = 0; i < unique_count; ++i) {
+		if(idata[i] == separator) {
+			continue;
 		}
-
-		/*glUnmapBuffer(GL_ARRAY_BUFFER);*/
+		float d = vdata[idata[i]].pos.dot(impact_point);
+		cos_dists.push_back({d, i});
 	}
+
 	std::sort(cos_dists.begin(), cos_dists.end(), [] (auto& a, auto& b) {
 		return a.first > b.first;
 	});
 
 	// Each damage unit strips a fragment from the spaghetti.
-	unsigned damage = std::max(1l, std::lround(bullet_damage(Random::gen)));
+	unsigned damage = 1; //std::max(1l, std::lround(bullet_damage(Random::gen)));
+	std::cout << "Target damage: " << damage << std::endl;
 	auto sorted_iter = cos_dists.begin();
 	for(unsigned i = 0; i < damage; ++i)
 	{
@@ -334,7 +394,8 @@ void Spaghetti::chip(const Vector4& impact_point)
 		const unsigned closest_vert = sorted_iter->second;
 
 		// Number of segments in the fragment:
-		unsigned num_segs = std::max(1l, std::lround(frailty(Random::gen)));
+		unsigned num_segs = std::max(2l, std::lround(frailty(Random::gen)));
+		std::cout << "Planed fragment size: " << num_segs << std::endl;
 
 		// Find where the fragment may start
 		int start = closest_vert;
@@ -342,74 +403,180 @@ void Spaghetti::chip(const Vector4& impact_point)
 		for(unsigned j = 0; j < num_segs; ++j) {
 			int prev = start--;
 			if(start == -1) {
-				start = idata.size()-1;
+				start = unique_count - 1;
 			}
 
-			if(idata[start] == separator || start == closest_vert)
+			if(idata[start] == separator)
 			{
 				start = prev;
 				break;
 			}
+
 			++max_segs;
+			if(start == closest_vert) {
+				break;
+			}
 		}
 
 		// Find where the fragment may end
-		int end = closest_vert;
-		for(unsigned j = 0; j < num_segs; ++j) {
-			int prev = end++;
-			if(end == idata.size()) {
-				end = 0;
-			}
+		{
+			int end = closest_vert;
+			for(unsigned j = 0; j < num_segs; ++j) {
+				if(end == unique_count) {
+					end = 0;
+				}
 
-			if(idata[end] == separator || end == closest_vert)
-			{
-				end = prev;
-				break;
+				if(idata[end] == separator) {
+					break;
+				}
+
+				++max_segs;
+				if(end == start) {
+					break;
+				}
 			}
-			++max_segs;
 		}
 
-		// There must be at least two vertices in this fragment
+		// There must be at least one segment in the fragment.
 		// Solitary vertices may happen in this algorithm. The ones
 		// not caught here are filtered later, when compacting
 		// the new IBO.
-		if(end == start) {
-			idata[end] = separator;
+		if(!max_segs) {
+			idata[start] = separator;
+			--i;
 			continue;
 		}
 
 		if(max_segs > num_segs) {
 			// Choose where to start the fragment:
-			start += Random::range(0, max_segs - num_segs);
+			start = (start + Random::range(0, max_segs - num_segs)) % unique_count;
 		} else {
 			// Limit the segment size:
 			num_segs = max_segs;
 		}
 
 		// Create the fragment.
-		spawn.push_back(std::make_shared<Fragment>(
+		adder.add_updatable(std::make_shared<Fragment>(
 			get_t(), angular_speed, speed,
-			p_vbo, idata[start], num_segs + 1
+			p_vbo, vdata, idata[start], num_segs + 1
 		));
 
-		// Remove vertices internal to the fragment:
-		for(++start; start < end; ++start) {
+		// If there is only one segment, it is because both vertices are
+		// limited by separator, so both must be removed.
+		if(num_segs == 1) {
 			idata[start] = separator;
+			idata[(start + 1) % unique_count] = separator;
+		} else {
+			// Remove vertices internal to the fragment:
+			for(unsigned j = 1; j < num_segs; ++j) {
+				unsigned idx = (start + j) % unique_count;
+				idata[idx] = separator;
+			}
 		}
 	}
 
 	// Filter blank spaces in the IBO
-	// TODO...
+	unsigned remaining_segs = 1000; //filter_IBO_segments(idata);
+	std::cout << "Remaining segs: " << remaining_segs << std::endl;
 
 	if(!ibo) {
 		ibo = BufferObject();
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(idata[0]),
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, idata.size() * sizeof(idata[0]),
 			idata.data(), GL_STATIC_DRAW);
 	} else {
 		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0,
-			count * sizeof(idata[0]), idata.data());
+			idata.size() * sizeof(idata[0]), idata.data());
+	}
+	count = idata.size();
+
+	// If too many segments were remove, kill the spaghetti.
+	if(remaining_segs < (vbuf_size - 1) * 2/5) {
+		// explode();
+		std::cout << "KILLED!" << std::endl;
+		dead = true;
 	}
 }
 
+unsigned Spaghetti::filter_IBO_segments(std::vector<uint16_t>& idata)
+{
+	const unsigned unique_count = idata.size() - 1;
+
+	enum class Role: uint8_t {
+		SEPARATOR,
+		FIRST_VERTEX,
+		ORDINARY_VERTEX
+	};
+
+	Role prev;
+	if(idata[(unique_count - 1)] == separator) {
+		prev = Role::SEPARATOR;
+	} else if(idata[(unique_count - 2)] == separator) {
+		prev = Role::FIRST_VERTEX;
+	} else {
+		prev = Role::ORDINARY_VERTEX;
+	}
+
+	unsigned segment_count = 0;
+
+	unsigned dest = 0;
+	for(unsigned i = 0; i < unique_count; ++i) {
+		if(idata[i] == separator) {
+			if(prev == Role::ORDINARY_VERTEX) {
+				idata[dest] = separator;
+				dest = (dest + 1) % unique_count;
+
+				prev = Role::SEPARATOR;
+			} else if(prev == Role::FIRST_VERTEX) {
+				dest = (unique_count + dest - 1) % unique_count;
+				prev = Role::SEPARATOR;
+			}
+		} else {
+			idata[dest] = idata[i];
+			dest = (dest + 1) % unique_count;
+
+			if(prev == Role::SEPARATOR) {
+				prev = Role::FIRST_VERTEX;
+			} else {
+				prev = Role::ORDINARY_VERTEX;
+				++segment_count;
+			}
+		}
+	}
+
+	idata.resize(dest);
+	if(!idata.empty()) {
+		idata.back() = idata[0];
+	}
+
+	return segment_count;
+}
+
 std::normal_distribution<> Spaghetti::bullet_damage(10.0, 6.0);
+
+// Based  on http://ndp.jct.ac.il/tutorials/infitut2/node57.html
+Vector4 Fragment::center_of_mass(
+	const std::vector<Spaghetti::Vertex>& vdata,
+	uint16_t start, uint16_t size) const
+{
+	assert(size > 0);
+
+	if(size == 1) {
+		return vdata[0].pos;
+	}
+
+	Vector4 M{0, 0, 0, 0};
+
+	const Vector4* prev = &vdata[start].pos;
+	for(unsigned i = 1; i < size; ++i) {
+		uint16_t idx = (start + i) % vdata.size();
+		const Vector4* curr = &vdata[idx].pos;
+
+		Vector4 delta = *curr - *prev;
+		M += delta;
+
+		prev = curr;
+	}
+
+	return M.normalized();
+}

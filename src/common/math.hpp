@@ -55,6 +55,13 @@ V rotate_unit_vec_towards(const V& from, const V& to, float angle)
 	return a * std::cos(angle) + b * std::sin(angle);
 }
 
+/** Calculates the smallest rotation QRot from one unit vector to another.
+ *
+ * Based on:
+ * https://math.stackexchange.com/questions/3682934/how-to-get-the-left-and-right-rotation-quaternions-between-two-mathbbr4-un
+ */
+QRot rotation_between_unit_vecs(const Vector4& from, const Vector4& to);
+
 // Generic vector stuff
 template <class T>
 T vfloor(T v)
