@@ -18,12 +18,12 @@ public:
 	static const Vector4 FRONT;
 
 	Vector4() = default;
+	Vector4(const Vector3 &other, float wl = 0.0f);
+	static Vector4 make_quaternion(float real, const Vector3 &imaginary);
 
 	constexpr Vector4(float xl, float yl, float zl, float wl):
 		x(xl), y(yl), z(zl), w(wl)
 	{}
-
-	Vector4(const Vector3 &other, float wl=0.0f);
 
 	float dot(const Vector4& ref) const
 	{
@@ -77,6 +77,9 @@ public:
 
 	/** Quaternion square root. */
 	Vector4 sqrt() const;
+
+	/** Quaternion imaginary part. */
+	Vector3 imaginary() const;
 
 	float& operator[](size_t elem)
 	{

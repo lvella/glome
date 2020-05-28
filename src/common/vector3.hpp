@@ -11,12 +11,9 @@ public:
 	Vector3()
 	{}
 
-	Vector3(float xl, float yl, float zl)
-	{
-		x = xl;
-		y = yl;
-		z = zl;
-	}
+	constexpr Vector3(float xl, float yl, float zl):
+		x(xl), y(yl), z(zl)
+	{}
 
 	Vector3(const Vector4 &other)
 	{

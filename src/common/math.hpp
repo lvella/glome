@@ -4,6 +4,7 @@
 
 #include "matrix4.hpp"
 #include "vector3.hpp"
+#include "rot_dir.hpp"
 #include "qrot.hpp"
 
 // Mathematical constants and variations
@@ -19,6 +20,15 @@ Matrix4 perspective(float fovy, float aspect, float zNear, float zFar);
 
 // Rotations around a 3-D axis from the origin point
 QRot qrotation(float angle, Vector3 axis);
+
+// Rotations around a 3-D axis from the origin point
+constexpr RotDir qrotation(Vector3 axis)
+{
+	return RotDir(
+		Vector3(axis.z, -axis.y, axis.x),
+		Vector3(axis.z, -axis.y, -axis.x)
+	);
+}
 
 // "3-D Rotations" from the origin point
 QRot xy_qrot(float angle);

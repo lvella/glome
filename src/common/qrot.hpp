@@ -7,7 +7,7 @@
 
 /** 4-D rotation represented as double quaternions.
  *
- * Can be used to represent every rotation inside this game.
+ * Can be used to represent every rotation/translation inside this game.
  * References:
  *  - https://digital.csic.es/bitstream/10261/132980/1/ON-CAYLEYS.pdf
  *  - https://en.wikipedia.org/w/index.php?title=Rotations_in_4-dimensional_Euclidean_space&oldid=950831829#Relation_to_quaternions

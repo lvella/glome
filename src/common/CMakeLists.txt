@@ -67,6 +67,7 @@ add_library(common STATIC
 	random.hpp
 	renderer.cpp
 	renderer.hpp
+	rot_dir.hpp
 	shader.cpp
 	shader.hpp
 	ship.cpp

@@ -49,6 +49,7 @@ private:
 	GLsizei draw_size;
 
 	QRot translation;
+	float speed;
 
 	Vector3 spin_axis;
 	float spin = 0;

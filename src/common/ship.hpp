@@ -8,6 +8,7 @@
 #include "mesh.hpp"
 #include "ship_controller.hpp"
 #include "fire.hpp"
+#include "rot_dir.hpp"
 
 class Ship : public Updatable, public Glome::Drawable
 {
@@ -29,6 +30,9 @@ public:
 	#endif
 
 protected:
+	static constexpr RotDir turn =
+		qrotation(Vector3(0.0, math::sqrt1_2, math::sqrt1_2));
+
 	Mesh* mesh;
 
 	// Attributes of the ship
