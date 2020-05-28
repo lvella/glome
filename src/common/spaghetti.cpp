@@ -48,6 +48,12 @@ private:
 	BufferObject vbo;
 	GLsizei draw_size;
 
+	QRot translation;
+
+	Vector3 spin_axis;
+	float spin = 0;
+	float spin_speed;
+
 	float ttl = 3.0;
 	float half_length;
 };
@@ -58,7 +64,9 @@ Fragment::Fragment(const QRot& orig_transformation,
 	const std::vector<Spaghetti::Vertex>& svdata,
 	uint16_t start, uint16_t size
 ):
-	draw_size(size)
+	draw_size(size),
+	spin_axis(Random::direction()),
+	spin_speed(Random::normalDistribution(0, 20))
 {
 	std::vector<Vertex> vdata(size);
 	for(uint16_t i = 0; i < size; ++i) {
@@ -79,7 +87,8 @@ Fragment::Fragment(const QRot& orig_transformation,
 		v.lenght -= half_length;
 	}
 
-	set_t(orig_transformation * offset.inverse());
+	translation = orig_transformation * offset.inverse();
+	set_t(translation);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, vdata.size() * sizeof(vdata[0]),
@@ -88,7 +97,8 @@ Fragment::Fragment(const QRot& orig_transformation,
 
 bool Fragment::update(float dt, UpdatableAdder& adder)
 {
-	return false;
+	spin += dt;
+	set_t(translation * qrotation(spin, spin_axis));
 
 	ttl -= dt;
 	return ttl > 0.0;
@@ -128,7 +138,7 @@ Vector4 Fragment::center_of_mass(std::vector<Vertex>& vdata) const
 		Vector4 delta = curr->sv.pos - prev->sv.pos;
 		float seg_len = delta.length();
 
-		M += delta * seg_len;
+		M += (curr->sv.pos + prev->sv.pos) * (0.5 * seg_len);
 		curr->lenght = prev->lenght + seg_len;
 
 		prev = curr;
@@ -353,24 +363,6 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 
 static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
 
-static void print_ibo(const uint16_t *data, uint16_t size)
-{
-	constexpr uint16_t SEP = ~uint16_t(0);
-
-	bool is_sep = data[0] == SEP;
-	unsigned count = 1;
-	for(unsigned i = 0; i < size; ++i) {
-		if((data[i] == SEP) == is_sep) {
-			++count;
-		} else {
-			std::cout << count << (is_sep ? 'S' : 'I') << ' ';
-			count = 1;
-			is_sep = !is_sep;
-		}
-	}
-	std::cout << count << (is_sep ? 'S' : 'I') << std::endl;
-}
-
 void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 {
 	TimeGuard timer(chip_time);
@@ -422,11 +414,8 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		return a.first > b.first;
 	});
 
-	std::cout << "Before:\n";
-	print_ibo(idata.data(), unique_count);
-
 	// Each damage unit strips a fragment from the spaghetti.
-	unsigned damage = 1; //std::max(1l, std::lround(bullet_damage(Random::gen)));
+	unsigned damage = std::max(1l, std::lround(bullet_damage(Random::gen)));
 	auto sorted_iter = cos_dists.begin();
 	for(unsigned i = 0; i < damage; ++i)
 	{
@@ -526,15 +515,9 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		}
 	}
 
-	std::cout << "Removed:\n";
-	print_ibo(idata.data(), unique_count);
-
 	// Filter blank spaces in the IBO
 	unsigned remaining_segs = filter_IBO_segments(idata);
 	std::cout << "Remaining segs: " << remaining_segs << std::endl;
-
-	std::cout << "Filtered:\n";
-	print_ibo(idata.data(), idata.size()-1);
 
 	if(!ibo) {
 		ibo = BufferObject();
