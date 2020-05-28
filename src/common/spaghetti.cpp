@@ -88,6 +88,8 @@ Fragment::Fragment(const QRot& orig_transformation,
 
 bool Fragment::update(float dt, UpdatableAdder& adder)
 {
+	return false;
+
 	ttl -= dt;
 	return ttl > 0.0;
 }
@@ -351,6 +353,24 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 
 static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
 
+static void print_ibo(const uint16_t *data, uint16_t size)
+{
+	constexpr uint16_t SEP = ~uint16_t(0);
+
+	bool is_sep = data[0] == SEP;
+	unsigned count = 1;
+	for(unsigned i = 0; i < size; ++i) {
+		if((data[i] == SEP) == is_sep) {
+			++count;
+		} else {
+			std::cout << count << (is_sep ? 'S' : 'I') << ' ';
+			count = 1;
+			is_sep = !is_sep;
+		}
+	}
+	std::cout << count << (is_sep ? 'S' : 'I') << std::endl;
+}
+
 void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 {
 	TimeGuard timer(chip_time);
@@ -401,6 +421,9 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 	std::sort(cos_dists.begin(), cos_dists.end(), [] (auto& a, auto& b) {
 		return a.first > b.first;
 	});
+
+	std::cout << "Before:\n";
+	print_ibo(idata.data(), unique_count);
 
 	// Each damage unit strips a fragment from the spaghetti.
 	unsigned damage = 1; //std::max(1l, std::lround(bullet_damage(Random::gen)));
@@ -503,9 +526,15 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		}
 	}
 
+	std::cout << "Removed:\n";
+	print_ibo(idata.data(), unique_count);
+
 	// Filter blank spaces in the IBO
 	unsigned remaining_segs = filter_IBO_segments(idata);
 	std::cout << "Remaining segs: " << remaining_segs << std::endl;
+
+	std::cout << "Filtered:\n";
+	print_ibo(idata.data(), idata.size()-1);
 
 	if(!ibo) {
 		ibo = BufferObject();
@@ -559,6 +588,7 @@ unsigned Spaghetti::filter_IBO_segments(std::vector<uint16_t>& idata)
 				prev = Role::SEPARATOR;
 			} else if(prev == Role::FIRST_VERTEX) {
 				dest = (unique_count + dest - 1) % unique_count;
+				--new_size;
 				prev = Role::SEPARATOR;
 			}
 		} else {
