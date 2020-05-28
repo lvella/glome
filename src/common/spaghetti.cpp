@@ -23,8 +23,117 @@
 
 using namespace Glome;
 
-// Number of line segments used to draw each curve
-static const size_t SEGMENTS = 20;
+class Fragment final:
+	public Updatable,
+	public Drawable
+{
+public:
+	Fragment(const QRot& orig_transformation,
+		float orig_angular_speed,
+		float orig_speed,
+		const std::vector<Spaghetti::Vertex>& vdata,
+		uint16_t start, uint16_t size);
+
+	bool update(float dt, UpdatableAdder& adder) override;
+	void draw(Camera& c) override;
+
+private:
+	struct Vertex {
+		Spaghetti::Vertex sv;
+		float lenght;
+	};
+
+	Vector4 center_of_mass(std::vector<Vertex>& vdata) const;
+
+	BufferObject vbo;
+	GLsizei draw_size;
+
+	float ttl = 3.0;
+	float half_length;
+};
+
+Fragment::Fragment(const QRot& orig_transformation,
+	float orig_angular_speed,
+	float orig_speed,
+	const std::vector<Spaghetti::Vertex>& svdata,
+	uint16_t start, uint16_t size
+):
+	draw_size(size)
+{
+	std::vector<Vertex> vdata(size);
+	for(uint16_t i = 0; i < size; ++i) {
+		vdata[i].sv = svdata[(i+start)%svdata.size()];
+	}
+
+	float length;
+	Vector4 new_origin = center_of_mass(vdata);
+	half_length = vdata.back().lenght * 0.5;
+
+	QRot offset = rotation_between_unit_vecs(
+		new_origin,
+		Vector4::ORIGIN
+	);
+
+	for(auto& v: vdata) {
+		v.sv.pos = offset * v.sv.pos;
+		v.lenght -= half_length;
+	}
+
+	set_t(orig_transformation * offset.inverse());
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, vdata.size() * sizeof(vdata[0]),
+		vdata.data(), GL_STATIC_DRAW);
+}
+
+bool Fragment::update(float dt, UpdatableAdder& adder)
+{
+	ttl -= dt;
+	return ttl > 0.0;
+}
+
+void Fragment::draw(Camera& c)
+{
+	auto &s = *c.getShader();
+	c.pushMultQRot(get_t());
+
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glEnableVertexAttribArray(s.colorAttr());
+
+	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE,
+		sizeof(Vertex), (GLvoid*) offsetof(Vertex, sv.pos));
+
+	glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE,
+		sizeof(Vertex), (GLvoid*) offsetof(Vertex, sv.color));
+
+	glDrawArrays(GL_LINE_STRIP, 0, draw_size);
+
+	c.popMat();
+}
+
+// Based  on http://ndp.jct.ac.il/tutorials/infitut2/node57.html
+Vector4 Fragment::center_of_mass(std::vector<Vertex>& vdata) const
+{
+	assert(vdata.size() > 1);
+
+	Vector4 M{0, 0, 0, 0};
+
+	Vertex* prev = &vdata[0];
+	prev->lenght = 0.0f;
+	for(unsigned i = 1; i < vdata.size(); ++i) {
+		Vertex* curr = &vdata[i];
+
+		Vector4 delta = curr->sv.pos - prev->sv.pos;
+		float seg_len = delta.length();
+
+		M += delta * seg_len;
+		curr->lenght = prev->lenght + seg_len;
+
+		prev = curr;
+	}
+
+	return M.normalized();
+}
 
 // From http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
 template <class T>
@@ -151,8 +260,7 @@ Spaghetti::Spaghetti():
 
 		vbuf_size = count;
 
-		p_vbo = std::make_shared<BufferObject>();
-		glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, vbuf_size * sizeof(vertices[0]),
 			vertices.data(), GL_STATIC_DRAW);
 	}
@@ -183,7 +291,7 @@ void Spaghetti::draw(Camera& c)
 	auto &s = *c.getShader();
 	c.pushMultQRot(get_t());
 
-	glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glEnableVertexAttribArray(s.colorAttr());
 
 	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE,
@@ -241,85 +349,6 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 	}
 }
 
-class Fragment final:
-	public Updatable,
-	public Drawable
-{
-public:
-	Fragment(const QRot& orig_transformation,
-		float orig_angular_speed,
-		float orig_speed,
-		const std::shared_ptr<BufferObject>& p_vbo,
-		const std::vector<Spaghetti::Vertex>& vdata,
-		uint16_t start, uint16_t size
-	):
-		p_vbo(p_vbo)
-	{
-		Vector4 new_origin = center_of_mass(vdata, start, size);
-
-		offset = rotation_between_unit_vecs(
-			Vector4::ORIGIN,
-			new_origin
-		);
-
-		set_t(orig_transformation * offset.inverse());
-
-		if(start + size > vdata.size()) {
-			draw_count = 2;
-			starts[0] = start;
-			sizes[0] = vdata.size() - start;
-
-			starts[1] = 0;
-			sizes[1] = size - sizes[0];
-		} else {
-			draw_count = 1;
-			starts[0] = start;
-			sizes[0] = size;
-		}
-	}
-
-	bool update(float dt, UpdatableAdder& adder) override
-	{
-		ttl -= dt;
-		return ttl > 0.0;
-	}
-
-	void draw(Camera& c) override
-	{
-		auto &s = *c.getShader();
-		c.pushMultQRot(get_t() * offset);
-
-		glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
-		glEnableVertexAttribArray(s.colorAttr());
-
-		glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE,
-			sizeof(Spaghetti::Vertex),
-			(GLvoid*) offsetof(Spaghetti::Vertex, pos));
-
-		glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE,
-			sizeof(Spaghetti::Vertex),
-			(GLvoid*) offsetof(Spaghetti::Vertex, color));
-
-		glMultiDrawArrays(GL_LINE_STRIP, starts, sizes, draw_count);
-
-		c.popMat();
-	}
-
-private:
-	Vector4 center_of_mass(
-		const std::vector<Spaghetti::Vertex>& vdata,
-		uint16_t start, uint16_t size
-	) const;
-
-	QRot offset;
-	std::shared_ptr<BufferObject> p_vbo;
-	uint8_t draw_count;
-	GLint starts[2];
-	GLsizei sizes[2];
-
-	float ttl = 3.0;
-};
-
 static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
 
 void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
@@ -357,7 +386,7 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 	// Retrieve VBO:
 	// Last vetex is no longer used after IBO is created, so subtract one.
 	std::vector<Vertex> vdata(vbuf_size - 1);
-	glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glGetBufferSubData(GL_ARRAY_BUFFER,
 		0, vdata.size() * sizeof(vdata[0]), vdata.data());
 
@@ -375,7 +404,6 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 
 	// Each damage unit strips a fragment from the spaghetti.
 	unsigned damage = 1; //std::max(1l, std::lround(bullet_damage(Random::gen)));
-	std::cout << "Target damage: " << damage << std::endl;
 	auto sorted_iter = cos_dists.begin();
 	for(unsigned i = 0; i < damage; ++i)
 	{
@@ -395,7 +423,6 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 
 		// Number of segments in the fragment:
 		unsigned num_segs = std::max(2l, std::lround(frailty(Random::gen)));
-		std::cout << "Planed fragment size: " << num_segs << std::endl;
 
 		// Find where the fragment may start
 		int start = closest_vert;
@@ -422,6 +449,7 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		{
 			int end = closest_vert;
 			for(unsigned j = 0; j < num_segs; ++j) {
+				++end;
 				if(end == unique_count) {
 					end = 0;
 				}
@@ -458,7 +486,7 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		// Create the fragment.
 		adder.add_updatable(std::make_shared<Fragment>(
 			get_t(), angular_speed, speed,
-			p_vbo, vdata, idata[start], num_segs + 1
+			vdata, idata[start], num_segs + 1
 		));
 
 		// If there is only one segment, it is because both vertices are
@@ -556,30 +584,3 @@ unsigned Spaghetti::filter_IBO_segments(std::vector<uint16_t>& idata)
 }
 
 std::normal_distribution<> Spaghetti::bullet_damage(10.0, 6.0);
-
-// Based  on http://ndp.jct.ac.il/tutorials/infitut2/node57.html
-Vector4 Fragment::center_of_mass(
-	const std::vector<Spaghetti::Vertex>& vdata,
-	uint16_t start, uint16_t size) const
-{
-	assert(size > 0);
-
-	if(size == 1) {
-		return vdata[0].pos;
-	}
-
-	Vector4 M{0, 0, 0, 0};
-
-	const Vector4* prev = &vdata[start].pos;
-	for(unsigned i = 1; i < size; ++i) {
-		uint16_t idx = (start + i) % vdata.size();
-		const Vector4* curr = &vdata[idx].pos;
-
-		Vector4 delta = *curr - *prev;
-		M += delta;
-
-		prev = curr;
-	}
-
-	return M.normalized();
-}

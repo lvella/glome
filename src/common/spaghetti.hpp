@@ -30,6 +30,9 @@ public:
 private:
   static constexpr uint16_t separator = std::numeric_limits<uint16_t>::max();
 
+  // Number of line segments used to draw each curve
+  static constexpr uint8_t SEGMENTS = 20;
+
   void chip(UpdatableAdder& adder, const Vector4& impact_point);
   unsigned filter_IBO_segments(std::vector<uint16_t>& idata);
 
@@ -41,7 +44,7 @@ private:
 
   std::normal_distribution<> frailty;
 
-  std::shared_ptr<BufferObject> p_vbo;
+  BufferObject vbo;
   GLsizei vbuf_size;
 
   BufferObject ibo{0};
