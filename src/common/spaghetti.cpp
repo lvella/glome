@@ -19,134 +19,11 @@
 #include "audio_effect.hpp"
 #include "projectile.hpp"
 #include "supernova.hpp"
+#include "rot_dir.hpp"
 #include "profiling.hpp"
+#include "spaghetti_fragment.hpp"
 
 using namespace Glome;
-
-class Fragment final:
-	public Updatable,
-	public Drawable
-{
-public:
-	Fragment(const QRot& orig_transformation,
-		float orig_angular_speed,
-		float orig_speed,
-		const std::vector<Spaghetti::Vertex>& vdata,
-		uint16_t start, uint16_t size);
-
-	bool update(float dt, UpdatableAdder& adder) override;
-	void draw(Camera& c) override;
-
-private:
-	struct Vertex {
-		Spaghetti::Vertex sv;
-		float lenght;
-	};
-
-	Vector4 center_of_mass(std::vector<Vertex>& vdata) const;
-
-	BufferObject vbo;
-	GLsizei draw_size;
-
-	QRot translation;
-	float speed;
-
-	Vector3 spin_axis;
-	float spin = 0;
-	float spin_speed;
-
-	float ttl = 3.0;
-	float half_length;
-};
-
-Fragment::Fragment(const QRot& orig_transformation,
-	float orig_angular_speed,
-	float orig_speed,
-	const std::vector<Spaghetti::Vertex>& svdata,
-	uint16_t start, uint16_t size
-):
-	draw_size(size),
-	spin_axis(Random::direction()),
-	spin_speed(Random::normalDistribution(0, 20))
-{
-	std::vector<Vertex> vdata(size);
-	for(uint16_t i = 0; i < size; ++i) {
-		vdata[i].sv = svdata[(i+start)%svdata.size()];
-	}
-
-	float length;
-	Vector4 new_origin = center_of_mass(vdata);
-	half_length = vdata.back().lenght * 0.5;
-
-	QRot offset = rotation_between_unit_vecs(
-		new_origin,
-		Vector4::ORIGIN
-	);
-
-	for(auto& v: vdata) {
-		v.sv.pos = offset * v.sv.pos;
-		v.lenght -= half_length;
-	}
-
-	translation = orig_transformation * offset.inverse();
-	set_t(translation);
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferData(GL_ARRAY_BUFFER, vdata.size() * sizeof(vdata[0]),
-		vdata.data(), GL_STATIC_DRAW);
-}
-
-bool Fragment::update(float dt, UpdatableAdder& adder)
-{
-	spin += dt;
-	set_t(translation * qrotation(spin, spin_axis));
-
-	ttl -= dt;
-	return ttl > 0.0;
-}
-
-void Fragment::draw(Camera& c)
-{
-	auto &s = *c.getShader();
-	c.pushMultQRot(get_t());
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glEnableVertexAttribArray(s.colorAttr());
-
-	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE,
-		sizeof(Vertex), (GLvoid*) offsetof(Vertex, sv.pos));
-
-	glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE,
-		sizeof(Vertex), (GLvoid*) offsetof(Vertex, sv.color));
-
-	glDrawArrays(GL_LINE_STRIP, 0, draw_size);
-
-	c.popMat();
-}
-
-// Based  on http://ndp.jct.ac.il/tutorials/infitut2/node57.html
-Vector4 Fragment::center_of_mass(std::vector<Vertex>& vdata) const
-{
-	assert(vdata.size() > 1);
-
-	Vector4 M{0, 0, 0, 0};
-
-	Vertex* prev = &vdata[0];
-	prev->lenght = 0.0f;
-	for(unsigned i = 1; i < vdata.size(); ++i) {
-		Vertex* curr = &vdata[i];
-
-		Vector4 delta = curr->sv.pos - prev->sv.pos;
-		float seg_len = delta.length();
-
-		M += (curr->sv.pos + prev->sv.pos) * (0.5 * seg_len);
-		curr->lenght = prev->lenght + seg_len;
-
-		prev = curr;
-	}
-
-	return M.normalized();
-}
 
 // From http://devmag.org.za/2011/04/05/bzier-curves-a-tutorial/
 template <class T>
@@ -204,7 +81,6 @@ Spaghetti::Spaghetti():
 
 	// Number of cubic Bézier curves
 	const size_t spaghetti_count = roundf(radius * density);
-	std::cout << "spaghetti_count " << spaghetti_count << std::endl;
 
 	// Displacement along radius
 	const QRot R_DISP = xw_qrot(radius);
@@ -497,9 +373,8 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		}
 
 		// Create the fragment.
-		adder.add_updatable(std::make_shared<Fragment>(
-			get_t(), angular_speed, speed,
-			vdata, idata[start], num_segs + 1
+		adder.add_updatable(std::make_shared<SpaghettiFragment>(
+			get_t(), vdata, idata[start], num_segs + 1
 		));
 
 		// If there is only one segment, it is because both vertices are
@@ -518,7 +393,6 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 
 	// Filter blank spaces in the IBO
 	unsigned remaining_segs = filter_IBO_segments(idata);
-	std::cout << "Remaining segs: " << remaining_segs << std::endl;
 
 	if(!ibo) {
 		ibo = BufferObject();
@@ -534,7 +408,6 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 	// If too many segments were remove, kill the spaghetti.
 	if(remaining_segs < (vbuf_size - 1) * 2/5) {
 		// explode();
-		std::cout << "KILLED!" << std::endl;
 		dead = true;
 	}
 }

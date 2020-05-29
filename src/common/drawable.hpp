@@ -15,4 +15,11 @@ namespace Glome
 		virtual void draw(Camera& c) = 0;
 		virtual void minimap_draw(Camera& c);
 	};
+
+	class NoMapDrawable: public Drawable
+	{
+	public:
+		virtual ~NoMapDrawable() {};
+		void minimap_draw(Camera& c) override final;
+	};
 }

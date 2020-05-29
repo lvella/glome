@@ -11,6 +11,7 @@
 #include "dustfield.hpp"
 #include "audio.hpp"
 #include "profiling.hpp"
+#include "spaghetti_fragment.hpp"
 #include <limits>
 
 namespace Game
@@ -81,6 +82,7 @@ initialize()
 	Projectile::initialize();
 	ParticleSystem::initialize();
 	DustField::initialize();
+	SpaghettiFragment::initialize();
 	//Menu::initialize();
 	initialize_meridians();
 

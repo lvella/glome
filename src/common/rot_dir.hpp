@@ -11,6 +11,8 @@
 class RotDir
 {
 public:
+	RotDir() = default;
+
 	constexpr RotDir(const Vector3& l, const Vector3& r):
 		l(l), r(r)
 	{}
