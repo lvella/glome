@@ -8,6 +8,7 @@
 
 #include "renderer.hpp"
 #include <algorithm>
+#include <memory>
 
 using namespace std;
 using namespace Options;
@@ -55,7 +56,7 @@ Renderer::update(float dt)
 }
 
 void
-Renderer::draw(vector<Glome::Drawable*>&& objs)
+Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -70,10 +71,10 @@ Renderer::draw(vector<Glome::Drawable*>&& objs)
 
 		vector<std::pair<float, Glome::Drawable*>> sorted;
 		sorted.reserve(objs.size());
-		for(Glome::Drawable* ptr: objs) {
+		for(auto& ptr: objs) {
 			float dist = std::acos(cam_pos.dot(ptr->position()))
 				- ptr->get_radius();
-			sorted.push_back({dist, ptr});
+			sorted.push_back({dist, ptr.get()});
 		}
 		std::sort(sorted.begin(), sorted.end(), [] (auto& a, auto& b) {
 			return a.first > b.first;
@@ -97,14 +98,14 @@ Renderer::draw(vector<Glome::Drawable*>&& objs)
 }
 
 void
-Renderer::fill_minimap(const vector<Glome::Drawable*>& objs, Camera &cam)
+Renderer::fill_minimap(const vector<std::shared_ptr<Glome::Drawable>>& objs, Camera &cam)
 {
 	std::shared_ptr<Glome::Drawable> curr = active->t.lock();
 
 	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
 	// Probably so insignificant it is not worth the effort.
 	for(auto &obj: objs) {
-		if(obj != curr.get())
+		if(obj != curr)
 			obj->minimap_draw(cam);
 	}
 }

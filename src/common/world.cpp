@@ -113,14 +113,11 @@ void World::draw()
 		sync = 0;
 	}
 
-	std::vector<Glome::Drawable*> objects;
-	std::vector<std::shared_ptr<Glome::Drawable>> sobjects;
+	std::vector<std::shared_ptr<Glome::Drawable>> objects;
 	objects.reserve(drawables.size());
-	sobjects.reserve(drawables.size());
 
 	clean_and_for_each_valid(drawables, [&](auto&& ptr) {
-		objects.push_back(ptr.get());
-		sobjects.push_back(std::move(ptr));
+		objects.push_back(std::move(ptr));
 	});
 
 	_render->draw(std::move(objects));
