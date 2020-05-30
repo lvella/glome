@@ -53,10 +53,17 @@ SpaghettiFragment::SpaghettiFragment(const QRot& orig_transformation,
 	translation = orig_transformation * offset.inverse();
 	set_t(translation);
 
+	float cos_radius = 1.0;
 	for(auto& v: vdata) {
 		v.sv.pos = offset * v.sv.pos;
 		v.length -= half_length;
+
+		float cos_dist_to_center = Vector4::ORIGIN.dot(v.sv.pos);
+		if(cos_dist_to_center < cos_radius) {
+			cos_radius = cos_dist_to_center;
+		}
 	}
+	set_radius(std::acos(cos_radius));
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, vdata.size() * sizeof(vdata[0]),
@@ -103,7 +110,7 @@ void SpaghettiFragment::draw(Camera& c)
 	glDisableVertexAttribArray(center_dist_attr);
 }
 
-// Based  on http://ndp.jct.ac.il/tutorials/infitut2/node57.html
+// Based on http://ndp.jct.ac.il/tutorials/infitut2/node57.html
 Vector4 SpaghettiFragment::center_of_mass(std::vector<Vertex>& vdata)
 {
 	assert(vdata.size() > 1);
