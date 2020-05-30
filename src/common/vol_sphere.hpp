@@ -48,7 +48,7 @@ class VolSphere: virtual public Object
     }
 
   private:
-    float radius;
+    float radius = 0.0;
 
     // Great spheres (sphere of radius π) are a special case
     // because they are used extensively by the spheric Octree
