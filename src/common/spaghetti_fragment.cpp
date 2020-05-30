@@ -1,5 +1,6 @@
 #include "spaghetti_fragment.hpp"
 
+#include <cmath>
 #include "random.hpp"
 
 CamShader SpaghettiFragment::shader;
@@ -25,12 +26,13 @@ SpaghettiFragment::SpaghettiFragment(const QRot& orig_transformation,
 	const std::vector<Spaghetti::Vertex>& svdata,
 	uint16_t start, uint16_t size
 ):
-	draw_size(size),
 	spin_axis(Random::direction()),
 	spin_speed(Random::normalDistribution(0, 20))
 {
+	assert(size > 0);
+
 	std::vector<Vertex> vdata(size);
-	for(uint16_t i = 0; i < size; ++i) {
+	for(uint16_t i = 0; i < vdata.size(); ++i) {
 		vdata[i].sv = svdata[(i+start)%svdata.size()];
 	}
 
@@ -68,6 +70,7 @@ SpaghettiFragment::SpaghettiFragment(const QRot& orig_transformation,
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, vdata.size() * sizeof(vdata[0]),
 		vdata.data(), GL_STATIC_DRAW);
+	draw_size = vdata.size();
 }
 
 bool SpaghettiFragment::update(float dt, UpdatableAdder& adder)
@@ -119,17 +122,23 @@ Vector4 SpaghettiFragment::center_of_mass(std::vector<Vertex>& vdata)
 
 	Vertex* prev = &vdata[0];
 	prev->length = 0.0f;
-	for(unsigned i = 1; i < vdata.size(); ++i) {
-		Vertex* curr = &vdata[i];
+	vdata.erase(std::remove_if(vdata.begin() + 1, vdata.end(), [&] (Vertex& v)
+	{
+		const float cos_len = v.sv.pos.dot(prev->sv.pos);
 
-		Vector4 delta = curr->sv.pos - prev->sv.pos;
-		float seg_len = delta.length();
+		if(cos_len >= 1.0) {
+			return true;
+		}
 
-		M += (curr->sv.pos + prev->sv.pos) * (0.5 * seg_len);
-		curr->length = prev->length + seg_len;
+		const float seg_len = std::acos(cos_len);
 
-		prev = curr;
-	}
+
+		M += (v.sv.pos + prev->sv.pos) * (0.5 * seg_len);
+		v.length = prev->length + seg_len;
+
+		prev = &v;
+		return false;
+	}), vdata.end());
 
 	return M.normalized();
 }
