@@ -176,7 +176,7 @@ void collision_filter(
 		// If the collision test cost in lower level is not
 		// higher than it would be in current level, descend.
 		if(lower_cost <= ex_cost) {
-			parallel_run_and_wait(globalThreadPool, [&] (TaskAdder add_task) {
+			globalThreadPool.parallel_run_and_wait([&] (TaskAdder add_task) {
 				for(uint8_t i = 0; i < 7; ++i) {
 					add_task([&, i] {collision_filter(
 						&cells[i], depth - 1,

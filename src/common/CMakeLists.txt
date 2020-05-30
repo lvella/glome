@@ -20,6 +20,7 @@ add_library(common STATIC
 	audio_source.hpp
 	audio_world.cpp
 	audio_world.hpp
+	buffer_object.hpp
 	camera.cpp
 	camera.hpp
 	collidable.hpp
@@ -56,6 +57,8 @@ add_library(common STATIC
 	options.hpp
 	particle_system.cpp
 	particle_system.hpp
+	profiling.cpp
+	profiling.hpp
 	projectile.cpp
 	projectile.hpp
 	qrot.cpp
@@ -87,6 +90,8 @@ add_library(common STATIC
 	vector3.hpp
 	vector4.cpp
 	vector4.hpp
+	vol_sphere.cpp
+	vol_sphere.hpp
 	world.cpp
 	world.hpp
 	world_dummy.cpp

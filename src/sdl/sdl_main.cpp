@@ -18,6 +18,8 @@
 #include "options.hpp"
 #include "game.hpp"
 #include "jsinput.hpp"
+#include "thread_pool.hpp"
+#include "random.hpp"
 
 #include "native.hpp"
 
@@ -25,6 +27,7 @@ static bool v_sync_enabled = true;
 
 SDL_Window *window;
 SDL_GLContext glcontext;
+std::vector<SDL_GLContext> threads_glcontexts;
 
 static void initialize_SDL()
 {
@@ -48,6 +51,12 @@ static void initialize_gl_context()
 	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
+
+	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
+
 	{
 		Uint32 video_flags = SDL_WINDOW_OPENGL;
 		if(Options::fullscreen)
@@ -61,7 +70,20 @@ static void initialize_gl_context()
 			Options::height,
 			video_flags);
 	}
+
+	// Create one SDL context per thread
+	threads_glcontexts.resize(globalThreadPool.get_num_threads());
+	for(auto& t_ctx: threads_glcontexts) {
+		t_ctx = SDL_GL_CreateContext(window);
+	}
+
+	// Main thread context
 	glcontext = SDL_GL_CreateContext(window);
+
+	// Setup one context per thread
+	globalThreadPool.run_in_all_pool_threads([](unsigned idx) {
+		SDL_GL_MakeCurrent(window, threads_glcontexts[idx]);
+	});
 
 	// Using GLEW to get the OpenGL functions
 	GLenum err = glewInit();
@@ -71,9 +93,9 @@ static void initialize_gl_context()
 		exit(1);
 	}
 
-	if(! GLEW_VERSION_2_1)
+	if(! GLEW_VERSION_3_2)
 	{
-		const char *msg = "Glome requires at least OpenGL 2.1";
+		const char *msg = "Glome requires at least OpenGL 3.2";
 		#ifdef WIN32
 		MessageBoxA(NULL, msg, NULL, MB_OK);
 		#else
@@ -81,6 +103,22 @@ static void initialize_gl_context()
 		#endif
 		exit(1);
 	}
+
+	int major, minor, mask;
+	glGetIntegerv(GL_MAJOR_VERSION, &major);
+	glGetIntegerv(GL_MINOR_VERSION, &minor);
+	glGetIntegerv(GL_CONTEXT_PROFILE_MASK, &mask);
+
+	std::cout << "OpenGL version: " << major << '.' << minor;
+	if(mask & GL_CONTEXT_CORE_PROFILE_BIT) {
+		std::cout << " Core Profile";
+	} else if(mask & GL_CONTEXT_COMPATIBILITY_PROFILE_BIT) {
+		std::cout << " Compatibility Profile";
+	}
+	std::cout << std::endl;
+
+	SDL_GL_SetAttribute(SDL_GL_MULTISAMPLESAMPLES, 4);
+
 
 	// Enable multisample, if available
 	{
@@ -140,7 +178,7 @@ static void main_loop()
 		++frame_count;
 	}
 
-	std::chrono::duration<float> time_running = std::chrono::steady_clock::now() - start;
+	std::chrono::duration<float> time_running = Timer::now() - start;
 	std::cout << frame_count << " frames rendered at "
 		<< frame_count / time_running.count() << " FPS.\n";
 }

@@ -1,9 +1,11 @@
 #pragma once
 
+#include <memory>
 #include "updatable.hpp"
 #include "drawable.hpp"
 #include "collidable.hpp"
 #include "audio_source.hpp"
+#include "buffer_object.hpp"
 
 class Spaghetti final:
   public Updatable,
@@ -12,9 +14,7 @@ class Spaghetti final:
   public Collidable
 {
 public:
-  Spaghetti(Audio::World &audio_world);
-
-  ~Spaghetti();
+  Spaghetti();
 
   void draw(Camera& s) override;
   bool update(float dt, UpdatableAdder& adder) override;
@@ -22,10 +22,7 @@ public:
   void collided_with(const Collidable& other, float) override;
 
 private:
-
-  Vector4 position() const override {
-    return Object::position();
-  }
+  void chip(const Vector4& impact_point);
 
   struct Vertex {
     Vector4 pos;
@@ -35,7 +32,10 @@ private:
   Vector3 rot_axis;
   float angular_speed;
   float speed;
-  GLuint vbo;
+  std::shared_ptr<BufferObject> p_vbo;
+  BufferObject ibo{0};
   GLsizei count;
   bool dead = false;
+
+  std::vector<std::shared_ptr<Updatable>> spawn;
 };

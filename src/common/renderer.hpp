@@ -28,10 +28,13 @@ public:
 	void setup_display();
 	void fill_minimap(const std::vector<Glome::Drawable*>& objs, Camera& cam);
 
+<<<<<<< HEAD
 	void audio_update();
 
 	void createViewingFustrum(const std::vector<Glome::Drawable*> &objs);
 
+=======
+>>>>>>> master
 protected:
 	struct Viewport: public Audio::Listener
 	{

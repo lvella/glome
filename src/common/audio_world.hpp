@@ -4,7 +4,7 @@
 #include <unordered_set>
 #include <vector>
 
-#include "qrot.hpp"
+#include "object.hpp"
 
 namespace Audio {
 	class Listener;
@@ -13,13 +13,16 @@ namespace Audio {
 	class World {
 		void addListener(Listener *l);
 
-		void updateFromListener(size_t listener, const QRot& transform);
+		void updateFromListener(float dt, size_t listener, const QRot& transform);
 
-		std::vector<std::weak_ptr<Source>> sources;
 		std::vector<Listener*> listeners;
 
 		friend class Source;
 		friend class Listener;
+
+	protected:
+		void try_add_source(const std::shared_ptr<Object>& obj);
+		std::vector<std::weak_ptr<Source>> sources;
 	};
 
 }

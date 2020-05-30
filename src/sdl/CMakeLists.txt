@@ -16,10 +16,9 @@ add_executable(glome
 	sdl_main.cpp
 )
 
-if(FIND_OPENGL)
-	find_package(OpenGL REQUIRED)
-	target_link_libraries(glome common ${OPENGL_LIBRARIES})
-endif()
+set(OpenGL_GL_PREFERENCE GLVND)
+find_package(OpenGL REQUIRED)
+target_link_libraries(glome common ${OPENGL_LIBRARIES})
 
 if(FIND_SDL2)
 	find_package(SDL2 REQUIRED)

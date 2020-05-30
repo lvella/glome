@@ -1,16 +1,18 @@
+#version 150 core
+
 // Input
 uniform mat4 projection;
 
 uniform vec4 center;
 uniform vec2 slerp_arc;
 
-attribute vec4 position;
+in vec4 position;
 
 // Output
-varying vec3 normal;
-varying vec3 frag_pos;
-varying vec3 direction;
-varying float fog_coord;
+out vec3 normal;
+out vec3 frag_pos;
+out vec3 direction;
+out float fog_coord;
 
 // External functions
 vec4 to_3d_eye(in vec4 v);

@@ -1,3 +1,5 @@
+#version 150 core
+
 // Input
 uniform vec4 transformation[2];
 

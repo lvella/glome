@@ -51,10 +51,11 @@ bool Supernova::update(float dt, UpdatableAdder&)
 	// Expanding rate; 0 is collapsed at origin, M_PI is
 	// collapsed at opposite pole.
 	float radius = get_radius();
-	set_radius(get_radius() + dt * 0.03);
+	radius += dt * 0.03;
 
 	slerp[0] = std::sin(radius);
 	slerp[1] = std::cos(radius);
+	set_radius(radius);
 
 	// Spin
 	mul_t(xy_qrot(slerp[1] * dt * 0.4));
@@ -89,12 +90,9 @@ void Supernova::draw(Camera &c)
 
 	slerp_arc.set(slerp);
 
-	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, bg_noise);
 
 	mesh->draw(c);
-
-	glDisable(GL_TEXTURE_2D);
 
 	c.popMat();
 	c.popShader();
@@ -111,4 +109,8 @@ void Supernova::minimap_draw(Camera &c)
 
 	c.popMat();
 	c.popShader();
+}
+
+void Supernova::collided_with(const Collidable& other, float)
+{
 }

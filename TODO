@@ -1,8 +1,8 @@
 == Needs for FIKALAB game ==
 
+- Fix performance regression.
 - Support Windows build (Rui)
 - Kill flying spaghetti monsters (Vella)
-  - When collide with supernova
   - Make some cool death animation
 - BUG: Fix quantum tunelling of bullets
   - Bullets pass straight through some FSMs.
@@ -21,9 +21,8 @@
     - don't draw the opposite side to fix this
 - Make game run in solid 90 Hz
   - make it 144 Hz, if possible
-  - Create a profile framework
-    - Generalize the one used for measuring octree
   - Cull unseen objects (Helder)
+  - Update audio in parallel with drawing
 - Implement stereo rendering using OpenVR API
 - Handle headset input:
   - Headset orientation changes camera view relative to ship position
@@ -47,6 +46,8 @@
 
 == GENERAL IMPROVEMENTS (low priority) ==
 
+- Properly setup and use VertexArrays (VAO) for each object type
+  - Possibly right after shader setup
 - Bring exporter up to date with current blender
 - Export meshes with CMake
 - Bring code to C++11:

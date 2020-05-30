@@ -5,6 +5,7 @@
 #include <cmath>
 #include <cassert>
 #include <algorithm>
+#include <memory>
 #include <mutex>
 #include <typeinfo>
 
@@ -15,6 +16,7 @@
 #include "color.hpp"
 #include "audio_effect.hpp"
 #include "projectile.hpp"
+#include "supernova.hpp"
 
 using namespace Glome;
 
@@ -26,42 +28,41 @@ template <class T>
 static T
 CalculateBezierPoint(float t, T *p)
 {
-    float u = 1.0 - t;
-    float tt = t * t;
-    float uu = u * u;
-    float uuu = uu * u;
-    float ttt = tt * t;
+	float u = 1.0 - t;
+	float tt = t * t;
+	float uu = u * u;
+	float uuu = uu * u;
+	float ttt = tt * t;
 
-    T v = p[0] * uuu; //first term
-    v += p[1] * (3 * uu * t); //second term
-    v += p[2] * (3 * u * tt); //third term
-    v += p[3] * ttt; //fourth term
+	T v = p[0] * uuu; //first term
+	v += p[1] * (3 * uu * t); //second term
+	v += p[2] * (3 * u * tt); //third term
+	v += p[3] * ttt; //fourth term
 
-    return v;
+	return v;
 }
 
 // From http://paulbourke.net/miscellaneous/interpolation/
 template <class T>
 static T
 CubicInterpolate(
-   T y0, T y1,
-   T y2, T y3,
-   float mu)
+	T y0, T y1,
+	T y2, T y3,
+	float mu)
 {
-   T a0,a1,a2,a3;
-   float mu2;
+	T a0,a1,a2,a3;
+	float mu2;
 
-   mu2 = mu*mu;
-   a0 = y3 - y2 - y0 + y1;
-   a1 = y0 - y1 - a0;
-   a2 = y2 - y0;
-   a3 = y1;
+	mu2 = mu*mu;
+	a0 = y3 - y2 - y0 + y1;
+	a1 = y0 - y1 - a0;
+	a2 = y2 - y0;
+	a3 = y1;
 
-   return (a0*mu*mu2 + a1*mu2 + a2*mu + a3);
+	return (a0*mu*mu2 + a1*mu2 + a2*mu + a3);
 }
 
-Spaghetti::Spaghetti(Audio::World &audio_world):
-	Audio::Source(&audio_world),
+Spaghetti::Spaghetti():
 	VolSphere(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f)))
 {
 	// Random spaghetti propertiers:
@@ -114,7 +115,7 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 	// Build the Vertex Buffer Object
 	{
 		std::vector<Vertex> vertices;
-		vertices.reserve(count);
+		vertices.reserve(++count);
 
 		for(int i = 0; i < spaghetti_count; ++i) {
 			Vector4 *curve = &bezier[(i*3)+1];
@@ -136,13 +137,13 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 				vertices.push_back(Vertex{v, Vector4(color, 1.0)});
 			}
 		}
-
+		vertices.push_back(vertices[0]);
 		assert(vertices.size() == count);
 
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(vertices[0]),
-			&vertices[0], GL_STATIC_DRAW);
+		p_vbo = std::make_shared<BufferObject>();
+		glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+		glBufferData(GL_ARRAY_BUFFER, count * sizeof(vertices[0]),
+			vertices.data(), GL_STATIC_DRAW);
 	}
 
 	// Define movement parameters
@@ -152,24 +153,18 @@ Spaghetti::Spaghetti(Audio::World &audio_world):
 
 	// Define starting position and orientation
 	set_t(
-	    xy_qrot(Random::arc())
-	  * xz_qrot(Random::arc())
-	  * yz_qrot(Random::arc())
-	  * xw_qrot(Random::arc())
-	  * yw_qrot(Random::arc())
-	  * zw_qrot(Random::arc())
+		  xy_qrot(Random::arc())
+		* xz_qrot(Random::arc())
+		* yz_qrot(Random::arc())
+		* xw_qrot(Random::arc())
+		* yw_qrot(Random::arc())
+		* zw_qrot(Random::arc())
 	);
 
 	// Configure humming sound effect
 	static Audio::Effect *hum_sound = Audio::Effect::getEffect("spaghetti");
 	//setGain(1.0);
-	play(*hum_sound, true, Random::zeroToOne());
-}
-
-Spaghetti::~Spaghetti()
-{
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glDeleteBuffers(1, &vbo);
+	play(hum_sound, true, Random::zeroToOne());
 }
 
 void Spaghetti::draw(Camera& c)
@@ -177,14 +172,14 @@ void Spaghetti::draw(Camera& c)
 	auto &s = *c.getShader();
 	c.pushMultQRot(get_t());
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glEnableVertexAttribArray(s.colorAttr());
 
 	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*) offsetof(Vertex, pos));
 	glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*) offsetof(Vertex, color));
 
-	glDrawArrays(GL_LINE_LOOP, 0, count);
+	glDrawArrays(GL_LINE_STRIP, 0, count);
 
 	c.popMat();
 }
@@ -202,13 +197,78 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder)
 
 	mul_t(velo);
 
+	while(!spawn.empty()) {
+		adder.add_updatable(std::move(spawn.back()));
+		spawn.pop_back();
+	}
+
 	return true;
 }
 
 
-void Spaghetti::collided_with(const Collidable& other, float)
+void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 {
 	if(typeid(other) == typeid(const Projectile&)) {
+		const Vector4 impact_point = rotate_unit_vec_towards(
+			position(), other.position(), get_radius()
+		);
+
+		chip(get_t().inverse() * impact_point);
+	}
+
+	if(typeid(other) == typeid(const Supernova&)) {
+		if(cos_dist >= cos(other.get_radius() - get_radius())) {
+			dead = true;
+		}
+	}
+}
+
+void Spaghetti::chip(const Vector4& impact_point)
+{
+	// Sanity check
+	assert(count > 2);
+	if(count <= 3) {
 		dead = true;
+		return;
+	}
+
+	// Retrieve VBO:
+	glBindBuffer(GL_ARRAY_BUFFER, *p_vbo);
+	Vertex *vdata = reinterpret_cast<Vertex*>(
+		glMapBufferRange(GL_ARRAY_BUFFER, 0,
+			count * sizeof(Vertex), GL_MAP_READ_BIT
+		)
+	);
+
+	// Retrieve IBO:
+	std::vector<uint16_t> idata(count);
+	if(ibo) {
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glGetBufferSubData(GL_ELEMENT_ARRAY_BUFFER,
+			0, idata.size() * sizeof(idata[0]), idata.data());
+	} else {
+		for(uint16_t i = 0; i < idata.size() - 1; ++i) {
+			idata[i] = i;
+		}
+		idata.back() = 0;
+	}
+
+	// TODO: to be continued
+	// Calculate distances.
+
+	glUnmapBuffer(GL_ARRAY_BUFFER);
+
+	// TODO: to be continued
+	// Slice the spaghetti
+	// count = ...
+
+	if(!ibo) {
+		std::cout << "NOW USING IBO!" << std::endl;
+		ibo = BufferObject();
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, count * sizeof(idata[0]),
+			idata.data(), GL_STATIC_DRAW);
+	} else {
+		glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, count, idata.data());
 	}
 }

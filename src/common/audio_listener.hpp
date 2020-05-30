@@ -13,7 +13,7 @@ namespace Audio {
 
 		virtual ~Listener() = default;
 
-		void update(const QRot& transform);
+		void update(float dt, const QRot& transform);
 
 		virtual const QRot &transformation() const = 0;
 

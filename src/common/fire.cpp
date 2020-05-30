@@ -56,8 +56,6 @@ void Fire::initialize()
 		program_fire.getUniform("half_width").set(width / 2.0f);
 	}
 
-	glEnable(GL_POINT_SPRITE);
-
 	// Without this in GLES
 	glEnable(GL_PROGRAM_POINT_SIZE);
 }
@@ -132,22 +130,17 @@ bool Fire::update(float dt, UpdatableAdder&)
 
 void Fire::draw(Camera& c)
 {
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-
-	// TODO: take inactive particles out of the way, and only copy relevant data
-	glBufferData(GL_ARRAY_BUFFER,
-		sizeof(RenderAttributes) * count,
-		rattrs, GL_STREAM_DRAW
-	);
 
 	c.pushShader(&program_fire);
 	c.pushMultQRot(get_t());
 
 	depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * actives_count, idx, GL_STREAM_DRAW);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(uint16_t) * actives_count, idx);
 
-	glEnable(GL_TEXTURE_2D);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(RenderAttributes) * count, rattrs); /// TEST
+
 	glBindTexture(GL_TEXTURE_2D, tex_particle);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glEnableVertexAttribArray(program_fire.colorAttr());
@@ -164,7 +157,6 @@ void Fire::draw(Camera& c)
 	glDisableVertexAttribArray(attrib_radius);
 	glDisableVertexAttribArray(program_fire.colorAttr());
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_TEXTURE_2D);
 }
 
 void Fire::minimap_draw(Camera& c)

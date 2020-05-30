@@ -1,12 +1,14 @@
+#version 150 core
+
 uniform mat4 projection;
 uniform float half_width;
 
-attribute vec4 position;
-attribute vec4 color;
-attribute float radius;
+in vec4 position;
+in vec4 color;
+in float radius;
 
-varying vec4 v_color;
-varying float fog_coord;
+out vec4 v_color;
+out float fog_coord;
 
 // External functions
 vec4 to_4d_eye(in vec4 v);

@@ -9,13 +9,12 @@
 #include "ship.hpp"
 #include "octree.hpp"
 #include "runcontext.hpp"
-#include "profiling.hpp"
 #include "audio_world.hpp"
 
 /** Every game mode should derive this class.
  * TODO: Based upon similarities between the game modes, refactor this class to hold what is common.
  */
-class World: public RunContext, public UpdatableAdder, public Audio::World
+class World: public RunContext, public Audio::World
 {
 public:
 	World();
@@ -31,7 +30,19 @@ public:
 	void draw() override;
 
 protected:
-	virtual void add_updatable(std::shared_ptr<Updatable> new_obj) override;
+	constexpr static size_t CHUNCK_SIZE = 200;
+	class Adder: public UpdatableAdder
+	{
+	public:
+		void add_elems_to_world(World& e)
+		{
+			for(auto& sptr: new_elems) {
+				e.add_updatable(std::move(sptr));
+			}
+		}
+	};
+
+	void add_updatable(std::shared_ptr<Updatable>&& new_obj);
 
 	Octree::Hypercube collision_tree;
 
@@ -40,7 +51,7 @@ protected:
 	std::vector<AiController*> ai_controls;
 
 private:
-	ProfillingAggregator profiler;
+	std::vector<GLsync> threads_sync;
 
 	std::vector<std::shared_ptr<Updatable>> updatables;
 	std::vector<std::weak_ptr<Collidable>> collidables;
