@@ -468,6 +468,9 @@ void Spaghetti::explode(UpdatableAdder& adder, const std::vector<uint16_t>& idat
 	const std::vector<Vertex>& vdata) const
 {
 	const unsigned unique_count = idata.size() - 1;
+	if(!unique_count) {
+		return;
+	}
 
 	// Search first separator
 	unsigned start;
