@@ -1,6 +1,5 @@
 == Needs for FIKALAB game ==
 
-- Fix performance regression.
 - Support Windows build (Rui)
 - Kill flying spaghetti monsters (Vella)
   - Make some cool death animation
