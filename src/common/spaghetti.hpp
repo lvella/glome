@@ -33,8 +33,12 @@ private:
   // Number of line segments used to draw each curve
   static constexpr uint8_t SEGMENTS = 20;
 
-  void chip(UpdatableAdder& adder, const Vector4& impact_point);
-  unsigned filter_IBO_segments(std::vector<uint16_t>& idata);
+  static unsigned filter_IBO_segments(std::vector<uint16_t>& idata);
+  bool chip(UpdatableAdder& adder, const Vector4& impact_point);
+
+  void explode(UpdatableAdder& adder,
+      const std::vector<uint16_t>& idata,
+      const std::vector<Vertex>& vdata) const;
 
   static std::normal_distribution<> bullet_damage;
 
@@ -50,7 +54,5 @@ private:
   BufferObject ibo{0};
   GLsizei count;
 
-  bool dead = false;
-
-  std::vector<Vector4> bullet_impact;
+  std::vector<Vector4> impact;
 };

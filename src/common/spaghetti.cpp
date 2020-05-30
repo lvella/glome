@@ -201,8 +201,11 @@ void Spaghetti::draw(Camera& c)
 
 bool Spaghetti::update(float dt, UpdatableAdder& adder)
 {
-	if(dead) {
-		return false;
+	while(!impact.empty()) {
+		if(!chip(adder, impact.back())) {
+			return false;
+		}
+		impact.pop_back();
 	}
 
 	QRot velo = qrotation(
@@ -212,35 +215,26 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder)
 
 	//mul_t(velo);
 
-	while(!bullet_impact.empty()) {
-		chip(adder, bullet_impact.back());
-		bullet_impact.pop_back();
-	}
-
 	return true;
 }
 
 
 void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 {
-	if(typeid(other) == typeid(const Projectile&)) {
+	if(typeid(other) == typeid(const Projectile&) ||
+		typeid(other) == typeid(const Supernova&))
+	{
 		const Vector4 impact_point = rotate_unit_vec_towards(
 			position(), other.position(), get_radius()
 		);
 
-		bullet_impact.push_back(get_t().inverse() * impact_point);
-	}
-
-	if(typeid(other) == typeid(const Supernova&)) {
-		if(cos_dist >= cos(other.get_radius() - get_radius())) {
-			dead = true;
-		}
+		impact.push_back(get_t().inverse() * impact_point);
 	}
 }
 
 static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
 
-void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
+bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 {
 	TimeGuard timer(chip_time);
 
@@ -248,8 +242,7 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 	// Must have at least 2 vertices
 	assert(count > 2);
 	if(count <= 2) {
-		dead = true;
-		return;
+		return false;
 	}
 
 	// The last element og the IBO repeats the first,
@@ -407,9 +400,10 @@ void Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 
 	// If too many segments were remove, kill the spaghetti.
 	if(remaining_segs < (vbuf_size - 1) * 2/5) {
-		// explode();
-		dead = true;
+		explode(adder, idata, vdata);
+		return false;
 	}
+	return true;
 }
 
 unsigned Spaghetti::filter_IBO_segments(std::vector<uint16_t>& idata)
@@ -470,4 +464,47 @@ unsigned Spaghetti::filter_IBO_segments(std::vector<uint16_t>& idata)
 	return segment_count;
 }
 
-std::normal_distribution<> Spaghetti::bullet_damage(10.0, 6.0);
+void Spaghetti::explode(UpdatableAdder& adder, const std::vector<uint16_t>& idata,
+	const std::vector<Vertex>& vdata) const
+{
+	const unsigned unique_count = idata.size() - 1;
+
+	// Search first separator
+	unsigned start;
+	for(start = 0; start < unique_count; ++start) {
+		if(idata[start] == separator) {
+			break;
+		}
+	}
+	start %= unique_count;
+
+	uint16_t frag_vcount = 0;
+	uint16_t frag_start;
+	for(unsigned i = 0; i < unique_count; ++i) {
+		unsigned idx = (start + i) % unique_count;
+
+		if(frag_vcount) {
+			if(idata[idx] == separator) {
+				// End of fragment:
+				adder.add_updatable(std::make_shared<SpaghettiFragment>(
+					get_t(), vdata, frag_start, frag_vcount
+				));
+				frag_vcount = 0;
+			} else {
+				// Middle of fragment:
+				++frag_vcount;
+			}
+		} else if(idata[idx] != separator) {
+			/* Start of fragment */
+			frag_vcount = 1;
+			frag_start = idata[idx];
+		}
+	}
+	if(frag_vcount) {
+		adder.add_updatable(std::make_shared<SpaghettiFragment>(
+			get_t(), vdata, frag_start, frag_vcount
+		));
+	}
+}
+
+std::normal_distribution<> Spaghetti::bullet_damage(5.0, 3.0);
