@@ -45,6 +45,6 @@ private:
 	float spin = 0;
 	float spin_speed;
 
-	float half_length;
+	float burn_progress;
 };
 

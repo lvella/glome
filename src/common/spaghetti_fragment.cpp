@@ -3,6 +3,9 @@
 #include <cmath>
 #include "random.hpp"
 
+// Same value as in spaghetti_frag.frag:
+static constexpr float BURN_LEN = 0.004;
+
 CamShader SpaghettiFragment::shader;
 Uniform SpaghettiFragment::burn_progress_uniform;
 GLint SpaghettiFragment::center_dist_attr;
@@ -38,7 +41,7 @@ SpaghettiFragment::SpaghettiFragment(const QRot& orig_transformation,
 
 	float length;
 	Vector4 new_origin = center_of_mass(vdata);
-	half_length = vdata.back().length * 0.5;
+	const float half_length = vdata.back().length * 0.5;
 
 	QRot offset = rotation_between_unit_vecs(
 		new_origin,
@@ -67,6 +70,8 @@ SpaghettiFragment::SpaghettiFragment(const QRot& orig_transformation,
 	}
 	set_radius(std::acos(cos_radius));
 
+	burn_progress = half_length + BURN_LEN;
+
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, vdata.size() * sizeof(vdata[0]),
 		vdata.data(), GL_STATIC_DRAW);
@@ -80,8 +85,8 @@ bool SpaghettiFragment::update(float dt, UpdatableAdder& adder)
 	spin += dt;
 	set_t(translation * qrotation(spin, spin_axis));
 
-	half_length -= 0.01 * dt;
-	return half_length > 0.0;
+	burn_progress -= dt * 0.01;
+	return burn_progress > 0.0;
 }
 
 void SpaghettiFragment::draw(Camera& c)
@@ -89,7 +94,7 @@ void SpaghettiFragment::draw(Camera& c)
 	c.pushShader(&shader);
 	c.pushMultQRot(get_t());
 
-	burn_progress_uniform.set(half_length);
+	burn_progress_uniform.set(burn_progress);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glEnableVertexAttribArray(shader.colorAttr());
