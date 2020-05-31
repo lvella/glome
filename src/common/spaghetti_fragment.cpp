@@ -101,7 +101,7 @@ void SpaghettiFragment::draw(Camera& c)
 	glVertexAttribPointer(shader.colorAttr(), 4, GL_FLOAT, GL_FALSE,
 		sizeof(Vertex), (GLvoid*) offsetof(Vertex, sv.color));
 
-	glVertexAttribPointer(center_dist_attr, 4, GL_FLOAT, GL_FALSE,
+	glVertexAttribPointer(center_dist_attr, 1, GL_FLOAT, GL_FALSE,
 		sizeof(Vertex), (GLvoid*) offsetof(Vertex, length));
 
 	glDrawArrays(GL_LINE_STRIP, 0, draw_size);
