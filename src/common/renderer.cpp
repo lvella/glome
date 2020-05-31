@@ -67,7 +67,6 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 		camera.pushShader(&shader);
 
 		draw_meridians(camera);
-		DustField::draw(camera);
 
 		const QRot inv_trans = active->transformation().inverse();
 		const Vector4 cam_pos = inv_trans.position();
@@ -96,6 +95,8 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 		for(auto &pair: transparent_objs) {
 			pair.second->draw(camera);
 		}
+
+		DustField::draw(camera);
 
 		MiniMap::draw(active->_x, active->_y, this,
 			inv_trans, objs
