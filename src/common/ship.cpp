@@ -29,6 +29,9 @@ Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
 		fx_engine(0.001f),
 		stats(std::move(sstats))
 {
+	// Not the ship itself, but the fire.
+	transparent = true;
+
 	mesh = Mesh::get_mesh(type);
 	set_radius(mesh->get_radius());
 

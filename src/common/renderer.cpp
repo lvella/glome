@@ -66,32 +66,36 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 		camera.reset(active->transformation());
 		camera.pushShader(&shader);
 
+		draw_meridians(camera);
+		DustField::draw(camera);
+
 		const QRot inv_trans = active->transformation().inverse();
 		const Vector4 cam_pos = inv_trans.position();
 
-		vector<std::pair<float, Glome::Drawable*>> sorted;
-		sorted.reserve(objs.size());
+		vector<std::pair<float, Glome::Drawable*>> transparent_objs;
 		for(auto& ptr: objs) {
-			float dist = std::acos(cam_pos.dot(ptr->position()))
-				- ptr->get_radius();
-			assert(!std::isnan(dist));
-			sorted.push_back({dist, ptr.get()});
+			if(ptr->is_transparent()) {
+				float dist = std::acos(cam_pos.dot(ptr->position()))
+					- ptr->get_radius();
+				assert(!std::isnan(dist));
+				transparent_objs.push_back({dist, ptr.get()});
+			} else {
+				ptr->draw(camera);
+			}
 		}
 
-		std::sort(sorted.begin(), sorted.end(), [] (auto& a, auto& b) {
-			return a.first > b.first;
-		});
+		std::sort(transparent_objs.begin(), transparent_objs.end(),
+			[] (auto& a, auto& b) {
+				return a.first > b.first;
+			}
+		);
 
 		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
+		Projectile::draw_many(sorted_projs, camera);
 
-		draw_meridians(camera);
-
-		for(auto &pair: sorted) {
+		for(auto &pair: transparent_objs) {
 			pair.second->draw(camera);
 		}
-
-		Projectile::draw_many(sorted_projs, camera);
-		DustField::draw(camera);
 
 		MiniMap::draw(active->_x, active->_y, this,
 			inv_trans, objs
