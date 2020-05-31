@@ -213,7 +213,7 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder)
 		rot_axis
 	) * zw_qrot(dt * speed);
 
-	//mul_t(velo);
+	mul_t(velo);
 
 	return true;
 }
