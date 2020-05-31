@@ -1,11 +1,11 @@
+#include "dustfield.hpp"
+
 #include <vector>
 
 #include "vector4.hpp"
 #include "random.hpp"
 #include "shader.hpp"
 #include "gl.hpp"
-
-#include "dustfield.hpp"
 
 namespace DustField
 {
@@ -23,9 +23,9 @@ struct Star
 
 const size_t DUST_SIZE = 200000;
 
-GLuint vbo;
-CamShader program;
-Uniform old_transform;
+static GLuint vbo;
+static CamShader program;
+static Uniform old_transform;
 
 /** Each star is drawn as a line. If the ship is stopped,
  * the both ends of the line are in the same point.
@@ -36,31 +36,41 @@ GLint attrib_endpoint;
 
 void initialize()
 {
-    std::vector<Star> dust(DUST_SIZE);
+	std::vector<Star> dust(DUST_SIZE);
 
-    for(auto &e: dust)
-    {
-        e.endpoints[0].pos = e.endpoints[1].pos = Random::point();
-        e.endpoints[0].end = 0.0f;
-        e.endpoints[1].end = 1.0f;
-    }
+	for(auto &e: dust)
+	{
+		e.endpoints[0].pos = e.endpoints[1].pos = Random::point();
+		e.endpoints[0].end = 0.0f;
+		e.endpoints[1].end = 1.0f;
+	}
 
-    glGenBuffers(1, &vbo);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, dust.size() * sizeof(Star), &dust[0], GL_STATIC_DRAW);
+	glGenBuffers(1, &vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferData(GL_ARRAY_BUFFER, dust.size() * sizeof(Star), &dust[0], GL_STATIC_DRAW);
 
-	const char* src[] = {"dustfield.vert", "world.frag", "no_texture.frag", "dustfield_fog.frag", nullptr};
-	program.setup_shader(src);
+	program.setup_shader({
+		"world/dustfield.vert",
+		"world/modelview.vert",
+		"common/quaternion.vert",
+		"world/world.frag",
+		"common/no_texture.frag",
+		"world/dustfield_fog.frag",
+		"world/fog.frag"
+	});
 	attrib_endpoint = glGetAttribLocation(program.program(), "endpoint");
 
 	old_transform = program.getUniform("old_transform");
 }
 
-void draw(Camera& cam, const Matrix4 &old_cam_transform)
+static QRot old_cam_transform;
+
+void draw(Camera& cam)
 {
     cam.pushShader(&program);
 
     old_transform.set(old_cam_transform);
+    old_cam_transform = cam.transformation();
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

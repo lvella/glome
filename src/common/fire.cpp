@@ -6,7 +6,7 @@
 
 #include "fire.hpp"
 
-static const int FIRE_LIFE = 20;
+static constexpr float FIRE_LIFE = 1.0f/3.0f; // s
 
 static CamShader program_fire;
 static GLint attrib_radius;
@@ -26,6 +26,8 @@ Fire::Fire(float radius):
 	scale_radius(radius),
 	intensity(1.0f)
 {
+	transparent = true;
+
 	setIntensity(0.0f);
 
 	create_circle_texture(64, 0.1, 0, 255, tex_particle, true);
@@ -34,13 +36,19 @@ Fire::Fire(float radius):
 		rattrs[i].radius = radius;
 		oattrs[i].active = false;
 	}
-	update();
 }
 
 void Fire::initialize()
 {
-	const char* src[] = {"fire.vert", "world.frag", "point_texture.frag", "fog.frag", nullptr};
-	program_fire.setup_shader(src);
+	program_fire.setup_shader({
+		"world/fire.vert",
+		"world/modelview.vert",
+		"common/quaternion.vert",
+		"world/world.frag",
+		"world/point_texture.frag",
+		"world/world_fog.frag",
+		"world/fog.frag"
+	});
 	attrib_radius = glGetAttribLocation(program_fire.program(), "radius");
 
 	program_fire.enable();
@@ -50,10 +58,8 @@ void Fire::initialize()
 		program_fire.getUniform("half_width").set(width / 2.0f);
 	}
 
-	glEnable(GL_POINT_SPRITE);
-
 	// Without this in GLES
-    glEnable(GL_PROGRAM_POINT_SIZE);
+	glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
 void Fire::set_width(int w)
@@ -72,15 +78,20 @@ void Fire::setIntensity(float i)
 		return;
 
 	intensity = i;
-	velocity = zw_matrix(i * scale_radius * 0.4);
-	origin_radius = scale_radius * 0.8f + i * scale_radius * 0.3f;
+	origin_radius = scale_radius * 0.7f + i * scale_radius * 0.3f;
 	target_count = 15 + i * (count - 15);
+
+	speed = intensity * scale_radius * 24.0;
+
+	const float radius = std::max(scale_radius, speed * FIRE_LIFE);
+	set_radius(radius);
 }
 
-void Fire::update()
+bool Fire::update(float dt, UpdatableAdder&)
 {
 	int new_count = actives_count;
 
+	auto velocity = zw_qrot(speed * dt);
 	for(int i = 0; i < count; ++i) {
 		OfflineAttributes &oattr = oattrs[i];
 
@@ -93,7 +104,7 @@ void Fire::update()
 		if(oattr.active) {
 			RenderAttributes &rattr = rattrs[i];
 
-			if(oattr.energy-- <= 0) {
+			if(oattr.energy <= 0.0) {
 				if(new_count > target_count) {
 					oattr.active = false;
 					--new_count;
@@ -101,36 +112,37 @@ void Fire::update()
 				}
 
 				float r = origin_radius;
-				rattr.position = _t * rand_in_sphere(r);
+				rattr.position = rand_in_sphere(r);
 				r /= origin_radius;
 				oattr.energy = FIRE_LIFE * (1.0f - r);
-				rattr.color = Vector4(1.0f, 0.7f, 0.0f, 0.0f) * r + Vector4(0.3f, 0.4f, 1.0f, 0.0f) * (1.0 - r);
+				rattr.color = Vector4(1.0f, 0.7f, 0.0f, 0.0f) * r
+					+ Vector4(0.3f, 0.4f, 1.0f, 0.0f) * (1.0 - r);
 			} else {
+				oattr.energy -= dt;
 				rattr.position = velocity * rattr.position;
 			}
-			rattr.color[3] = oattr.energy / float(FIRE_LIFE);
+			rattr.color[3] = oattr.energy / FIRE_LIFE;
 		}
 	}
 
 	actives_count = new_count;
 
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	// TODO: take inactive particles out of the way, and only copy relevant data
-	glBufferData(GL_ARRAY_BUFFER, sizeof(RenderAttributes) * count, rattrs, GL_STREAM_DRAW);
+	return true;
 }
 
 void Fire::draw(Camera& c)
 {
-	c.pushShader(&program_fire);
-	c.pushMultMat(_t);
 
-    depthSort(c.transformation());
+	c.pushShader(&program_fire);
+	c.pushMultQRot(get_t());
+
+	depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(uint16_t) * actives_count, idx, GL_STREAM_DRAW);
+	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(uint16_t) * actives_count, idx);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(RenderAttributes) * count, rattrs); /// TEST
 
-	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, tex_particle);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 	glEnableVertexAttribArray(program_fire.colorAttr());
@@ -147,6 +159,4 @@ void Fire::draw(Camera& c)
 	glDisableVertexAttribArray(attrib_radius);
 	glDisableVertexAttribArray(program_fire.colorAttr());
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glDisable(GL_TEXTURE_2D);
 }
-

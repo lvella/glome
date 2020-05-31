@@ -8,19 +8,20 @@
 #include "mesh.hpp"
 #include "ship_controller.hpp"
 #include "fire.hpp"
+#include "rot_dir.hpp"
 
 class Ship : public Updatable, public Glome::Drawable
 {
 public:
 	Ship(Mesh::Type type, ShipStats::shared_ptr sstats);
-	virtual ~Ship() {};
-	void draw(Camera& c) override;
-	void update() override;
+	~Ship() = default;
+
+	virtual void draw(Camera& c) override;
+	virtual bool update(float dt, UpdatableAdder&) override;
 	void load_guns(Mesh::Type type); //TODO: This method is similar to load_engines, change it!
 	void load_engines(Mesh::Type type);
 	void set_controller(ShipController* pctrl);
 	ShipController* ctrl;
-	AiController* aux;
 
 	#ifdef STATS_TUNING
 	float get_scale() {
@@ -29,20 +30,22 @@ public:
 	#endif
 
 protected:
+	static constexpr RotDir turn =
+		qrotation(Vector3(0.0, math::sqrt1_2, math::sqrt1_2));
+
 	Mesh* mesh;
 
 	// Attributes of the ship
 	ShipStats::shared_ptr stats;
 
 	// Gun properties
-	Matrix4 r_canon, l_canon;
+	QRot r_canon, l_canon;
 	uint16_t nguns;
 
 	// Engine properties
-	float rel_speed;
-	Matrix4 velocity;
-	uint16_t nengines;
 	Fire fx_engine;
+	float rel_speed;
+	uint16_t nengines;
 
 	// Shield properties
 	uint16_t life;

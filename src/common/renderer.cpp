@@ -1,4 +1,4 @@
-#include <future>
+#include "renderer.hpp"
 
 #include "options.hpp"
 #include "meridian.hpp"
@@ -7,7 +7,8 @@
 #include "fire.hpp"
 #include "dustfield.hpp"
 
-#include "renderer.hpp"
+#include <algorithm>
+#include <memory>
 
 using namespace std;
 using namespace Options;
@@ -15,9 +16,11 @@ using namespace Options;
 void
 Renderer::initialize()
 {
-	const char *sources[] = { "world.vert", "world.frag", "no_texture.frag", "fog.frag", nullptr };
-
-	shader.setup_shader(sources);
+	shader.setup_shader({
+		"world/world.vert", "world/modelview.vert", "common/quaternion.vert",
+		"world/world.frag", "world/world_fog.frag",
+		"common/no_texture.frag", "world/fog.frag"
+	});
 }
 
 void
@@ -25,26 +28,12 @@ Renderer::setup_display()
 {
 	glEnable(GL_DEPTH_TEST);
 	glEnable(GL_BLEND);
-	glEnable(GL_ALPHA_TEST);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glAlphaFunc(GL_NOTEQUAL, 0.0f);
 	glViewport(0, 0, width, height);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// Things that are not in OpenGL ES:
-	//TODO: use #ifdefs
-	//TODO: load anti-alias settings from configuration
-	glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-
-	glLineWidth(1.5f);
-	glEnable(GL_LINE_SMOOTH);
-	glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-
-	glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
-	glEnable(GL_POLYGON_SMOOTH);
 }
 
-Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)
+Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world)
 {
 	assert(pp.size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
 	int h = height / (pp.size() > 2 ? 2 : 1);
@@ -54,73 +43,109 @@ Renderer::Renderer(const vector<Ship*>& pp, Audio::World &audio_world)
 		players.emplace_back(pp[i], (i%2) * w, height - (i/2 + 1) * h, w, h, audio_world);
 	}
 
-	// Set non-changing camera perspective
-	camera.setProjection(perspective(FOV, float(w) / float(h), 0.001f, 5.0f));
 	Fire::set_width(w);
 }
 
 void
-Renderer::draw(const vector<Glome::Drawable*>& objs)
+Renderer::update(float dt)
+{
+	for(Viewport& v: players) {
+		v.update(dt);
+		v.Audio::Listener::update(dt, v.transformation());
+	}
+}
+
+void
+Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for(active = begin(players); active != end(players); ++active) {
 		active->enable();
 
-		camera.reset(active->newCameraTransform());
+		camera.reset(active->transformation());
 		camera.pushShader(&shader);
 
-		auto sorted_projs = std::async(&Projectile::cull_sort_from_camera, camera);
+		draw_meridians(camera);
+		DustField::draw(camera);
 
-	        draw_meridians(camera);
+		const QRot inv_trans = active->transformation().inverse();
+		const Vector4 cam_pos = inv_trans.position();
 
-		for(auto &obj: objs) {
-			obj->draw(camera);
+		vector<std::pair<float, Glome::Drawable*>> transparent_objs;
+		for(auto& ptr: objs) {
+			if(ptr->is_transparent()) {
+				float dist = std::acos(cam_pos.dot(ptr->position()))
+					- ptr->get_radius();
+				assert(!std::isnan(dist));
+				transparent_objs.push_back({dist, ptr.get()});
+			} else {
+				ptr->draw(camera);
+			}
 		}
 
-		Projectile::draw_many(sorted_projs.get(), camera);
-		DustField::draw(camera, active->cam_hist.front());
+		std::sort(transparent_objs.begin(), transparent_objs.end(),
+			[] (auto& a, auto& b) {
+				return a.first > b.first;
+			}
+		);
 
-		MiniMap::draw(active->_x, active->_y, this, active->t->transformation().transpose(), objs);
+		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
+		Projectile::draw_many(sorted_projs, camera);
+
+		for(auto &pair: transparent_objs) {
+			pair.second->draw(camera);
+		}
+
+		MiniMap::draw(active->_x, active->_y, this,
+			inv_trans, objs
+		);
 	}
 }
 
 void
-Renderer::fill_minimap(const vector<Glome::Drawable*>& objs, Camera &cam)
+Renderer::fill_minimap(const vector<std::shared_ptr<Glome::Drawable>>& objs, Camera &cam)
 {
+	std::shared_ptr<Glome::Drawable> curr = active->t.lock();
+
 	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
 	// Probably so insignificant it is not worth the effort.
 	for(auto &obj: objs) {
-		if(obj != active->t)
+		if(obj != curr)
 			obj->minimap_draw(cam);
 	}
 }
 
 void
-Renderer::audio_update()
+Renderer::Viewport::update(float dt)
 {
-	for(auto &p :players)
-	{
-		p.Audio::Listener::update(p.cam_hist.front());
+	QRot new_trans;
+	if(auto ptr = t.lock()) {
+		new_trans = cam_offset * ptr->get_t().inverse();
+	} else {
+		new_trans = cam_hist.front().t;
 	}
-}
 
-inline Matrix4
-Renderer::Viewport::newCameraTransform()
-{
-	Matrix4 ret;
+	cam_hist.push_back({dt, new_trans});
 
-	ret = cam_hist.front();
+	while(cam_hist.front().dt <= dt) {
+		dt -= cam_hist.front().dt;
+		curr_qrot = cam_hist.front().t;
 
-	cam_hist.pop_front();
-	cam_hist.push_back(cam_offset * t->transformation().transpose());
+		cam_hist.pop_front();
+		assert(!cam_hist.empty());
+	}
 
-	return ret;
+	PathPoint& next = cam_hist.front();
+	const float slerp_factor = dt / next.dt; // range [0, 1]
+
+	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
+	next.dt -= dt;
 }
 
 CamShader Renderer::shader;
-const Matrix4 Renderer::Viewport::cam_offset(
-		yz_matrix(0.2) *
-		zw_matrix(-0.015) *
-		yw_matrix(-0.01)
-	);
+const QRot Renderer::Viewport::cam_offset(
+	yz_qrot(0.2) *
+	zw_qrot(-0.015) *
+	yw_qrot(-0.01)
+);

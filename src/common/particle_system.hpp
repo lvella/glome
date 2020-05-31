@@ -5,8 +5,6 @@
 #include "shader.hpp"
 #include "object.hpp"
 #include "gl.hpp"
-#include "drawable.hpp"
-#include "updatable.hpp"
 #include "matrix4.hpp"
 
 /*** PARTICLE SYSTEM ***/
@@ -35,12 +33,12 @@ MMMMMMMMMMMMMMMMMMMMM: ..  .  .    ..MMMMMMMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMMMMM. ~..      7. =MMMMMMMMMMMMMMMMMMMMMMM
 MMMMMMMMMMMMMMMMMMMMMM7..~.   :.   .MMMMMMMMMMMMMMMMMMMMMMMM*/
 
-class ParticleSystem : public Updatable, public Glome::Drawable
+class ParticleSystem
 {
 public:
 	ParticleSystem(int np);
-	virtual	~ParticleSystem() = 0;
-	void depthSort(const Matrix4 &t);
+	virtual ~ParticleSystem();
+	void depthSort(const QRot &t);
 
 	static void initialize();
 protected:
@@ -58,7 +56,7 @@ protected:
 	{
 		Vector4 position;
 		Vector4 color;
-		float radius; /* Radius, in radians */
+		float radius; /* in radians */
 	};
 
 	// Logical attributes not used directly in rendering
@@ -66,13 +64,13 @@ protected:
 	{
 		OfflineAttributes():
 			active(false),
-			energy(0),
+			energy(0.0f),
 			cam_dist(0.0f)
 		{}
 
-		bool active; /* Particle is alive or not */
-		int energy;	/* Energy of the particle */
+		float energy;	/* Energy of the particle */
 		float cam_dist;
+		bool active; /* Particle is alive or not */
 	};
 
 	RenderAttributes *rattrs;

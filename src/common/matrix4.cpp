@@ -27,22 +27,10 @@ THE SOFTWARE.
 */
 #include "matrix4.hpp"
 
-  const Matrix4 Matrix4::ZERO(
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0,
-        0, 0, 0, 0 );
-
-    const Matrix4 Matrix4::IDENTITY(
-        1, 0, 0, 0,
-        0, 1, 0, 0,
-        0, 0, 1, 0,
-        0, 0, 0, 1 );
-
     //-----------------------------------------------------------------------
-    inline static Real
-        MINOR(const Matrix4& m, const size_t r0, const size_t r1, const size_t r2,
-								const size_t c0, const size_t c1, const size_t c2)
+    inline static Real MINOR(const Matrix4& m,
+        const size_t r0, const size_t r1, const size_t r2,
+	const size_t c0, const size_t c1, const size_t c2)
     {
         return m[r0][c0] * (m[r1][c1] * m[r2][c2] - m[r2][c1] * m[r1][c2]) -
             m[r0][c1] * (m[r1][c0] * m[r2][c2] - m[r2][c0] * m[r1][c2]) +

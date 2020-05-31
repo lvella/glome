@@ -3,22 +3,24 @@
 #include "vector2.hpp"
 #include "updatable.hpp"
 #include "drawable.hpp"
+#include "collidable.hpp"
 #include "mesh.hpp"
 
 // Supernova that expands and eats the whole world!
-class Supernova: public Glome::Drawable, public Updatable
+class Supernova final: public Glome::Drawable, public Updatable, public Collidable
 {
 public:
 	Supernova();
-	virtual ~Supernova();
+	~Supernova();
 
-	void update() override;
+	bool update(float dt, UpdatableAdder &) override;
 	void draw(Camera &c) override;
 	void minimap_draw(Camera &c) override;
 
+	void collided_with(const Collidable& other, float) override;
+
 private:
 	Vector2 slerp;
-	float size; // Expansion factor
 
 	// Stuff that should be static:
 	GLuint bg_noise;
@@ -29,6 +31,6 @@ private:
 	Uniform center;
 
 	Mesh* map_mesh;
-	CamShader map_shader;
+	SpaceShader map_shader;
 	Uniform map_slerp_arc;
 };

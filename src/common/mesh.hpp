@@ -2,6 +2,7 @@
 
 #include "shader.hpp"
 #include "vector3.hpp"
+#include "camera.hpp"
 
 class Mesh
 {
@@ -9,6 +10,11 @@ public:
 	enum class Type {HUNTER, DESTROYER, UFO, ICOSPHERE, UVSPHERE, MESH_COUNT};
 
 	~Mesh();
+
+	float get_radius()
+	{
+		return radius;
+	}
 
 	void draw(Camera& c);
 
@@ -41,7 +47,9 @@ private:
 
 	Mesh(Type type);
 
-	#ifdef STATS_TUNING
+	float radius;
+
+#ifdef STATS_TUNING
 	std::vector<VertexData> mesh_data;
 public:
 	void rescale(float scale) {

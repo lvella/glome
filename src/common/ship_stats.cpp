@@ -33,17 +33,22 @@ auto ShipStats::get() -> shared_ptr
 
 	ret->scale = 1.0f;
 
-	ret->max_rot_per_frame = 0.03;
-	ret->max_speed_forward = 0.0015;
-	ret->max_accel_forward = 0.0002;
-	ret->max_speed_vertical = 0.0004;
-	ret->max_speed_horizontal = 0.0004;
-	ret->max_speed_spin = 0.02;
+	ret->rot_factor = 0.6; // rad / s
+	ret->max_accel_rot = 108.0; // rad / s²
 
-	ret->shot_speed = 0.02;
-	ret->shot_power = 82;
-	ret->canon_cooldown_rate = 7;
-	ret->max_fire_rate = 15;
+	ret->max_speed_forward = 0.09; // rad / s
+	ret->max_accel_forward = 1.44; // rad / s²
+
+	ret->max_speed_vertical = 0.024; // rad / s
+	ret->max_speed_horizontal = 0.024; // rad / s
+	ret->max_speed_spin = 1.2; // rad / s
+
+	ret->shot_speed = 1.2; // rad / s
+
+	ret->canon_cooldown_rate = 420.0f; // J / s
+	ret->canon_fire_interval = 1.0f/15.0f; // s
+	ret->max_heat = 1500.f; // J
+	ret->shot_power = 82.0f; // J
 
 	return ret;
 }

@@ -5,29 +5,29 @@
 #include "camera.hpp"
 #include "matrix4.hpp"
 #include "vector4.hpp"
-#include "vol_sphere.hpp"
+#include "collidable.hpp"
 #include "ship_controller.hpp"
 
-class Projectile: virtual public Object, public VolSphere
+class Projectile final: virtual public Object, public Collidable
 {
 public:
 	static void initialize();
-	static void shot(ShipController *s, const Matrix4& from, float speed);
+	static void shot(ShipController *s, const QRot& from, float speed);
 	static void draw_many(const std::vector<Projectile*>& shots, Camera& cam);
 	static void draw_in_minimap();
-	static void update_all();
-	static std::vector<VolSphere*> get_collision_volumes();
+	static void update_all(float dt);
+	static std::vector<Collidable*> get_collision_volumes();
 	static std::vector<Projectile*> cull_sort_from_camera(const Camera& cam);
 
-	void collided_with(const VolSphere& other, float) override
+	void collided_with(const Collidable& other, float) override
 	{
 		die();
 	}
 
 private:
-	Projectile(ShipController *s, const Matrix4& from, float speed);
+	Projectile(ShipController *s, const QRot& from, float speed);
 	void draw(Camera& cam);
-	void update();
+	void update(float dt);
 	inline bool is_dead() const
 	{
 		// Maximum Time To Live
@@ -39,11 +39,11 @@ private:
 		ttl = max_ttl;
 	}
 
-	Matrix4 ds;
 	ShipController *owner;
-	unsigned short ttl;
-	unsigned short max_ttl;
-	unsigned short max_ttl_2;
+	float speed;
+	float ttl;
+	float max_ttl;
+	float max_ttl_2;
 	unsigned char alpha;
 
 	using SList = std::list<Projectile>;

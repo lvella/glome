@@ -1,16 +1,17 @@
-#include <sstream>
+#include "mesh.hpp"
+
+#include <iostream>
 #include <cassert>
 #include <map>
 #include <set>
 #include <utility>
-
 #include <GL/glew.h>
 
-#include "config.hpp"
+#include "math.hpp"
 #include "vector4.hpp"
 #include "world.hpp"
 #include "random.hpp"
-#include "mesh.hpp"
+#include "data_file.hpp"
 
 using namespace std;
 
@@ -63,10 +64,22 @@ void Mesh::fill_VBO(const std::vector<VertexData>& vdata, float scale) {
 
 	std::vector<VertexData4D> transformed(vdata.size());
 
+	// Radius of the bounding sphere centered on origin.
+	// TODO: find the best fitting sphere.
+	// TODO 2: load the best fitting sphere from file.
+	float cos_radius = 1.0f;
+
 	for(unsigned i = 0; i < vdata.size(); ++i) {
 		transformed[i].pos = (vdata[i].pos * scale).inverse_stereo_proj();
 		transformed[i].color = vdata[i].color;
+
+		float cos_dist = -transformed[i].pos.w;
+		if(cos_dist < cos_radius) {
+			cos_radius = cos_dist;
+		}
 	}
+
+	radius = std::acos(cos_radius);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VertexData4D) * transformed.size(),
@@ -76,37 +89,30 @@ void Mesh::fill_VBO(const std::vector<VertexData>& vdata, float scale) {
 void Mesh::load_from_file(const char* name)
 {
 	uint16_t ilen, vlen;
-
-	int ret;
-	FILE *fd;
+	bool ret;
 
 	std::cout << "Loading mesh " << name << std::endl;
+	auto fd = load_data_file("models/"s + name + ".wire"s);
 
 	// Load mesh file and put it into the list of meshs if does not exists
 	{
 		unsigned int mesh_pos;
-		std::stringstream dir;
-		dir << DATA_DIR << "/models/" << name << ".wire";
-		fd = fopen(dir.str().c_str(), "rb");
-		/* Read header of file */
-		ret = fread(&mesh_pos, sizeof(unsigned int), 1, fd);
-		assert(ret == 1);
 
-		/* Pointer file to mesh position */
-		fseek(fd, mesh_pos, SEEK_SET);
-		assert(fd != nullptr);
+		ret = fd.read_binary(&mesh_pos);
+		assert(ret);
+		fd.seekg(mesh_pos);
 	}
 
 	{
 		// Reading 3-D vertex coordinates(12bytes) and colorRGBA values(16bytes)
 		// format: <x, y, z> <r, g, b, a>
 		//#TODO: Make the inverse projection to 4-D using the 3-D vector, to scale objects easily
-		ret = fread(&vlen, sizeof(vlen), 1, fd);
-		assert(ret == 1);
+		ret = fd.read_binary(&vlen);
+		assert(ret);
 
 		std::vector<VertexData> vdata(vlen);
-		ret = fread(&vdata[0], sizeof(VertexData), vlen, fd);
-		assert(ret == vlen);
+		ret = fd.read_binary(vdata.data(), vlen);
+		assert(ret);
 
 		// Create vertex buffer
 		fill_VBO(vdata);
@@ -119,18 +125,18 @@ void Mesh::load_from_file(const char* name)
 	{
 		// Reading edges coordinates (8bytes)
 		// format:  <v_index0 , v_index1>
-		ret = fread(&ilen, sizeof(ilen), 1, fd);
-		assert(ret == 1);
-		// Create index buffer
-		uint16_t ibolen = ilen * 2 * sizeof(uint16_t);
-		uint16_t idata[ibolen];
-		ret = fread(idata, 2 * sizeof(uint16_t), ilen, fd);
-		assert(ret == ilen);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, ibolen, idata, GL_STATIC_DRAW);
-	}
+		ret = fd.read_binary(&ilen);
+		assert(ret);
 
-	fclose(fd);
+		// Create index buffer
+		std::vector<uint16_t> idata(ilen * 2);
+
+		ret = fd.read_binary(idata.data(), idata.size());
+		assert(ret);
+
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, idata.size() * sizeof(idata[0]), idata.data(), GL_STATIC_DRAW);
+	}
 
 	len = ilen * 2;
 	primitive_type = GL_LINES;
@@ -152,7 +158,7 @@ void Mesh::generate_uvsphere()
 	// Create vertices and link segments
 	for(int i = 0; i < SEGMENTS; ++i)
 	{
-		float a = i * (2.0 * M_PI / SEGMENTS);
+		float a = i * (2.0 * math::pi / SEGMENTS);
 		float x, y;
 
 		x = sin(a);
@@ -166,7 +172,7 @@ void Mesh::generate_uvsphere()
 				++e_idx;
 			}
 
-			float b = 0.15 + j * ((M_PI - 0.3) / (RINGS - 1));
+			float b = 0.15 + j * ((math::pi - 0.3) / (RINGS - 1));
 			float sb = sin(b);
 
 			v[v_idx++] = Vector4(sb * x, sb * y, cos(b), 0.0f);
@@ -193,6 +199,7 @@ void Mesh::generate_uvsphere()
 	len = 2 * e_idx;
 	primitive_type = GL_LINES;
 	has_colorbuf = false;
+	radius = 1.0f;
 }
 
 // based on http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
@@ -271,7 +278,7 @@ void Mesh::generate_icosphere()
 					{9, 8, 1},
 			};
 			for(int i = 0; i < 20; ++i) {
-				face_subdivide(SUB, FACES[i][2], FACES[i][1], FACES[i][0]);
+				face_subdivide(SUB, FACES[i][0], FACES[i][1], FACES[i][2]);
 			}
 
 			assert(iv == sizeof(v) / sizeof(Vector4));
@@ -349,6 +356,7 @@ void Mesh::generate_icosphere()
 	primitive_type = GL_TRIANGLES;
 
 	has_colorbuf = false;
+	radius = 1.0f;
 }
 
 void

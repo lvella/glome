@@ -1,9 +1,10 @@
 #pragma once
 
+#include <memory>
 #include <unordered_set>
 #include <vector>
-#include "audio_source.hpp"
-#include "audio_listener.hpp"
+
+#include "object.hpp"
 
 namespace Audio {
 	class Listener;
@@ -12,13 +13,16 @@ namespace Audio {
 	class World {
 		void addListener(Listener *l);
 
-		void updateFromListener(size_t listener, const Matrix4& transform);
+		void updateFromListener(float dt, size_t listener, const QRot& transform);
 
-		std::unordered_set<Source*> sources;
 		std::vector<Listener*> listeners;
 
 		friend class Source;
 		friend class Listener;
+
+	protected:
+		void try_add_source(const std::shared_ptr<Object>& obj);
+		std::vector<std::weak_ptr<Source>> sources;
 	};
 
 }

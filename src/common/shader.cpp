@@ -1,11 +1,10 @@
-#include <map>
-#include <cstring>
-
-#include "config.hpp"
-
 #include "shader.hpp"
 
-using namespace std;
+#include <cstring>
+
+#include "data_file.hpp"
+
+using namespace std::string_literals;
 
 struct ltstr
 {
@@ -16,42 +15,20 @@ struct ltstr
 };
 static std::map<const char*, GLuint, ltstr> loaded_shaders;
 
-Shader::Shader():
-	prog(0)
-{}
-
-Shader::Shader(const char *sources[])
+Shader::Shader(const SourceVector& sources)
 {
 	setup_shader(sources);
 }
 
-Shader::~Shader()
+void Shader::setup_shader(const SourceVector& sources)
 {
-	if(prog)
-		glDeleteProgram(prog);
-}
-
-void Shader::setup_shader(const char *sources[])
-{
-	char *ptr;
-	char err[10000];
-	const char **iter;
-	const char *name;
-	int ret;
-
-	FILE *fl;
 	GLint len;
 	GLint type;
 	GLuint shader;
 
-	assert(sources);
-	assert(*sources);
 	prog = glCreateProgram();
 
-	iter = sources;
-	while(*iter != nullptr)
-	{
-		name = *iter;
+	for(const char* name: sources) {
 		if(loaded_shaders.find(name) == loaded_shaders.end())
 		{
 			if(strrchr(name, '.')[1] == 'v')
@@ -63,37 +40,31 @@ void Shader::setup_shader(const char *sources[])
 				type = GL_FRAGMENT_SHADER;
 			}
 
-			string path(DATA_DIR);
-			path += "/shaders/";
-			path += name;
+			auto fl = load_data_file("shaders/"s + name);
+			fl.seekg(0, fl.end);
+			len = fl.tellg();
+			fl.seekg(0, fl.beg);
 
-			fl = fopen(path.c_str(), "r");
-			if(!fl)
+			std::vector<char> buff(len);
+			if(!fl.read(buff.data(), buff.size()))
 			{
-				cout <<"Could not open file \""<<name<<"\": "<<strerror(errno)<<endl;
-				break;
+				std::cout<<"Could not read whole file: "<<strerror(errno)<< std::endl;
 			}
-			fseek(fl, 0, SEEK_END);
-			len = ftell(fl);
-			fseek(fl, 0, SEEK_SET);
-			ptr = new char [len];
+			fl.close();
 
-			ret = fread(ptr, 1, len, fl);
-			if(ret != len)
-			{
-				cout<<"Could not read whole file: "<<strerror(errno)<< endl;
-			}
-			fclose(fl);
 			shader = glCreateShader(type);
-			glShaderSource(shader, 1, (const GLchar**)&ptr, &len);
+			{
+				char *ptr = buff.data();
+				glShaderSource(shader, 1, (const GLchar**)&ptr, &len);
+			}
 			glCompileShader(shader);
 			{
 				GLsizei length;
+				char err[10000];
 				glGetShaderInfoLog(shader, 10000, &length, err);
 				if(length)
-					cout << "Shader "<<name<<" compilation log:\n" << err << endl;
+					std::cout << "Shader "<<name<<" compilation log:\n" << err << std::endl;
 			}
-			delete [] ptr;
 			loaded_shaders.insert(std::pair<const char*, GLuint>(name, shader));
 		}
 		else
@@ -102,35 +73,69 @@ void Shader::setup_shader(const char *sources[])
 		}
 
 		glAttachShader(prog, shader);
-		++iter;
-
 	}
 	// We expect every shader to have a "position" attribute, to be the reference attribute
 	glBindAttribLocation(prog, 0, "position");
 	glLinkProgram(prog);
 	{
 		GLsizei length;
+		char err[10000];
 		glGetProgramInfoLog(prog, 10000, &length, err);
 		if(length) {
-			cout << "Linkage log of [" << *sources;
-			for(iter = sources + 1; *iter; ++iter)
-				cout << ", " << *iter;
-			cout << "]:\n" << err << '\n';
+			std::cout << "Linkage log of [";
+			const char* sep = "";
+			for(auto name: sources) {
+				std::cout << sep << name;
+				sep = ", ";
+			}
+			std::cout << "]:\n" << err << std::endl;
 		}
 	}
 
-	transform = getUniform("transform");
 	attr_color = glGetAttribLocation(prog, "color");
 	attr_texcoord = glGetAttribLocation(prog, "texcoord");
 }
 
-void CamShader::setup_shader(const char *sources[])
+Shader::~Shader()
 {
-	Shader::setup_shader(sources);
-	projection = getUniform("projection");
+	glDeleteProgram(prog);
 }
 
-void CamShader::setProjection(const Matrix4& proj) const
-{
-	projection.set(proj);
+Uniform Shader::getUniform(const char *name) const {
+	GLint ret = glGetUniformLocation(prog, name);
+	assert(ret != -1);
+	if(ret == -1) {
+		std::cerr << "Could not retrieve \"" << name
+			<< "\" uniform: " << glGetError() << std::endl;
+	}
+	return Uniform{ret};
 }
+
+void SpaceShader::setup_shader(const SourceVector& sources)
+{
+	Shader::setup_shader(sources);
+	transform = getUniform("transformation");
+}
+
+void CamShader::initialize(float aspect_ratio)
+{
+	proj_mat = perspective(FOV_Y, aspect_ratio, Z_NEAR, Z_FAR);
+	initialized = true;
+}
+
+void CamShader::setup_shader(const SourceVector& sources)
+{
+	SpaceShader::setup_shader(sources);
+
+	assert(initialized);
+
+	// Must be enabled in order to set values.
+	enable();
+
+	// Set immutable uniforms.
+	getUniform("projection").set(proj_mat);
+	getUniform("zFar").set(Z_FAR);
+}
+
+Matrix4 CamShader::proj_mat;
+bool CamShader::initialized = false;

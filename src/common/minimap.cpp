@@ -1,23 +1,19 @@
-#include <cmath>
+#include "meridian.hpp"
 
 #include <GL/glew.h>
-#include <GL/glu.h>
+#include <memory>
 
 #include "math.hpp"
 #include "projectile.hpp"
 #include "ship.hpp"
 #include "shader.hpp"
-#include "meridian.hpp"
 #include "renderer.hpp"
 #include "options.hpp"
 #include "textures.hpp"
 #include "minimap.hpp"
 
-using namespace std;
-using namespace Options;
-
 static Camera camera;
-static CamShader map_projection;
+static SpaceShader map_projection;
 
 static Shader hud;
 
@@ -31,7 +27,8 @@ static GLint hud_has_tex;
 GLuint square_vbo;
 
 void
-MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center, std::vector<Glome::Drawable*> objs)
+MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
+	const std::vector<std::shared_ptr<Glome::Drawable>>& objs)
 {
 	const int b = 10;
 	const int l = 10;
@@ -68,7 +65,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center, std
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	// From now on, use the camera with transform stack to draw objects
-	camera.reset(yz_matrix(M_PI / 2) * center);
+	camera.reset(yz_qrot(math::pi_2) * center);
 	camera.pushShader(&map_projection);
 
 	// Draw shots
@@ -83,6 +80,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const Matrix4& center, std
 	glBindTexture(GL_TEXTURE_2D, tex_object);
 	rend->fill_minimap(objs, camera);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	camera.popShader();
 }
 
 void
@@ -98,7 +96,8 @@ MiniMap::initialize()
 		const float cx = 0.0f;
 		const float cy = 0.0f;
 
-		const float dx = 0.5f * width * sinf(FOV) / height;
+		const float dx = 0.5f * Options::width * sinf(CamShader::FOV_Y)
+			/ Options::height;
 
 		const float ppx0 = cx - dx;
 		const float ppy = cy + cosf(asinf(dx));
@@ -129,12 +128,20 @@ MiniMap::initialize()
 		glBufferData(GL_ARRAY_BUFFER, sizeof(v), v, GL_STATIC_DRAW);
 	}
 
-	const char* src_proj[] = {"minimap.vert", "map_stuff.vert", "minimap.frag", "texture.frag", nullptr};
-	map_projection.setup_shader(src_proj);
+	map_projection.setup_shader({
+		"minimap/minimap.vert",
+		"minimap/map_stuff.vert",
+		"common/quaternion.vert",
+		"minimap/minimap.frag",
+		"common/luminance_alpha_texture.frag"
+	});
 	proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
 
-	const char* src_hud[] = {"hud.vert", "map_stuff.vert", "minimap.frag", "texture.frag", nullptr};
-	hud.setup_shader(src_hud);
+	hud.setup_shader({
+		"minimap/hud.vert",
+		"minimap/map_stuff.vert",
+		"minimap/minimap.frag",
+		"common/luminance_alpha_texture.frag"
+	});
 	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
 }
-

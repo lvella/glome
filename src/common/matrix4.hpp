@@ -71,68 +71,26 @@ using Real = float;
 class Matrix4
 {
 protected:
-	// Even though OGRE's uses column vectors, this shit originally was stored
-	// in memory transposed compared to how OpenGL stores the matrices. This
-	// is a hack to fix that, I hope optimizer will get rid of it.
-	class Accessor {
-	public:
-		template<class A>
-		class ColAccessor {
-		public:
-			ColAccessor(A* ac, int r):
-				a(ac),
-				row(r)
-			{}
-
-			Real& operator[](int col) {
-				return a->m[col][row];
-			}
-
-			Real operator[](int col) const {
-				return a->m[col][row];
-			}
-
-		private:
-			int row;
-			A* a;
-		};
-
-		const ColAccessor<const Accessor> operator[](int row) const {
-			return ColAccessor<const Accessor>(this, row);
-		}
-
-		ColAccessor<Accessor> operator[](int row) {
-			return ColAccessor<Accessor>(this, row);
-		}
-	private:
-		Real m[4][4];
-	};
-
-  /// The matrix entries, indexed by [row][col].
-  union {
-    Accessor m;
-    Real _m[16]; // Now I hope this to be is stored in OpenGL format...
-  };
+	Real m[4][4];
 
 public:
   /** Default constructor.
       @note
       It does <b>NOT</b> initialize the matrix for efficiency.
   */
-  inline Matrix4()
-  {
-  }
+  Matrix4() = default;
 
-  inline Matrix4(Real m00, Real m01, Real m02, Real m03,
+  constexpr Matrix4(Real m00, Real m01, Real m02, Real m03,
 		 Real m10, Real m11, Real m12, Real m13,
 		 Real m20, Real m21, Real m22, Real m23,
-		 Real m30, Real m31, Real m32, Real m33 )
-  {
-    m[0][0] = m00; m[0][1] = m01; m[0][2] = m02; m[0][3] = m03;
-    m[1][0] = m10; m[1][1] = m11; m[1][2] = m12; m[1][3] = m13;
-    m[2][0] = m20; m[2][1] = m21; m[2][2] = m22; m[2][3] = m23;
-    m[3][0] = m30; m[3][1] = m31; m[3][2] = m32; m[3][3] = m33;
-  }
+		 Real m30, Real m31, Real m32, Real m33 ):
+    m{
+      {m00, m01, m02, m03},
+      {m10, m11, m12, m13},
+      {m20, m21, m22, m23},
+      {m30, m31, m32, m33}
+    }
+  {}
 
   inline Matrix4(Real *m2)
   {
@@ -164,13 +122,13 @@ public:
     std::swap(m[3][3], other.m[3][3]);
   }
 
-  inline Accessor::ColAccessor<Accessor> operator [] ( size_t iRow )
+  inline Real* operator [] ( size_t iRow )
   {
     assert( iRow < 4 );
     return m[iRow];
   }
 
-  inline const Accessor::ColAccessor<const Accessor> operator [] ( size_t iRow ) const
+  inline const Real* operator [] ( size_t iRow ) const
   {
     assert( iRow < 4 );
     return m[iRow];
@@ -343,9 +301,6 @@ public:
 		   m[0][3], m[1][3], m[2][3], m[3][3]);
   }
 
-  static const Matrix4 ZERO;
-  static const Matrix4 IDENTITY;
-
   inline Matrix4 operator*(Real scalar) const
   {
     return Matrix4(
@@ -373,7 +328,7 @@ public:
   }
 
   void loadTo(GLint var) const {
-  	glUniformMatrix4fv(var, 1, GL_FALSE, _m);
+  	glUniformMatrix4fv(var, 1, GL_TRUE, &m[0][0]);
   }
 
   Vector4 position() const {
@@ -383,4 +338,24 @@ public:
   Matrix4 adjoint() const;
   Real determinant() const;
   Matrix4 inverse() const;
+
+  constexpr static Matrix4 ZERO()
+  {
+    return {
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0,
+        0, 0, 0, 0
+    };
+  }
+
+  constexpr static Matrix4 IDENTITY()
+  {
+    return {
+        1, 0, 0, 0,
+        0, 1, 0, 0,
+        0, 0, 1, 0,
+        0, 0, 0, 1
+    };
+  }
 };

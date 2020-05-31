@@ -6,6 +6,8 @@
 class Vector2
 {
 public:
+	static constexpr size_t size = 2;
+
 	Vector2()
 	{}
 
@@ -55,7 +57,8 @@ public:
 		return sqrtf(squared_length());
 	}
 
-	const float* getVertex() const {return v;}
+	const float* data() const {return v;}
+	float* data() {return v;}
 
 	// STL-like interface
 	using iterator = float*;

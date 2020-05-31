@@ -4,47 +4,36 @@
 
 Camera::Camera()
 {
-	reset(Matrix4::IDENTITY);
+	reset(QRot::IDENTITY());
 }
 
-void Camera::setProjection(const Matrix4& p)
+void Camera::reset(const QRot& invCam)
 {
-	PROJ_MAT = p;
-}
-
-const Matrix4& Camera::getProjection()
-{
-	return PROJ_MAT;
-}
-
-void Camera::reset(const Matrix4& invCam)
-{
-	mat_stack.resize(1);
-	mat_stack[0] = invCam;
+	qrot_stack.resize(1);
+	qrot_stack[0] = invCam;
 
 	shader_stack.resize(0);
 }
 
-void Camera::pushMultMat(const Matrix4& t)
+void Camera::pushMultQRot(const QRot& t)
 {
 	assert(!shader_stack.empty());
 
-	mat_stack.push_back(mat_stack.back() * t);
-	shader_stack.back()->setTransform(mat_stack.back());
+	qrot_stack.push_back(qrot_stack.back() * t);
+	shader_stack.back()->setTransform(qrot_stack.back());
 }
 
 void Camera::popMat()
 {
-	mat_stack.pop_back();
-	//shader_stack.back()->setTransform(mat_stack.back());
+	qrot_stack.pop_back();
+	//shader_stack.back()->setTransform(qrot_stack.back());
 }
 
-void Camera::pushShader(const CamShader *s)
+void Camera::pushShader(const SpaceShader *s)
 {
 	shader_stack.push_back(s);
 	s->enable();
-	s->setProjection(Camera::PROJ_MAT);
-	s->setTransform(mat_stack.back());
+	s->setTransform(qrot_stack.back());
 }
 
 void Camera::popShader()
@@ -55,9 +44,7 @@ void Camera::popShader()
 	}
 }
 
-const Shader* Camera::getShader() const
+const SpaceShader* Camera::getShader() const
 {
 	return shader_stack.back();
 }
-
-Matrix4 Camera::PROJ_MAT;

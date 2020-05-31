@@ -1,12 +1,12 @@
+#include "projectile.hpp"
+
 #include <ctime>
-#include <cmath>
 #include <algorithm>
 #include <vector>
 
 #include "shader.hpp"
 #include "math.hpp"
 #include "textures.hpp"
-#include "projectile.hpp"
 
 using namespace std;
 
@@ -15,8 +15,6 @@ static GLuint tex_projectile;
 static GLuint vbo;
 static GLuint texture;
 static GLint uniform_has_tex;
-static GLint uniform_camera;
-static GLint uniform_projection;
 static CamShader program_bullet;
 
 static GLuint minimap_vbo;
@@ -26,14 +24,6 @@ Projectile::SList Projectile::shots;
 
 void Projectile::initialize()
 {
-	const char *source[] = {
-	    "projectile.vert",
-	    "world.frag",
-	    "texture.frag",
-	    "fog.frag",
-	    nullptr
-	};
-
 	{
 		const float data[] = {
 			1.0f, 0.78f, 0.59f,
@@ -62,28 +52,33 @@ void Projectile::initialize()
 
 	create_spherical_texture(64, texture);
 
-	program_bullet.setup_shader(source);
-	uniform_has_tex =
-	    glGetUniformLocation(program_bullet.program(), "has_tex");
-	uniform_camera =
-	    glGetUniformLocation(program_bullet.program(), "camera");
-	uniform_projection =
-	    glGetUniformLocation(program_bullet.program(), "projection");
+	program_bullet.setup_shader({
+		"world/projectile.vert",
+		"world/modelview.vert",
+		"common/quaternion.vert",
+		"world/world.frag",
+		"common/luminance_alpha_texture.frag",
+		"world/world_fog.frag",
+		"world/fog.frag"
+	});
+
+	uniform_has_tex = glGetUniformLocation(
+		program_bullet.program(), "has_tex");
 }
 
-void Projectile::shot(ShipController * s, const Matrix4 & from, float speed)
+void Projectile::shot(ShipController * s, const QRot& from, float speed)
 {
 	// TODO: find a non-hackish way to use emplace_front...
 	shots.push_front(Projectile{s, from, speed});
 }
 
-void Projectile::update_all()
+void Projectile::update_all(float dt)
 {
-	shots.remove_if([](Projectile& p) {
+	shots.remove_if([dt](Projectile& p) {
 		if(p.is_dead()) {
 			return true;
 		}
-		p.update();
+		p.update(dt);
 		return false;
 	});
 
@@ -100,7 +95,7 @@ void Projectile::update_all()
 		{
 			size_t i = 0;
 			for (auto& e: shots) {
-				minimap_buf[i++] = e.transformation().position();
+				minimap_buf[i++] = e.position();
 			}
 		}
 
@@ -117,10 +112,10 @@ void Projectile::update_all()
 	}
 }
 
-std::vector<VolSphere *>
+std::vector<Collidable *>
 Projectile::get_collision_volumes()
 {
-	std::vector<VolSphere *> ret(shots.size());
+	std::vector<Collidable *> ret(shots.size());
 	std::transform(shots.begin(), shots.end(), ret.begin(),
 		[](Projectile& p) {
 			return &p;
@@ -146,7 +141,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 	to_sort.reserve(shots.size());
 
 	for(auto & shot: shots) {
-		Vector4 pos = cam.transformation() * shot._t.position();
+		Vector4 pos = cam.transformation() * shot.position();
 		if (pos[2] <= 0) {
 			to_sort.emplace_back(&shot, pos.squared_length());
 		}
@@ -195,28 +190,30 @@ void Projectile::draw_in_minimap()
 		glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 		glDrawArrays(GL_POINTS, 0, shots.size());
 	}
+
 }
 
-Projectile::Projectile(ShipController * s, const Matrix4 & from,
-	float speed):
+Projectile::Projectile(ShipController * s, const QRot& from, float speed):
     Object(from), VolSphere(0.004),
-    ds(zw_matrix(-speed)), owner(s),
-    ttl(0), max_ttl((2 * M_PI - 0.05) / speed),
+    speed(speed), owner(s),
+    ttl(0.0), max_ttl((2 * math::pi - 0.05) / speed),
     max_ttl_2(max_ttl / 2), alpha(255u)
 {
 }
 
 void Projectile::draw(Camera & c)
 {
-	c.pushMultMat(_t);
+	c.pushMultQRot(get_t());
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	c.popMat();
+
 }
 
-void Projectile::update()
+void Projectile::update(float dt)
 {
-	++ttl;
-	alpha = ttl < (max_ttl_2) ? 255u : 255u - (ttl - max_ttl_2) * 200 / max_ttl_2;
+	ttl += dt;
+	alpha = ttl < (max_ttl_2) ?
+		255u : 255u - uint8_t((ttl - max_ttl_2) * 200.0 / max_ttl_2);
 
-	_t = _t * ds;
+	mul_t(zw_qrot(-speed * dt));
 }

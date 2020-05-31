@@ -1,110 +1,105 @@
-#include "matrix4.hpp"
 #include "math.hpp"
 
-Matrix4
-rotation(float angle, float x, float y, float z) {
-  const float c = cos(angle);
-  const float s = sin(angle);
-  const float omc = 1.0 - c;
-
-  return Matrix4
-      (x*x*omc+c, x*y*omc-z*s, x*z*omc+y*s, 0.0,
-       y*x*omc+z*s, y*y*omc+c, y*z*omc-x*s, 0.0,
-       x*z*omc-y*s, y*z*omc+x*s, z*z*omc+c, 0.0,
-       0.0, 0.0, 0.0, 1.0);
-}
+#include "matrix4.hpp"
+#include "qrot.hpp"
 
 Matrix4
 perspective(float fovy, float aspect, float zNear, float zFar)
 {
-	float f = 1.0f / tan(fovy / 2.0);
+	float f = 1.0f / std::tan(fovy / 2.0);
 	float dif = zNear - zFar;
 	return Matrix4(
-			f/aspect, 0.0f, 0.0f, 0.0f,
-			0.0f, f, 0.0f, 0.0f,
-			0.0f, 0.0f, (zFar + zNear) / dif, 2.0 * zFar * zNear / dif,
-			0.0f, 0.0f, -1.0f, 0.0f
-			);
+		f/aspect, 0.0f, 0.0f, 0.0f,
+		0.0f, f, 0.0f, 0.0f,
+		0.0f, 0.0f, (zFar + zNear) / dif, 2.0 * zFar * zNear / dif,
+		0.0f, 0.0f, -1.0f, 0.0f
+	);
 }
 
-Matrix4
-xy_matrix(float angle) {
-  const float c = cos(angle);
-  const float s = sin(angle);
-  return Matrix4(c, -s, 0, 0,
-                 s, c, 0, 0,
-                 0, 0, 1, 0,
-                 0, 0, 0, 1);
-}
-
-Matrix4
-xz_matrix(float angle) {
-  const float c = cos(angle);
-  const float s = sin(angle);
-  return Matrix4(c, 0, -s, 0,
-                 0, 1, 0, 0,
-                 s, 0, c, 0,
-                 0, 0, 0, 1);
-}
-
-Matrix4
-yz_matrix(float angle) {
-  const float c = cos(angle);
-  const float s = sin(angle);
-  return Matrix4(1, 0, 0, 0,
-                 0, c, -s, 0,
-                 0, s, c, 0,
-                 0, 0, 0, 1);
-}
-
-Matrix4
-xw_matrix(float angle) {
-  const float c = cos(angle);
-  const float s = sin(angle);
-  return Matrix4(c, 0, 0, -s,
-		 0, 1, 0, 0,
-		 0, 0, 1, 0,
-		 s, 0, 0, c);
-}
-
-Matrix4
-zw_matrix(float angle) {
-  const float c = cos(angle);
-  const float s = sin(angle);
-  return Matrix4(1,0,0,0,
-		 0,1,0,0,
-		 0,0,c,-s,
-		 0,0,s,c);
-}
-
-Matrix4
-yw_matrix(float angle) {
-  const float c = cos(angle);
-  const float s = sin(angle);
-  return Matrix4(1,0,0,0,
-		 0,c,0,-s,
-		 0,0,1,0,
-		 0,s,0,c);
-}
-
-Vector4
-cross(const Vector4 &a, const Vector4 &b, const Vector4 &c)
+QRot qrotation(float angle, Vector3 axis)
 {
-	return Vector4(
-			c.y * b.z * a.w - b.y * c.z * a.w -
-		   	c.y * a.z * b.w + a.y * c.z * b.w +
-			b.y * a.z * c.w - a.y * b.z * c.w,
+	const float h = 0.5 * angle;
+	const float c = std::cos(h);
+	const float s = std::sin(h);
+	const Vector4 q(c, s * axis.z, -s * axis.y, s * axis.x);
+	return QRot(q, Vector4(q.x, q.y, q.z, -q.w));
+}
 
-			- c.x * b.z * a.w + b.x * c.z * a.w
-			+ c.x * a.z * b.w - a.x * c.z * b.w
-			- b.x * a.z * c.w + a.x * b.z * c.w,
+QRot xy_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const Vector4 q(std::cos(h), std::sin(h), 0, 0);
+	return QRot(q, q, false);
+}
 
-			c.x * b.y * a.w - b.x * c.y * a.w -
-			c.x * a.y * b.w + a.x * c.y * b.w +
-			b.x * a.y * c.w - a.x * b.y * c.w,
+QRot xz_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const Vector4 q(std::cos(h), 0, std::sin(h), 0);
+	return QRot(q, q, false);
+}
 
-			- c.x * b.y * a.z + b.x * c.y * a.z
-			+ c.x * a.y * b.z - a.x * c.y * b.z
-			- b.x * a.y * c.z + a.x * b.y * c.z
+QRot yz_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const float c = std::cos(h);
+	const float s = std::sin(h);
+	return QRot(
+		Vector4(c, 0, 0, s),
+		Vector4(c, 0, 0, -s),
+		false
+	);
+}
+
+QRot xw_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const Vector4 q(std::cos(h), 0, 0, std::sin(h));
+	return QRot(q, q, false);
+}
+
+QRot zw_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const float c = std::cos(h);
+	const float s = std::sin(h);
+	return QRot(
+		Vector4(c, s, 0, 0),
+		Vector4(c, -s, 0, 0),
+		false
+	);
+}
+
+QRot yw_qrot(float angle)
+{
+	const float h = 0.5 * angle;
+	const float c = std::cos(h);
+	const float s = std::sin(h);
+	return QRot(
+		Vector4(c, 0, -s, 0),
+		Vector4(c, 0, s, 0),
+		false
+	);
+}
+
+QRot nlerp(const QRot& a, const QRot& b, float t)
+{
+	return QRot(
+		nlerp(a.l, b.l, t),
+		nlerp(a.r, b.r, t),
+		false
+	);
+}
+
+Vector4 nlerp(const Vector4& a, const Vector4& b, float t)
+{
+	return (a + (b - a) * t).normalized();
+}
+
+QRot rotation_between_unit_vecs(const Vector4& from, const Vector4& to)
+{
+	return QRot(
+		(to * from.conjugate()).sqrt(),
+		(from.conjugate() * to).sqrt()
 	);
 }

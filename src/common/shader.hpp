@@ -3,12 +3,16 @@
 #include "gl.hpp"
 #include "matrix4.hpp"
 #include "vector2.hpp"
+#include "math.hpp"
+
+#include <vector>
+#include <map>
 
 class Uniform
 {
 public:
 	Uniform() {}
-	Uniform(GLint location): id(location) {}
+	explicit Uniform(GLint location): id(location) {}
 
 	void set(bool val) const
 	{
@@ -27,12 +31,12 @@ public:
 
 	void set(const Vector2 &val) const
 	{
-		glUniform2fv(id, 1, val.getVertex());
+		glUniform2fv(id, 1, val.data());
 	}
 
 	void set(const Vector4 &val) const
 	{
-		glUniform4fv(id, 1, val.getVertex());
+		glUniform4fv(id, 1, val.data());
 	}
 
 	void set(const Matrix4 &val) const
@@ -40,26 +44,29 @@ public:
 		val.loadTo(id);
 	}
 
+	void set(const QRot& val) const
+	{
+		val.loadToUniform(id);
+	}
+
 private:
 	// Lightweight object, should have no other attribute.
-	GLint id;
+	GLint id = -1;
 };
 
 class Shader
 {
 public:
-	Shader();
-	Shader(const char *sources[]);
+	using SourceVector = std::vector<const char*>;
+
+	Shader() = default;
+	Shader(const SourceVector& sources);
 	virtual ~Shader();
 
-	virtual void setup_shader(const char *sources[]);
+	virtual void setup_shader(const SourceVector& sources);
 
 	void enable() const {
 		glUseProgram(prog);
-	}
-
-	void setTransform(const Matrix4& t) const {
-		transform.set(t);
 	}
 
 	GLint posAttr() const {
@@ -74,29 +81,50 @@ public:
 		return attr_texcoord;
 	}
 
-	Uniform getUniform(const char *name) const {
-		return glGetUniformLocation(prog, name);
-	}
+	Uniform getUniform(const char *name) const;
 
 	GLuint program() const {
 		return prog;
 	}
 
 protected:
-	GLuint prog;
-
-	Uniform transform;
+	GLuint prog = 0;
 
 	GLint attr_color;
 	GLint attr_texcoord;
 };
 
-class CamShader: public Shader
+class SpaceShader: public Shader
 {
 public:
-	void setup_shader(const char *sources[]) override;
-	void setProjection(const Matrix4& proj) const;
+	virtual ~SpaceShader() = default;
+	virtual void setup_shader(const SourceVector& sources) override;
 
-protected:
-	Uniform projection;
+	void setTransform(const QRot& t) const
+	{
+		transform.set(t);
+	}
+
+private:
+	Uniform transform;
+};
+
+class CamShader final: public SpaceShader
+{
+public:
+	static constexpr float FOV_Y = math::pi / 4.0f;
+	static constexpr float Z_NEAR = 0.007f;
+	static constexpr float Z_FAR = 2.1f;
+
+	static void initialize(float aspect_ratio);
+	static const Matrix4& getProjection()
+	{
+		return proj_mat;
+	}
+
+	virtual void setup_shader(const SourceVector& sources) override;
+
+private:
+	static Matrix4 proj_mat;
+	static bool initialized;
 };

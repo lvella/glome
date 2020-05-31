@@ -1,31 +1,57 @@
-- Update objects in parallel
-- Use 2 quaternion as position/orientation representation
-- Make world updates independent of FPS
-- Transfer momentum on collision between objects (ships, flying spagetti monsters)
-  - At least prevent them from intersecting, change their velocity away from one another
-- Fix supernova appearance:
-  - you can see the triangles (you must not)
-  - you can see briefly see the other side when it is half size (you must not)
-    - don't draw the opposite side to fix this
-- Fix projectile appearance (it has a diagonal tear)
+== Needs for FIKALAB game ==
+
+- Support Windows build (Rui)
 - Add collision to supernova
   - Kill player when collide, finishing the game
   - Show and register score, then ask to try again
+    - Take care to make it compatible with VR UI
+- Transfer momentum on collision between objects (ships, flying spagetti monsters)
+  - At least prevent them from intersecting, change their velocity away from one another
+  - How to fit that to current crazy FSM movement?
+- Fix supernova appearance:
+  - you can see briefly see the other side when it is half size (you must not)
+    - don't draw the opposite side to fix this
+- Make game run in solid 90 Hz
+  - make it 144 Hz, if possible
+  - Cull unseen objects (Helder)
+  - Update audio in parallel with drawing
+- Implement stereo rendering using OpenVR API
+- Handle headset input:
+  - Headset orientation changes camera view relative to ship position
+- Figure VR inputs
+  - Study the possibilities
+  - EVA movement-like maybe?
+  - 2 hand canons, maybe?
+    - laser targetting
+    - each cannon position given by each controller position
+- Change ship design to fit VR
+- Sound effects:
+  - Shot
+  - Hit
+  - Engine fire
+  - Flying spagetti monster
+  - Splash into supernova
+  - others?
+- Fix destroyer's double flame positions
+- Visual cue of cannon heat
+  - Maybe remove cannon heat stuff?
+
+== GENERAL IMPROVEMENTS (low priority) ==
+
+- Properly setup and use VertexArrays (VAO) for each object type
+  - Possibly right after shader setup
+- Bring exporter up to date with current blender
+- Export meshes with CMake
 - Bring code to C++11:
   - Always use "override"
-  - Remove all new/delete
-- Sort objects when drawing each viewport
-- Kill flying spaghetti monsters
-  - When shot
-  - When collide with supernova
-  - Make some cool death animation
-- Cull unseen objects
-- Make game run in solid 144 Hz
-  - Create a profile framework
-    - Generalize the one used for measuring octree
-- Possibly use GLM for linear algebra
+  - Remove all new/delete (Diogo)
+- Make dustfield independent of FPS
+  - Reuse camera history code
+- Port to Vulkan (maybe we can use it to improve performance)
 
-===================================================
+== OLD GLOME TODO (do not apply for FIKALAB) ==
+
+- Visual effect of cannon fire when shooting
 
 Main topics:
 - Physics
@@ -51,4 +77,3 @@ Menu:
 - Create options to configure.
 - Stash options and load them at startup.
 - Enhance ugly guichan buttons.
-

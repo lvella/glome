@@ -11,22 +11,19 @@ class Vector3;
 class Vector4
 {
 public:
+	static constexpr size_t size = 4;
+
 	static const Vector4 ORIGIN;
-    static const Vector4 UP;
-    static const Vector4 FRONT;
+	static const Vector4 UP;
+	static const Vector4 FRONT;
 
-	Vector4()
+	Vector4() = default;
+	Vector4(const Vector3 &other, float wl = 0.0f);
+	static Vector4 make_quaternion(float real, const Vector3 &imaginary);
+
+	constexpr Vector4(float xl, float yl, float zl, float wl):
+		x(xl), y(yl), z(zl), w(wl)
 	{}
-
-	inline Vector4(float xl, float yl, float zl, float wl)
-	{
-		x = xl;
-		y = yl;
-		z = zl;
-		w = wl;
-	}
-
-	Vector4(const Vector3 &other, float wl=0.0f);
 
 	float dot(const Vector4& ref) const
 	{
@@ -39,14 +36,33 @@ public:
 	}
 
 	Vector4 operator+=(const Vector4& ref)
-  {
+	{
 		(*this) = *this + ref;
 		return *this;
-  }
+	}
 
 	Vector4 operator-(const Vector4& ref) const
 	{
 		return Vector4(x-ref.x, y-ref.y, z-ref.z, w-ref.w);
+	}
+
+	Vector4 operator-() const
+	{
+		return Vector4(-x, -y, -z, -w);
+	}
+
+	/** Quaternion multiplication.
+	 *
+	 * Straight from wikipedia.
+	 */
+	Vector4 operator*(const Vector4& q) const
+	{
+		return Vector4(
+			x*q.x - y*q.y - z*q.z - w*q.w,
+			x*q.y + y*q.x + z*q.w - w*q.z,
+			x*q.z - y*q.w + z*q.x + w*q.y,
+			x*q.w + y*q.z - z*q.y + w*q.x
+		);
 	}
 
 	Vector4 operator*(float s) const
@@ -59,26 +75,34 @@ public:
 		return (*this) = (*this) * s;
 	}
 
+	/** Quaternion square root. */
+	Vector4 sqrt() const;
+
+	/** Quaternion imaginary part. */
+	Vector3 imaginary() const;
+
 	float& operator[](size_t elem)
 	{
 		return v[elem];
 	}
 
-	Vector4 normalized()
+	/** Quaternion conjugate. */
+	Vector4 conjugate() const
 	{
-		return (*this) * (1.0 / length());
+		return Vector4(x, -y, -z, -w);
+	}
+
+	Vector4 normalized() const
+	{
+		return (*this) * (1.0f / length());
 	}
 
 	float calc_norm_w() const
 	{
-		return -sqrtf(1.0f - x*x - y*y - z*z);
+		return -std::sqrt(1.0f - x*x - y*y - z*z);
 	}
 
-	Vector4 stereo_proj() const
-	{
-		float factor = 1.0f - w;
-		return Vector4(x/factor, y/factor, z/factor, 1.0f);
-	}
+	Vector3 stereo_proj() const;
 
 	float squared_length() const
 	{
@@ -87,11 +111,11 @@ public:
 
 	float length() const
 	{
-		return sqrt(squared_length());
+		return std::sqrt(squared_length());
 	}
 
-	const float* getVertex() const {return v;}
-	float* getVertex() {return v;}
+	const float* data() const {return v;}
+	float* data() {return v;}
 
 	/** Function for writing to a stream. */
 	friend std::ostream& operator<<(std::ostream& o, const Vector4& v);

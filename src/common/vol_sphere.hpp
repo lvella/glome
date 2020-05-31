@@ -1,26 +1,29 @@
 #pragma once
 
-#include <cassert>
-#include <cmath>
-
+#include "math.hpp"
 #include "object.hpp"
 
 // This class represents a sphere for the
 // purposes of collision detection.
-class VolSphere: virtual private Object
+
+// TODO: make object center different from sphere center.
+// This is useful for asymetric stuff, like engine fire.
+class VolSphere: virtual public Object
 {
   public:
-    // Build a sphere from center and radius. As usual
-    // for the spheric space, the center must be normalized,
-    // and the radius, as any distance, must be given in radians.
-    // The radius must be given in range [0, PI)
-    VolSphere(float radius):
-      radius(radius),
-      cos_great_dist(std::cos(radius + M_PI_2))
+    VolSphere() = default;
+
+    // Build a sphere from radius.
+    // See set_radius().
+    VolSphere(float radius)
     {
-      assert(radius >= 0);
-      assert(radius < M_PI);
+      set_radius(radius);
     }
+
+    // Set sphere radius. As usual for this game space,
+    // the radius, as any distance, must be given in radians.
+    // The radius must be given in range [0, PI)
+    void set_radius(float r);
 
     // Tells if this intersects with a given great sphere.
     bool intersects_great_sphere(const Vector4& center) const
@@ -29,32 +32,8 @@ class VolSphere: virtual private Object
     }
 
     // Tells if two given sphere intersects
-    bool intersects(const VolSphere& other, float &cos_dist) const
-    {
-      // Calculates the cossine of the angle between the center of
-      // the two spheres.
-      cos_dist = this->position().dot(other.position());
-
-      // The following algorithm fails if the sum of the radius of the
-      // spheres is greater than or equal 180°. But in this case, both
-      // spheres are always touching:
-      if((radius + other.radius) >= M_PI) {
-	return true;
-      }
-
-      // Calculates the cossine of the sum of the radius.
-      float touching_radius = std::cos(radius + other.radius);
-
-      // True if distance between centers is smaller or equal
-      // the radius touching distance
-      return cos_dist >= touching_radius;
-    }
-
-    bool intersects(const VolSphere& other) const
-    {
-      float cos_dist;
-      return intersects(other, cos_dist);
-    }
+    bool intersects(const VolSphere& other, float &cos_dist) const;
+    bool intersects(const VolSphere& other) const;
 
     // Tells if a given point is contained in the sphere
     bool contains(const Vector4 &p) const
@@ -67,10 +46,8 @@ class VolSphere: virtual private Object
       return radius;
     }
 
-    virtual void collided_with(const VolSphere& other, float cos_dist) = 0;
-
   private:
-    float radius;
+    float radius = 0.0;
 
     // Great spheres (sphere of radius π) are a special case
     // because they are used extensively by the spheric Octree

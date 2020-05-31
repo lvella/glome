@@ -1,11 +1,9 @@
 #pragma once
 
-#include "matrix4.hpp"
+#include "qrot.hpp"
 #include "audio_world.hpp"
 
 namespace Audio {
-	class World;
-
 	class Listener {
 	public:
 		Listener(World* w);
@@ -15,9 +13,9 @@ namespace Audio {
 
 		virtual ~Listener() = default;
 
-		void update(const Matrix4& transform);
+		void update(float dt, const QRot& transform);
 
-		virtual const Matrix4 &transformation() const = 0;
+		virtual const QRot &transformation() const = 0;
 
 	private:
 		Listener &operator=(Listener&) = default;

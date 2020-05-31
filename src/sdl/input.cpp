@@ -1,12 +1,11 @@
 #include <iostream>
 #include <fstream>
-#include <sstream>
 #include <string>
 #include <cassert>
 
 #include <SDL.h>
 
-#include "config.hpp"
+#include "data_file.hpp"
 #include "input.hpp"
 #include "kbinput.hpp"
 #include "jsinput.hpp"
@@ -37,14 +36,10 @@ ShipController* create_ship_controller(int controller_id)
 */
 void read_controllers_settings()
 {
-	std::ifstream ifs;
 	int number_of_controllers, number_of_functions, controller_id, key, input_type;
 	int func_key;
 
-	std::stringstream dir;
-	dir << DATA_DIR << "/controllers/input.config";
-	ifs.open(dir.str().c_str(), std::ifstream::in);
-	assert(ifs.is_open());
+	std::ifstream ifs = load_data_file("controllers/input.config");
 	ifs >> number_of_controllers;
 	for(int i = 0; i < number_of_controllers; ++i)
 	{

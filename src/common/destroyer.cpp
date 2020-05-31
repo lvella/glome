@@ -26,25 +26,23 @@ Destroyer::Destroyer():
 
 	Matrix4 lolo;
 	memcpy(&lolo, &lala, sizeof(Matrix4));
-	other_jet.set_transformation(lolo);
+	other_jet.set_t(QRot(lolo));
 	other_jet.setIntensity(1.0f);
-}
-
-Destroyer::~Destroyer()
-{
 }
 
 void Destroyer::draw(Camera &c)
 {
-	c.pushMultMat(_t);
+	c.pushMultQRot(get_t());
 	mesh->draw(c);
 	fx_engine.draw(c);
 	other_jet.draw(c);
 	c.popMat();
 }
 
-void Destroyer::update()
+bool Destroyer::update(float dt, UpdatableAdder& adder)
 {
-	Ship::update();
-	other_jet.update();
+	bool ret = Ship::update(dt, adder);
+	other_jet.update(dt, adder);
+
+	return ret;
 }
