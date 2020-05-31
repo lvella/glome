@@ -196,6 +196,7 @@ int main(int argc, char **argv)
 	initialize_gl_context();
 	Input::Js::initialize(0);
 	Input::initialize();
+
 	Game::initialize();
 
 	main_loop();

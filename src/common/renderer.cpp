@@ -74,8 +74,10 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 		for(auto& ptr: objs) {
 			float dist = std::acos(cam_pos.dot(ptr->position()))
 				- ptr->get_radius();
+			assert(!std::isnan(dist));
 			sorted.push_back({dist, ptr.get()});
 		}
+
 		std::sort(sorted.begin(), sorted.end(), [] (auto& a, auto& b) {
 			return a.first > b.first;
 		});

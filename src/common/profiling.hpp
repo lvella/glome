@@ -16,7 +16,9 @@ public:
 
 	void print() const
 	{
-		std::cout << name <<  " avg " << sum_time / count << "s\n";
+		if(count != 0) {
+			std::cout << name <<  " avg " << sum_time / count << "s\n";
+		}
 	}
 
 private:

@@ -1,6 +1,7 @@
 #include "spaghetti_fragment.hpp"
 
 #include <cmath>
+#include <iostream>
 #include "random.hpp"
 
 // Same value as in spaghetti_frag.frag:
@@ -32,7 +33,7 @@ SpaghettiFragment::SpaghettiFragment(const QRot& orig_transformation,
 	spin_axis(Random::direction()),
 	spin_speed(Random::normalDistribution(0, 20))
 {
-	assert(size > 0);
+	assert(size > 1);
 
 	std::vector<Vertex> vdata(size);
 	for(uint16_t i = 0; i < vdata.size(); ++i) {
@@ -48,15 +49,15 @@ SpaghettiFragment::SpaghettiFragment(const QRot& orig_transformation,
 		Vector4::ORIGIN
 	);
 
+	translation = orig_transformation * offset.inverse();
+	set_t(translation);
+
 	translation_speed = 0.1 * Random::zeroToOne();
 
 	translation_dir = RotDir(
 		Vector4::ORIGIN,
 		random_spread() * new_origin
 	);
-
-	translation = orig_transformation * offset.inverse();
-	set_t(translation);
 
 	float cos_radius = 1.0;
 	for(auto& v: vdata) {
@@ -130,13 +131,14 @@ Vector4 SpaghettiFragment::center_of_mass(std::vector<Vertex>& vdata)
 	vdata.erase(std::remove_if(vdata.begin() + 1, vdata.end(), [&] (Vertex& v)
 	{
 		const float cos_len = v.sv.pos.dot(prev->sv.pos);
-
 		if(cos_len >= 1.0) {
 			return true;
 		}
 
 		const float seg_len = std::acos(cos_len);
-
+		if(seg_len <= 0) {
+			return true;
+		}
 
 		M += (v.sv.pos + prev->sv.pos) * (0.5 * seg_len);
 		v.length = prev->length + seg_len;
@@ -145,7 +147,11 @@ Vector4 SpaghettiFragment::center_of_mass(std::vector<Vertex>& vdata)
 		return false;
 	}), vdata.end());
 
-	return M.normalized();
+	if(vdata.size() > 1) {
+		return M.normalized();
+	} else {
+		return vdata[0].sv.pos;
+	}
 }
 
 QRot SpaghettiFragment::random_spread()
