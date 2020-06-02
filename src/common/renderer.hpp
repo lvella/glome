@@ -27,14 +27,8 @@ public:
 	void draw(std::vector<Glome::Drawable*>&& objs);
 	void setup_display();
 	void fill_minimap(const std::vector<Glome::Drawable*>& objs, Camera& cam);
+	void createViewingFustrum(const std::vector<Glome::Drawable*> &objs, const QRot& cameraTransformation);
 
-<<<<<<< HEAD
-	void audio_update();
-
-	void createViewingFustrum(const std::vector<Glome::Drawable*> &objs);
-
-=======
->>>>>>> master
 protected:
 	struct Viewport: public Audio::Listener
 	{
@@ -66,6 +60,17 @@ protected:
 			QRot t;
 		};
 
+		struct Frustrum {
+			Vector4 left_wall_center;
+			Vector4 right_wall_center;
+			Vector4 top_wall_center;
+			Vector4 bottom_wall_center;
+			Vector4 far_wall_center;
+    		float far_wall_radius;
+
+			bool isIn() {return true;}
+		};
+
 		std::weak_ptr<Ship> t;
 		QRot curr_qrot;
 		std::deque<PathPoint> cam_hist;
@@ -74,6 +79,9 @@ protected:
 
 		// Camera position relative to target...
 		static const QRot cam_offset;
+
+		// Viewing Fustrum
+		// Fustrum fustrum;
 	};
 
 	std::vector<Viewport> players;

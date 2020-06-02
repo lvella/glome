@@ -14,7 +14,6 @@ namespace Glome
 		virtual ~Drawable() {};
 		virtual void draw(Camera& c) = 0;
 		virtual void minimap_draw(Camera& c);
-		//TODO: not taking into account multiplayer
-		bool isInView = true;
+		bool isInView = false;
 	};
 }

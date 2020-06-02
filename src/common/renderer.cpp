@@ -62,15 +62,15 @@ Renderer::draw(vector<Glome::Drawable*>&& objs)
 
 	for(active = begin(players); active != end(players); ++active) {
 		active->enable();
-
-		// HDX
-		createViewingFustrum(objs);
 		
 		camera.reset(active->transformation());
 		camera.pushShader(&shader);
 
 		const QRot inv_trans = active->transformation().inverse();
 		const Vector4 cam_pos = inv_trans.position();
+
+		// HDX
+		createViewingFustrum(objs, inv_trans);
 
 		vector<std::pair<float, Glome::Drawable*>> sorted;
 		sorted.reserve(objs.size());
@@ -155,7 +155,9 @@ const QRot Renderer::Viewport::cam_offset(
 );
 
 
-void Renderer::createViewingFustrum(const vector<Glome::Drawable*>& objs) {
+void Renderer::createViewingFustrum(const vector<Glome::Drawable*>& objs, const QRot& cameraTransform) {
+
+	printf("alooo");
 	
 	#ifdef FUSTRUM_CULLING
 		#warning "Fustrum Culling is ON"
@@ -168,20 +170,21 @@ void Renderer::createViewingFustrum(const vector<Glome::Drawable*>& objs) {
 		//TODO: over them as the ship moves
 		// need to find the centers of the 5 circles of the fustrum (the near clipping plane can be ignored)
 		// except for the far clipping plane, they are 90Âº from the ship/player
-		Vector4 topClippingPlaneCenter{0,-1,0,-1};
-		Vector4 bottomClippingPlaneCenter{0,+1,0,-1};
-		Vector4 leftClippingPlaneCenter{-1,0,0,-1};
-		Vector4 rightClippingPlaneCenter{+1,0,0,-1};
+		Vector4 topClippingPlaneCenter{0,-1,0,0};
+		Vector4 bottomClippingPlaneCenter{0,+1,0,0};
+		Vector4 leftClippingPlaneCenter{+1,0,0,0};
+		Vector4 rightClippingPlaneCenter{-1,0,0,0};
 		// all these will rotate towards z=-1
 		// get the rotation matrices
 		// top and bottom rotate by FOV/2
-		float xPlaneRotation = CamShader::FOV_Y/2;
-		float yPlaneRotation = (float(Options::width) / float(Options::height)) / 2;
+		// FOVx = FOVy*aspectratio
+		float yzPlaneRotation = CamShader::FOV_Y/2;
+		float xzPlaneRotation = CamShader::FOV_Y*(float(Options::width) / float(Options::height)) / 2;
 		// left and right rotate by aspectRatio/2
-		Matrix4 topClippingPlaneRotation = xz_matrix(xPlaneRotation);
-		Matrix4 bottomClippingPlaneRotation = xz_matrix(-xPlaneRotation);
-		Matrix4 leftClippingPlaneRotation = yz_matrix(yPlaneRotation);
-		Matrix4 rightClippingPlaneRotation = yz_matrix(-yPlaneRotation);
+		QRot topClippingPlaneRotation = yz_qrot(yzPlaneRotation);
+		QRot bottomClippingPlaneRotation = yz_qrot(-yzPlaneRotation);
+		QRot leftClippingPlaneRotation = xz_qrot(-xzPlaneRotation);
+		QRot rightClippingPlaneRotation = xz_qrot(xzPlaneRotation);
 		// apply the rotation to the centers of the planes/circles
 		// multiply the vectors with the rotation matrices
 		topClippingPlaneCenter = topClippingPlaneRotation*topClippingPlaneCenter;
@@ -190,80 +193,27 @@ void Renderer::createViewingFustrum(const vector<Glome::Drawable*>& objs) {
 		rightClippingPlaneCenter = rightClippingPlaneRotation*rightClippingPlaneCenter;
 		// for the far clipping plane
 		// get the point parallel to the ship in the far clipping plane
-		Vector4 S{0,0,CamShader::Z_FAR,-1};
-		// get the correct point by applying the inverse transform
-		// of the camera (inverse = transpose because of orthonormality)
-		Matrix4 inversePerspective(CamShader::getProjection().transpose());
-		Vector4 P = inversePerspective*S;
-		// how to get the other point???
-		// maybe, get the line from the original point and the anti-perspective point
-		// and check the intersection with the circle
-		// get the line (direction and way)
-		Vector4 line = (P - S).normalized();
-		// now calculate the intersection with the sphere
-		// this should give two points, one we already have, we want the other one
-		// equation for a sphere (from wikipedia)
-			// || x - c || ^2 = r^2
-			// c -> center point
-			// r -> radius
-			// x -> points on the sphere
-		// equation for a line
-			// x = o + d*l
-			// d -> distance along line from starting point
-			// l -> direction of the line
-			// o -> origin of the line
-			// x -> points on the line
-		// d = -( l.(o-c)) +- sqrt( (l.(o-c))^2 - (||o-c||^2 - r^2) )
-		// if the value inside the sqrt() is less than zero, no solution exist ==> should never happen in our case
-		// if it is zero, one solution exists ==> also should never happen in our case
-		// if it is greater than zero, two solutions exist ==> should always be the case
-		// so, calculate the inside of the sqrt() first to get the two solutins, then solver for d, we will have two different ds
-		// with the ds, we can calculate the two points that intersect with the sphere by substituing them in the line equation
-		Vector4 o_minus_c = S-Vector4(0,0,0,0);
-		float temp = line.dot(o_minus_c);
-		temp *= temp;
-		float temp2 = o_minus_c.length() * o_minus_c.length() - 1;
-		float inside_sqrt = temp - temp2;
-		printf("inside_sqrt = %f\n", inside_sqrt);
-		if(inside_sqrt < 0) {
-			printf("ERROR: inside_sqrt < 0\n");
-			exit(-1);
-		}
-		else if(inside_sqrt == 0) {
-			printf("ERROR: inside_sqrt == 0\n");
-			exit(-1);
-		}
-		float d1 = -1 * (line.dot(o_minus_c)) + inside_sqrt;
-		float d2 = -1 * (line.dot(o_minus_c)) - inside_sqrt;
-		Vector4 P2 = S + line*d1;
-		if(P2 == P) {
-			P2 = S + line*d2;
-		}
-		// now that I have both points, I want the point in the middle of the two
-		Vector4 P_middle{(P.x+P2.x)/2, (P.y+P2.y)/2, (P.z+P2.z)/2, (P.w+P2.w)/2};
-		// normalize to get it in the circumference
-		P_middle = P_middle.normalized();
-		// now get the opposite point in the 4D sphere
-		Vector4 P_definite = P_middle * -1;
-		// calculate the radius of the far clipping plane
-		float farClippingPlaneRadius = acos(P_definite.dot(S));
-		// with the radius, I can get the far clipping plane center
-		// with the origin at S, move radius in the direction of the ship
-		Vector4 direction = S-Vector4(0,0,0,-1);
-		direction = direction.normalized();
-		Vector4 farClippingPlaneCenter = S + direction*farClippingPlaneRadius;
+		Vector4 S = Vector3(0,0,-CamShader::Z_FAR/2).inverse_stereo_proj();
+		Vector4 farClippingPlaneCenter = -((Vector4{0,0,0,1} + S)*0.5).normalized();
+		float farClippingPlaneCosRadius = Vector4(0,0,0,1).dot(farClippingPlaneCenter);
 
+		// multiply the planes by the camera
+		topClippingPlaneCenter = cameraTransform*topClippingPlaneCenter;
+		bottomClippingPlaneCenter = cameraTransform*bottomClippingPlaneCenter;
+		leftClippingPlaneCenter = cameraTransform*leftClippingPlaneCenter;
+		rightClippingPlaneCenter = cameraTransform*rightClippingPlaneCenter;
+		farClippingPlaneCenter = cameraTransform*farClippingPlaneCenter;
 
 
 		// now that we have all the planes, check if each object is inside the fustrum
-		// I though it was supposed to be '<' but this way no objects get caught in the fustrum ???
 		int objsInView = 0;
+		// std::cos(math::pi_2) == 0
 		for(auto &obj: objs) {
-			if(obj->position().dot(topClippingPlaneCenter) 		  > cos(90)
-				&& obj->position().dot(bottomClippingPlaneCenter) > cos(90)
-				&& obj->position().dot(leftClippingPlaneCenter)   > cos(90)
-				&& obj->position().dot(rightClippingPlaneCenter)  > cos(90)
-				// && obj->position().dot(farClippingPlaneCenter) 	  < cos(90)
+			if(obj->position().dot(topClippingPlaneCenter) 		  >= 0
+				&& obj->position().dot(bottomClippingPlaneCenter) >= 0
+				&& obj->position().dot(leftClippingPlaneCenter)   >= 0
+				&& obj->position().dot(rightClippingPlaneCenter)  >= 0
+				&& obj->position().dot(farClippingPlaneCenter) 	  >= farClippingPlaneCosRadius
 			) {
 				obj->isInView = true;
 				objsInView++;
