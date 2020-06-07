@@ -13,6 +13,43 @@
 using namespace std;
 using namespace Options;
 
+namespace {
+
+class SpecsTracker
+{
+public:
+	SpecsTracker(Camera& camera):
+		c(camera)
+	{}
+
+	~SpecsTracker()
+	{
+		shutdown();
+	}
+
+	void maybe_set(DrawSpecs* s)
+	{
+		if(s != active) {
+			shutdown();
+			active = s;
+			if(s) s->setup_draw_state(c);
+		}
+	}
+
+private:
+	void shutdown()
+	{
+		if(active) {
+			active->shutdown_draw_state(c);
+		}
+	}
+
+	Camera& c;
+	DrawSpecs *active = nullptr;
+};
+
+}
+
 void
 Renderer::setup_display()
 {
@@ -46,87 +83,74 @@ Renderer::update(float dt)
 }
 
 void
-Renderer::draw(std::unordered_multimap<DrawSpecs*, std::weak_ptr<Glome::Drawable>>& objs)
+Renderer::draw(ObjSet& objs)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for(active = begin(players); active != end(players); ++active) {
 		active->enable();
 
-		camera.reset(active->transformation());
-
-		//TODO: make meridian an ordinary object
-		//draw_meridians(camera);
-
-		const QRot inv_trans = active->transformation().inverse();
-		const Vector4 cam_pos = inv_trans.position();
-
-		vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
-		vector<std::pair<float, Glome::Drawable*>> transparent_objs;
-
-		DrawSpecs* active_specs = nullptr;
-		for(auto iter = objs.begin(); iter != objs.end();) {
-			auto ptr = iter->second.lock();
-			if(!ptr) {
-				iter = objs.erase(iter);
-				continue;
-			}
-
-			if(ptr->is_transparent()) {
-				float dist = std::acos(cam_pos.dot(ptr->position()))
-					- ptr->get_radius();
-				assert(!std::isnan(dist));
-				transparent_objs.push_back({dist, ptr.get()});
-			} else {
-				if(active_specs != iter->first) {
-					if(active_specs) {
-						active_specs->shutdown_draw_state(camera);
-					}
-					active_specs = iter->first;
-					active_specs->setup_draw_state(camera);
-				}
-				ptr->draw(camera);
-			}
-
-			drawn_objs.emplace_back(std::move(ptr));
-			++iter;
-		}
-
-		std::sort(transparent_objs.begin(), transparent_objs.end(),
-			[] (auto& a, auto& b) {
-				return a.first > b.first;
-			}
-		);
-
-		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
-		Projectile::draw_many(sorted_projs, camera);
-
-		for(auto &pair: transparent_objs) {
-			auto& obj = *pair.second;
-
-			DrawSpecs* obj_ds = &obj.get_draw_specs();
-			if(active_specs != obj_ds) {
-				if(active_specs) {
-					active_specs->shutdown_draw_state(camera);
-				}
-				active_specs = obj_ds;
-				active_specs->setup_draw_state(camera);
-			}
-
-			obj.draw(camera);
-		}
-
-		if(active_specs) {
-			active_specs->shutdown_draw_state(camera);
-			active_specs = nullptr;
-		}
+		auto drawn_objs = draw_objs_in_world(objs);
 
 		DustField::draw(camera);
 
 		MiniMap::draw(active->_x, active->_y, this,
-			inv_trans, drawn_objs
+			active->transformation().inverse(), drawn_objs
 		);
 	}
+}
+
+vector<std::shared_ptr<Glome::Drawable>>
+Renderer::draw_objs_in_world(ObjSet& objs)
+{
+	camera.reset(active->transformation());
+	SpecsTracker specs(camera);
+
+	//draw_meridians(camera);
+
+	const Vector4 cam_pos = active->transformation().inverse().position();
+
+	vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
+	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
+
+	for(auto iter = objs.begin(); iter != objs.end();) {
+		auto ptr = iter->second.lock();
+		if(!ptr) {
+			iter = objs.erase(iter);
+			continue;
+		}
+
+		if(ptr->is_transparent()) {
+			float dist = std::acos(cam_pos.dot(ptr->position()))
+				- ptr->get_radius();
+			assert(!std::isnan(dist));
+			transparent_objs.push_back({dist, ptr.get()});
+		} else {
+			specs.maybe_set(iter->first);
+			ptr->draw(camera);
+		}
+
+		drawn_objs.emplace_back(std::move(ptr));
+		++iter;
+	}
+
+	std::sort(transparent_objs.begin(), transparent_objs.end(),
+		[] (auto& a, auto& b) {
+			return a.first > b.first;
+		}
+	);
+
+	auto sorted_projs = Projectile::cull_sort_from_camera(camera);
+	Projectile::draw_many(sorted_projs, camera);
+
+	for(auto &pair: transparent_objs) {
+		auto& obj = *pair.second;
+
+		specs.maybe_set(&obj.get_draw_specs());
+		obj.draw(camera);
+	}
+
+	return drawn_objs;
 }
 
 void

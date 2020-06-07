@@ -17,10 +17,18 @@
 class Renderer
 {
 public:
+	using ObjSet = std::unordered_multimap<
+		DrawSpecs*,
+		std::weak_ptr<Glome::Drawable>
+	>;
+
 	Renderer(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world);
 
 	void update(float dt);
-	void draw(std::unordered_multimap<DrawSpecs*, std::weak_ptr<Glome::Drawable>>& objs);
+	void draw(ObjSet& objs);
+
+	std::vector<std::shared_ptr<Glome::Drawable>> draw_objs_in_world(ObjSet& objs);
+
 	void setup_display();
 	void fill_minimap(const std::vector<std::shared_ptr<Glome::Drawable>>& objs,
 		Camera& cam);
