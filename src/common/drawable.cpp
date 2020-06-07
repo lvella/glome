@@ -1,6 +1,37 @@
 #include "drawable.hpp"
 
+#include "shader.hpp"
+#include "camera.hpp"
+
 extern GLuint square_vbo;
+
+namespace {
+
+class DefaultDrawSpec final: public DrawSpecs
+{
+public:
+	template<typename Token>
+	DefaultDrawSpec(const Token& token):
+		DrawSpecs(token)
+	{
+		shader.setup_shader({
+			"world/world.vert", "world/modelview.vert",
+			"common/quaternion.vert", "world/world.frag",
+			"world/world_fog.frag", "common/no_texture.frag",
+			"world/fog.frag"
+		});
+	}
+
+	void setup_draw_state(Camera& c)
+	{
+		c.setShader(&shader);
+	}
+
+private:
+	CamShader shader;
+};
+
+}
 
 void Glome::Drawable::minimap_draw(Camera& c)
 {
@@ -15,5 +46,15 @@ void Glome::Drawable::minimap_draw(Camera& c)
 	c.popMat();
 }
 
+bool Glome::Drawable::is_transparent() const
+{
+	return false;
+}
+
 void Glome::NoMapDrawable::minimap_draw(Camera& c)
 {}
+
+DrawSpecs& Glome::Drawable::get_draw_specs() const
+{
+	return DrawSpecs::get_instance<::DefaultDrawSpec>();
+}

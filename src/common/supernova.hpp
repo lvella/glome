@@ -17,19 +17,16 @@ public:
 	void draw(Camera &c) override;
 	void minimap_draw(Camera &c) override;
 
+	DrawSpecs& get_draw_specs() const override;
+
 	void collided_with(const Collidable& other, float) override;
+
+	bool is_transparent() const override;
 
 private:
 	Vector2 slerp;
 
 	// Stuff that should be static:
-	GLuint bg_noise;
-
-	Mesh* mesh;
-	CamShader shader;
-	Uniform slerp_arc;
-	Uniform center;
-
 	Mesh* map_mesh;
 	SpaceShader map_shader;
 	Uniform map_slerp_arc;

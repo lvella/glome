@@ -160,7 +160,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 void Projectile::draw_many(const std::vector < Projectile * >&shots, Camera & c)
 {
 	if (shots.size() != 0) {
-		c.pushShader(&program_bullet);
+		c.setShader(&program_bullet);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glUniform1i(uniform_has_tex, 1);
@@ -178,7 +178,6 @@ void Projectile::draw_many(const std::vector < Projectile * >&shots, Camera & c)
 			i->draw(c);
 
 		glDisableVertexAttribArray(program_bullet.colorAttr());
-		c.popShader();
 	}
 }
 
@@ -206,7 +205,6 @@ void Projectile::draw(Camera & c)
 	c.pushMultQRot(get_t());
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 	c.popMat();
-
 }
 
 void Projectile::update(float dt)

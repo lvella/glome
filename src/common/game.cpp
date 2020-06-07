@@ -71,7 +71,6 @@ initialize()
 	// can be created with the correct perspective
 	// matrix.
 	CamShader::initialize(float(Options::width) / float(Options::height));
-	Renderer::initialize();
 
 	Audio::initialize();
 
@@ -82,7 +81,6 @@ initialize()
 	Projectile::initialize();
 	ParticleSystem::initialize();
 	DustField::initialize();
-	SpaghettiFragment::initialize();
 	//Menu::initialize();
 	initialize_meridians();
 

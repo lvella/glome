@@ -77,7 +77,6 @@ protected:
 	uint16_t *idx;
 	uint16_t count;
 	uint16_t actives_count;
-	GLuint tex_particle;
 };
 
 

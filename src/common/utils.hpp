@@ -15,6 +15,36 @@ public:
 	NonCopyable& operator=(const NonCopyable&) = delete;
 };
 
+class NonMovable {
+public:
+	NonMovable() = default;
+
+	NonMovable(NonMovable&&) = delete;
+	NonMovable& operator=(NonMovable&&) = delete;
+
+	NonMovable(const NonMovable&) = default;
+	NonMovable& operator=(const NonMovable&) = default;
+};
+
+class MandatorySingleton {
+private:
+	class CreationToken: public NonCopyable, public NonMovable {
+		CreationToken() = default;
+		friend MandatorySingleton;
+	};
+
+public:
+	template<class T>
+	static T& get_instance()
+	{
+		static T singleton{CreationToken{}};
+		return singleton;
+	}
+
+protected:
+	MandatorySingleton(const CreationToken&) {}
+};
+
 template<typename T, typename F>
 void remove_if(std::vector<T>& v, F&& func)
 {

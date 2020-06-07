@@ -14,16 +14,6 @@ using namespace std;
 using namespace Options;
 
 void
-Renderer::initialize()
-{
-	shader.setup_shader({
-		"world/world.vert", "world/modelview.vert", "common/quaternion.vert",
-		"world/world.frag", "world/world_fog.frag",
-		"common/no_texture.frag", "world/fog.frag"
-	});
-}
-
-void
 Renderer::setup_display()
 {
 	glEnable(GL_DEPTH_TEST);
@@ -56,7 +46,7 @@ Renderer::update(float dt)
 }
 
 void
-Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
+Renderer::draw(std::unordered_multimap<DrawSpecs*, std::weak_ptr<Glome::Drawable>>& objs)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -64,23 +54,42 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 		active->enable();
 
 		camera.reset(active->transformation());
-		camera.pushShader(&shader);
 
-		draw_meridians(camera);
+		//TODO: make meridian an ordinary object
+		//draw_meridians(camera);
 
 		const QRot inv_trans = active->transformation().inverse();
 		const Vector4 cam_pos = inv_trans.position();
 
+		vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
 		vector<std::pair<float, Glome::Drawable*>> transparent_objs;
-		for(auto& ptr: objs) {
+
+		DrawSpecs* active_specs = nullptr;
+		for(auto iter = objs.begin(); iter != objs.end();) {
+			auto ptr = iter->second.lock();
+			if(!ptr) {
+				iter = objs.erase(iter);
+				continue;
+			}
+
 			if(ptr->is_transparent()) {
 				float dist = std::acos(cam_pos.dot(ptr->position()))
 					- ptr->get_radius();
 				assert(!std::isnan(dist));
 				transparent_objs.push_back({dist, ptr.get()});
 			} else {
+				if(active_specs != iter->first) {
+					if(active_specs) {
+						active_specs->shutdown_draw_state(camera);
+					}
+					active_specs = iter->first;
+					active_specs->setup_draw_state(camera);
+				}
 				ptr->draw(camera);
 			}
+
+			drawn_objs.emplace_back(std::move(ptr));
+			++iter;
 		}
 
 		std::sort(transparent_objs.begin(), transparent_objs.end(),
@@ -93,13 +102,29 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 		Projectile::draw_many(sorted_projs, camera);
 
 		for(auto &pair: transparent_objs) {
-			pair.second->draw(camera);
+			auto& obj = *pair.second;
+
+			DrawSpecs* obj_ds = &obj.get_draw_specs();
+			if(active_specs != obj_ds) {
+				if(active_specs) {
+					active_specs->shutdown_draw_state(camera);
+				}
+				active_specs = obj_ds;
+				active_specs->setup_draw_state(camera);
+			}
+
+			obj.draw(camera);
+		}
+
+		if(active_specs) {
+			active_specs->shutdown_draw_state(camera);
+			active_specs = nullptr;
 		}
 
 		DustField::draw(camera);
 
 		MiniMap::draw(active->_x, active->_y, this,
-			inv_trans, objs
+			inv_trans, drawn_objs
 		);
 	}
 }
@@ -144,7 +169,6 @@ Renderer::Viewport::update(float dt)
 	next.dt -= dt;
 }
 
-CamShader Renderer::shader;
 const QRot Renderer::Viewport::cam_offset(
 	yz_qrot(0.2) *
 	zw_qrot(-0.015) *

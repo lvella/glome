@@ -4,29 +4,60 @@
 #include "textures.hpp"
 #include "supernova.hpp"
 
+namespace {
+
+Mesh* mesh;
+CamShader shader;
+Uniform slerp_arc;
+Uniform center;
+
+class SupernovaSpecs: public DrawSpecs
+{
+public:
+	template<class Token> SupernovaSpecs(const Token& t):
+		DrawSpecs(t)
+	{
+		bg_noise = create_noise_texture(800, 600, 1.0f / 50.0f, Vector2(Random::arc(), Random::arc()) * 20.0f);
+
+		mesh = Mesh::get_mesh(Mesh::ICOSPHERE);
+
+		shader.setup_shader({
+			"world/supernova.vert",
+			"world/modelview.vert",
+			"common/quaternion.vert",
+			"world/supernova.frag",
+			"world/world_fog.frag",
+			"world/fog.frag",
+			"world/noise3D.frag"
+		});
+		slerp_arc = shader.getUniform("slerp_arc");
+		center = shader.getUniform("center");
+		shader.enable();
+		shader.getUniform("texbase").set(0);
+	}
+
+	void setup_draw_state(Camera& c) override
+	{
+		c.setShader(&shader);
+		glBindTexture(GL_TEXTURE_2D, bg_noise);
+	}
+
+	void shutdown_draw_state(Camera&) override
+	{
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+private:
+	GLuint bg_noise;
+};
+
+}
+
 Supernova::Supernova():
 	VolSphere(0.0f),
-	mesh(Mesh::get_mesh(Mesh::ICOSPHERE)),
 	map_mesh(Mesh::get_mesh(Mesh::UVSPHERE))
 {
-	transparent = true;
-
 	// TODO: initialize this stuff only once
-	bg_noise = create_noise_texture(800, 600, 1.0f / 50.0f, Vector2(Random::arc(), Random::arc()) * 20.0f);
-
-	shader.setup_shader({
-		"world/supernova.vert",
-		"world/modelview.vert",
-		"common/quaternion.vert",
-		"world/supernova.frag",
-		"world/world_fog.frag",
-		"world/fog.frag",
-		"world/noise3D.frag"
-	});
-	slerp_arc = shader.getUniform("slerp_arc");
-	center = shader.getUniform("center");
-	shader.enable();
-	shader.getUniform("texbase").set(0);
 
 	map_shader.setup_shader({
 		"minimap/map_supernova.vert",
@@ -56,8 +87,6 @@ bool Supernova::update(float dt, UpdatableAdder&)
 	radius += dt * 0.03;
 	set_radius(radius);
 
-	transparent = radius < math::pi_2;
-
 	slerp[0] = std::sin(radius);
 	slerp[1] = std::cos(radius);
 
@@ -69,8 +98,6 @@ bool Supernova::update(float dt, UpdatableAdder&)
 
 void Supernova::draw(Camera &c)
 {
-	c.pushShader(&shader);
-
 	c.pushMultQRot(get_t());
 
 	{
@@ -94,17 +121,21 @@ void Supernova::draw(Camera &c)
 
 	slerp_arc.set(slerp);
 
-	glBindTexture(GL_TEXTURE_2D, bg_noise);
-
 	mesh->draw(c);
 
 	c.popMat();
-	c.popShader();
+}
+
+DrawSpecs& Supernova::get_draw_specs() const
+{
+	return DrawSpecs::get_instance<SupernovaSpecs>();
 }
 
 void Supernova::minimap_draw(Camera &c)
 {
-	c.pushShader(&map_shader);
+	const SpaceShader* prev = c.getShader();
+
+	c.setShader(&map_shader);
 	c.pushMultQRot(get_t());
 
 	map_slerp_arc.set(slerp);
@@ -112,9 +143,15 @@ void Supernova::minimap_draw(Camera &c)
 	map_mesh->draw(c);
 
 	c.popMat();
-	c.popShader();
+
+	c.setShader(prev);
 }
 
 void Supernova::collided_with(const Collidable& other, float)
 {
+}
+
+bool Supernova::is_transparent() const
+{
+	return get_radius() < math::pi_2;
 }

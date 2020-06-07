@@ -11,9 +11,10 @@ public:
 
 	bool update(float dt, UpdatableAdder&) override;
 	void draw(Camera& c) override;
+	bool is_transparent() const override;
 	void setIntensity(float i);
 
-	static void initialize();
+	DrawSpecs& get_draw_specs() const override;
 
 	// Little hackish: must be called if viewport ever happens to change size.
 	static void set_width(int w);
@@ -25,7 +26,5 @@ private:
 	float speed;
 
 	uint16_t target_count;
-
-	static int width;
 };
 

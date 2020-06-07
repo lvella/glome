@@ -69,7 +69,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 
 	// From now on, use the camera with transform stack to draw objects
 	camera.reset(yz_qrot(math::pi_2) * center);
-	camera.pushShader(&map_projection);
+	camera.setShader(&map_projection);
 
 	// Draw shots
 	glUniform1i(proj_has_tex, 0);
@@ -83,7 +83,6 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 	glBindTexture(GL_TEXTURE_2D, tex_object);
 	rend->fill_minimap(objs, camera);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	camera.popShader();
 }
 
 void

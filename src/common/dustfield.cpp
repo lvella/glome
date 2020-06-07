@@ -67,7 +67,7 @@ static QRot old_cam_transform;
 
 void draw(Camera& cam)
 {
-    cam.pushShader(&program);
+    cam.setShader(&program);
 
     old_transform.set(old_cam_transform);
     old_cam_transform = cam.transformation();
@@ -80,8 +80,6 @@ void draw(Camera& cam)
     glVertexAttribPointer(attrib_endpoint, 1, GL_FLOAT, GL_FALSE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, end));
 
     glDrawArrays(GL_LINES, 0, DUST_SIZE*2);
-
-    cam.popShader();
 }
 
 }

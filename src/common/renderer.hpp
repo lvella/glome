@@ -2,6 +2,7 @@
 
 #include <deque>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "audio_world.hpp"
@@ -16,12 +17,10 @@
 class Renderer
 {
 public:
-	static void initialize();
-
 	Renderer(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world);
 
 	void update(float dt);
-	void draw(std::vector<std::shared_ptr<Glome::Drawable>>&& objs);
+	void draw(std::unordered_multimap<DrawSpecs*, std::weak_ptr<Glome::Drawable>>& objs);
 	void setup_display();
 	void fill_minimap(const std::vector<std::shared_ptr<Glome::Drawable>>& objs,
 		Camera& cam);
@@ -71,8 +70,4 @@ protected:
 
 	std::vector<Viewport>::iterator active;
 	Camera camera;
-
-	static CamShader shader;
-	static GLint shader_uniform_camera;
-	static GLint shader_uniform_projection;
 };

@@ -2,6 +2,7 @@
 
 #include <list>
 #include <memory>
+#include <unordered_map>
 
 #include "renderer.hpp"
 #include "drawable.hpp"
@@ -55,6 +56,6 @@ private:
 
 	std::vector<std::shared_ptr<Updatable>> updatables;
 	std::vector<std::weak_ptr<Collidable>> collidables;
-	std::vector<std::weak_ptr<Glome::Drawable>> drawables;
+	std::unordered_multimap<DrawSpecs*, std::weak_ptr<Glome::Drawable>> drawables;
 };
 

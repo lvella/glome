@@ -4,26 +4,49 @@
 #include <iostream>
 #include "random.hpp"
 
+namespace {
+
 // Same value as in spaghetti_frag.frag:
-static constexpr float BURN_LEN = 0.004;
+constexpr float BURN_LEN = 0.004;
 
-CamShader SpaghettiFragment::shader;
-Uniform SpaghettiFragment::burn_progress_uniform;
-GLint SpaghettiFragment::center_dist_attr;
+CamShader shader;
+Uniform burn_progress_uniform;
+GLint center_dist_attr;
 
-void SpaghettiFragment::initialize()
+class SpaghettiFragmentSpecs: public DrawSpecs
 {
-	shader.setup_shader({
-		"common/quaternion.vert",
-		"world/modelview.vert",
-		"world/spaghetti_frag.vert",
-		"world/world_fog.frag",
-		"world/fog.frag",
-		"world/spaghetti_frag.frag",
-	});
+public:
+	template<class Token> SpaghettiFragmentSpecs(const Token& t):
+		DrawSpecs(t)
+	{
+		shader.setup_shader({
+			"common/quaternion.vert",
+			"world/modelview.vert",
+			"world/spaghetti_frag.vert",
+			"world/world_fog.frag",
+			"world/fog.frag",
+			"world/spaghetti_frag.frag",
+		});
 
-	center_dist_attr = glGetAttribLocation(shader.program(), "center_dist");
-	burn_progress_uniform = shader.getUniform("burn_progress");
+		center_dist_attr = glGetAttribLocation(shader.program(), "center_dist");
+		burn_progress_uniform = shader.getUniform("burn_progress");
+	}
+
+
+	void setup_draw_state(Camera& c) override
+	{
+		c.setShader(&shader);
+		glEnableVertexAttribArray(shader.colorAttr());
+		glEnableVertexAttribArray(center_dist_attr);
+	}
+
+	void shutdown_draw_state(Camera&) override
+	{
+		glDisableVertexAttribArray(shader.colorAttr());
+		glDisableVertexAttribArray(center_dist_attr);
+	}
+};
+
 }
 
 SpaghettiFragment::SpaghettiFragment(const QRot& orig_transformation,
@@ -92,14 +115,11 @@ bool SpaghettiFragment::update(float dt, UpdatableAdder& adder)
 
 void SpaghettiFragment::draw(Camera& c)
 {
-	c.pushShader(&shader);
 	c.pushMultQRot(get_t());
 
 	burn_progress_uniform.set(burn_progress);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glEnableVertexAttribArray(shader.colorAttr());
-	glEnableVertexAttribArray(center_dist_attr);
 
 	glVertexAttribPointer(shader.posAttr(), 4, GL_FLOAT, GL_FALSE,
 		sizeof(Vertex), (GLvoid*) offsetof(Vertex, sv.pos));
@@ -113,10 +133,11 @@ void SpaghettiFragment::draw(Camera& c)
 	glDrawArrays(GL_LINE_STRIP, 0, draw_size);
 
 	c.popMat();
-	c.popShader();
+}
 
-	glDisableVertexAttribArray(shader.colorAttr());
-	glDisableVertexAttribArray(center_dist_attr);
+DrawSpecs& SpaghettiFragment::get_draw_specs() const
+{
+	return DrawSpecs::get_instance<SpaghettiFragmentSpecs>();
 }
 
 // Based on http://ndp.jct.ac.il/tutorials/infitut2/node57.html
