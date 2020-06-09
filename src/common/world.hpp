@@ -52,6 +52,8 @@ protected:
 	std::vector<AiController*> ai_controls;
 
 private:
+	void dynamic_object_match(const std::shared_ptr<Object>& new_obj);
+
 	std::vector<GLsync> threads_sync;
 
 	std::vector<std::shared_ptr<Updatable>> updatables;

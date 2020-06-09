@@ -78,12 +78,13 @@ static Vector4 rand_in_sphere(float &r)
 	return ret;
 }
 
-Fire::Fire(float radius):
+Fire::Fire(ParentRef&& parent, float radius):
 	ParticleSystem(200),
+	SubObject(std::move(parent)),
 	scale_radius(radius),
 	intensity(1.0f)
 {
-	setIntensity(0.0f);
+	set_intensity(0.0f);
 
 	for(int i = 0; i < count; ++i)
 	{
@@ -100,7 +101,7 @@ void Fire::set_width(int w)
 	}
 }
 
-void Fire::setIntensity(float i)
+void Fire::set_intensity(float i)
 {
 	if(i == intensity)
 		return;
@@ -115,7 +116,7 @@ void Fire::setIntensity(float i)
 	set_radius(radius);
 }
 
-bool Fire::update(float dt, UpdatableAdder&)
+void Fire::update(float dt)
 {
 	int new_count = actives_count;
 
@@ -154,13 +155,11 @@ bool Fire::update(float dt, UpdatableAdder&)
 	}
 
 	actives_count = new_count;
-
-	return true;
 }
 
 void Fire::draw(Camera& c)
 {
-	c.pushMultQRot(get_t());
+	c.pushMultQRot(get_world_t());
 
 	depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

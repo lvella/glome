@@ -10,11 +10,13 @@
 #include "fire.hpp"
 #include "rot_dir.hpp"
 
-class Ship : public Updatable, public Glome::Drawable
+class Ship : public SuperObject, public Updatable, public Glome::Drawable
 {
 public:
 	Ship(Mesh::Types type, ShipStats::shared_ptr sstats);
 	~Ship() = default;
+
+	std::vector<std::weak_ptr<SubObject>> create_sub_objects() override;
 
 	virtual void draw(Camera& c) override;
 	virtual bool update(float dt, UpdatableAdder&) override;
@@ -43,11 +45,10 @@ protected:
 	uint16_t nguns;
 
 	// Engine properties
-	Fire fx_engine;
+	std::shared_ptr<Fire> fx_engine;
 	float rel_speed;
 	uint16_t nengines;
 
 	// Shield properties
 	uint16_t life;
 };
-

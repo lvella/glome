@@ -366,7 +366,7 @@ bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		}
 
 		// Create the fragment.
-		adder.add_updatable(std::make_shared<SpaghettiFragment>(
+		adder.add(std::make_shared<SpaghettiFragment>(
 			get_t(), vdata, idata[start], num_segs + 1
 		));
 
@@ -489,7 +489,7 @@ void Spaghetti::explode(UpdatableAdder& adder, const std::vector<uint16_t>& idat
 		if(frag_vcount) {
 			if(idata[idx] == separator) {
 				// End of fragment:
-				adder.add_updatable(std::make_shared<SpaghettiFragment>(
+				adder.add(std::make_shared<SpaghettiFragment>(
 					get_t(), vdata, frag_start, frag_vcount
 				));
 				frag_vcount = 0;
@@ -504,7 +504,7 @@ void Spaghetti::explode(UpdatableAdder& adder, const std::vector<uint16_t>& idat
 		}
 	}
 	if(frag_vcount) {
-		adder.add_updatable(std::make_shared<SpaghettiFragment>(
+		adder.add(std::make_shared<SpaghettiFragment>(
 			get_t(), vdata, frag_start, frag_vcount
 		));
 	}

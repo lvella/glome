@@ -2,6 +2,7 @@
 
 #include "qrot.hpp"
 #include "camera.hpp"
+#include <memory>
 
 class Object
 {
@@ -36,4 +37,3 @@ private:
 	QRot _t;
 	Vector4 pos;
 };
-

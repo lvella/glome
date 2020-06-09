@@ -51,6 +51,7 @@ add_library(common STATIC
 	minimap.hpp
 	object.cpp
 	object.hpp
+	object_adder.hpp
 	octree.cpp
 	octree.hpp
 	options.cpp
@@ -82,6 +83,8 @@ add_library(common STATIC
 	spaghetti.hpp
 	spaghetti_fragment.cpp
 	spaghetti_fragment.hpp
+	sub_object.cpp
+	sub_object.hpp
 	supernova.cpp
 	supernova.hpp
 	textures.cpp

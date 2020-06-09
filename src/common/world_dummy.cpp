@@ -66,7 +66,7 @@ WorldDummy::WorldDummy()
 				);
 
 				for(size_t j = i; j < max; ++j) {
-					adder.add_updatable(
+					adder.add(
 						std::make_shared<Spaghetti>()
 					);
 				}

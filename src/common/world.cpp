@@ -14,18 +14,31 @@ World::World():
 	threads_sync(globalThreadPool.get_num_threads())
 {}
 
-void World::add_updatable(std::shared_ptr<Updatable>&& new_obj)
+void World::dynamic_object_match(const std::shared_ptr<Object>& new_obj)
 {
-	if(auto ptr = std::dynamic_pointer_cast<Collidable>(new_obj); ptr) {
+	if(auto ptr = std::dynamic_pointer_cast<Collidable>(new_obj)) {
 		collidables.emplace_back(ptr);
 	}
 
-	if(auto ptr = std::dynamic_pointer_cast<Glome::Drawable>(new_obj); ptr) {
+	if(auto ptr = std::dynamic_pointer_cast<Glome::Drawable>(new_obj)) {
 		drawables.emplace(&ptr->get_draw_specs(), ptr);
 	}
 
 	Audio::World::try_add_source(new_obj);
 
+	if(auto ptr = std::dynamic_pointer_cast<SuperObject>(new_obj)) {
+		auto subobjs = ptr->create_sub_objects();
+		for(auto& wptr: subobjs) {
+			if(auto sptr = wptr.lock()) {
+				dynamic_object_match(sptr);
+			}
+		}
+	}
+}
+
+void World::add_updatable(std::shared_ptr<Updatable>&& new_obj)
+{
+	dynamic_object_match(new_obj);
 	updatables.emplace_back(std::move(new_obj));
 }
 

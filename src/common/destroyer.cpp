@@ -2,8 +2,7 @@
 #include "destroyer.hpp"
 
 Destroyer::Destroyer():
-	Ship(Mesh::DESTROYER, ShipStats::get()),
-	other_jet(0.0006f)
+	Ship(Mesh::DESTROYER, ShipStats::get())
 {
 	float lala[] = {
 			0.9999993443489075,
@@ -26,23 +25,31 @@ Destroyer::Destroyer():
 
 	Matrix4 lolo;
 	memcpy(&lolo, &lala, sizeof(Matrix4));
-	other_jet.set_t(QRot(lolo));
-	other_jet.setIntensity(1.0f);
+	other_jet->set_t(QRot(lolo));
+	other_jet->set_intensity(1.0f);
+}
+
+std::vector<std::weak_ptr<SubObject>> Destroyer::create_sub_objects()
+{
+	auto ret = Ship::create_sub_objects();
+
+	other_jet = std::make_shared<Fire>(weak_from_this(), 0.0006f);
+	ret.push_back(other_jet);
+
+	return ret;
 }
 
 void Destroyer::draw(Camera &c)
 {
 	c.pushMultQRot(get_t());
 	mesh->draw(c);
-	fx_engine.draw(c);
-	other_jet.draw(c);
 	c.popMat();
 }
 
 bool Destroyer::update(float dt, UpdatableAdder& adder)
 {
 	bool ret = Ship::update(dt, adder);
-	other_jet.update(dt, adder);
+	other_jet->update(dt);
 
 	return ret;
 }

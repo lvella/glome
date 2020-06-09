@@ -3,16 +3,18 @@
 #include "particle_system.hpp"
 #include "updatable.hpp"
 #include "drawable.hpp"
+#include "sub_object.hpp"
 
-class Fire final: public ParticleSystem, public Updatable, public Glome::NoMapDrawable
+class Fire final: public ParticleSystem, public SubObject, public Glome::NoMapDrawable
 {
 public:
-	Fire(float radius);
+	Fire(ParentRef&& parent, float radius);
 
-	bool update(float dt, UpdatableAdder&) override;
 	void draw(Camera& c) override;
 	bool is_transparent() const override;
-	void setIntensity(float i);
+	void set_intensity(float i);
+
+	void update(float dt);
 
 	DrawSpecs& get_draw_specs() const override;
 
