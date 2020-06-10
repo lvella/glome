@@ -2,12 +2,10 @@
 
 #include "gl.hpp"
 #include "math.hpp"
-#include "world.hpp"
 #include "minimap.hpp"
+#include "initialization.hpp"
 
-void
-Meridians::initialize()
-{
+RegisterInitialization Meridians::ini{[] {
   glGenBuffers(1, &vbo);
   float vdata[360*4];
 
@@ -23,7 +21,7 @@ Meridians::initialize()
     }
 
   glBufferData(GL_ARRAY_BUFFER, sizeof(vdata), (GLvoid*)vdata, GL_STATIC_DRAW);
-}
+}};
 
 void
 Meridians::draw(Camera &c)

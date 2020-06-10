@@ -16,7 +16,7 @@ public:
 
 	void update(float dt);
 
-	DrawSpecs& get_draw_specs() const override;
+	DrawSpecsBase& get_draw_specs() const override;
 
 	// Little hackish: must be called if viewport ever happens to change size.
 	static void set_width(int w);

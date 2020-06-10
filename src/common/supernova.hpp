@@ -17,7 +17,7 @@ public:
 	void draw(Camera &c) override;
 	void minimap_draw(Camera &c) override;
 
-	DrawSpecs& get_draw_specs() const override;
+	DrawSpecsBase& get_draw_specs() const override;
 
 	void collided_with(const Collidable& other, float) override;
 

@@ -39,7 +39,6 @@ public:
 	virtual ~ParticleSystem();
 	void depthSort(const QRot &t);
 
-	static void initialize();
 protected:
 	// TODO: Think of some kind of BO pool to share the usage of stream BOs
 	union {

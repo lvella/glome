@@ -12,7 +12,7 @@
 #include "audio.hpp"
 #include "profiling.hpp"
 #include "spaghetti_fragment.hpp"
-#include <limits>
+#include "initialization.hpp"
 
 namespace Game
 {
@@ -60,16 +60,11 @@ initialize()
 	// matrix.
 	CamShader::initialize(float(Options::width) / float(Options::height));
 
-	Audio::initialize();
+	//Menu::initialize();
+
+	initialize_registered();
 
 	world.reset(new WorldDummy());
-
-	MiniMap::initialize();
-	Projectile::initialize();
-	ParticleSystem::initialize();
-	DustField::initialize();
-	Meridians::initialize();
-	//Menu::initialize();
 
 	switch_state(WORLD);
 }

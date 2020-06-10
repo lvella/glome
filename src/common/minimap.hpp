@@ -19,5 +19,4 @@ namespace MiniMap
       const std::vector<std::shared_ptr<Glome::Drawable>>& objs);
   void draw_dot(const Object &obj);
   void update();
-  void initialize();
 }

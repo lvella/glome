@@ -5,17 +5,33 @@
 #include "object.hpp"
 #include "vol_sphere.hpp"
 #include "utils.hpp"
+#include "initialization.hpp"
 
-class DrawSpecs: public MandatorySingleton
+class DrawSpecsBase: public MandatorySingleton
 {
 public:
 	using MandatorySingleton::MandatorySingleton;
 
-	virtual ~DrawSpecs() = default;
+	virtual ~DrawSpecsBase() = default;
 
 	virtual void setup_draw_state(Camera& c) = 0;
 	virtual void shutdown_draw_state(Camera& c) {};
 };
+
+template<class T>
+class DrawSpecs: public DrawSpecsBase
+{
+public:
+	using DrawSpecsBase::DrawSpecsBase;
+
+private:
+	static RegisterInitialization ini;
+};
+
+template<class T>
+RegisterInitialization DrawSpecs<T>::ini {[] {
+	MandatorySingleton::get_instance<T>();
+}};
 
 // TODO: either remove this namespace, or add it to everything else
 namespace Glome
@@ -29,7 +45,7 @@ namespace Glome
 
 		virtual bool is_transparent() const;
 
-		virtual DrawSpecs& get_draw_specs() const;
+		virtual DrawSpecsBase& get_draw_specs() const;
 	};
 
 	class NoMapDrawable: public Drawable

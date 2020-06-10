@@ -3,6 +3,7 @@
 #include "vector4.hpp"
 #include "random.hpp"
 #include "shader.hpp"
+#include "initialization.hpp"
 #include "gl.hpp"
 
 #include "dustfield.hpp"
@@ -34,8 +35,7 @@ static Uniform old_transform;
  * the line the vertex is. */
 GLint attrib_endpoint;
 
-void initialize()
-{
+static RegisterInitialization ini{[] {
 	std::vector<Star> dust(DUST_SIZE);
 
 	for(auto &e: dust)
@@ -61,7 +61,7 @@ void initialize()
 	attrib_endpoint = glGetAttribLocation(program.program(), "endpoint");
 
 	old_transform = program.getUniform("old_transform");
-}
+}};
 
 static QRot old_cam_transform;
 

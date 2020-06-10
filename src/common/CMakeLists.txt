@@ -38,6 +38,8 @@ add_library(common STATIC
 	fire.hpp
 	game.cpp
 	game.hpp
+	initialization.hpp
+	initialization.cpp
 	make_array.hpp
 	math.cpp
 	math.hpp

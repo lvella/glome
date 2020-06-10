@@ -58,6 +58,6 @@ private:
 
 	std::vector<std::shared_ptr<Updatable>> updatables;
 	std::vector<std::weak_ptr<Collidable>> collidables;
-	std::unordered_multimap<DrawSpecs*, std::weak_ptr<Glome::Drawable>> drawables;
+	std::unordered_multimap<DrawSpecsBase*, std::weak_ptr<Glome::Drawable>> drawables;
 };
 

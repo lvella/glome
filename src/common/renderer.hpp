@@ -17,7 +17,7 @@ class Renderer
 {
 public:
 	using ObjSet = std::unordered_multimap<
-		DrawSpecs*,
+		DrawSpecsBase*,
 		std::weak_ptr<Glome::Drawable>
 	>;
 

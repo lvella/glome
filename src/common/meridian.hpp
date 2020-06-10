@@ -8,8 +8,6 @@ class Meridians final:
   public Glome::Drawable
 {
 public:
-	static void initialize();
-
 	Meridians()
 	{
 		set_radius(math::pi);
@@ -21,4 +19,5 @@ public:
 
 private:
 	static GLuint vbo;
+	static class RegisterInitialization ini;
 };

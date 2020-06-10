@@ -29,7 +29,7 @@ public:
 		shutdown();
 	}
 
-	void maybe_set(DrawSpecs* s)
+	void maybe_set(DrawSpecsBase* s)
 	{
 		if(s != active) {
 			shutdown();
@@ -47,7 +47,7 @@ private:
 	}
 
 	Camera& c;
-	DrawSpecs *active = nullptr;
+	DrawSpecsBase *active = nullptr;
 };
 
 }

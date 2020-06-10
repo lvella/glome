@@ -7,6 +7,7 @@
 #include "shader.hpp"
 #include "math.hpp"
 #include "textures.hpp"
+#include "initialization.hpp"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ static std::vector < Vector4 > minimap_buf;
 
 Projectile::SList Projectile::shots;
 
-void Projectile::initialize()
+static RegisterInitialization ini{[]
 {
 	{
 		const float data[] = {
@@ -64,7 +65,7 @@ void Projectile::initialize()
 
 	uniform_has_tex = glGetUniformLocation(
 		program_bullet.program(), "has_tex");
-}
+}};
 
 void Projectile::shot(ShipController * s, const QRot& from, float speed)
 {

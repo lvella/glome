@@ -15,6 +15,8 @@
 #include "textures.hpp"
 #include "minimap.hpp"
 
+#include "initialization.hpp"
+
 static SpaceShader map_projection;
 
 static Shader hud;
@@ -84,9 +86,9 @@ draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
-void
-initialize()
-{
+}
+
+static RegisterInitialization ini{[] {
 	create_circle_texture(256, 0.9, 0, 255, tex_minimap);
 	create_circle_texture(16, 0.8, 0, 255, tex_object);
 
@@ -136,7 +138,7 @@ initialize()
 		"minimap/minimap.frag",
 		"common/luminance_alpha_texture.frag"
 	});
-	proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
+	MiniMap::proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
 
 	hud.setup_shader({
 		"minimap/hud.vert",
@@ -145,6 +147,4 @@ initialize()
 		"common/luminance_alpha_texture.frag"
 	});
 	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
-}
-
-}
+}};

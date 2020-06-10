@@ -11,7 +11,7 @@ CamShader shader;
 Uniform slerp_arc;
 Uniform center;
 
-class SupernovaSpecs: public DrawSpecs
+class SupernovaSpecs: public DrawSpecs<SupernovaSpecs>
 {
 public:
 	template<class Token> SupernovaSpecs(const Token& t):
@@ -124,9 +124,9 @@ void Supernova::draw(Camera &c)
 	mesh->draw(c);
 }
 
-DrawSpecs& Supernova::get_draw_specs() const
+DrawSpecsBase& Supernova::get_draw_specs() const
 {
-	return DrawSpecs::get_instance<SupernovaSpecs>();
+	return DrawSpecsBase::get_instance<SupernovaSpecs>();
 }
 
 void Supernova::minimap_draw(Camera &c)

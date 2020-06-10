@@ -17,7 +17,7 @@ public:
 	bool update(float dt, UpdatableAdder& adder) override;
 	void draw(Camera& c) override;
 
-	DrawSpecs& get_draw_specs() const override;
+	DrawSpecsBase& get_draw_specs() const override;
 
 private:
 	struct Vertex {

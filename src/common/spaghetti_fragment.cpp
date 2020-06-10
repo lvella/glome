@@ -13,7 +13,7 @@ CamShader shader;
 Uniform burn_progress_uniform;
 GLint center_dist_attr;
 
-class SpaghettiFragmentSpecs: public DrawSpecs
+class SpaghettiFragmentSpecs: public DrawSpecs<SpaghettiFragmentSpecs>
 {
 public:
 	template<class Token> SpaghettiFragmentSpecs(const Token& t):
@@ -133,9 +133,9 @@ void SpaghettiFragment::draw(Camera& c)
 	glDrawArrays(GL_LINE_STRIP, 0, draw_size);
 }
 
-DrawSpecs& SpaghettiFragment::get_draw_specs() const
+DrawSpecsBase& SpaghettiFragment::get_draw_specs() const
 {
-	return DrawSpecs::get_instance<SpaghettiFragmentSpecs>();
+	return DrawSpecsBase::get_instance<SpaghettiFragmentSpecs>();
 }
 
 // Based on http://ndp.jct.ac.il/tutorials/infitut2/node57.html

@@ -1,10 +1,10 @@
+#include "fire.hpp"
+
 #include "gl.hpp"
 #include "options.hpp"
 #include "textures.hpp"
 #include "math.hpp"
 #include "random.hpp"
-
-#include "fire.hpp"
 
 namespace {
 
@@ -14,7 +14,7 @@ CamShader program_fire;
 GLint attrib_radius;
 int width = -1;
 
-class FireSpecs final: public DrawSpecs
+class FireSpecs final: public DrawSpecs<FireSpecs>
 {
 public:
 	template<class Token> FireSpecs(const Token& t):
@@ -178,7 +178,7 @@ bool Fire::is_transparent() const
 	return true;
 }
 
-DrawSpecs& Fire::get_draw_specs() const
+DrawSpecsBase& Fire::get_draw_specs() const
 {
-	return DrawSpecs::get_instance<::FireSpecs>();
+	return DrawSpecsBase::get_instance<::FireSpecs>();
 }

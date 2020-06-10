@@ -7,7 +7,7 @@ extern GLuint square_vbo;
 
 namespace {
 
-class DefaultDrawSpec final: public DrawSpecs
+class DefaultDrawSpec final: public DrawSpecs<DefaultDrawSpec>
 {
 public:
 	template<typename Token>
@@ -53,7 +53,7 @@ bool Glome::Drawable::is_transparent() const
 void Glome::NoMapDrawable::minimap_draw(Camera& c)
 {}
 
-DrawSpecs& Glome::Drawable::get_draw_specs() const
+DrawSpecsBase& Glome::Drawable::get_draw_specs() const
 {
-	return DrawSpecs::get_instance<::DefaultDrawSpec>();
+	return DrawSpecsBase::get_instance<::DefaultDrawSpec>();
 }
