@@ -106,8 +106,6 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	Camera camera(active->transformation());
 	SpecsTracker specs(camera);
 
-	//draw_meridians(camera);
-
 	const Vector4 cam_pos = active->transformation().inverse().position();
 
 	vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
