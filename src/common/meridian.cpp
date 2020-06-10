@@ -3,11 +3,10 @@
 #include "gl.hpp"
 #include "math.hpp"
 #include "world.hpp"
-
-static GLuint vbo;
+#include "minimap.hpp"
 
 void
-initialize_meridians()
+Meridians::initialize()
 {
   glGenBuffers(1, &vbo);
   float vdata[360*4];
@@ -27,15 +26,18 @@ initialize_meridians()
 }
 
 void
-draw_meridians(Camera &c)
+Meridians::draw(Camera &c)
 {
 	const Shader *s = c.getShader();
+
+	glDisableVertexAttribArray(s->colorAttr());
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
+	c.setQRot(QRot::IDENTITY());
 	glVertexAttrib4f(s->colorAttr(), 1.0f, 1.0f, 0.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
 
@@ -63,4 +65,15 @@ draw_meridians(Camera &c)
 	c.setQRot(t);
 	glVertexAttrib4f(s->colorAttr(), .0f, 1.0f, 0.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
+
+	glEnableVertexAttribArray(s->colorAttr());
 }
+
+void
+Meridians::minimap_draw(Camera& c)
+{
+	glUniform1i(MiniMap::proj_has_tex, 0);
+	draw(c);
+}
+
+GLuint Meridians::vbo;

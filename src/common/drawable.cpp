@@ -25,6 +25,7 @@ public:
 	void setup_draw_state(Camera& c)
 	{
 		c.setShader(&shader);
+		glEnableVertexAttribArray(shader.colorAttr());
 	}
 
 private:

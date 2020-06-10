@@ -17,7 +17,7 @@ class Spaghetti final:
 public:
   Spaghetti();
 
-  void draw(Camera& s) override;
+  void draw(Camera& c) override;
   bool update(float dt, UpdatableAdder& adder) override;
 
   void collided_with(const Collidable& other, float) override;

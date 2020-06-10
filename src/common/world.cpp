@@ -14,7 +14,7 @@ World::World():
 	threads_sync(globalThreadPool.get_num_threads())
 {}
 
-void World::dynamic_object_match(const std::shared_ptr<Object>& new_obj)
+void World::add_unmanaged(const std::shared_ptr<Object>& new_obj)
 {
 	if(auto ptr = std::dynamic_pointer_cast<Collidable>(new_obj)) {
 		collidables.emplace_back(ptr);
@@ -30,7 +30,7 @@ void World::dynamic_object_match(const std::shared_ptr<Object>& new_obj)
 		auto subobjs = ptr->create_sub_objects();
 		for(auto& wptr: subobjs) {
 			if(auto sptr = wptr.lock()) {
-				dynamic_object_match(sptr);
+				add_unmanaged(sptr);
 			}
 		}
 	}
@@ -38,7 +38,7 @@ void World::dynamic_object_match(const std::shared_ptr<Object>& new_obj)
 
 void World::add_updatable(std::shared_ptr<Updatable>&& new_obj)
 {
-	dynamic_object_match(new_obj);
+	add_unmanaged(new_obj);
 	updatables.emplace_back(std::move(new_obj));
 }
 

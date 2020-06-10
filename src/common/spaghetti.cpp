@@ -181,7 +181,6 @@ void Spaghetti::draw(Camera& c)
 	c.setQRot(get_t());
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glEnableVertexAttribArray(s.colorAttr());
 
 	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE,
 		sizeof(Vertex), (GLvoid*) offsetof(Vertex, pos));

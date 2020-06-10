@@ -44,6 +44,7 @@ protected:
 	};
 
 	void add_updatable(std::shared_ptr<Updatable>&& new_obj);
+	void add_unmanaged(const std::shared_ptr<Object>& new_obj);
 
 	Octree::Hypercube collision_tree;
 
@@ -52,7 +53,6 @@ protected:
 	std::vector<AiController*> ai_controls;
 
 private:
-	void dynamic_object_match(const std::shared_ptr<Object>& new_obj);
 
 	std::vector<GLsync> threads_sync;
 

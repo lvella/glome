@@ -81,8 +81,8 @@ initialize()
 	Projectile::initialize();
 	ParticleSystem::initialize();
 	DustField::initialize();
+	Meridians::initialize();
 	//Menu::initialize();
-	initialize_meridians();
 
 	switch_state(WORLD);
 }

@@ -22,14 +22,17 @@ static Shader hud;
 static GLuint tex_minimap;
 static GLuint tex_object;
 
-static GLint proj_has_tex;
 static GLint hud_has_tex;
 
 // TODO: Ugly! Encapsulate this!
 GLuint square_vbo;
 
+namespace MiniMap {
+
+GLint proj_has_tex;
+
 void
-MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
+draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 	const std::vector<std::shared_ptr<Glome::Drawable>>& objs)
 {
 	const int b = 10;
@@ -74,9 +77,6 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 	glUniform1i(proj_has_tex, 0);
 	Projectile::draw_in_minimap();
 
-	// Draw meridians
-	draw_meridians(camera);
-
 	// Draw map objects
 	glUniform1i(proj_has_tex, 1);
 	glBindTexture(GL_TEXTURE_2D, tex_object);
@@ -85,7 +85,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 }
 
 void
-MiniMap::initialize()
+initialize()
 {
 	create_circle_texture(256, 0.9, 0, 255, tex_minimap);
 	create_circle_texture(16, 0.8, 0, 255, tex_object);
@@ -145,4 +145,6 @@ MiniMap::initialize()
 		"common/luminance_alpha_texture.frag"
 	});
 	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
+}
+
 }
