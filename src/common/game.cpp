@@ -16,22 +16,10 @@
 
 namespace Game
 {
+
 RunContext* context;
 
-
-class Paused final: public RunContext {
-	void setup_display() override
-	{}
-
-	void draw() override
-	{}
-
-	void update(float) override
-	{}
-};
-
 static std::unique_ptr<World> world;
-static std::unique_ptr<Paused> paused;
 
 void
 frame(std::chrono::duration<float> frame_time)
@@ -76,7 +64,6 @@ initialize()
 	Audio::initialize();
 
 	world.reset(new WorldDummy());
-	paused.reset(new Paused());
 
 	MiniMap::initialize();
 	Projectile::initialize();
@@ -99,11 +86,8 @@ void switch_state(state s)
 {
 	switch(s)
 	{
-	case EXIT:
-		//running = true;
-		break;
 	case MENU:
-		context = paused.get();
+		//context = menu.get();
 		break;
 	case WORLD:
 		context = world.get();
