@@ -141,7 +141,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 	to_sort.reserve(shots.size());
 
 	for(auto & shot: shots) {
-		Vector4 pos = cam.transformation() * shot.position();
+		Vector4 pos = cam.getBaseTransformation() * shot.position();
 		if (pos[2] <= 0) {
 			to_sort.emplace_back(&shot, pos.squared_length());
 		}
@@ -202,9 +202,8 @@ Projectile::Projectile(ShipController * s, const QRot& from, float speed):
 
 void Projectile::draw(Camera & c)
 {
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	c.popMat();
 }
 
 void Projectile::update(float dt)

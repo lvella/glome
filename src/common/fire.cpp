@@ -159,9 +159,8 @@ void Fire::update(float dt)
 
 void Fire::draw(Camera& c)
 {
-	c.pushMultQRot(get_world_t());
+	depthSort(c.setQRot(get_world_t()));
 
-	depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(uint16_t) * actives_count, idx);
 
@@ -172,8 +171,6 @@ void Fire::draw(Camera& c)
 	glVertexAttribPointer(program_fire.colorAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(sizeof(Vector4)));
 	glVertexAttribPointer(attrib_radius, 1, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(2*sizeof(Vector4)));
 	glDrawElements(GL_POINTS, actives_count, GL_UNSIGNED_SHORT, 0);
-
-	c.popMat();
 }
 
 bool Fire::is_transparent() const

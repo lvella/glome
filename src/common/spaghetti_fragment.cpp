@@ -115,7 +115,7 @@ bool SpaghettiFragment::update(float dt, UpdatableAdder& adder)
 
 void SpaghettiFragment::draw(Camera& c)
 {
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 
 	burn_progress_uniform.set(burn_progress);
 
@@ -131,8 +131,6 @@ void SpaghettiFragment::draw(Camera& c)
 		sizeof(Vertex), (GLvoid*) offsetof(Vertex, length));
 
 	glDrawArrays(GL_LINE_STRIP, 0, draw_size);
-
-	c.popMat();
 }
 
 DrawSpecs& SpaghettiFragment::get_draw_specs() const

@@ -15,7 +15,6 @@
 #include "textures.hpp"
 #include "minimap.hpp"
 
-static Camera camera;
 static SpaceShader map_projection;
 
 static Shader hud;
@@ -68,7 +67,7 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	// From now on, use the camera with transform stack to draw objects
-	camera.reset(yz_qrot(math::pi_2) * center);
+	Camera camera(yz_qrot(math::pi_2) * center);
 	camera.setShader(&map_projection);
 
 	// Draw shots

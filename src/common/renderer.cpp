@@ -1,3 +1,8 @@
+#include "renderer.hpp"
+
+#include <algorithm>
+#include <memory>
+
 #include "drawable.hpp"
 #include "options.hpp"
 #include "meridian.hpp"
@@ -5,10 +10,7 @@
 #include "projectile.hpp"
 #include "fire.hpp"
 #include "dustfield.hpp"
-
-#include "renderer.hpp"
-#include <algorithm>
-#include <memory>
+#include "camera.hpp"
 
 using namespace std;
 using namespace Options;
@@ -92,8 +94,6 @@ Renderer::draw(ObjSet& objs)
 
 		auto drawn_objs = draw_objs_in_world(objs);
 
-		DustField::draw(camera);
-
 		MiniMap::draw(active->_x, active->_y, this,
 			active->transformation().inverse(), drawn_objs
 		);
@@ -103,7 +103,7 @@ Renderer::draw(ObjSet& objs)
 vector<std::shared_ptr<Glome::Drawable>>
 Renderer::draw_objs_in_world(ObjSet& objs)
 {
-	camera.reset(active->transformation());
+	Camera camera(active->transformation());
 	SpecsTracker specs(camera);
 
 	//draw_meridians(camera);
@@ -149,6 +149,8 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 		specs.maybe_set(&obj.get_draw_specs());
 		obj.draw(camera);
 	}
+
+	DustField::draw(camera);
 
 	return drawn_objs;
 }

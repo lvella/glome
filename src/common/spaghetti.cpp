@@ -178,7 +178,7 @@ Spaghetti::Spaghetti():
 void Spaghetti::draw(Camera& c)
 {
 	auto &s = *c.getShader();
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glEnableVertexAttribArray(s.colorAttr());
@@ -195,8 +195,6 @@ void Spaghetti::draw(Camera& c)
 	} else {
 		glDrawArrays(GL_LINE_STRIP, 0, count);
 	}
-
-	c.popMat();
 }
 
 bool Spaghetti::update(float dt, UpdatableAdder& adder)

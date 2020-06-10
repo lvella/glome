@@ -41,9 +41,8 @@ std::vector<std::weak_ptr<SubObject>> Destroyer::create_sub_objects()
 
 void Destroyer::draw(Camera &c)
 {
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 	mesh->draw(c);
-	c.popMat();
 }
 
 bool Destroyer::update(float dt, UpdatableAdder& adder)

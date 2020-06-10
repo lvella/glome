@@ -8,21 +8,19 @@
 class Camera
 {
 public:
-	Camera();
+	Camera(const QRot& invCam);
 
-	void reset(const QRot& invCam);
-
-	void pushMultQRot(const QRot& t);
-	void popMat();
+	QRot setQRot(const QRot& t);
 
 	void setShader(const SpaceShader *s);
 	const SpaceShader* getShader() const;
 
-	const QRot& transformation() const {
-		return qrot_stack.back();
+	const QRot& getBaseTransformation() const
+	{
+		return base_trans;
 	}
 
 private:
 	const SpaceShader* shader = nullptr;
-	std::vector<QRot> qrot_stack;
+	const QRot& base_trans;
 };

@@ -120,9 +120,8 @@ Ship::load_engines(Mesh::Types type)
 void
 Ship::draw(Camera& c)
 {
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 	mesh->draw(c);
-	c.popMat();
 }
 
 bool

@@ -98,12 +98,12 @@ bool Supernova::update(float dt, UpdatableAdder&)
 
 void Supernova::draw(Camera &c)
 {
-	c.pushMultQRot(get_t());
-
 	{
+		const QRot trans = c.setQRot(get_t());
+
 		// Calculate the center of the projected sphere, to use in the yellow gloom effect.
 		// TODO: For a better effect, increase the LOD if the player gets close enough.
-		Vector4 pos = c.transformation().position();
+		const Vector4 pos = trans.position();
 		const float radius = get_radius();
 		float center_angle = acosf(pos.w);
 		float p1d = sinf(center_angle + radius) / (1.0f - cosf(center_angle + radius));
@@ -122,8 +122,6 @@ void Supernova::draw(Camera &c)
 	slerp_arc.set(slerp);
 
 	mesh->draw(c);
-
-	c.popMat();
 }
 
 DrawSpecs& Supernova::get_draw_specs() const
@@ -136,13 +134,11 @@ void Supernova::minimap_draw(Camera &c)
 	const SpaceShader* prev = c.getShader();
 
 	c.setShader(&map_shader);
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 
 	map_slerp_arc.set(slerp);
 	glVertexAttrib3f(map_shader.colorAttr(), 1.0f, 1.0f, 1.0f);
 	map_mesh->draw(c);
-
-	c.popMat();
 
 	c.setShader(prev);
 }

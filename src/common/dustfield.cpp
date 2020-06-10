@@ -70,7 +70,7 @@ void draw(Camera& cam)
     cam.setShader(&program);
 
     old_transform.set(old_cam_transform);
-    old_cam_transform = cam.transformation();
+    old_cam_transform = cam.getBaseTransformation();
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

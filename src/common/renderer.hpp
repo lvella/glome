@@ -7,7 +7,6 @@
 
 #include "audio_world.hpp"
 #include "audio_listener.hpp"
-#include "camera.hpp"
 #include "drawable.hpp"
 #include "shader.hpp"
 #include "qrot.hpp"
@@ -77,5 +76,4 @@ protected:
 	std::vector<Viewport> players;
 
 	std::vector<Viewport>::iterator active;
-	Camera camera;
 };
