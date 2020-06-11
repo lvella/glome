@@ -1,9 +1,14 @@
 #pragma once
 
+#include <random>
 #include "vector4.hpp"
 
 namespace Random
 {
+
+using Generator = std::mt19937;
+extern Generator gen;
+
 // Integer range [a, b]
 int range(int a, int b);
 

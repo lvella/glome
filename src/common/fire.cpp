@@ -26,6 +26,8 @@ Fire::Fire(float radius):
 	scale_radius(radius),
 	intensity(1.0f)
 {
+	transparent = true;
+
 	setIntensity(0.0f);
 
 	create_circle_texture(64, 0.1, 0, 255, tex_particle, true);
@@ -158,6 +160,3 @@ void Fire::draw(Camera& c)
 	glDisableVertexAttribArray(program_fire.colorAttr());
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
-
-void Fire::minimap_draw(Camera& c)
-{}

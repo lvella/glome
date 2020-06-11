@@ -11,6 +11,8 @@
 #include "dustfield.hpp"
 #include "audio.hpp"
 #include "profiling.hpp"
+#include "spaghetti_fragment.hpp"
+#include <limits>
 
 namespace Game
 {
@@ -49,6 +51,11 @@ void
 initialize()
 {
 	// OpenGL nonchanging settings
+	GLuint VertexArrayID;
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+	glEnableVertexAttribArray(0);
+
 	glEnableVertexAttribArray(0);
 	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
 	glClearDepth(1.0f);
@@ -57,10 +64,8 @@ initialize()
 
 	glLineWidth(1.5f);
 
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
-	glEnableVertexAttribArray(0);
+	glEnable(GL_PRIMITIVE_RESTART);
+	glPrimitiveRestartIndex(std::numeric_limits<uint16_t>::max());
 
 	// Must be the first to initialize, so shaders
 	// can be created with the correct perspective
@@ -77,6 +82,7 @@ initialize()
 	Projectile::initialize();
 	ParticleSystem::initialize();
 	DustField::initialize();
+	SpaghettiFragment::initialize();
 	//Menu::initialize();
 	initialize_meridians();
 

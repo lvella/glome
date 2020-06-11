@@ -67,6 +67,7 @@ add_library(common STATIC
 	random.hpp
 	renderer.cpp
 	renderer.hpp
+	rot_dir.hpp
 	shader.cpp
 	shader.hpp
 	ship.cpp
@@ -79,6 +80,8 @@ add_library(common STATIC
 	simplexnoise1234.hpp
 	spaghetti.cpp
 	spaghetti.hpp
+	spaghetti_fragment.cpp
+	spaghetti_fragment.hpp
 	supernova.cpp
 	supernova.hpp
 	textures.cpp

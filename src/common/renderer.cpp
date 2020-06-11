@@ -9,6 +9,7 @@
 #include "vector4.hpp"
 
 #include <algorithm>
+#include <memory>
 
 using namespace std;
 using namespace Options;
@@ -59,7 +60,7 @@ Renderer::update(float dt)
 }
 
 void
-Renderer::draw(vector<Glome::Drawable*>&& objs)
+Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -69,28 +70,36 @@ Renderer::draw(vector<Glome::Drawable*>&& objs)
 		camera.reset(active->transformation());
 		camera.pushShader(&shader);
 
+		draw_meridians(camera);
+
 		const QRot inv_trans = active->transformation().inverse();
 		const Vector4 cam_pos = inv_trans.position();
 
 		// HDX
 		// createViewingFustrum(objs, inv_trans);
 
-		vector<std::pair<float, Glome::Drawable*>> sorted;
-		sorted.reserve(objs.size());
-		for(Glome::Drawable* ptr: objs) {
-			float dist = std::acos(cam_pos.dot(ptr->position()))
-				- ptr->get_radius();
-			sorted.push_back({dist, ptr});
+		vector<std::pair<float, Glome::Drawable*>> transparent_objs;
+		for(auto& ptr: objs) {
+			if(ptr->is_transparent()) {
+				float dist = std::acos(cam_pos.dot(ptr->position()))
+					- ptr->get_radius();
+				assert(!std::isnan(dist));
+				transparent_objs.push_back({dist, ptr.get()});
+			} else {
+				ptr->draw(camera);
+			}
 		}
-		std::sort(sorted.begin(), sorted.end(), [] (auto& a, auto& b) {
-			return a.first > b.first;
-		});
+
+		std::sort(transparent_objs.begin(), transparent_objs.end(),
+			[] (auto& a, auto& b) {
+				return a.first > b.first;
+			}
+		);
 
 		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
+		Projectile::draw_many(sorted_projs, camera);
 
-		draw_meridians(camera);
-
-		for(auto &pair: sorted) {
+		for(auto &pair: transparent_objs) {
 			//TODO: not taking into account multiplayer (HDX)
 			// #ifdef FUSTRUM_CULLING
 			// 	if (pair.second->isInView)
@@ -103,7 +112,6 @@ Renderer::draw(vector<Glome::Drawable*>&& objs)
 				pair.second->draw(camera);
 		}
 
-		Projectile::draw_many(sorted_projs, camera);
 		DustField::draw(camera);
 
 		MiniMap::draw(active->_x, active->_y, this,
@@ -113,14 +121,14 @@ Renderer::draw(vector<Glome::Drawable*>&& objs)
 }
 
 void
-Renderer::fill_minimap(const vector<Glome::Drawable*>& objs, Camera &cam)
+Renderer::fill_minimap(const vector<std::shared_ptr<Glome::Drawable>>& objs, Camera &cam)
 {
 	std::shared_ptr<Glome::Drawable> curr = active->t.lock();
 
 	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
 	// Probably so insignificant it is not worth the effort.
 	for(auto &obj: objs) {
-		if(obj != curr.get())
+		if(obj != curr)
 			obj->minimap_draw(cam);
 	}
 }

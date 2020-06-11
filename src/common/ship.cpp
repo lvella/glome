@@ -29,6 +29,9 @@ Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
 		fx_engine(0.001f),
 		stats(std::move(sstats))
 {
+	// Not the ship itself, but the fire.
+	transparent = true;
+
 	mesh = Mesh::get_mesh(type);
 	set_radius(mesh->get_radius());
 
@@ -199,9 +202,7 @@ Ship::update(float dt, UpdatableAdder& adder)
 		mul_t(zw_qrot(dt * ctrl->speed) * yw_qrot(dt * ctrl->speed_v)
 			* xw_qrot(dt * ctrl->speed_h)
 			* xy_qrot(dt * ctrl->speed_s) * yz_qrot(dt * ctrl->v_tilt)
-			* qrotation(-dt * ctrl->h_tilt,
-				Vector3(0.0, math::sqrt1_2, math::sqrt1_2)
-			)
+			* turn(-dt * ctrl->h_tilt)
 		);
 
 		fx_engine.setIntensity(std::max(0.0f, rel_speed));

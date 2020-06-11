@@ -31,7 +31,7 @@ GLuint square_vbo;
 
 void
 MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
-	const std::vector<Glome::Drawable*>& objs)
+	const std::vector<std::shared_ptr<Glome::Drawable>>& objs)
 {
 	const int b = 10;
 	const int l = 10;

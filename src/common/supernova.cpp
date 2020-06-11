@@ -9,6 +9,8 @@ Supernova::Supernova():
 	mesh(Mesh::get_mesh(Mesh::ICOSPHERE)),
 	map_mesh(Mesh::get_mesh(Mesh::UVSPHERE))
 {
+	transparent = true;
+
 	// TODO: initialize this stuff only once
 	bg_noise = create_noise_texture(800, 600, 1.0f / 50.0f, Vector2(Random::arc(), Random::arc()) * 20.0f);
 
@@ -52,10 +54,12 @@ bool Supernova::update(float dt, UpdatableAdder&)
 	// collapsed at opposite pole.
 	float radius = get_radius();
 	radius += dt * 0.03;
+	set_radius(radius);
+
+	transparent = radius < math::pi_2;
 
 	slerp[0] = std::sin(radius);
 	slerp[1] = std::cos(radius);
-	set_radius(radius);
 
 	// Spin
 	mul_t(xy_qrot(slerp[1] * dt * 0.4));

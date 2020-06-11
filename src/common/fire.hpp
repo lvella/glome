@@ -4,14 +4,13 @@
 #include "updatable.hpp"
 #include "drawable.hpp"
 
-class Fire final: public ParticleSystem, public Updatable, public Glome::Drawable
+class Fire final: public ParticleSystem, public Updatable, public Glome::NoMapDrawable
 {
 public:
 	Fire(float radius);
 
 	bool update(float dt, UpdatableAdder&) override;
 	void draw(Camera& c) override;
-	void minimap_draw(Camera& c) override;
 	void setIntensity(float i);
 
 	static void initialize();

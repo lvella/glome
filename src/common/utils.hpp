@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <memory>
+#include <algorithm>
 
 class NonCopyable {
 public:
@@ -17,23 +18,8 @@ public:
 template<typename T, typename F>
 void remove_if(std::vector<T>& v, F&& func)
 {
-	auto curr = v.begin();
-	auto last_empty = v.begin();
-	auto end = v.end();
-	while(curr != end) {
-		if(!func(*curr)) {
-			if(curr != last_empty) {
-				*last_empty = std::move(*curr);
-			}
-			++last_empty;
-		}
-
-		++curr;
-	}
-
-	if(last_empty != curr) {
-		v.resize(last_empty - v.begin());
-	}
+	auto new_end = std::remove_if(v.begin(), v.end(), std::move(func));
+	v.erase(new_end, v.end());
 }
 
 template<typename T, typename F>
