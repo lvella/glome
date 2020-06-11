@@ -46,7 +46,7 @@ Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_wo
 	Fire::set_width(w);
 
 	QRot inv_trans = players[0].transformation().inverse();
-	fustrum = Fustrum{inv_trans};
+	fustrum.configure(inv_trans);
 }
 
 void

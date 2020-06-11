@@ -1,6 +1,6 @@
 #include "fustrum.hpp"
 
-Fustrum::Fustrum(QRot& cameraTransform) {
+void Fustrum::configure(const QRot& cameraTransform) {
 
     // the centers of the 5 planes/circles are 90º from the player/ship
     top_wall_center = Vector4(0,-1,0,0);
