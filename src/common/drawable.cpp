@@ -14,3 +14,6 @@ void Glome::Drawable::minimap_draw(Camera& c)
 
 	c.popMat();
 }
+
+void Glome::NoMapDrawable::minimap_draw(Camera& c)
+{}

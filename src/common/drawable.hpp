@@ -14,6 +14,20 @@ namespace Glome
 		virtual ~Drawable() {};
 		virtual void draw(Camera& c) = 0;
 		virtual void minimap_draw(Camera& c);
-		bool isInView = false;
+
+		bool is_transparent() const
+		{
+			return transparent;
+		}
+
+	protected:
+		bool transparent = false;
+	};
+
+	class NoMapDrawable: public Drawable
+	{
+	public:
+		virtual ~NoMapDrawable() {};
+		void minimap_draw(Camera& c) override final;
 	};
 }

@@ -4,6 +4,7 @@
 
 #include "matrix4.hpp"
 #include "vector3.hpp"
+#include "rot_dir.hpp"
 #include "qrot.hpp"
 
 // Mathematical constants and variations
@@ -20,6 +21,15 @@ Matrix4 perspective(float fovy, float aspect, float zNear, float zFar);
 // Rotations around a 3-D axis from the origin point
 QRot qrotation(float angle, Vector3 axis);
 
+// Rotations around a 3-D axis from the origin point
+constexpr RotDir qrotation(Vector3 axis)
+{
+	return RotDir(
+		Vector3(axis.z, -axis.y, axis.x),
+		Vector3(axis.z, -axis.y, -axis.x)
+	);
+}
+
 // "3-D Rotations" from the origin point
 QRot xy_qrot(float angle);
 QRot xz_qrot(float angle);
@@ -29,20 +39,6 @@ QRot yz_qrot(float angle);
 QRot xw_qrot(float angle);
 QRot zw_qrot(float angle);
 QRot yw_qrot(float angle);
-
-// These two are almost like glRotate, but in
-// radians, and the vector must be normalized.
-Matrix4 rotation(float angle, float x, float y, float z);
-
-// "3-D Rotations" from viewpoint
-Matrix4 xy_matrix(float angle);
-Matrix4 xz_matrix(float angle);
-Matrix4 yz_matrix(float angle);
-
-// "Translations" from viewpoint
-Matrix4 xw_matrix(float angle);
-Matrix4 zw_matrix(float angle);
-Matrix4 yw_matrix(float angle);
 
 /** Normalized linear interpolation.
  *
@@ -68,6 +64,13 @@ V rotate_unit_vec_towards(const V& from, const V& to, float angle)
 	// a and b forms an orthonormal basis, so just rotate a in direction of b
 	return a * std::cos(angle) + b * std::sin(angle);
 }
+
+/** Calculates the smallest rotation QRot from one unit vector to another.
+ *
+ * Based on:
+ * https://math.stackexchange.com/questions/3682934/how-to-get-the-left-and-right-rotation-quaternions-between-two-mathbbr4-un
+ */
+QRot rotation_between_unit_vecs(const Vector4& from, const Vector4& to);
 
 // Generic vector stuff
 template <class T>

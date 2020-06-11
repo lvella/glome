@@ -96,74 +96,10 @@ Vector4 nlerp(const Vector4& a, const Vector4& b, float t)
 	return (a + (b - a) * t).normalized();
 }
 
-Matrix4
-xy_matrix(float angle) {
-	const float c = std::cos(angle);
-	const float s = std::sin(angle);
-	return Matrix4(
-		c, -s, 0, 0,
-		s, c, 0, 0,
-		0, 0, 1, 0,
-		0, 0, 0, 1
-	);
-}
-
-Matrix4
-xz_matrix(float angle) {
-	const float c = std::cos(angle);
-	const float s = std::sin(angle);
-	return Matrix4(
-		c, 0, -s, 0,
-		0, 1, 0, 0,
-		s, 0, c, 0,
-		0, 0, 0, 1
-	);
-}
-
-Matrix4
-yz_matrix(float angle) {
-	const float c = std::cos(angle);
-	const float s = std::sin(angle);
-	return Matrix4(
-		1, 0, 0, 0,
-		0, c, -s, 0,
-		0, s, c, 0,
-		0, 0, 0, 1
-	);
-}
-
-Matrix4
-xw_matrix(float angle) {
-	const float c = std::cos(angle);
-	const float s = std::sin(angle);
-	return Matrix4(
-		c, 0, 0, -s,
-		0, 1, 0, 0,
-		0, 0, 1, 0,
-		s, 0, 0, c
-	);
-}
-
-Matrix4
-zw_matrix(float angle) {
-	const float c = std::cos(angle);
-	const float s = std::sin(angle);
-	return Matrix4(
-		1,0,0,0,
-		0,1,0,0,
-		0,0,c,-s,
-		0,0,s,c
-	);
-}
-
-Matrix4
-yw_matrix(float angle) {
-	const float c = std::cos(angle);
-	const float s = std::sin(angle);
-	return Matrix4(
-		1,0,0,0,
-		0,c,0,-s,
-		0,0,1,0,
-		0,s,0,c
+QRot rotation_between_unit_vecs(const Vector4& from, const Vector4& to)
+{
+	return QRot(
+		(to * from.conjugate()).sqrt(),
+		(from.conjugate() * to).sqrt()
 	);
 }
