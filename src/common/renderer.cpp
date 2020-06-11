@@ -44,6 +44,9 @@ Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_wo
 	}
 
 	Fire::set_width(w);
+
+	QRot inv_trans = players[0].transformation().inverse();
+	fustrum = Fustrum{inv_trans};
 }
 
 void
@@ -70,7 +73,7 @@ Renderer::draw(vector<Glome::Drawable*>&& objs)
 		const Vector4 cam_pos = inv_trans.position();
 
 		// HDX
-		createViewingFustrum(objs, inv_trans);
+		// createViewingFustrum(objs, inv_trans);
 
 		vector<std::pair<float, Glome::Drawable*>> sorted;
 		sorted.reserve(objs.size());
@@ -89,13 +92,15 @@ Renderer::draw(vector<Glome::Drawable*>&& objs)
 
 		for(auto &pair: sorted) {
 			//TODO: not taking into account multiplayer (HDX)
-			#ifdef FUSTRUM_CULLING
-				if (pair.second->isInView)
-					pair.second->draw(camera);
-			#else
-				pair->second->draw(camera);
-				objsInView++;
-			#endif
+			// #ifdef FUSTRUM_CULLING
+			// 	if (pair.second->isInView)
+			// 		pair.second->draw(camera);
+			// #else
+			// 	pair->second->draw(camera);
+			// 	objsInView++;
+			// #endif
+			if(fustrum.isIn(pair.second))
+				pair.second->draw(camera);
 		}
 
 		Projectile::draw_many(sorted_projs, camera);
@@ -155,86 +160,75 @@ const QRot Renderer::Viewport::cam_offset(
 );
 
 
-void Renderer::createViewingFustrum(const vector<Glome::Drawable*>& objs, const QRot& cameraTransform) {
+// void Renderer::createViewingFustrum(const struct Fustrum &fustrum, const vector<Glome::Drawable*>& objs, const QRot& cameraTransform) {
 
-	printf("alooo");
-	
-	#ifdef FUSTRUM_CULLING
-		#warning "Fustrum Culling is ON"
-		// ============================================= //
-		// ============== Fustrum culling ============== //
-		// ============================================= //
-		//TODO: this should not be here, it is being computed every frame
-		//TODO: put it someplace else where it is only done once and then 
-		//TODO: save the planes so matrix transformations can be applied 
-		//TODO: over them as the ship moves
-		// need to find the centers of the 5 circles of the fustrum (the near clipping plane can be ignored)
-		// except for the far clipping plane, they are 90Âº from the ship/player
-		Vector4 topClippingPlaneCenter{0,-1,0,0};
-		Vector4 bottomClippingPlaneCenter{0,+1,0,0};
-		Vector4 leftClippingPlaneCenter{+1,0,0,0};
-		Vector4 rightClippingPlaneCenter{-1,0,0,0};
-		// all these will rotate towards z=-1
-		// get the rotation matrices
-		// top and bottom rotate by FOV/2
-		// FOVx = FOVy*aspectratio
-		float yzPlaneRotation = CamShader::FOV_Y/2;
-		float xzPlaneRotation = CamShader::FOV_Y*(float(Options::width) / float(Options::height)) / 2;
-		// left and right rotate by aspectRatio/2
-		QRot topClippingPlaneRotation = yz_qrot(yzPlaneRotation);
-		QRot bottomClippingPlaneRotation = yz_qrot(-yzPlaneRotation);
-		QRot leftClippingPlaneRotation = xz_qrot(-xzPlaneRotation);
-		QRot rightClippingPlaneRotation = xz_qrot(xzPlaneRotation);
-		// apply the rotation to the centers of the planes/circles
-		// multiply the vectors with the rotation matrices
-		topClippingPlaneCenter = topClippingPlaneRotation*topClippingPlaneCenter;
-		bottomClippingPlaneCenter = bottomClippingPlaneRotation*bottomClippingPlaneCenter;
-		leftClippingPlaneCenter = leftClippingPlaneRotation*leftClippingPlaneCenter;
-		rightClippingPlaneCenter = rightClippingPlaneRotation*rightClippingPlaneCenter;
-		// for the far clipping plane
-		// get the point parallel to the ship in the far clipping plane
-		Vector4 S = Vector3(0,0,-CamShader::Z_FAR/2).inverse_stereo_proj();
-		Vector4 farClippingPlaneCenter = -((Vector4{0,0,0,1} + S)*0.5).normalized();
-		float farClippingPlaneCosRadius = Vector4(0,0,0,1).dot(farClippingPlaneCenter);
+// 	#ifdef FUSTRUM_CULLING
+// 		#warning "Fustrum Culling is ON"
+// 		// ============================================= //
+// 		// ============== Fustrum culling ============== //
+// 		// ============================================= //
+// 		//TODO: this should not be here, it is being computed every frame
+// 		//TODO: put it someplace else where it is only done once and then 
+// 		//TODO: save the planes so matrix transformations can be applied 
+// 		//TODO: over them as the ship moves
+// 		// need to find the centers of the 5 circles of the fustrum (the near clipping plane can be ignored)
+// 		// except for the far clipping plane, they are 90º from the ship/player
+// 		Vector4 topClippingPlaneCenter{0,-1,0,0};
+// 		Vector4 bottomClippingPlaneCenter{0,+1,0,0};
+// 		Vector4 leftClippingPlaneCenter{+1,0,0,0};
+// 		Vector4 rightClippingPlaneCenter{-1,0,0,0};
+// 		// all these will rotate towards z=-1
+// 		// get the rotation matrices
+// 		// top and bottom rotate by FOV/2
+// 		// FOVx = FOVy*aspectratio
+// 		float yzPlaneRotation = CamShader::FOV_Y/2;
+// 		float xzPlaneRotation = CamShader::FOV_Y*(float(Options::width) / float(Options::height)) / 2;
+// 		// left and right rotate by aspectRatio/2
+// 		QRot topClippingPlaneRotation = yz_qrot(yzPlaneRotation);
+// 		QRot bottomClippingPlaneRotation = yz_qrot(-yzPlaneRotation);
+// 		QRot leftClippingPlaneRotation = xz_qrot(-xzPlaneRotation);
+// 		QRot rightClippingPlaneRotation = xz_qrot(xzPlaneRotation);
+// 		// apply the rotation to the centers of the planes/circles
+// 		// multiply the vectors with the rotation matrices
+// 		topClippingPlaneCenter = topClippingPlaneRotation*topClippingPlaneCenter;
+// 		bottomClippingPlaneCenter = bottomClippingPlaneRotation*bottomClippingPlaneCenter;
+// 		leftClippingPlaneCenter = leftClippingPlaneRotation*leftClippingPlaneCenter;
+// 		rightClippingPlaneCenter = rightClippingPlaneRotation*rightClippingPlaneCenter;
+// 		// for the far clipping plane
+// 		// get the point parallel to the ship in the far clipping plane
+// 		Vector4 S = Vector3(0,0,-CamShader::Z_FAR/2).inverse_stereo_proj();
+// 		Vector4 farClippingPlaneCenter = -((Vector4{0,0,0,1} + S)*0.5).normalized();
+// 		float farClippingPlaneCosRadius = Vector4(0,0,0,1).dot(farClippingPlaneCenter);
 
-		// multiply the planes by the camera
-		topClippingPlaneCenter = cameraTransform*topClippingPlaneCenter;
-		bottomClippingPlaneCenter = cameraTransform*bottomClippingPlaneCenter;
-		leftClippingPlaneCenter = cameraTransform*leftClippingPlaneCenter;
-		rightClippingPlaneCenter = cameraTransform*rightClippingPlaneCenter;
-		farClippingPlaneCenter = cameraTransform*farClippingPlaneCenter;
+// 		// multiply the planes by the camera
+// 		topClippingPlaneCenter = cameraTransform*topClippingPlaneCenter;
+// 		bottomClippingPlaneCenter = cameraTransform*bottomClippingPlaneCenter;
+// 		leftClippingPlaneCenter = cameraTransform*leftClippingPlaneCenter;
+// 		rightClippingPlaneCenter = cameraTransform*rightClippingPlaneCenter;
+// 		farClippingPlaneCenter = cameraTransform*farClippingPlaneCenter;
 
 
-		// now that we have all the planes, check if each object is inside the fustrum
-		int objsInView = 0;
-		// std::cos(math::pi_2) == 0
-		for(auto &obj: objs) {
-			if(obj->position().dot(topClippingPlaneCenter) 		  >= 0
-				&& obj->position().dot(bottomClippingPlaneCenter) >= 0
-				&& obj->position().dot(leftClippingPlaneCenter)   >= 0
-				&& obj->position().dot(rightClippingPlaneCenter)  >= 0
-				&& obj->position().dot(farClippingPlaneCenter) 	  >= farClippingPlaneCosRadius
-			) {
-				obj->isInView = true;
-				objsInView++;
-			} else {
-				obj->isInView = false;
-			}
-		}
+// 		// now that we have all the planes, check if each object is inside the fustrum
+// 		int objsInView = 0;
+// 		// std::cos(math::pi_2) == 0
+// 		for(auto &obj: objs) {
+// 			if(obj->position().dot(topClippingPlaneCenter) 		  >= 0
+// 				&& obj->position().dot(bottomClippingPlaneCenter) >= 0
+// 				&& obj->position().dot(leftClippingPlaneCenter)   >= 0
+// 				&& obj->position().dot(rightClippingPlaneCenter)  >= 0
+// 				&& obj->position().dot(farClippingPlaneCenter) 	  >= farClippingPlaneCosRadius
+// 			) {
+// 				obj->isInView = true;
+// 				objsInView++;
+// 			} else {
+// 				obj->isInView = false;
+// 			}
+// 		}
 
-		// debug: how many objs are in view
-		printf("Total objs: %d, objs in view: %d\n", objs.size(), objsInView);
-		// debug: try to draw the planes
-		// from the centers, get a point on the plane, 
-		// glBegin(GL_QUADS);
-		// 	glColor3ub(255, 0, 0);
-		// 	glVertex4f(auxTop.x-100, auxTop.y-100, auxTop.z-100, auxTop.w);
-		// 	glVertex4f(auxBot.x-100, auxBot.y-100, auxBot.z-100, auxBot.w);
-		// 	glVertex4f(auxLeft.x-100, auxLeft.y-100, auxLeft.z-100, auxLeft.w);
-		// 	glVertex4f(auxRight.x-100, auxRight.y-100, auxRight.z-100, auxRight.w);
-		// glEnd();
+// 		// debug: how many objs are in view
+// 		printf("Total objs: %d, objs in view: %d\n", objs.size(), objsInView);
 
-	#else
-		#warning "Fustrum Culling is OFF"
-	#endif
-}
+// 	#else
+// 		#warning "Fustrum Culling is OFF"
+// 	#endif
+// }

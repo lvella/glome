@@ -12,8 +12,9 @@
 #include "qrot.hpp"
 #include "math.hpp"
 #include "ship.hpp"
+#include "fustrum.hpp"
 
-#define FUSTRUM_CULLING
+// #define FUSTRUM_CULLING
 
 
 class Renderer
@@ -27,7 +28,7 @@ public:
 	void draw(std::vector<Glome::Drawable*>&& objs);
 	void setup_display();
 	void fill_minimap(const std::vector<Glome::Drawable*>& objs, Camera& cam);
-	void createViewingFustrum(const std::vector<Glome::Drawable*> &objs, const QRot& cameraTransformation);
+	// void createViewingFustrum(const std::vector<Glome::Drawable*> &objs, const QRot& cameraTransformation);
 
 protected:
 	struct Viewport: public Audio::Listener
@@ -60,17 +61,6 @@ protected:
 			QRot t;
 		};
 
-		struct Frustrum {
-			Vector4 left_wall_center;
-			Vector4 right_wall_center;
-			Vector4 top_wall_center;
-			Vector4 bottom_wall_center;
-			Vector4 far_wall_center;
-    		float far_wall_radius;
-
-			bool isIn() {return true;}
-		};
-
 		std::weak_ptr<Ship> t;
 		QRot curr_qrot;
 		std::deque<PathPoint> cam_hist;
@@ -79,9 +69,6 @@ protected:
 
 		// Camera position relative to target...
 		static const QRot cam_offset;
-
-		// Viewing Fustrum
-		// Fustrum fustrum;
 	};
 
 	std::vector<Viewport> players;
@@ -92,4 +79,7 @@ protected:
 	static CamShader shader;
 	static GLint shader_uniform_camera;
 	static GLint shader_uniform_projection;
+
+	Fustrum fustrum;
+
 };
