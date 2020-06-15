@@ -34,22 +34,34 @@ void Fustrum::configure(const QRot& cameraTransform) {
     far_wall_cos_radius = Vector4(0,0,0,1).dot(far_wall_center);
 
     // multiply the planes by the camera
-    top_wall_center = cameraTransform*top_wall_center;
-    bottom_wall_center = cameraTransform*bottom_wall_center;
-    left_wall_center = cameraTransform*left_wall_center;
-    right_wall_center = cameraTransform*right_wall_center;
-    far_wall_center = cameraTransform*far_wall_center;
+    top_wall_center     = cameraTransform * top_wall_center;
+    bottom_wall_center  = cameraTransform * bottom_wall_center;
+    left_wall_center    = cameraTransform * left_wall_center;
+    right_wall_center   = cameraTransform * right_wall_center;
+    far_wall_center     = cameraTransform * far_wall_center;
 }
 
-bool Fustrum::isIn(const Glome::Drawable* obj) {
-    float boundary_check = std::cos(math::pi_2 + obj->get_radius());
-    float boundary_check_far = std::cos(math::pi_2 + obj->get_radius() + far_wall_cos_radius);
-    if (obj->position().dot(top_wall_center) 	   >= boundary_check
-        && obj->position().dot(bottom_wall_center) >= boundary_check
-        && obj->position().dot(left_wall_center)   >= boundary_check
-        && obj->position().dot(right_wall_center)  >= boundary_check
-        && obj->position().dot(far_wall_center)    >= boundary_check_far
+Fustrum Fustrum::operator*(const QRot& cameraTransform) {
+    Fustrum fustrum;
+    fustrum.top_wall_center     = cameraTransform * this->top_wall_center;
+    fustrum.bottom_wall_center  = cameraTransform * this->bottom_wall_center;
+    fustrum.left_wall_center    = cameraTransform * this->left_wall_center;
+    fustrum.right_wall_center   = cameraTransform * this->right_wall_center;
+    fustrum.far_wall_center     = cameraTransform * this->far_wall_center;
+    return fustrum;
+}
+
+bool Fustrum::isIn(const Glome::Drawable& obj) {
+    float boundary_check = std::cos(math::pi_2 + obj.get_radius());
+    float boundary_check_far = std::cos(math::pi_2 + obj.get_radius() + far_wall_cos_radius);
+    // float boundary_check = 0;
+    // float boundary_check_far = far_wall_cos_radius;
+    if (obj.position().dot(top_wall_center) 	  >= boundary_check
+        && obj.position().dot(bottom_wall_center) >= boundary_check
+        && obj.position().dot(left_wall_center)   >= boundary_check
+        && obj.position().dot(right_wall_center)  >= boundary_check
+        && obj.position().dot(far_wall_center)    >= boundary_check_far
     )
-        return true;				
+        return true;
     return false;
 }

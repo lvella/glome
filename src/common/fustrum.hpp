@@ -10,7 +10,8 @@ class Fustrum {
 public:
 
     void configure(const QRot& cameraTransform);
-    bool isIn(const Glome::Drawable* obj);
+    bool isIn(const Glome::Drawable& obj);
+    Fustrum operator*(const QRot& cameraTransform);
 
     Vector4 left_wall_center;
     Vector4 right_wall_center;

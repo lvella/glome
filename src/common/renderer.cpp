@@ -75,9 +75,12 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 		const QRot inv_trans = active->transformation().inverse();
 		const Vector4 cam_pos = inv_trans.position();
 
+		fustrum.configure(inv_trans);
+
 		// HDX
 		// createViewingFustrum(objs, inv_trans);
 
+		int objsInView = 0;
 		vector<std::pair<float, Glome::Drawable*>> transparent_objs;
 		for(auto& ptr: objs) {
 			if(ptr->is_transparent()) {
@@ -85,10 +88,13 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 					- ptr->get_radius();
 				assert(!std::isnan(dist));
 				transparent_objs.push_back({dist, ptr.get()});
-			} else {
+			} else if(fustrum.isIn(*ptr)) {
 				ptr->draw(camera);
+				objsInView++;
 			}
 		}
+		// debug: how many objs are in view
+		printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
 
 		std::sort(transparent_objs.begin(), transparent_objs.end(),
 			[] (auto& a, auto& b) {
@@ -99,18 +105,22 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
 		Projectile::draw_many(sorted_projs, camera);
 
-		for(auto &pair: transparent_objs) {
-			//TODO: not taking into account multiplayer (HDX)
-			// #ifdef FUSTRUM_CULLING
-			// 	if (pair.second->isInView)
-			// 		pair.second->draw(camera);
-			// #else
-			// 	pair->second->draw(camera);
-			// 	objsInView++;
-			// #endif
-			if(fustrum.isIn(pair.second))
-				pair.second->draw(camera);
-		}
+		// // int objsInView = 0;
+		// for(auto &pair: objs) {
+		// 	//TODO: not taking into account multiplayer (HDX)
+		// 	// #ifdef FUSTRUM_CULLING
+		// 	// 	if (pair.second->isInView)
+		// 	// 		pair.second->draw(camera);
+		// 	// #else
+		// 	// 	pair->second->draw(camera);
+		// 	// 	objsInView++;
+		// 	// #endif
+		// 	if(!pair->is_transparent() && fustrum.isIn(*pair))
+		// 		pair->draw(camera);
+		// 		objsInView++;
+		// }
+		// debug: how many objs are in view
+		// printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
 
 		DustField::draw(camera);
 
@@ -158,6 +168,7 @@ Renderer::Viewport::update(float dt)
 
 	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
 	next.dt -= dt;
+
 }
 
 CamShader Renderer::shader;
