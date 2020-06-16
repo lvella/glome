@@ -1,5 +1,3 @@
-#include "fire.hpp"
-
 #include "particle_system.hpp"
 
 static Shader program_particle_system;
@@ -67,9 +65,4 @@ void ParticleSystem::depthSort(const QRot &t)
 
 	comparer.oattrs = oattrs;
 	std::sort(idx, idx + count, comparer);
-}
-
-void ParticleSystem::initialize()
-{
-	Fire::initialize();
 }

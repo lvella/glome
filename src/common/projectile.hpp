@@ -9,7 +9,6 @@
 class Projectile final: virtual public Object, public Collidable
 {
 public:
-	static void initialize();
 	static void shot(ShipController *s, const QRot& from, float speed);
 	static void draw_many(const std::vector<Projectile*>& shots, Camera& cam);
 	static void draw_in_minimap();

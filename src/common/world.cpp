@@ -14,21 +14,31 @@ World::World():
 	threads_sync(globalThreadPool.get_num_threads())
 {}
 
-template<typename T>
-static void try_add(std::vector<std::weak_ptr<T>>& v, const std::shared_ptr<Updatable>& obj)
+void World::add_unmanaged(const std::shared_ptr<Object>& new_obj)
 {
-	auto cast_obj = std::dynamic_pointer_cast<T>(obj);
-	if(cast_obj) {
-		v.emplace_back(cast_obj);
+	if(auto ptr = std::dynamic_pointer_cast<Collidable>(new_obj)) {
+		collidables.emplace_back(ptr);
+	}
+
+	if(auto ptr = std::dynamic_pointer_cast<Glome::Drawable>(new_obj)) {
+		drawables.emplace(&ptr->get_draw_specs(), ptr);
+	}
+
+	Audio::World::try_add_source(new_obj);
+
+	if(auto ptr = std::dynamic_pointer_cast<SuperObject>(new_obj)) {
+		auto subobjs = ptr->create_sub_objects();
+		for(auto& wptr: subobjs) {
+			if(auto sptr = wptr.lock()) {
+				add_unmanaged(sptr);
+			}
+		}
 	}
 }
 
 void World::add_updatable(std::shared_ptr<Updatable>&& new_obj)
 {
-	try_add(collidables, new_obj);
-	try_add(drawables, new_obj);
-	Audio::World::try_add_source(new_obj);
-
+	add_unmanaged(new_obj);
 	updatables.emplace_back(std::move(new_obj));
 }
 
@@ -95,7 +105,8 @@ void World::update(float dt)
 	}
 
 	{
-		static TimeAccumulator& audio_ta = globalProfiler.newTimer("Update renderer with audio");
+		static TimeAccumulator& audio_ta = globalProfiler.newTimer(
+			"Update renderer with audio");
 		TimeGuard timer(audio_ta);
 
 		_render->update(dt);
@@ -113,12 +124,5 @@ void World::draw()
 		sync = 0;
 	}
 
-	std::vector<std::shared_ptr<Glome::Drawable>> objects;
-	objects.reserve(drawables.size());
-
-	clean_and_for_each_valid(drawables, [&](auto&& ptr) {
-		objects.push_back(std::move(ptr));
-	});
-
-	_render->draw(std::move(objects));
+	_render->draw(drawables);
 }

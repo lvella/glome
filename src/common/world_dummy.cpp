@@ -11,7 +11,8 @@
 
 using namespace std;
 
-WorldDummy::WorldDummy()
+WorldDummy::WorldDummy():
+	meridians{std::make_shared<Meridians>()}
 {
 	std::vector<std::weak_ptr<Ship>> bot;
 	std::vector<std::weak_ptr<Ship>> players;
@@ -51,6 +52,9 @@ WorldDummy::WorldDummy()
 	}
 	_render = new Renderer(std::move(players), *this);
 
+	// Add unmanaged meridians
+	add_unmanaged(meridians);
+
 	// Create supernova
 	add_updatable(std::make_shared<Supernova>());
 
@@ -66,7 +70,7 @@ WorldDummy::WorldDummy()
 				);
 
 				for(size_t j = i; j < max; ++j) {
-					adder.add_updatable(
+					adder.add(
 						std::make_shared<Spaghetti>()
 					);
 				}

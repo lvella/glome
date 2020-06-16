@@ -5,7 +5,7 @@
 void VolSphere::set_radius(float r)
 {
 	assert(r >= 0);
-	assert(r < math::pi);
+	assert(r <= math::pi);
 
 	radius = r;
 	cos_great_dist = std::cos(std::min(r + math::pi_2, math::pi));

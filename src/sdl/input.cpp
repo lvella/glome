@@ -12,6 +12,8 @@
 #include "jsinput.hpp"
 #include "events.hpp"
 
+extern bool is_paused;
+
 namespace Input
 {
 /*
@@ -128,5 +130,64 @@ handle()
 	return run;
 }
 
+bool
+handle_paused()
+{
+	assert(is_paused);
+
+	SDL_Event e;
+	while(SDL_WaitEvent(&e))
+	{
+		switch(e.type)
+		{
+		case SDL_QUIT:
+			return false;
+		case SDL_KEYDOWN:
+			if(e.key.keysym.sym == SDLK_ESCAPE) {
+				game_pause(0, 1.0f);
+				return true;
+			}
+			if(e.key.keysym.sym == SDLK_q) {
+				return false;
+			}
+		}
+	}
+
+	std::cout << "Error on wait event: " << SDL_GetError() << std::endl;
+	assert(0);
+	return false;
 }
 
+float normalize_button(int e)
+{
+	switch(e)
+	{
+	case SHOOT:
+	case MOVE_BACKWARD:
+	case MOVE_RIGHT:
+	case MOVE_UP:
+	case MOVE_SPINL:
+		return 1.0;
+	case MOVE_DOWN:
+	case MOVE_LEFT:
+	case MOVE_SPINR:
+	case MOVE_FORWARD:
+		return -1.0;
+	case PAUSE:
+		return 1.0;
+	default:
+		return 0.0;
+	}
+}
+
+void game_pause(int b, float a)
+{
+	if(a > 0.5f) {
+		//Game::switch_state(paused ? Game::WORLD : Game::MENU);
+		is_paused = !is_paused;
+
+		SDL_SetRelativeMouseMode(SDL_bool(!is_paused));
+	}
+}
+
+}

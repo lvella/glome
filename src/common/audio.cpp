@@ -4,10 +4,12 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 
+#include "initialization.hpp"
+
 static ALCdevice* al_device;
 static ALCcontext* al_context;
 
-void Audio::initialize()
+static RegisterInitialization ini{[]
 {
    al_device = alcOpenDevice(NULL);
    if(al_device == NULL) {
@@ -19,7 +21,7 @@ void Audio::initialize()
    alcMakeContextCurrent(al_context);
 
    // TODO: properly configure AL_SPEED_OF_SOUND
-}
+}};
 
 void Audio::shutdown()
 {

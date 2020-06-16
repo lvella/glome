@@ -2,6 +2,7 @@
 
 #include <list>
 #include <memory>
+#include <unordered_map>
 
 #include "renderer.hpp"
 #include "drawable.hpp"
@@ -43,6 +44,7 @@ protected:
 	};
 
 	void add_updatable(std::shared_ptr<Updatable>&& new_obj);
+	void add_unmanaged(const std::shared_ptr<Object>& new_obj);
 
 	Octree::Hypercube collision_tree;
 
@@ -51,10 +53,11 @@ protected:
 	std::vector<AiController*> ai_controls;
 
 private:
+
 	std::vector<GLsync> threads_sync;
 
 	std::vector<std::shared_ptr<Updatable>> updatables;
 	std::vector<std::weak_ptr<Collidable>> collidables;
-	std::vector<std::weak_ptr<Glome::Drawable>> drawables;
+	std::unordered_multimap<DrawSpecsBase*, std::weak_ptr<Glome::Drawable>> drawables;
 };
 

@@ -1,3 +1,8 @@
+#include "renderer.hpp"
+
+#include <algorithm>
+#include <memory>
+
 #include "drawable.hpp"
 #include "options.hpp"
 #include "meridian.hpp"
@@ -5,6 +10,7 @@
 #include "projectile.hpp"
 #include "fire.hpp"
 #include "dustfield.hpp"
+#include "camera.hpp"
 #include "renderer.hpp"
 #include "vector4.hpp"
 
@@ -14,14 +20,41 @@
 using namespace std;
 using namespace Options;
 
-void
-Renderer::initialize()
+namespace {
+
+class SpecsTracker
 {
-	shader.setup_shader({
-		"world/world.vert", "world/modelview.vert", "common/quaternion.vert",
-		"world/world.frag", "world/world_fog.frag",
-		"common/no_texture.frag", "world/fog.frag"
-	});
+public:
+	SpecsTracker(Camera& camera):
+		c(camera)
+	{}
+
+	~SpecsTracker()
+	{
+		shutdown();
+	}
+
+	void maybe_set(DrawSpecsBase* s)
+	{
+		if(s != active) {
+			shutdown();
+			active = s;
+			if(s) s->setup_draw_state(c);
+		}
+	}
+
+private:
+	void shutdown()
+	{
+		if(active) {
+			active->shutdown_draw_state(c);
+		}
+	}
+
+	Camera& c;
+	DrawSpecsBase *active = nullptr;
+};
+
 }
 
 void
@@ -60,21 +93,39 @@ Renderer::update(float dt)
 }
 
 void
-Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
+Renderer::draw(ObjSet& objs)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for(active = begin(players); active != end(players); ++active) {
 		active->enable();
+<<<<<<< HEAD
 		
 		camera.reset(active->transformation());
 		camera.pushShader(&shader);
+=======
 
-		draw_meridians(camera);
+		auto drawn_objs = draw_objs_in_world(objs);
 
-		const QRot inv_trans = active->transformation().inverse();
-		const Vector4 cam_pos = inv_trans.position();
+		MiniMap::draw(active->_x, active->_y, this,
+			active->transformation().inverse(), drawn_objs
+		);
+	}
+}
 
+vector<std::shared_ptr<Glome::Drawable>>
+Renderer::draw_objs_in_world(ObjSet& objs)
+{
+	Camera camera(active->transformation());
+	SpecsTracker specs(camera);
+>>>>>>> master
+
+	const Vector4 cam_pos = active->transformation().inverse().position();
+
+	vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
+	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
+
+<<<<<<< HEAD
 		fustrum.configure(inv_trans);
 
 		// HDX
@@ -92,19 +143,32 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 				ptr->draw(camera);
 				objsInView++;
 			}
+=======
+	for(auto iter = objs.begin(); iter != objs.end();) {
+		auto ptr = iter->second.lock();
+		if(!ptr) {
+			iter = objs.erase(iter);
+			continue;
+>>>>>>> master
 		}
 		// debug: how many objs are in view
 		printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
 
-		std::sort(transparent_objs.begin(), transparent_objs.end(),
-			[] (auto& a, auto& b) {
-				return a.first > b.first;
-			}
-		);
+		if(ptr->is_transparent()) {
+			float dist = std::acos(cam_pos.dot(ptr->position()))
+				- ptr->get_radius();
+			assert(!std::isnan(dist));
+			transparent_objs.push_back({dist, ptr.get()});
+		} else {
+			specs.maybe_set(iter->first);
+			ptr->draw(camera);
+		}
 
-		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
-		Projectile::draw_many(sorted_projs, camera);
+		drawn_objs.emplace_back(std::move(ptr));
+		++iter;
+	}
 
+<<<<<<< HEAD
 		// // int objsInView = 0;
 		// for(auto &pair: objs) {
 		// 	//TODO: not taking into account multiplayer (HDX)
@@ -121,13 +185,27 @@ Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
 		// }
 		// debug: how many objs are in view
 		// printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
+=======
+	std::sort(transparent_objs.begin(), transparent_objs.end(),
+		[] (auto& a, auto& b) {
+			return a.first > b.first;
+		}
+	);
+>>>>>>> master
 
-		DustField::draw(camera);
+	auto sorted_projs = Projectile::cull_sort_from_camera(camera);
+	Projectile::draw_many(sorted_projs, camera);
 
-		MiniMap::draw(active->_x, active->_y, this,
-			inv_trans, objs
-		);
+	for(auto &pair: transparent_objs) {
+		auto& obj = *pair.second;
+
+		specs.maybe_set(&obj.get_draw_specs());
+		obj.draw(camera);
 	}
+
+	DustField::draw(camera);
+
+	return drawn_objs;
 }
 
 void
@@ -171,7 +249,6 @@ Renderer::Viewport::update(float dt)
 
 }
 
-CamShader Renderer::shader;
 const QRot Renderer::Viewport::cam_offset(
 	yz_qrot(0.2) *
 	zw_qrot(-0.015) *

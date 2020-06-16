@@ -12,26 +12,14 @@
 #include "audio.hpp"
 #include "profiling.hpp"
 #include "spaghetti_fragment.hpp"
-#include <limits>
+#include "initialization.hpp"
 
 namespace Game
 {
+
 RunContext* context;
 
-
-class Paused final: public RunContext {
-	void setup_display() override
-	{}
-
-	void draw() override
-	{}
-
-	void update(float) override
-	{}
-};
-
 static std::unique_ptr<World> world;
-static std::unique_ptr<Paused> paused;
 
 void
 frame(std::chrono::duration<float> frame_time)
@@ -71,20 +59,12 @@ initialize()
 	// can be created with the correct perspective
 	// matrix.
 	CamShader::initialize(float(Options::width) / float(Options::height));
-	Renderer::initialize();
 
-	Audio::initialize();
+	//Menu::initialize();
+
+	initialize_registered();
 
 	world.reset(new WorldDummy());
-	paused.reset(new Paused());
-
-	MiniMap::initialize();
-	Projectile::initialize();
-	ParticleSystem::initialize();
-	DustField::initialize();
-	SpaghettiFragment::initialize();
-	//Menu::initialize();
-	initialize_meridians();
 
 	switch_state(WORLD);
 }
@@ -99,11 +79,8 @@ void switch_state(state s)
 {
 	switch(s)
 	{
-	case EXIT:
-		//running = true;
-		break;
 	case MENU:
-		context = paused.get();
+		//context = menu.get();
 		break;
 	case WORLD:
 		context = world.get();

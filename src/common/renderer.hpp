@@ -2,11 +2,11 @@
 
 #include <deque>
 #include <memory>
+#include <unordered_map>
 #include <vector>
 
 #include "audio_world.hpp"
 #include "audio_listener.hpp"
-#include "camera.hpp"
 #include "drawable.hpp"
 #include "shader.hpp"
 #include "qrot.hpp"
@@ -20,12 +20,18 @@
 class Renderer
 {
 public:
-	static void initialize();
+	using ObjSet = std::unordered_multimap<
+		DrawSpecsBase*,
+		std::weak_ptr<Glome::Drawable>
+	>;
 
 	Renderer(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world);
 
 	void update(float dt);
-	void draw(std::vector<std::shared_ptr<Glome::Drawable>>&& objs);
+	void draw(ObjSet& objs);
+
+	std::vector<std::shared_ptr<Glome::Drawable>> draw_objs_in_world(ObjSet& objs);
+
 	void setup_display();
 	void fill_minimap(const std::vector<std::shared_ptr<Glome::Drawable>>& objs,
 		Camera& cam);
@@ -75,12 +81,4 @@ protected:
 	std::vector<Viewport> players;
 
 	std::vector<Viewport>::iterator active;
-	Camera camera;
-
-	static CamShader shader;
-	static GLint shader_uniform_camera;
-	static GLint shader_uniform_projection;
-
-	Fustrum fustrum;
-
 };

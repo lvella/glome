@@ -39,7 +39,6 @@ public:
 	virtual ~ParticleSystem();
 	void depthSort(const QRot &t);
 
-	static void initialize();
 protected:
 	// TODO: Think of some kind of BO pool to share the usage of stream BOs
 	union {
@@ -77,7 +76,6 @@ protected:
 	uint16_t *idx;
 	uint16_t count;
 	uint16_t actives_count;
-	GLuint tex_particle;
 };
 
 

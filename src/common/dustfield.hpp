@@ -4,6 +4,5 @@
 
 namespace DustField
 {
-    void initialize();
     void draw(Camera& cam);
 }

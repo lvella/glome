@@ -26,28 +26,9 @@ namespace Input
 	void initialize();
 
 	bool handle();
+	bool handle_paused();
 
-	inline float normalize_button(int e)
-	{
-		switch(e)
-		{
-		case SHOOT:
-		case MOVE_BACKWARD:
-		case MOVE_RIGHT:
-		case MOVE_UP:
-		case MOVE_SPINL:
-			return 1.0;
-		case MOVE_DOWN:
-		case MOVE_LEFT:
-		case MOVE_SPINR:
-		case MOVE_FORWARD:
-			return -1.0;
-		case PAUSE:
-			return 1.0;
-		default:
-			return 0.0;
-		}
-	}
+	float normalize_button(int e);
 
 	inline void rotate(int controller_id, float rx, float ry)
 	{
@@ -100,15 +81,6 @@ namespace Input
 		ship_controllers[controller_id]->shoot((bool)a);
 	}
 
-	inline void game_pause(int b, float a)
-	{
-		static bool paused = false;
-		if(a > 0.5f) {
-			Game::switch_state(paused ? Game::WORLD : Game::MENU);
-			paused = !paused;
-
-			SDL_SetRelativeMouseMode(SDL_bool(!paused));
-		}
-	}
+	void game_pause(int b, float a);
 }
 

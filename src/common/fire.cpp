@@ -1,15 +1,72 @@
+#include "fire.hpp"
+
 #include "gl.hpp"
 #include "options.hpp"
 #include "textures.hpp"
 #include "math.hpp"
 #include "random.hpp"
 
-#include "fire.hpp"
+namespace {
 
-static constexpr float FIRE_LIFE = 1.0f/3.0f; // s
+constexpr float FIRE_LIFE = 1.0f/3.0f; // s
 
-static CamShader program_fire;
-static GLint attrib_radius;
+CamShader program_fire;
+GLint attrib_radius;
+int width = -1;
+
+class FireSpecs final: public DrawSpecs<FireSpecs>
+{
+public:
+	template<class Token> FireSpecs(const Token& t):
+		DrawSpecs(t)
+	{
+		program_fire.setup_shader({
+			"world/fire.vert",
+			"world/modelview.vert",
+			"common/quaternion.vert",
+			"world/world.frag",
+			"world/point_texture.frag",
+			"world/world_fog.frag",
+			"world/fog.frag"
+		});
+		attrib_radius = glGetAttribLocation(program_fire.program(), "radius");
+
+		program_fire.enable();
+		program_fire.getUniform("has_tex").set(true);
+		program_fire.getUniform("texbase").set(0);
+		if(width > 0) {
+			program_fire.getUniform("half_width").set(width / 2.0f);
+		}
+
+		// Without this in GLES
+		glEnable(GL_PROGRAM_POINT_SIZE);
+
+		create_circle_texture(64, 0.1, 0, 255, tex_particle, true);
+	}
+
+	void setup_draw_state(Camera& c) override
+	{
+		c.setShader(&program_fire);
+
+		glBindTexture(GL_TEXTURE_2D, tex_particle);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
+		glEnableVertexAttribArray(program_fire.colorAttr());
+		glEnableVertexAttribArray(attrib_radius);
+	}
+
+	void shutdown_draw_state(Camera&) override
+	{
+		glDisableVertexAttribArray(attrib_radius);
+		glDisableVertexAttribArray(program_fire.colorAttr());
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+private:
+	GLuint tex_particle;
+};
+
+}
 
 static Vector4 rand_in_sphere(float &r)
 {
@@ -21,45 +78,19 @@ static Vector4 rand_in_sphere(float &r)
 	return ret;
 }
 
-Fire::Fire(float radius):
+Fire::Fire(ParentRef&& parent, float radius):
 	ParticleSystem(200),
+	SubObject(std::move(parent)),
 	scale_radius(radius),
 	intensity(1.0f)
 {
-	transparent = true;
+	set_intensity(0.0f);
 
-	setIntensity(0.0f);
-
-	create_circle_texture(64, 0.1, 0, 255, tex_particle, true);
 	for(int i = 0; i < count; ++i)
 	{
 		rattrs[i].radius = radius;
 		oattrs[i].active = false;
 	}
-}
-
-void Fire::initialize()
-{
-	program_fire.setup_shader({
-		"world/fire.vert",
-		"world/modelview.vert",
-		"common/quaternion.vert",
-		"world/world.frag",
-		"world/point_texture.frag",
-		"world/world_fog.frag",
-		"world/fog.frag"
-	});
-	attrib_radius = glGetAttribLocation(program_fire.program(), "radius");
-
-	program_fire.enable();
-	program_fire.getUniform("has_tex").set(true);
-	program_fire.getUniform("texbase").set(0);
-	if(width > 0) {
-		program_fire.getUniform("half_width").set(width / 2.0f);
-	}
-
-	// Without this in GLES
-	glEnable(GL_PROGRAM_POINT_SIZE);
 }
 
 void Fire::set_width(int w)
@@ -70,9 +101,7 @@ void Fire::set_width(int w)
 	}
 }
 
-int Fire::width = -1;
-
-void Fire::setIntensity(float i)
+void Fire::set_intensity(float i)
 {
 	if(i == intensity)
 		return;
@@ -87,7 +116,7 @@ void Fire::setIntensity(float i)
 	set_radius(radius);
 }
 
-bool Fire::update(float dt, UpdatableAdder&)
+void Fire::update(float dt)
 {
 	int new_count = actives_count;
 
@@ -126,37 +155,30 @@ bool Fire::update(float dt, UpdatableAdder&)
 	}
 
 	actives_count = new_count;
-
-	return true;
 }
 
 void Fire::draw(Camera& c)
 {
+	depthSort(c.setQRot(get_world_t()));
 
-	c.pushShader(&program_fire);
-	c.pushMultQRot(get_t());
-
-	depthSort(c.transformation());
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(uint16_t) * actives_count, idx);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(RenderAttributes) * count, rattrs); /// TEST
 
-	glBindTexture(GL_TEXTURE_2D, tex_particle);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-	glEnableVertexAttribArray(program_fire.colorAttr());
-	glEnableVertexAttribArray(attrib_radius);
-
 	glVertexAttribPointer(program_fire.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), 0);
 	glVertexAttribPointer(program_fire.colorAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(sizeof(Vector4)));
 	glVertexAttribPointer(attrib_radius, 1, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(2*sizeof(Vector4)));
 	glDrawElements(GL_POINTS, actives_count, GL_UNSIGNED_SHORT, 0);
+}
 
-	c.popMat();
-	c.popShader();
+bool Fire::is_transparent() const
+{
+	return true;
+}
 
-	glDisableVertexAttribArray(attrib_radius);
-	glDisableVertexAttribArray(program_fire.colorAttr());
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+DrawSpecsBase& Fire::get_draw_specs() const
+{
+	return DrawSpecsBase::get_instance<::FireSpecs>();
 }

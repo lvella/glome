@@ -15,7 +15,8 @@
 #include "textures.hpp"
 #include "minimap.hpp"
 
-static Camera camera;
+#include "initialization.hpp"
+
 static SpaceShader map_projection;
 
 static Shader hud;
@@ -23,14 +24,17 @@ static Shader hud;
 static GLuint tex_minimap;
 static GLuint tex_object;
 
-static GLint proj_has_tex;
 static GLint hud_has_tex;
 
 // TODO: Ugly! Encapsulate this!
 GLuint square_vbo;
 
+namespace MiniMap {
+
+GLint proj_has_tex;
+
 void
-MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
+draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 	const std::vector<std::shared_ptr<Glome::Drawable>>& objs)
 {
 	const int b = 10;
@@ -68,27 +72,23 @@ MiniMap::draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	// From now on, use the camera with transform stack to draw objects
-	camera.reset(yz_qrot(math::pi_2) * center);
-	camera.pushShader(&map_projection);
+	Camera camera(yz_qrot(math::pi_2) * center);
+	camera.setShader(&map_projection);
 
 	// Draw shots
 	glUniform1i(proj_has_tex, 0);
 	Projectile::draw_in_minimap();
-
-	// Draw meridians
-	draw_meridians(camera);
 
 	// Draw map objects
 	glUniform1i(proj_has_tex, 1);
 	glBindTexture(GL_TEXTURE_2D, tex_object);
 	rend->fill_minimap(objs, camera);
 	glBindTexture(GL_TEXTURE_2D, 0);
-	camera.popShader();
 }
 
-void
-MiniMap::initialize()
-{
+}
+
+static RegisterInitialization ini{[] {
 	create_circle_texture(256, 0.9, 0, 255, tex_minimap);
 	create_circle_texture(16, 0.8, 0, 255, tex_object);
 
@@ -138,7 +138,7 @@ MiniMap::initialize()
 		"minimap/minimap.frag",
 		"common/luminance_alpha_texture.frag"
 	});
-	proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
+	MiniMap::proj_has_tex = glGetUniformLocation(map_projection.program(), "has_tex");
 
 	hud.setup_shader({
 		"minimap/hud.vert",
@@ -147,4 +147,4 @@ MiniMap::initialize()
 		"common/luminance_alpha_texture.frag"
 	});
 	hud_has_tex = glGetUniformLocation(hud.program(), "has_tex");
-}
+}};

@@ -178,10 +178,9 @@ Spaghetti::Spaghetti():
 void Spaghetti::draw(Camera& c)
 {
 	auto &s = *c.getShader();
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glEnableVertexAttribArray(s.colorAttr());
 
 	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE,
 		sizeof(Vertex), (GLvoid*) offsetof(Vertex, pos));
@@ -195,8 +194,6 @@ void Spaghetti::draw(Camera& c)
 	} else {
 		glDrawArrays(GL_LINE_STRIP, 0, count);
 	}
-
-	c.popMat();
 }
 
 bool Spaghetti::update(float dt, UpdatableAdder& adder)
@@ -366,7 +363,7 @@ bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		}
 
 		// Create the fragment.
-		adder.add_updatable(std::make_shared<SpaghettiFragment>(
+		adder.add(std::make_shared<SpaghettiFragment>(
 			get_t(), vdata, idata[start], num_segs + 1
 		));
 
@@ -489,7 +486,7 @@ void Spaghetti::explode(UpdatableAdder& adder, const std::vector<uint16_t>& idat
 		if(frag_vcount) {
 			if(idata[idx] == separator) {
 				// End of fragment:
-				adder.add_updatable(std::make_shared<SpaghettiFragment>(
+				adder.add(std::make_shared<SpaghettiFragment>(
 					get_t(), vdata, frag_start, frag_vcount
 				));
 				frag_vcount = 0;
@@ -504,7 +501,7 @@ void Spaghetti::explode(UpdatableAdder& adder, const std::vector<uint16_t>& idat
 		}
 	}
 	if(frag_vcount) {
-		adder.add_updatable(std::make_shared<SpaghettiFragment>(
+		adder.add(std::make_shared<SpaghettiFragment>(
 			get_t(), vdata, frag_start, frag_vcount
 		));
 	}

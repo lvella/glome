@@ -7,6 +7,7 @@
 #include "shader.hpp"
 #include "math.hpp"
 #include "textures.hpp"
+#include "initialization.hpp"
 
 using namespace std;
 
@@ -22,7 +23,7 @@ static std::vector < Vector4 > minimap_buf;
 
 Projectile::SList Projectile::shots;
 
-void Projectile::initialize()
+static RegisterInitialization ini{[]
 {
 	{
 		const float data[] = {
@@ -64,7 +65,7 @@ void Projectile::initialize()
 
 	uniform_has_tex = glGetUniformLocation(
 		program_bullet.program(), "has_tex");
-}
+}};
 
 void Projectile::shot(ShipController * s, const QRot& from, float speed)
 {
@@ -141,7 +142,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 	to_sort.reserve(shots.size());
 
 	for(auto & shot: shots) {
-		Vector4 pos = cam.transformation() * shot.position();
+		Vector4 pos = cam.getBaseTransformation() * shot.position();
 		if (pos[2] <= 0) {
 			to_sort.emplace_back(&shot, pos.squared_length());
 		}
@@ -160,7 +161,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 void Projectile::draw_many(const std::vector < Projectile * >&shots, Camera & c)
 {
 	if (shots.size() != 0) {
-		c.pushShader(&program_bullet);
+		c.setShader(&program_bullet);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glUniform1i(uniform_has_tex, 1);
@@ -178,7 +179,6 @@ void Projectile::draw_many(const std::vector < Projectile * >&shots, Camera & c)
 			i->draw(c);
 
 		glDisableVertexAttribArray(program_bullet.colorAttr());
-		c.popShader();
 	}
 }
 
@@ -203,10 +203,8 @@ Projectile::Projectile(ShipController * s, const QRot& from, float speed):
 
 void Projectile::draw(Camera & c)
 {
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	c.popMat();
-
 }
 
 void Projectile::update(float dt)
