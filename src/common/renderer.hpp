@@ -81,4 +81,6 @@ protected:
 	std::vector<Viewport> players;
 
 	std::vector<Viewport>::iterator active;
+
+	Fustrum fustrum;
 };

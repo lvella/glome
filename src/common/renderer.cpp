@@ -99,11 +99,6 @@ Renderer::draw(ObjSet& objs)
 
 	for(active = begin(players); active != end(players); ++active) {
 		active->enable();
-<<<<<<< HEAD
-		
-		camera.reset(active->transformation());
-		camera.pushShader(&shader);
-=======
 
 		auto drawn_objs = draw_objs_in_world(objs);
 
@@ -118,41 +113,24 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 {
 	Camera camera(active->transformation());
 	SpecsTracker specs(camera);
->>>>>>> master
 
 	const Vector4 cam_pos = active->transformation().inverse().position();
 
 	vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
 	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
 
-<<<<<<< HEAD
-		fustrum.configure(inv_trans);
+	// fustrum.configure(active->transformation().inverse());
+	fustrum = fustrum*active->transformation().inverse();
+	// HDX
+	// createViewingFustrum(objs, inv_trans);
 
-		// HDX
-		// createViewingFustrum(objs, inv_trans);
-
-		int objsInView = 0;
-		vector<std::pair<float, Glome::Drawable*>> transparent_objs;
-		for(auto& ptr: objs) {
-			if(ptr->is_transparent()) {
-				float dist = std::acos(cam_pos.dot(ptr->position()))
-					- ptr->get_radius();
-				assert(!std::isnan(dist));
-				transparent_objs.push_back({dist, ptr.get()});
-			} else if(fustrum.isIn(*ptr)) {
-				ptr->draw(camera);
-				objsInView++;
-			}
-=======
+	int objsInView = 0;
 	for(auto iter = objs.begin(); iter != objs.end();) {
 		auto ptr = iter->second.lock();
 		if(!ptr) {
 			iter = objs.erase(iter);
 			continue;
->>>>>>> master
 		}
-		// debug: how many objs are in view
-		printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
 
 		if(ptr->is_transparent()) {
 			float dist = std::acos(cam_pos.dot(ptr->position()))
@@ -161,44 +139,31 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 			transparent_objs.push_back({dist, ptr.get()});
 		} else {
 			specs.maybe_set(iter->first);
-			ptr->draw(camera);
+
+			if(fustrum.isIn(*ptr)) {
+				ptr->draw(camera);
+				objsInView++;
+			}
 		}
 
 		drawn_objs.emplace_back(std::move(ptr));
 		++iter;
 	}
+	// debug: how many objs are in view
+	printf("Total objs: %zu, objs in view: %d\t", objs.size(), objsInView);
+	printf("Transparent objs: %zu\n", transparent_objs.size());
 
-<<<<<<< HEAD
-		// // int objsInView = 0;
-		// for(auto &pair: objs) {
-		// 	//TODO: not taking into account multiplayer (HDX)
-		// 	// #ifdef FUSTRUM_CULLING
-		// 	// 	if (pair.second->isInView)
-		// 	// 		pair.second->draw(camera);
-		// 	// #else
-		// 	// 	pair->second->draw(camera);
-		// 	// 	objsInView++;
-		// 	// #endif
-		// 	if(!pair->is_transparent() && fustrum.isIn(*pair))
-		// 		pair->draw(camera);
-		// 		objsInView++;
-		// }
-		// debug: how many objs are in view
-		// printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
-=======
 	std::sort(transparent_objs.begin(), transparent_objs.end(),
 		[] (auto& a, auto& b) {
 			return a.first > b.first;
 		}
 	);
->>>>>>> master
 
 	auto sorted_projs = Projectile::cull_sort_from_camera(camera);
 	Projectile::draw_many(sorted_projs, camera);
 
 	for(auto &pair: transparent_objs) {
 		auto& obj = *pair.second;
-
 		specs.maybe_set(&obj.get_draw_specs());
 		obj.draw(camera);
 	}
