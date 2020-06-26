@@ -23,7 +23,6 @@ struct Star
 };
 
 const size_t DUST_SIZE = 200000;
-// const size_t DUST_SIZE = 0; // HDX
 
 static GLuint vbo;
 static CamShader program;

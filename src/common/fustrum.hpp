@@ -9,14 +9,17 @@
 class Fustrum {
 public:
 
-    void configure(const QRot& cameraTransform);
-    bool isIn(const Glome::Drawable& obj);
-    Fustrum operator*(const QRot& cameraTransform);
+    static void initializeAtOrigin(Fustrum& fustrum, const QRot& cameraTransform);
+    bool isIn(const Glome::Drawable& obj) const;
+    Fustrum operator*(const QRot& cameraTransform) const;
+    
+    friend std::ostream& operator<<(std::ostream& o, const Fustrum& f);
 
-    Vector4 left_wall_center;
-    Vector4 right_wall_center;
+// private:
     Vector4 top_wall_center;
     Vector4 bottom_wall_center;
+    Vector4 left_wall_center;
+    Vector4 right_wall_center;
     Vector4 far_wall_center;
     float far_wall_cos_radius;
 };

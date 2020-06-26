@@ -16,6 +16,8 @@
 
 #include <algorithm>
 #include <memory>
+#include <iomanip>
+#include <stdlib.h>
 
 using namespace std;
 using namespace Options;
@@ -80,7 +82,7 @@ Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_wo
 	Fire::set_width(w);
 
 	QRot inv_trans = players[0].transformation().inverse();
-	fustrum.configure(inv_trans);
+	Fustrum::initializeAtOrigin(fustrum, inv_trans);
 }
 
 void
@@ -119,10 +121,14 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
 	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
 
-	// fustrum.configure(active->transformation().inverse());
-	fustrum = fustrum*active->transformation().inverse();
-	// HDX
-	// createViewingFustrum(objs, inv_trans);
+	// vector<Glome::Drawable*> v_objs;
+	// for(auto kv: objs) {
+	// 	v_objs.push_back(kv.second);
+	// }
+	// createViewingFustrum(v_objs, active->transformation().inverse(), camera);
+
+	Fustrum fustrum2;
+	fustrum2 = fustrum*active->transformation().inverse();
 
 	int objsInView = 0;
 	for(auto iter = objs.begin(); iter != objs.end();) {
@@ -132,6 +138,11 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 			continue;
 		}
 
+		// if(fustrum2.isIn(*ptr)) {
+		// 	ptr->draw(camera);
+		// 	objsInView++;
+		// }
+
 		if(ptr->is_transparent()) {
 			float dist = std::acos(cam_pos.dot(ptr->position()))
 				- ptr->get_radius();
@@ -139,19 +150,18 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 			transparent_objs.push_back({dist, ptr.get()});
 		} else {
 			specs.maybe_set(iter->first);
-
-			if(fustrum.isIn(*ptr)) {
+			// ptr->draw(camera);
+			if(fustrum2.isIn(*ptr)) {
 				ptr->draw(camera);
 				objsInView++;
 			}
 		}
 
-		drawn_objs.emplace_back(std::move(ptr));
+		if(fustrum2.isIn(*ptr)) {
+			drawn_objs.emplace_back(std::move(ptr));
+		}
 		++iter;
 	}
-	// debug: how many objs are in view
-	printf("Total objs: %zu, objs in view: %d\t", objs.size(), objsInView);
-	printf("Transparent objs: %zu\n", transparent_objs.size());
 
 	std::sort(transparent_objs.begin(), transparent_objs.end(),
 		[] (auto& a, auto& b) {
@@ -165,8 +175,17 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	for(auto &pair: transparent_objs) {
 		auto& obj = *pair.second;
 		specs.maybe_set(&obj.get_draw_specs());
-		obj.draw(camera);
+		// obj.draw(camera);
+		if(fustrum2.isIn(obj)) {
+			obj.draw(camera);
+			objsInView++;
+		}
 	}
+
+	// debug: how many objs are in view
+	printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
+	cout << fustrum2  << endl;
+	// exit(0);
 
 	DustField::draw(camera);
 
@@ -221,7 +240,7 @@ const QRot Renderer::Viewport::cam_offset(
 );
 
 
-// void Renderer::createViewingFustrum(const struct Fustrum &fustrum, const vector<Glome::Drawable*>& objs, const QRot& cameraTransform) {
+// void Renderer::createViewingFustrum(const vector<Glome::Drawable*>& objs, const QRot& cameraTransform, Camera& camera) {
 
 // 	#ifdef FUSTRUM_CULLING
 // 		#warning "Fustrum Culling is ON"
@@ -279,10 +298,8 @@ const QRot Renderer::Viewport::cam_offset(
 // 				&& obj->position().dot(rightClippingPlaneCenter)  >= 0
 // 				&& obj->position().dot(farClippingPlaneCenter) 	  >= farClippingPlaneCosRadius
 // 			) {
-// 				obj->isInView = true;
+// 				obj->draw(camera);
 // 				objsInView++;
-// 			} else {
-// 				obj->isInView = false;
 // 			}
 // 		}
 

@@ -35,7 +35,7 @@ public:
 	void setup_display();
 	void fill_minimap(const std::vector<std::shared_ptr<Glome::Drawable>>& objs,
 		Camera& cam);
-	// void createViewingFustrum(const std::vector<Glome::Drawable*> &objs, const QRot& cameraTransformation);
+	// void createViewingFustrum(const std::vector<Glome::Drawable*> &objs, const QRot& cameraTransformation, Camera& camera);
 
 protected:
 	struct Viewport: public Audio::Listener
