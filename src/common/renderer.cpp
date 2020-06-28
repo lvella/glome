@@ -81,8 +81,8 @@ Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_wo
 
 	Fire::set_width(w);
 
-	QRot inv_trans = players[0].transformation().inverse();
-	Fustrum::initializeAtOrigin(fustrum, inv_trans);
+	// QRot inv_trans = players[0].transformation().inverse();
+	Fustrum::initializeAtOrigin(fustrum);
 }
 
 void
@@ -127,8 +127,9 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	// }
 	// createViewingFustrum(v_objs, active->transformation().inverse(), camera);
 
+	// Fustrum fustrum2 = active->transformation().inverse() * fustrum;
 	Fustrum fustrum2;
-	fustrum2 = fustrum*active->transformation().inverse();
+	fustrum2 = fustrum * active->transformation().inverse();
 
 	int objsInView = 0;
 	for(auto iter = objs.begin(); iter != objs.end();) {
@@ -184,7 +185,7 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 
 	// debug: how many objs are in view
 	printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
-	cout << fustrum2  << endl;
+	// cout << fustrum2  << endl;
 	// exit(0);
 
 	DustField::draw(camera);

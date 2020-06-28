@@ -1,6 +1,6 @@
 #include "fustrum.hpp"
 
-void Fustrum::initializeAtOrigin(Fustrum& fustrum, const QRot& cameraTransform) {
+void Fustrum::initializeAtOrigin(Fustrum& fustrum) {
 
     // the centers of the 5 planes/circles are 90º from the player/ship
     fustrum.top_wall_center    = Vector4(0,-1,0,0);
@@ -34,7 +34,7 @@ void Fustrum::initializeAtOrigin(Fustrum& fustrum, const QRot& cameraTransform) 
     fustrum.far_wall_cos_radius = Vector4(0,0,0,1).dot(fustrum.far_wall_center);
 
     // multiply the planes by the camera
-    fustrum = fustrum * cameraTransform;
+    // fustrum = fustrum * cameraTransform;
 }
 
 Fustrum Fustrum::operator*(const QRot& cameraTransform) const {
@@ -70,4 +70,13 @@ std::ostream& operator<<(std::ostream& o, const Fustrum& f) {
     o << " far_wall_cos_radius: " << f.far_wall_cos_radius << '\n';
     return o;
 }
-    
+
+// Fustrum operator*(const QRot& cameraTransform, Fustrum& fustrum) {
+//     Fustrum fustrum2;
+//     fustrum.top_wall_center     = cameraTransform * fustrum.top_wall_center;
+//     fustrum.bottom_wall_center  = cameraTransform * fustrum.bottom_wall_center;
+//     fustrum.left_wall_center    = cameraTransform * fustrum.left_wall_center;
+//     fustrum.right_wall_center   = cameraTransform * fustrum.right_wall_center;
+//     fustrum.far_wall_center     = cameraTransform * fustrum.far_wall_center;
+//     return fustrum2;
+// }

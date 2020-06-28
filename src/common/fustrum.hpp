@@ -9,10 +9,10 @@
 class Fustrum {
 public:
 
-    static void initializeAtOrigin(Fustrum& fustrum, const QRot& cameraTransform);
+    static void initializeAtOrigin(Fustrum& fustrum);
     bool isIn(const Glome::Drawable& obj) const;
     Fustrum operator*(const QRot& cameraTransform) const;
-    
+
     friend std::ostream& operator<<(std::ostream& o, const Fustrum& f);
 
 // private:
@@ -23,3 +23,5 @@ public:
     Vector4 far_wall_center;
     float far_wall_cos_radius;
 };
+
+// Fustrum operator*(const QRot& cameraTransform, Fustrum& fustrum);
