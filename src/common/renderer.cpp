@@ -81,8 +81,7 @@ Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_wo
 
 	Fire::set_width(w);
 
-	// QRot inv_trans = players[0].transformation().inverse();
-	Fustrum::initializeAtOrigin(fustrum);
+	Frustum::initializeAtOrigin(frustum);
 }
 
 void
@@ -121,15 +120,8 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
 	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
 
-	// vector<Glome::Drawable*> v_objs;
-	// for(auto kv: objs) {
-	// 	v_objs.push_back(kv.second);
-	// }
-	// createViewingFustrum(v_objs, active->transformation().inverse(), camera);
-
-	// Fustrum fustrum2 = active->transformation().inverse() * fustrum;
-	Fustrum fustrum2;
-	fustrum2 = fustrum * active->transformation().inverse();
+	Frustum frustum2;
+	frustum2 = frustum * active->transformation().inverse();
 
 	int objsInView = 0;
 	for(auto iter = objs.begin(); iter != objs.end();) {
@@ -139,11 +131,6 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 			continue;
 		}
 
-		// if(fustrum2.isIn(*ptr)) {
-		// 	ptr->draw(camera);
-		// 	objsInView++;
-		// }
-
 		if(ptr->is_transparent()) {
 			float dist = std::acos(cam_pos.dot(ptr->position()))
 				- ptr->get_radius();
@@ -151,16 +138,13 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 			transparent_objs.push_back({dist, ptr.get()});
 		} else {
 			specs.maybe_set(iter->first);
-			// ptr->draw(camera);
-			if(fustrum2.isIn(*ptr)) {
+			if(frustum2.isIn(*ptr)) {
 				ptr->draw(camera);
 				objsInView++;
 			}
 		}
 
-		if(fustrum2.isIn(*ptr)) {
-			drawn_objs.emplace_back(std::move(ptr));
-		}
+		drawn_objs.emplace_back(std::move(ptr));
 		++iter;
 	}
 
@@ -176,17 +160,14 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	for(auto &pair: transparent_objs) {
 		auto& obj = *pair.second;
 		specs.maybe_set(&obj.get_draw_specs());
-		// obj.draw(camera);
-		if(fustrum2.isIn(obj)) {
+		if(frustum2.isIn(obj)) {
 			obj.draw(camera);
 			objsInView++;
 		}
 	}
 
 	// debug: how many objs are in view
-	printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
-	// cout << fustrum2  << endl;
-	// exit(0);
+	// printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
 
 	DustField::draw(camera);
 
@@ -241,18 +222,18 @@ const QRot Renderer::Viewport::cam_offset(
 );
 
 
-// void Renderer::createViewingFustrum(const vector<Glome::Drawable*>& objs, const QRot& cameraTransform, Camera& camera) {
+// void Renderer::createViewingFrustum(const vector<Glome::Drawable*>& objs, const QRot& cameraTransform, Camera& camera) {
 
 // 	#ifdef FUSTRUM_CULLING
-// 		#warning "Fustrum Culling is ON"
+// 		#warning "Frustum Culling is ON"
 // 		// ============================================= //
-// 		// ============== Fustrum culling ============== //
+// 		// ============== Frustum culling ============== //
 // 		// ============================================= //
 // 		//TODO: this should not be here, it is being computed every frame
 // 		//TODO: put it someplace else where it is only done once and then 
 // 		//TODO: save the planes so matrix transformations can be applied 
 // 		//TODO: over them as the ship moves
-// 		// need to find the centers of the 5 circles of the fustrum (the near clipping plane can be ignored)
+// 		// need to find the centers of the 5 circles of the frustum (the near clipping plane can be ignored)
 // 		// except for the far clipping plane, they are 90º from the ship/player
 // 		Vector4 topClippingPlaneCenter{0,-1,0,0};
 // 		Vector4 bottomClippingPlaneCenter{0,+1,0,0};
@@ -289,7 +270,7 @@ const QRot Renderer::Viewport::cam_offset(
 // 		farClippingPlaneCenter = cameraTransform*farClippingPlaneCenter;
 
 
-// 		// now that we have all the planes, check if each object is inside the fustrum
+// 		// now that we have all the planes, check if each object is inside the frustum
 // 		int objsInView = 0;
 // 		// std::cos(math::pi_2) == 0
 // 		for(auto &obj: objs) {
@@ -308,6 +289,6 @@ const QRot Renderer::Viewport::cam_offset(
 // 		printf("Total objs: %d, objs in view: %d\n", objs.size(), objsInView);
 
 // 	#else
-// 		#warning "Fustrum Culling is OFF"
+// 		#warning "Frustum Culling is OFF"
 // 	#endif
 // }

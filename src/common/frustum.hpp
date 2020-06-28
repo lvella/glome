@@ -6,14 +6,14 @@
 #include "math.hpp"
 #include "options.hpp"
 
-class Fustrum {
+class Frustum {
 public:
 
-    static void initializeAtOrigin(Fustrum& fustrum);
+    static void initializeAtOrigin(Frustum& frustum);
     bool isIn(const Glome::Drawable& obj) const;
-    Fustrum operator*(const QRot& cameraTransform) const;
+    Frustum operator*(const QRot& cameraTransform) const;
 
-    friend std::ostream& operator<<(std::ostream& o, const Fustrum& f);
+    friend std::ostream& operator<<(std::ostream& o, const Frustum& f);
 
 // private:
     Vector4 top_wall_center;
@@ -24,4 +24,4 @@ public:
     float far_wall_cos_radius;
 };
 
-// Fustrum operator*(const QRot& cameraTransform, Fustrum& fustrum);
+// Frustum operator*(const QRot& cameraTransform, Frustum& frustum);
