@@ -81,7 +81,7 @@ Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_wo
 
 	Fire::set_width(w);
 
-	Frustum::initializeAtOrigin(frustum);
+	Frustum::initializeAtOrigin(frustum_at_origin);
 }
 
 void
@@ -120,8 +120,8 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
 	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
 
-	Frustum frustum2;
-	frustum2 = frustum * active->transformation().inverse();
+	Frustum frustum = active->transformation().inverse() * frustum_at_origin;
+	// Frustum frustum = frustum_at_origin * active->transformation().inverse();
 
 	int objsInView = 0;
 	for(auto iter = objs.begin(); iter != objs.end();) {
@@ -138,7 +138,7 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 			transparent_objs.push_back({dist, ptr.get()});
 		} else {
 			specs.maybe_set(iter->first);
-			if(frustum2.isIn(*ptr)) {
+			if(frustum.isIn(*ptr)) {
 				ptr->draw(camera);
 				objsInView++;
 			}
@@ -160,14 +160,14 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	for(auto &pair: transparent_objs) {
 		auto& obj = *pair.second;
 		specs.maybe_set(&obj.get_draw_specs());
-		if(frustum2.isIn(obj)) {
+		if(frustum.isIn(obj)) {
 			obj.draw(camera);
 			objsInView++;
 		}
 	}
 
 	// debug: how many objs are in view
-	// printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
+	printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
 
 	DustField::draw(camera);
 

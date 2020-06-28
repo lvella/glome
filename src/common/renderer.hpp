@@ -82,5 +82,5 @@ protected:
 
 	std::vector<Viewport>::iterator active;
 
-	Frustum frustum;
+	Frustum frustum_at_origin;
 };

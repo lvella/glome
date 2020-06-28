@@ -15,13 +15,12 @@ public:
 
     friend std::ostream& operator<<(std::ostream& o, const Frustum& f);
 
-// private:
     Vector4 top_wall_center;
     Vector4 bottom_wall_center;
     Vector4 left_wall_center;
     Vector4 right_wall_center;
     Vector4 far_wall_center;
-    float far_wall_cos_radius;
+    float far_wall_radius;
 };
 
-// Frustum operator*(const QRot& cameraTransform, Frustum& frustum);
+Frustum operator*(const QRot& cameraTransform, Frustum& f);
