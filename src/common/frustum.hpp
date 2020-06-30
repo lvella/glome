@@ -11,7 +11,6 @@ public:
 
     static void initializeAtOrigin(Frustum& frustum);
     bool isIn(const Glome::Drawable& obj) const;
-    Frustum operator*(const QRot& cameraTransform) const;
 
     friend std::ostream& operator<<(std::ostream& o, const Frustum& f);
 

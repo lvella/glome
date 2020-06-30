@@ -34,26 +34,7 @@ void Frustum::initializeAtOrigin(Frustum& frustum) {
     frustum.far_wall_radius = Vector4(0,0,0,1).dot(frustum.far_wall_center);
 }
 
-Frustum Frustum::operator*(const QRot& cameraTransform) const {
-    Frustum frustum;
-    frustum.top_wall_center     = cameraTransform * top_wall_center;
-    frustum.bottom_wall_center  = cameraTransform * bottom_wall_center;
-    frustum.left_wall_center    = cameraTransform * left_wall_center;
-    frustum.right_wall_center   = cameraTransform * right_wall_center;
-    frustum.far_wall_center     = cameraTransform * far_wall_center;
-    frustum.far_wall_radius = Vector4(0,0,0,1).dot(frustum.far_wall_center);
-    return frustum;
-}
-
 bool Frustum::isIn(const Glome::Drawable& obj) const {
-    // float boundary_check = std::cos(math::pi_2 + obj.get_radius());
-    // float boundary_check_far = std::cos(math::pi_2 + obj.get_radius() + Vector4(0,0,0,1).dot(far_wall_center));
-    // if (obj.position().dot(top_wall_center) 	  >= boundary_check
-    //     && obj.position().dot(bottom_wall_center) >= boundary_check
-    //     && obj.position().dot(left_wall_center)   >= boundary_check
-    //     && obj.position().dot(right_wall_center)  >= boundary_check
-    //     //&& obj.position().dot(far_wall_center)    >= boundary_check_far
-    // )
     if (obj.intersects_great_sphere(top_wall_center)
         && obj.intersects_great_sphere(bottom_wall_center)
         && obj.intersects_great_sphere(left_wall_center)
@@ -70,7 +51,7 @@ std::ostream& operator<<(std::ostream& o, const Frustum& f) {
     o << " left_wall_center  : " << f.left_wall_center;
     o << " right_wall_center : " << f.right_wall_center;
     o << " far_wall_center   : " << f.far_wall_center;
-    o << " far_wall_cos_radius: " << f.far_wall_radius << '\n';
+    o << " far_wall_radius   : " << f.far_wall_radius << '\n';
     return o;
 }
 
@@ -81,6 +62,6 @@ Frustum operator*(const QRot& cameraTransform, Frustum& f) {
     frustum.left_wall_center    = cameraTransform * f.left_wall_center;
     frustum.right_wall_center   = cameraTransform * f.right_wall_center;
     frustum.far_wall_center     = cameraTransform * f.far_wall_center;
-    frustum.far_wall_radius = Vector4(0,0,0,1).dot(frustum.far_wall_center);
+    frustum.far_wall_radius = std::acos(Vector4(0,0,0,1).dot(frustum.far_wall_center));
     return frustum;
 }
