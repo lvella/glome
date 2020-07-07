@@ -31,7 +31,7 @@ void Frustum::initializeAtOrigin(Frustum& frustum) {
     // get the point parallel to the ship in the far clipping plane
     Vector4 S = Vector3(0,0,-CamShader::Z_FAR/2).inverse_stereo_proj();
     frustum.far_wall_center = -((Vector4{0,0,0,1} + S)*0.5).normalized();
-    frustum.far_wall_radius = Vector4(0,0,0,1).dot(frustum.far_wall_center);
+    frustum.far_wall_radius = std::acos(Vector4(0,0,0,1).dot(frustum.far_wall_center));
 }
 
 bool Frustum::isIn(const Glome::Drawable& obj) const {
@@ -62,6 +62,6 @@ Frustum operator*(const QRot& cameraTransform, Frustum& f) {
     frustum.left_wall_center    = cameraTransform * f.left_wall_center;
     frustum.right_wall_center   = cameraTransform * f.right_wall_center;
     frustum.far_wall_center     = cameraTransform * f.far_wall_center;
-    frustum.far_wall_radius = std::acos(Vector4(0,0,0,1).dot(frustum.far_wall_center));
+    frustum.far_wall_radius     = f.far_wall_radius;
     return frustum;
 }

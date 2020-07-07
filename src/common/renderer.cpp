@@ -121,7 +121,6 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
 
 	Frustum frustum = active->transformation().inverse() * frustum_at_origin;
-	// Frustum frustum = frustum_at_origin * active->transformation().inverse();
 
 	int objsInView = 0;
 	for(auto iter = objs.begin(); iter != objs.end();) {
@@ -167,7 +166,8 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	}
 
 	// debug: how many objs are in view
-	printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
+	// printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
+	//std::cout << frustum << std::endl;
 
 	DustField::draw(camera);
 
@@ -220,75 +220,3 @@ const QRot Renderer::Viewport::cam_offset(
 	zw_qrot(-0.015) *
 	yw_qrot(-0.01)
 );
-
-
-// void Renderer::createViewingFrustum(const vector<Glome::Drawable*>& objs, const QRot& cameraTransform, Camera& camera) {
-
-// 	#ifdef FUSTRUM_CULLING
-// 		#warning "Frustum Culling is ON"
-// 		// ============================================= //
-// 		// ============== Frustum culling ============== //
-// 		// ============================================= //
-// 		//TODO: this should not be here, it is being computed every frame
-// 		//TODO: put it someplace else where it is only done once and then 
-// 		//TODO: save the planes so matrix transformations can be applied 
-// 		//TODO: over them as the ship moves
-// 		// need to find the centers of the 5 circles of the frustum (the near clipping plane can be ignored)
-// 		// except for the far clipping plane, they are 90º from the ship/player
-// 		Vector4 topClippingPlaneCenter{0,-1,0,0};
-// 		Vector4 bottomClippingPlaneCenter{0,+1,0,0};
-// 		Vector4 leftClippingPlaneCenter{+1,0,0,0};
-// 		Vector4 rightClippingPlaneCenter{-1,0,0,0};
-// 		// all these will rotate towards z=-1
-// 		// get the rotation matrices
-// 		// top and bottom rotate by FOV/2
-// 		// FOVx = FOVy*aspectratio
-// 		float yzPlaneRotation = CamShader::FOV_Y/2;
-// 		float xzPlaneRotation = CamShader::FOV_Y*(float(Options::width) / float(Options::height)) / 2;
-// 		// left and right rotate by aspectRatio/2
-// 		QRot topClippingPlaneRotation = yz_qrot(yzPlaneRotation);
-// 		QRot bottomClippingPlaneRotation = yz_qrot(-yzPlaneRotation);
-// 		QRot leftClippingPlaneRotation = xz_qrot(-xzPlaneRotation);
-// 		QRot rightClippingPlaneRotation = xz_qrot(xzPlaneRotation);
-// 		// apply the rotation to the centers of the planes/circles
-// 		// multiply the vectors with the rotation matrices
-// 		topClippingPlaneCenter = topClippingPlaneRotation*topClippingPlaneCenter;
-// 		bottomClippingPlaneCenter = bottomClippingPlaneRotation*bottomClippingPlaneCenter;
-// 		leftClippingPlaneCenter = leftClippingPlaneRotation*leftClippingPlaneCenter;
-// 		rightClippingPlaneCenter = rightClippingPlaneRotation*rightClippingPlaneCenter;
-// 		// for the far clipping plane
-// 		// get the point parallel to the ship in the far clipping plane
-// 		Vector4 S = Vector3(0,0,-CamShader::Z_FAR/2).inverse_stereo_proj();
-// 		Vector4 farClippingPlaneCenter = -((Vector4{0,0,0,1} + S)*0.5).normalized();
-// 		float farClippingPlaneCosRadius = Vector4(0,0,0,1).dot(farClippingPlaneCenter);
-
-// 		// multiply the planes by the camera
-// 		topClippingPlaneCenter = cameraTransform*topClippingPlaneCenter;
-// 		bottomClippingPlaneCenter = cameraTransform*bottomClippingPlaneCenter;
-// 		leftClippingPlaneCenter = cameraTransform*leftClippingPlaneCenter;
-// 		rightClippingPlaneCenter = cameraTransform*rightClippingPlaneCenter;
-// 		farClippingPlaneCenter = cameraTransform*farClippingPlaneCenter;
-
-
-// 		// now that we have all the planes, check if each object is inside the frustum
-// 		int objsInView = 0;
-// 		// std::cos(math::pi_2) == 0
-// 		for(auto &obj: objs) {
-// 			if(obj->position().dot(topClippingPlaneCenter) 		  >= 0
-// 				&& obj->position().dot(bottomClippingPlaneCenter) >= 0
-// 				&& obj->position().dot(leftClippingPlaneCenter)   >= 0
-// 				&& obj->position().dot(rightClippingPlaneCenter)  >= 0
-// 				&& obj->position().dot(farClippingPlaneCenter) 	  >= farClippingPlaneCosRadius
-// 			) {
-// 				obj->draw(camera);
-// 				objsInView++;
-// 			}
-// 		}
-
-// 		// debug: how many objs are in view
-// 		printf("Total objs: %d, objs in view: %d\n", objs.size(), objsInView);
-
-// 	#else
-// 		#warning "Frustum Culling is OFF"
-// 	#endif
-// }

@@ -4,7 +4,6 @@ project(glome_sdl)
 
 option(FIND_SDL2 "Try to find SDL2" ON)
 option(FIND_GLEW "Try to find GLEW" ON)
-option(FIND_OPENGL "Try to find OPENGL" ON)
 
 add_executable(glome
 	input.cpp
