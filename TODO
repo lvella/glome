@@ -1,9 +1,13 @@
 == Needs for FIKALAB game ==
 
-- Support Windows build (Rui)
-- Add collision to supernova
-  - Kill player when collide, finishing the game
-  - Show and register score, then ask to try again
+- Support Windows build (Diogo)
+  - Focus on CLang and MSVC
+- CI (Rui)
+- Game menu with scoreboard:
+  - Devise some way to score (Lucas)
+    - HUD displaying current score
+  - Kill player when collide with supernova, finishing the game
+  - Show score, then ask to try again
     - Take care to make it compatible with VR UI
 - Transfer momentum on collision between objects (ships, flying spagetti monsters)
   - At least prevent them from intersecting, change their velocity away from one another
