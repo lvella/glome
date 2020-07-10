@@ -39,7 +39,10 @@ bool Frustum::isIn(const Glome::Drawable& obj) const {
         && obj.intersects_great_sphere(bottom_wall_center)
         && obj.intersects_great_sphere(left_wall_center)
         && obj.intersects_great_sphere(right_wall_center)
-        && obj.position().dot(far_wall_center) >= std::cos(obj.get_radius() + far_wall_radius)
+        && test_sphere_intersection(
+            obj.get_radius(), far_wall_radius,
+            obj.position().dot(far_wall_center)
+        )
     )
         return true;
     return false;
