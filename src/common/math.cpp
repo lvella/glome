@@ -103,3 +103,23 @@ QRot rotation_between_unit_vecs(const Vector4& from, const Vector4& to)
 		(from.conjugate() * to).sqrt()
 	);
 }
+
+bool test_sphere_intersection(float radius_a, float radius_b, float cos_dist)
+{
+	float total_radius = radius_a + radius_b;
+
+	// The following algorithm fails if the sum of the radius of the
+	// spheres is greater than or equal 180°. But in this case, both
+	// spheres are always touching:
+	if(total_radius >= math::pi) {
+		return true;
+	}
+
+	// Calculates the cossine of the sum of the radius.
+	float touching_radius = std::cos(total_radius);
+
+	// True if distance between centers is smaller or equal
+	// the radius touching distance
+	return cos_dist >= touching_radius;
+
+}

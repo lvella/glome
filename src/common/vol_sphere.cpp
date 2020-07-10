@@ -13,23 +13,11 @@ void VolSphere::set_radius(float r)
 
 bool VolSphere::intersects(const VolSphere& other, float &cos_dist) const
 {
-	// The following algorithm fails if the sum of the radius of the
-	// spheres is greater than or equal 180°. But in this case, both
-	// spheres are always touching:
-	if((radius + other.radius) >= math::pi) {
-		return true;
-	}
-
 	// Calculates the cossine of the angle between the center of
 	// the two spheres.
 	cos_dist = this->position().dot(other.position());
 
-	// Calculates the cossine of the sum of the radius.
-	float touching_radius = std::cos(radius + other.radius);
-
-	// True if distance between centers is smaller or equal
-	// the radius touching distance
-	return cos_dist >= touching_radius;
+	return test_sphere_intersection(radius, other.radius, cos_dist);
 }
 
 bool VolSphere::intersects(const VolSphere& other) const
