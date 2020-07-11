@@ -29,7 +29,7 @@ void Frustum::initializeAtOrigin(Frustum& frustum) {
 
     // for the far clipping plane
     // get the point parallel to the ship in the far clipping plane
-    Vector4 S = Vector3(0,0,-CamShader::Z_FAR/2).inverse_stereo_proj();
+    Vector4 S = Vector3(0,0,-CamShader::Z_FAR).inverse_stereo_proj();
     frustum.far_wall_center = -((Vector4{0,0,0,1} + S)*0.5).normalized();
     frustum.far_wall_radius = std::acos(Vector4(0,0,0,1).dot(frustum.far_wall_center));
 }
@@ -39,7 +39,10 @@ bool Frustum::isIn(const Glome::Drawable& obj) const {
         && obj.intersects_great_sphere(bottom_wall_center)
         && obj.intersects_great_sphere(left_wall_center)
         && obj.intersects_great_sphere(right_wall_center)
-        && obj.position().dot(far_wall_center) >= std::cos(obj.get_radius() + far_wall_radius)
+        && test_sphere_intersection(
+            obj.get_radius(), far_wall_radius,
+            obj.position().dot(far_wall_center)
+        )
     )
         return true;
     return false;
