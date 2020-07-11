@@ -11,6 +11,13 @@
 #include "fire.hpp"
 #include "dustfield.hpp"
 #include "camera.hpp"
+#include "renderer.hpp"
+#include "vector4.hpp"
+
+#include <algorithm>
+#include <memory>
+#include <iomanip>
+#include <stdlib.h>
 
 using namespace std;
 using namespace Options;
@@ -73,6 +80,8 @@ Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_wo
 	}
 
 	Fire::set_width(w);
+
+	Frustum::initializeAtOrigin(frustum_at_origin);
 }
 
 void
@@ -111,6 +120,9 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
 	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
 
+	Frustum frustum = active->transformation().inverse() * frustum_at_origin;
+
+	int objsInView = 0;
 	for(auto iter = objs.begin(); iter != objs.end();) {
 		auto ptr = iter->second.lock();
 		if(!ptr) {
@@ -125,7 +137,10 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 			transparent_objs.push_back({dist, ptr.get()});
 		} else {
 			specs.maybe_set(iter->first);
-			ptr->draw(camera);
+			if(frustum.isIn(*ptr)) {
+				ptr->draw(camera);
+				objsInView++;
+			}
 		}
 
 		drawn_objs.emplace_back(std::move(ptr));
@@ -143,10 +158,16 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 
 	for(auto &pair: transparent_objs) {
 		auto& obj = *pair.second;
-
 		specs.maybe_set(&obj.get_draw_specs());
-		obj.draw(camera);
+		if(frustum.isIn(obj)) {
+			obj.draw(camera);
+			objsInView++;
+		}
 	}
+
+	// debug: how many objs are in view
+	// printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
+	//std::cout << frustum << std::endl;
 
 	DustField::draw(camera);
 
@@ -191,6 +212,7 @@ Renderer::Viewport::update(float dt)
 
 	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
 	next.dt -= dt;
+
 }
 
 const QRot Renderer::Viewport::cam_offset(

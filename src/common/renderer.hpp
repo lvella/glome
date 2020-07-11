@@ -12,6 +12,7 @@
 #include "qrot.hpp"
 #include "math.hpp"
 #include "ship.hpp"
+#include "frustum.hpp"
 
 class Renderer
 {
@@ -76,4 +77,6 @@ protected:
 	std::vector<Viewport> players;
 
 	std::vector<Viewport>::iterator active;
+
+	Frustum frustum_at_origin;
 };

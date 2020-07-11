@@ -104,6 +104,8 @@ add_library(common STATIC
 	world.hpp
 	world_dummy.cpp
 	world_dummy.hpp
+	frustum.cpp
+	frustum.hpp
 )
 
 target_include_directories(common PUBLIC
