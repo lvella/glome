@@ -28,43 +28,43 @@ Meridians::draw(Camera &c)
 {
 	const Shader *s = c.getShader();
 
-	glDisableVertexAttribArray(s->colorAttr());
+	glDisableVertexAttribArray(Shader::ATTR_COLOR);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	c.setQRot(QRot::IDENTITY());
-	glVertexAttrib4f(s->colorAttr(), 1.0f, 1.0f, 0.0f, 1.0f);
+	glVertexAttrib4f(Shader::ATTR_COLOR, 1.0f, 1.0f, 0.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
 
 	QRot t = xz_qrot(math::pi_2);
 	c.setQRot(t);
-	glVertexAttrib4f(s->colorAttr(), .0f, 1.f, 1.0f, 1.0f);
+	glVertexAttrib4f(Shader::ATTR_COLOR, .0f, 1.f, 1.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
 
 	t *= yz_qrot(math::pi_2);
 	c.setQRot(t);
-	glVertexAttrib4f(s->colorAttr(), 1.0f, .0f, 1.0f, 1.0f);
+	glVertexAttrib4f(Shader::ATTR_COLOR, 1.0f, .0f, 1.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
 
 	t *= xw_qrot(-math::pi_2);
 	c.setQRot(t);
-	glVertexAttrib4f(s->colorAttr(), 1.0f, .0f, .0f, 1.0f);
+	glVertexAttrib4f(Shader::ATTR_COLOR, 1.0f, .0f, .0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
 
 	t *= yw_qrot(-math::pi_2);
 	c.setQRot(t);
-	glVertexAttrib4f(s->colorAttr(), .0f, .0f, 1.0f, 1.0f);
+	glVertexAttrib4f(Shader::ATTR_COLOR, .0f, .0f, 1.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
 
 	t *= yz_qrot(math::pi_2);
 	c.setQRot(t);
-	glVertexAttrib4f(s->colorAttr(), .0f, 1.0f, 0.0f, 1.0f);
+	glVertexAttrib4f(Shader::ATTR_COLOR, .0f, 1.0f, 0.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
 
-	glEnableVertexAttribArray(s->colorAttr());
+	glEnableVertexAttribArray(Shader::ATTR_COLOR);
 }
 
 void

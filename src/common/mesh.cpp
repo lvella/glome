@@ -369,8 +369,8 @@ Mesh::draw(Camera& c)
 
 	if(has_colorbuf) {
 		stride = 32;
-		glEnableVertexAttribArray(s->colorAttr());
-		glVertexAttribPointer(s->colorAttr(),
+		glEnableVertexAttribArray(Shader::ATTR_COLOR);
+		glVertexAttribPointer(Shader::ATTR_COLOR,
 			4, GL_FLOAT, GL_FALSE, stride, (void*) (4 * sizeof(float))
 		);
 	}
@@ -378,12 +378,12 @@ Mesh::draw(Camera& c)
 		stride = 0;
 	}
 
-	glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, stride, NULL);
+	glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE, stride, NULL);
 
 	glDrawElements(primitive_type, len, GL_UNSIGNED_SHORT, NULL);
 
 	if(has_colorbuf)
-		glDisableVertexAttribArray(s->colorAttr());
+		glDisableVertexAttribArray(Shader::ATTR_COLOR);
 }
 
 Mesh*
