@@ -25,7 +25,7 @@ public:
 	void setup_draw_state(Camera& c)
 	{
 		c.setShader(&shader);
-		glEnableVertexAttribArray(shader.colorAttr());
+		glEnableVertexAttribArray(Shader::ATTR_COLOR);
 	}
 
 private:
@@ -39,9 +39,9 @@ void Glome::Drawable::minimap_draw(Camera& c)
 	const Shader *s = c.getShader();
 	c.setQRot(get_t());
 
-	glVertexAttrib3f(s->colorAttr(), 1.0f, 0.0f, 0.0f);
+	glVertexAttrib3f(Shader::ATTR_COLOR, 1.0f, 0.0f, 0.0f);
 	glBindBuffer(GL_ARRAY_BUFFER, square_vbo);
-	glVertexAttribPointer(s->posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(Shader::ATTR_POSITION, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 }
 

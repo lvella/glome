@@ -76,7 +76,7 @@ void draw(Camera& cam)
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glEnableVertexAttribArray(attrib_endpoint);
 
-    glVertexAttribPointer(program.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, pos));
+    glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, pos));
     glVertexAttribPointer(attrib_endpoint, 1, GL_FLOAT, GL_FALSE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, end));
 
     glDrawArrays(GL_LINES, 0, DUST_SIZE*2);

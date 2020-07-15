@@ -36,13 +36,13 @@ public:
 	void setup_draw_state(Camera& c) override
 	{
 		c.setShader(&shader);
-		glEnableVertexAttribArray(shader.colorAttr());
+		glEnableVertexAttribArray(Shader::ATTR_COLOR);
 		glEnableVertexAttribArray(center_dist_attr);
 	}
 
 	void shutdown_draw_state(Camera&) override
 	{
-		glDisableVertexAttribArray(shader.colorAttr());
+		glDisableVertexAttribArray(Shader::ATTR_COLOR);
 		glDisableVertexAttribArray(center_dist_attr);
 	}
 };
@@ -121,10 +121,10 @@ void SpaghettiFragment::draw(Camera& c)
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 
-	glVertexAttribPointer(shader.posAttr(), 4, GL_FLOAT, GL_FALSE,
+	glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE,
 		sizeof(Vertex), (GLvoid*) offsetof(Vertex, sv.pos));
 
-	glVertexAttribPointer(shader.colorAttr(), 4, GL_FLOAT, GL_FALSE,
+	glVertexAttribPointer(Shader::ATTR_COLOR, 4, GL_FLOAT, GL_FALSE,
 		sizeof(Vertex), (GLvoid*) offsetof(Vertex, sv.color));
 
 	glVertexAttribPointer(center_dist_attr, 1, GL_FLOAT, GL_FALSE,

@@ -167,18 +167,18 @@ void Projectile::draw_many(const std::vector < Projectile * >&shots, Camera & c)
 		glUniform1i(uniform_has_tex, 1);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
-		glEnableVertexAttribArray(program_bullet.colorAttr());
+		glEnableVertexAttribArray(Shader::ATTR_COLOR);
 
-		glVertexAttribPointer(program_bullet.posAttr(), 2, GL_FLOAT,
+		glVertexAttribPointer(Shader::ATTR_POSITION, 2, GL_FLOAT,
 				      GL_FALSE, 5 * sizeof(float),
 				      (float *)0 + 3);
-		glVertexAttribPointer(program_bullet.colorAttr(), 3, GL_FLOAT,
+		glVertexAttribPointer(Shader::ATTR_COLOR, 3, GL_FLOAT,
 				      GL_FALSE, 5 * sizeof(float), (float *)0);
 
 		for(auto i: shots)
 			i->draw(c);
 
-		glDisableVertexAttribArray(program_bullet.colorAttr());
+		glDisableVertexAttribArray(Shader::ATTR_COLOR);
 	}
 }
 

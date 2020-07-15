@@ -5,6 +5,8 @@
 #include "vector2.hpp"
 #include "math.hpp"
 
+#include <array>
+#include <bitset>
 #include <vector>
 #include <map>
 
@@ -57,6 +59,21 @@ private:
 class Shader
 {
 public:
+	// Attributes locations, in order:
+	enum Attributes: GLint {
+		ATTR_POSITION,
+		ATTR_COLOR,
+		ATTR_TEXCOORD,
+		NUM_ATTRIBUTES
+	};
+
+	// Attributes names, in order:
+	static constexpr char const * attr_names[NUM_ATTRIBUTES] = {
+		"position",
+		"color",
+		"texcoord"
+	};
+
 	using SourceVector = std::vector<const char*>;
 
 	Shader() = default;
@@ -65,21 +82,7 @@ public:
 
 	virtual void setup_shader(const SourceVector& sources);
 
-	void enable() const {
-		glUseProgram(prog);
-	}
-
-	GLint posAttr() const {
-		return 0;
-	}
-
-	GLint colorAttr() const {
-		return attr_color;
-	}
-
-	GLint texcoordAttr() const {
-		return attr_texcoord;
-	}
+	void enable() const;
 
 	Uniform getUniform(const char *name) const;
 
@@ -89,9 +92,6 @@ public:
 
 protected:
 	GLuint prog = 0;
-
-	GLint attr_color;
-	GLint attr_texcoord;
 };
 
 class SpaceShader: public Shader

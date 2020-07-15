@@ -77,8 +77,11 @@ void Shader::setup_shader(const SourceVector& sources)
 
 		glAttachShader(prog, shader);
 	}
-	// We expect every shader to have a "position" attribute, to be the reference attribute
-	glBindAttribLocation(prog, 0, "position");
+
+	for(unsigned i = 0; i < NUM_ATTRIBUTES; ++i) {
+		glBindAttribLocation(prog, i, attr_names[i]);
+	}
+
 	glLinkProgram(prog);
 	{
 		GLsizei length;
@@ -94,9 +97,11 @@ void Shader::setup_shader(const SourceVector& sources)
 			std::cout << "]:\n" << err << std::endl;
 		}
 	}
+}
 
-	attr_color = glGetAttribLocation(prog, "color");
-	attr_texcoord = glGetAttribLocation(prog, "texcoord");
+void Shader::enable() const
+{
+	glUseProgram(prog);
 }
 
 Shader::~Shader()

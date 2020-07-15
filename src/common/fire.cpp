@@ -50,14 +50,14 @@ public:
 
 		glBindTexture(GL_TEXTURE_2D, tex_particle);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE);
-		glEnableVertexAttribArray(program_fire.colorAttr());
+		glEnableVertexAttribArray(Shader::ATTR_COLOR);
 		glEnableVertexAttribArray(attrib_radius);
 	}
 
 	void shutdown_draw_state(Camera&) override
 	{
 		glDisableVertexAttribArray(attrib_radius);
-		glDisableVertexAttribArray(program_fire.colorAttr());
+		glDisableVertexAttribArray(Shader::ATTR_COLOR);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
@@ -167,8 +167,8 @@ void Fire::draw(Camera& c)
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(RenderAttributes) * count, rattrs); /// TEST
 
-	glVertexAttribPointer(program_fire.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), 0);
-	glVertexAttribPointer(program_fire.colorAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(sizeof(Vector4)));
+	glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), 0);
+	glVertexAttribPointer(Shader::ATTR_COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(sizeof(Vector4)));
 	glVertexAttribPointer(attrib_radius, 1, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(2*sizeof(Vector4)));
 	glDrawElements(GL_POINTS, actives_count, GL_UNSIGNED_SHORT, 0);
 }

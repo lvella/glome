@@ -117,12 +117,11 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 
 	const Vector4 cam_pos = active->transformation().inverse().position();
 
-	vector<std::shared_ptr<Glome::Drawable>> drawn_objs;
+	vector<std::shared_ptr<Glome::Drawable>> remaining_objs;
 	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
 
 	Frustum frustum = active->transformation().inverse() * frustum_at_origin;
 
-	int objsInView = 0;
 	for(auto iter = objs.begin(); iter != objs.end();) {
 		auto ptr = iter->second.lock();
 		if(!ptr) {
@@ -130,20 +129,19 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 			continue;
 		}
 
-		if(ptr->is_transparent()) {
-			float dist = std::acos(cam_pos.dot(ptr->position()))
-				- ptr->get_radius();
-			assert(!std::isnan(dist));
-			transparent_objs.push_back({dist, ptr.get()});
-		} else {
-			specs.maybe_set(iter->first);
-			if(frustum.isIn(*ptr)) {
+		if(frustum.isIn(*ptr)) {
+			if(ptr->is_transparent()) {
+				float dist = std::acos(cam_pos.dot(ptr->position()))
+					- ptr->get_radius();
+				assert(!std::isnan(dist));
+				transparent_objs.push_back({dist, ptr.get()});
+			} else {
+				specs.maybe_set(iter->first);
 				ptr->draw(camera);
-				objsInView++;
 			}
 		}
 
-		drawn_objs.emplace_back(std::move(ptr));
+		remaining_objs.emplace_back(std::move(ptr));
 		++iter;
 	}
 
@@ -159,19 +157,12 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 	for(auto &pair: transparent_objs) {
 		auto& obj = *pair.second;
 		specs.maybe_set(&obj.get_draw_specs());
-		if(frustum.isIn(obj)) {
-			obj.draw(camera);
-			objsInView++;
-		}
+		obj.draw(camera);
 	}
-
-	// debug: how many objs are in view
-	// printf("Total objs: %zu, objs in view: %d\n", objs.size(), objsInView);
-	//std::cout << frustum << std::endl;
 
 	DustField::draw(camera);
 
-	return drawn_objs;
+	return remaining_objs;
 }
 
 void

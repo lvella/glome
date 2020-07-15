@@ -137,7 +137,7 @@ void Supernova::minimap_draw(Camera &c)
 	c.setQRot(get_t());
 
 	map_slerp_arc.set(slerp);
-	glVertexAttrib3f(map_shader.colorAttr(), 1.0f, 1.0f, 1.0f);
+	glVertexAttrib3f(Shader::ATTR_COLOR, 1.0f, 1.0f, 1.0f);
 	map_mesh->draw(c);
 
 	c.setShader(prev);

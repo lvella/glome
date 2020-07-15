@@ -46,20 +46,20 @@ draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 
 	// Draw 2D green background.
 	hud.enable();
-	glDisableVertexAttribArray(hud.colorAttr());
+	glDisableVertexAttribArray(Shader::ATTR_COLOR);
 	glDisable(GL_DEPTH_TEST);
 
 	glUniform1i(hud_has_tex, 1);
 	glBindTexture(GL_TEXTURE_2D, tex_minimap);
-	glVertexAttrib4f(hud.colorAttr(), 0.06f, 0.64f, 0.12f, 0.55f);
+	glVertexAttrib4f(Shader::ATTR_COLOR, 0.06f, 0.64f, 0.12f, 0.55f);
 
 	glBindBuffer(GL_ARRAY_BUFFER, square_vbo);
-	glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, NULL);
+	glVertexAttribPointer(Shader::ATTR_POSITION, 2, GL_FLOAT, GL_FALSE, 0, NULL);
 
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 
 	// Draw field of vision
-	glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, (void*)(16*sizeof(float)));
+	glVertexAttribPointer(Shader::ATTR_POSITION, 2, GL_FLOAT, GL_FALSE, 0, (void*)(16*sizeof(float)));
 	glDrawArrays(GL_LINE_STRIP, 0, 3);
 
 	// Draw ship object
@@ -67,8 +67,8 @@ draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 	glEnable(GL_DEPTH_TEST);
 	glClear(GL_DEPTH_BUFFER_BIT);
 
-	glVertexAttrib3f(hud.colorAttr(), 1.0f, 1.0f, 1.0f);
-	glVertexAttribPointer(hud.posAttr(), 2, GL_FLOAT, GL_FALSE, 0, (void*)(8*sizeof(float)));
+	glVertexAttrib3f(Shader::ATTR_COLOR, 1.0f, 1.0f, 1.0f);
+	glVertexAttribPointer(Shader::ATTR_POSITION, 2, GL_FLOAT, GL_FALSE, 0, (void*)(8*sizeof(float)));
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	// From now on, use the camera with transform stack to draw objects
