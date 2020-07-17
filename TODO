@@ -5,8 +5,9 @@
 - CI (Rui)
 - Game menu with scoreboard:
   - Devise some way to score (Lucas)
-    - HUD displaying current score
   - Kill player when collide with supernova, finishing the game
+  - HUD displaying current score
+    - Maybe use guichan
   - Show score, then ask to try again
     - Take care to make it compatible with VR UI
 - Transfer momentum on collision between objects (ships, flying spagetti monsters)
@@ -15,11 +16,7 @@
 - Fix supernova appearance:
   - you can see briefly see the other side when it is half size (you must not)
     - don't draw the opposite side to fix this
-- Make game run in solid 90 Hz
-  - make it 144 Hz, if possible
-  - Cull unseen objects (Helder)
-  - Update audio in parallel with drawing
-- Implement stereo rendering using OpenVR API
+- Implement stereo rendering using OpenVR API (Helder)
 - Handle headset input:
   - Headset orientation changes camera view relative to ship position
 - Figure VR inputs
@@ -36,6 +33,7 @@
   - Flying spagetti monster
   - Splash into supernova
   - others?
+- Update audio in parallel with drawing
 - Fix destroyer's double flame positions
 - Display on map only the volume unconsumed by supernova
 - Visual cue of cannon heat
