@@ -50,7 +50,7 @@ protected:
 
 	Renderer* _render;
 	std::vector<std::weak_ptr<Ship>> ships;
-	std::vector<AiController*> ai_controls;
+	std::vector<std::shared_ptr<AiController>> ai_controls;
 
 private:
 

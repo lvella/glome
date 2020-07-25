@@ -1,6 +1,7 @@
 #pragma once
 
 #include <list>
+#include <memory>
 #include "matrix4.hpp"
 #include "vector4.hpp"
 #include "collidable.hpp"
@@ -9,7 +10,9 @@
 class Projectile final: virtual public Object, public Collidable
 {
 public:
-	static void shot(ShipController *s, const QRot& from, float speed);
+	static void shot(const std::shared_ptr<ShipController>& s,
+		const QRot& from, float speed);
+
 	static void draw_many(const std::vector<Projectile*>& shots, Camera& cam);
 	static void draw_in_minimap();
 	static void update_all(float dt);
@@ -22,7 +25,7 @@ public:
 	}
 
 private:
-	Projectile(ShipController *s, const QRot& from, float speed);
+	Projectile(const std::shared_ptr<ShipController>& s, const QRot& from, float speed);
 	void draw(Camera& cam);
 	void update(float dt);
 	inline bool is_dead() const
@@ -36,7 +39,6 @@ private:
 		ttl = max_ttl;
 	}
 
-	ShipController *owner;
 	float speed;
 	float ttl;
 	float max_ttl;

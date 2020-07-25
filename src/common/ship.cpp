@@ -19,7 +19,7 @@ using namespace Glome;
 extern const char* mesh_filename[Mesh::MESH_COUNT];
 
 void
-Ship::set_controller(ShipController* pctrl)
+Ship::set_controller(const std::shared_ptr<ShipController>& pctrl)
 {
 	ctrl = pctrl;
 	ctrl->stats = stats.get();
@@ -184,8 +184,7 @@ Ship::update(float dt, UpdatableAdder& adder)
 				// bringing the bullet closer to the cannon:
 				const float offset = speed * (ctrl->shot_countdown + dt);
 
-				Projectile::shot(ctrl,
-					get_t()
+				Projectile::shot(ctrl, get_t()
 					* (ctrl->canon_shot_last ? l_canon : r_canon)
 					* zw_qrot(offset), speed
 				);
