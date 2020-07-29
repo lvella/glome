@@ -196,13 +196,54 @@ void Spaghetti::draw(Camera& c)
 	}
 }
 
+Spaghetti::Damager* Spaghetti::get_damager(const std::shared_ptr<Scorer>& scorer)
+{
+	if(!scorer)
+	{
+		return nullptr;
+	}
+
+	for(Damager &d: damage_log) {
+		if(d.scorer == scorer) {
+			return &d;
+		}
+	}
+	damage_log.push_back({scorer, 0});
+	return &damage_log.back();
+}
+
+uint64_t Spaghetti::compute_score(unsigned damage_done)
+{
+	// TODO: compute score logic here!
+	return (100 * damage_done) / total_damage;
+}
+
 bool Spaghetti::update(float dt, UpdatableAdder& adder)
 {
-	while(!impact.empty()) {
-		if(!chip(adder, impact.back())) {
+	while(!impacts.empty()) {
+		auto& back = impacts.back();
+
+		unsigned damage;
+		bool survived = chip(adder, back.location, damage);
+		total_damage += damage;
+
+		Damager *dmgr = get_damager(back.scorer);
+		if(dmgr) {
+			dmgr->damage += damage;
+		}
+
+		if(!survived) {
+			// Score is only computed if it was
+			// not supernova who killed the spaghetti.
+			if(dmgr) {
+				for(auto& d: damage_log) {
+					d.scorer->add_points(compute_score(d.damage));
+				}
+			}
 			return false;
 		}
-		impact.pop_back();
+
+		impacts.pop_back();
 	}
 
 	QRot velo = qrotation(
@@ -221,17 +262,19 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 	if(typeid(other) == typeid(const Projectile&) ||
 		typeid(other) == typeid(const Supernova&))
 	{
-		const Vector4 impact_point = rotate_unit_vec_towards(
-			position(), other.position(), get_radius()
-		);
-
-		impact.push_back(get_t().inverse() * impact_point);
+		impacts.push_back({
+			(typeid(other) == typeid(const Projectile&) ?
+			 	static_cast<const Projectile&>(other).get_scorer() :
+				std::shared_ptr<Scorer>{}),
+			rotate_unit_vec_towards(
+				position(), other.position(), get_radius())
+		});
 	}
 }
 
 static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
 
-bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
+bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point, unsigned& damage)
 {
 	TimeGuard timer(chip_time);
 
@@ -282,7 +325,7 @@ bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 	});
 
 	// Each damage unit strips a fragment from the spaghetti.
-	unsigned damage = std::max(1l, std::lround(bullet_damage(Random::gen)));
+	damage = std::max(1l, std::lround(bullet_damage(Random::gen)));
 	auto sorted_iter = cos_dists.begin();
 	for(unsigned i = 0; i < damage; ++i)
 	{

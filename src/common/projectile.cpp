@@ -68,7 +68,7 @@ static RegisterInitialization ini{[]
 		program_bullet.program(), "has_tex");
 }};
 
-void Projectile::shot(const std::shared_ptr<ShipController>& s, const QRot& from, float speed)
+void Projectile::shot(const std::shared_ptr<Scorer>& s, const QRot& from, float speed)
 {
 	// TODO: find a non-hackish way to use emplace_front...
 	shots.push_front(Projectile{s, from, speed});
@@ -194,12 +194,13 @@ void Projectile::draw_in_minimap()
 
 }
 
-Projectile::Projectile(const std::shared_ptr<ShipController>& s,
+Projectile::Projectile(const std::shared_ptr<Scorer>& s,
 	const QRot& from, float speed):
     Object(from), VolSphere(0.004),
     speed(speed),
     ttl(0.0), max_ttl((2 * math::pi - 0.05) / speed),
-    max_ttl_2(max_ttl / 2), alpha(255u)
+    max_ttl_2(max_ttl / 2), alpha(255u),
+    scorer(s)
 {
 }
 
