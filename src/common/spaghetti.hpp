@@ -61,7 +61,7 @@ private:
   float angular_speed;
   float speed;
 
-  std::normal_distribution<> frailty;
+  std::normal_distribution<> fragility;
 
   BufferObject vbo;
   GLsizei vbuf_size;
