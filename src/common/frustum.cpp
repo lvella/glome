@@ -34,8 +34,7 @@ void Frustum::initializeAtOrigin(Frustum& frustum) {
     frustum.far_wall_radius = std::acos(Vector4(0,0,0,1).dot(frustum.far_wall_center));
 }
 
-bool Frustum::isIn(const Glome::Drawable& obj) const {
-    const Vector4 pos = obj.get_world_t().position();
+bool Frustum::isIn(const Glome::Drawable& obj, const Vector4& pos) const {
     if (obj.intersects_great_sphere(pos, top_wall_center)
         && obj.intersects_great_sphere(pos, bottom_wall_center)
         && obj.intersects_great_sphere(pos, left_wall_center)
