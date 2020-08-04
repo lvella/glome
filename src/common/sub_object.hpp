@@ -5,23 +5,16 @@
 
 #include "object.hpp"
 
-/** Either a SubObject, SuperObject or both. */
-class TreeNode: virtual public Object
-{
-public:
-	virtual const QRot& get_world_t() const;
-};
-
 /** Object contained in another object.
  *
  * For simplicity, must not be Updatable.
  * Updatables are objects managed by World.
  * TODO: rename Updatable to WorldManaged or something.
  */
-class SubObject: virtual public TreeNode
+class SubObject: virtual public Object
 {
 public:
-	using ParentRef = std::weak_ptr<TreeNode>;
+	using ParentRef = std::weak_ptr<Object>;
 
 	SubObject(ParentRef&& parent):
 		parent(std::move(parent))
@@ -43,7 +36,7 @@ private:
  * SubObject's transformation is relative to its SuperObject.
  */
 class SuperObject:
-	virtual public TreeNode,
+	virtual public Object,
 	public std::enable_shared_from_this<SuperObject>
 {
 public:

@@ -35,13 +35,14 @@ void Frustum::initializeAtOrigin(Frustum& frustum) {
 }
 
 bool Frustum::isIn(const Glome::Drawable& obj) const {
-    if (obj.intersects_great_sphere(top_wall_center)
-        && obj.intersects_great_sphere(bottom_wall_center)
-        && obj.intersects_great_sphere(left_wall_center)
-        && obj.intersects_great_sphere(right_wall_center)
+    const Vector4 pos = obj.get_world_t().position();
+    if (obj.intersects_great_sphere(pos, top_wall_center)
+        && obj.intersects_great_sphere(pos, bottom_wall_center)
+        && obj.intersects_great_sphere(pos, left_wall_center)
+        && obj.intersects_great_sphere(pos, right_wall_center)
         && test_sphere_intersection(
             obj.get_radius(), far_wall_radius,
-            obj.position().dot(far_wall_center)
+            pos.dot(far_wall_center)
         )
     )
         return true;

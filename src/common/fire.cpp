@@ -165,7 +165,7 @@ void Fire::draw(Camera& c)
 	glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, sizeof(uint16_t) * actives_count, idx);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(RenderAttributes) * count, rattrs); /// TEST
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(RenderAttributes) * count, rattrs);
 
 	glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), 0);
 	glVertexAttribPointer(Shader::ATTR_COLOR, 4, GL_FLOAT, GL_FALSE, sizeof(*rattrs), (GLfloat*)(sizeof(Vector4)));
