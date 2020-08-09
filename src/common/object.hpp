@@ -13,7 +13,7 @@ public:
 	}
 	virtual ~Object() = 0;
 
-	const QRot &get_t() const
+	const QRot& get_t() const
 	{
 		return _t;
 	}
@@ -22,6 +22,11 @@ public:
 	{
 		_t = ref;
 		pos = ref.position();
+	}
+
+	virtual const QRot& get_world_t() const
+	{
+		return _t;
 	}
 
 	void mul_t(const QRot& ref)
