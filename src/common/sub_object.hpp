@@ -26,8 +26,15 @@ public:
 	virtual const QRot& get_world_t() const final override;
 
 private:
+	void invalidate_sub_cache()
+	{
+		dirty = true;
+	}
+	friend class SuperObject;
+
 	ParentRef parent;
 	mutable QRot world_t;
+	mutable bool dirty;
 };
 
 /** Object that contains and manages other objects.
@@ -41,5 +48,14 @@ class SuperObject:
 {
 public:
 	virtual ~SuperObject() = default;
-	virtual std::vector<std::weak_ptr<SubObject>> create_sub_objects() = 0;
+	const std::vector<std::weak_ptr<SubObject>>& get_sub_objects();
+
+	virtual void invalidate_cache() final override;
+
+protected:
+	virtual void create_sub_objects(std::vector<std::weak_ptr<SubObject>>&) = 0;
+
+private:
+	std::vector<std::weak_ptr<SubObject>> objs;
+	bool initialized = false;
 };

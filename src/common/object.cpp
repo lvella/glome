@@ -3,11 +3,13 @@
 Object::~Object()
 {}
 
-
-void Object::set_t(const QRot& ref)
+const Vector4 Object::get_world_pos() const
 {
-	_t = ref;
-	dirty = true;
+	if(dirty) {
+		pos = get_world_t().position();
+		dirty = false;
+	}
+	return pos;
 }
 
 const QRot& Object::get_world_t() const
@@ -15,11 +17,7 @@ const QRot& Object::get_world_t() const
 	return _t;
 }
 
-const Vector4 Object::get_world_pos() const
+void Object::invalidate_cache()
 {
-	if(dirty) {
-		pos = _t.position();
-		dirty = false;
-	}
-	return pos;
+	dirty = true;
 }
