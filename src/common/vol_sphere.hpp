@@ -26,16 +26,10 @@ class VolSphere: virtual public Object
     // The radius must be given in range [0, PI)
     void set_radius(float r);
 
-    // Tells if this would intersect with a given great sphere from a given position.
-    bool intersects_great_sphere(const Vector4& pos, const Vector4& center) const
-    {
-      return center.dot(pos) >= cos_great_dist;
-    }
-
     // Tells if this intersects with a given great sphere.
     bool intersects_great_sphere(const Vector4& center) const
     {
-      return intersects_great_sphere(get_world_pos(), center);
+      return center.dot(get_world_pos()) >= cos_great_dist;
     }
 
     // Tells if two given sphere intersects
