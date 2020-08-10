@@ -18,27 +18,17 @@ public:
 		return _t;
 	}
 
-	void set_t(const QRot& ref)
-	{
-		_t = ref;
-		pos = ref.position();
-	}
-
-	virtual const QRot& get_world_t() const
-	{
-		return _t;
-	}
-
 	void mul_t(const QRot& ref)
 	{
 		set_t(_t * ref);
 	}
 
-	const Vector4& position() const {
-		return pos;
-	}
+	virtual void set_t(const QRot& ref);
+	virtual const QRot& get_world_t() const;
+	virtual const Vector4 get_world_pos() const;
 
 private:
 	QRot _t;
-	Vector4 pos;
+	mutable Vector4 pos;
+	mutable bool dirty = true;
 };

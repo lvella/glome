@@ -222,7 +222,7 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 		typeid(other) == typeid(const Supernova&))
 	{
 		const Vector4 impact_point = rotate_unit_vec_towards(
-			position(), other.position(), get_radius()
+			get_world_pos(), other.get_world_pos(), get_radius()
 		);
 
 		impact.push_back(get_t().inverse() * impact_point);

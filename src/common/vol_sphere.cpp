@@ -15,7 +15,7 @@ bool VolSphere::intersects(const VolSphere& other, float &cos_dist) const
 {
 	// Calculates the cossine of the angle between the center of
 	// the two spheres.
-	cos_dist = this->position().dot(other.position());
+	cos_dist = this->get_world_pos().dot(other.get_world_pos());
 
 	return test_sphere_intersection(radius, other.radius, cos_dist);
 }
