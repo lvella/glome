@@ -6,6 +6,7 @@ project(glome)
 # options
 option(STATS_TUNING "Enable ship statistics tunning")
 option(ENABLE_IPO "Enable interprocedural optimization, if available")
+set(OPENVR_PATH "~/openvr" CACHE STRING "Path to openvr on the system")
 set(DATA_DIR "data" CACHE STRING "Path to data directory")
 set(EXTRA_CXX_FLAGS "" CACHE STRING "Extra C++ flags used during compilation")
 set(EXTRA_LD_FLAGS "" CACHE STRING "Extra flags used during linking")
@@ -31,6 +32,25 @@ if(ENABLE_IPO)
 		set_property(TARGET glome PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 	endif()
 endif()
+
+# Check that the steamVR SDK is installed 
+# (needed to prevent a segfault in OpenVR).
+if(CMAKE_HOST_UNIX)
+	find_file(OPENVRPATHS openvrpaths.vrpath PATHS $ENV{HOME}/.config/openvr "$ENV{HOME}/Library/Application Support/OpenVR/.openvr")
+	if(${OPENVRPATHS} MATCHES OPENVRPATHS-NOTFOUND)
+		message(FATAL_ERROR "${OPENVRPATHS} Please install SteamVR SDK to continue..")
+	endif()
+endif()
+
+# OpenVR API path
+find_library(OPENVR_LIBRARIES
+	NAMES
+		openvr_api
+	PATHS
+		${OPENVR_PATH}/bin
+		${OPENVR_PATH}/lib
+)
+message(STATUS "OPENVR_PATH: ${OPENVR_PATH}")
 
 target_include_directories(common PUBLIC
 	"${PROJECT_BINARY_DIR}/src"

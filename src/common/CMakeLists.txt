@@ -70,6 +70,8 @@ add_library(common STATIC
 	random.hpp
 	renderer.cpp
 	renderer.hpp
+	renderer_vr.cpp
+	renderer_vr.hpp
 	rot_dir.hpp
 	shader.cpp
 	shader.hpp
@@ -126,6 +128,10 @@ if(USE_PKG_CONFIG)
 		target_link_libraries(common PUBLIC PkgConfig::OPENAL)
 	endif()
 endif()
+
+target_include_directories(common PUBLIC
+	${OPENVR_PATH}/headers
+)
 
 find_package(Threads)
 target_link_libraries(common PUBLIC ${CMAKE_THREAD_LIBS_INIT})

@@ -9,6 +9,8 @@
 #include "spaghetti.hpp"
 #include "thread_pool.hpp"
 
+#include "openvr.h"
+
 using namespace std;
 
 WorldDummy::WorldDummy():
@@ -50,7 +52,24 @@ WorldDummy::WorldDummy():
 		players.insert(players.end(), bot.begin(),
 			bot.begin() + min(bot.size(), 4 - players.size()));
 	}
-	_render = new Renderer(std::move(players), *this);
+
+	// Loading the SteamVR Runtime
+	vr::EVRInitError eError = vr::VRInitError_None;
+	m_pHMD = std::make_shared<vr::IVRSystem>(
+		vr::VR_Init( &eError, vr::VRApplication_Scene )
+	);
+
+	if ( eError != vr::VRInitError_None )
+	{
+		m_pHMD = nullptr;
+		std::cout << "Unable to init VR runtime: %s", vr::VR_GetVRInitErrorAsEnglishDescription( eError ) << '\n';
+		std::cout << "Launching in non-VR mode" << std::endl;
+		_render = new Renderer(std::move(players), *this);
+	}
+	else
+	{
+		_render = new RendererVR(std::move(players), *this, m_pHMD.);
+	}
 
 	// Add unmanaged meridians
 	add_unmanaged(meridians);
