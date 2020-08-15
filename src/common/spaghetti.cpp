@@ -64,12 +64,20 @@ CubicInterpolate(
 	return (a0*mu*mu2 + a1*mu2 + a2*mu + a3);
 }
 
+constexpr float radius_mu = 0.011f;
+constexpr float radius_sigma = 0.0045f;
+
+// The following constants were calculated with
+// the script "scripts/probabilities-calculator.py"
+constexpr float dmg_mu = 32.67f;
+constexpr float dmg_sigma = 34.8f;
+
 Spaghetti::Spaghetti():
-	VolSphere(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f)))
+	VolSphere(std::max(0.003f, Random::normalDistribution(radius_mu, radius_sigma)))
 {
 	{
-		float frailty_mean = Random::normalDistribution(1.5 * SEGMENTS, 0.5 * SEGMENTS);
-		frailty = std::normal_distribution<>{frailty_mean, frailty_mean * 0.1};
+		float fragility_mean = Random::normalDistribution(1.5 * SEGMENTS, 0.5 * SEGMENTS);
+		fragility = std::normal_distribution<>{fragility_mean, fragility_mean * 0.1};
 	}
 
 	// Random spaghetti propertiers:
@@ -81,6 +89,7 @@ Spaghetti::Spaghetti():
 
 	// Number of cubic Bézier curves
 	const size_t spaghetti_count = roundf(radius * density);
+	assert(spaghetti_count > 1);
 
 	// Displacement along radius
 	const QRot R_DISP = xw_qrot(radius);
@@ -196,13 +205,61 @@ void Spaghetti::draw(Camera& c)
 	}
 }
 
+Spaghetti::Damager* Spaghetti::get_damager(const std::shared_ptr<Scorer>& scorer)
+{
+	if(!scorer)
+	{
+		return nullptr;
+	}
+
+	for(Damager &d: damage_log) {
+		if(d.scorer == scorer) {
+			return &d;
+		}
+	}
+	damage_log.push_back({scorer, 0});
+	return &damage_log.back();
+}
+
+uint64_t Spaghetti::compute_score(unsigned damage_done)
+{
+	// Radius multiplier. Smaller is better:
+	const double rad = std::exp((radius_mu - get_radius()) / radius_sigma);
+
+	// Damage multiplier. The more damage it took to die, the better.
+	const double dam = std::exp((total_damage - dmg_mu) / dmg_sigma);
+
+	const double ret = (100u * damage_done / double(total_damage)) * rad * dam;
+
+	return std::lround(ret);
+}
+
 bool Spaghetti::update(float dt, UpdatableAdder& adder)
 {
-	while(!impact.empty()) {
-		if(!chip(adder, impact.back())) {
+	while(!impacts.empty()) {
+		auto& back = impacts.back();
+
+		unsigned damage;
+		bool survived = chip(adder, back.location, damage);
+		total_damage += damage;
+
+		Damager *dmgr = get_damager(back.scorer);
+		if(dmgr) {
+			dmgr->damage += damage;
+		}
+
+		if(!survived) {
+			// Score is only computed if it was
+			// not supernova who killed the spaghetti.
+			if(dmgr) {
+				for(auto& d: damage_log) {
+					d.scorer->add_points(compute_score(d.damage));
+				}
+			}
 			return false;
 		}
-		impact.pop_back();
+
+		impacts.pop_back();
 	}
 
 	QRot velo = qrotation(
@@ -221,17 +278,19 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 	if(typeid(other) == typeid(const Projectile&) ||
 		typeid(other) == typeid(const Supernova&))
 	{
-		const Vector4 impact_point = rotate_unit_vec_towards(
-			position(), other.position(), get_radius()
-		);
-
-		impact.push_back(get_t().inverse() * impact_point);
+		impacts.push_back({
+			(typeid(other) == typeid(const Projectile&) ?
+			 	static_cast<const Projectile&>(other).get_scorer() :
+				std::shared_ptr<Scorer>{}),
+			rotate_unit_vec_towards(
+				position(), other.position(), get_radius())
+		});
 	}
 }
 
 static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
 
-bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
+bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point, unsigned& damage)
 {
 	TimeGuard timer(chip_time);
 
@@ -282,7 +341,7 @@ bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 	});
 
 	// Each damage unit strips a fragment from the spaghetti.
-	unsigned damage = std::max(1l, std::lround(bullet_damage(Random::gen)));
+	damage = std::max(1l, std::lround(bullet_damage(Random::gen)));
 	auto sorted_iter = cos_dists.begin();
 	for(unsigned i = 0; i < damage; ++i)
 	{
@@ -301,7 +360,7 @@ bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		const unsigned closest_vert = sorted_iter->second;
 
 		// Number of segments in the fragment:
-		unsigned num_segs = std::max(2l, std::lround(frailty(Random::gen)));
+		unsigned num_segs = std::max(2l, std::lround(fragility(Random::gen)));
 
 		// Find where the fragment may start
 		int start = closest_vert;

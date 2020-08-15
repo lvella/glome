@@ -4,8 +4,7 @@
   - Focus on CLang and MSVC
 - CI (Rui)
 - Game menu with scoreboard:
-  - Devise some way to score (Lucas)
-  - Kill player when collide with supernova, finishing the game
+  - Kill player when collide with supernova, finishing the game (Lucas)
   - HUD displaying current score
     - Maybe use guichan
   - Show score, then ask to try again

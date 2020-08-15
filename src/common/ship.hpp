@@ -22,8 +22,8 @@ public:
 	virtual bool update(float dt, UpdatableAdder&) override;
 	void load_guns(Mesh::Types type); //TODO: This method is similar to load_engines, change it!
 	void load_engines(Mesh::Types type);
-	void set_controller(ShipController* pctrl);
-	ShipController* ctrl;
+	void set_controller(const std::shared_ptr<ShipController>& pctrl);
+	std::shared_ptr<ShipController> ctrl;
 
 	#ifdef STATS_TUNING
 	float get_scale() {
