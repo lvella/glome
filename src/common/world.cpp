@@ -27,7 +27,7 @@ void World::add_unmanaged(const std::shared_ptr<Object>& new_obj)
 	Audio::World::try_add_source(new_obj);
 
 	if(auto ptr = std::dynamic_pointer_cast<SuperObject>(new_obj)) {
-		auto subobjs = ptr->create_sub_objects();
+		auto subobjs = ptr->get_sub_objects();
 		for(auto& wptr: subobjs) {
 			if(auto sptr = wptr.lock()) {
 				add_unmanaged(sptr);

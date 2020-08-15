@@ -282,8 +282,8 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 			(typeid(other) == typeid(const Projectile&) ?
 			 	static_cast<const Projectile&>(other).get_scorer() :
 				std::shared_ptr<Scorer>{}),
-			rotate_unit_vec_towards(
-				position(), other.position(), get_radius())
+			rotate_unit_vec_towards(get_world_pos(),
+				other.get_world_pos(), get_radius())
 		});
 	}
 }

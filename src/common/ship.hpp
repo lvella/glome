@@ -16,7 +16,7 @@ public:
 	Ship(Mesh::Types type, ShipStats::shared_ptr sstats);
 	~Ship() = default;
 
-	std::vector<std::weak_ptr<SubObject>> create_sub_objects() override;
+	void create_sub_objects(std::vector<std::weak_ptr<SubObject>>&) override;
 
 	virtual void draw(Camera& c) override;
 	virtual bool update(float dt, UpdatableAdder&) override;

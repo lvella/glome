@@ -8,7 +8,7 @@ class Destroyer final: public Ship
 public:
 	Destroyer();
 
-	std::vector<std::weak_ptr<SubObject>> create_sub_objects() override;
+	void create_sub_objects(std::vector<std::weak_ptr<SubObject>>&) override;
 
 	void draw(Camera &c) override;
 	bool update(float dt, UpdatableAdder& adder) override;

@@ -97,7 +97,7 @@ void Projectile::update_all(float dt)
 		{
 			size_t i = 0;
 			for (auto& e: shots) {
-				minimap_buf[i++] = e.position();
+				minimap_buf[i++] = e.get_world_pos();
 			}
 		}
 
@@ -143,7 +143,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 	to_sort.reserve(shots.size());
 
 	for(auto & shot: shots) {
-		Vector4 pos = cam.getBaseTransformation() * shot.position();
+		Vector4 pos = cam.getBaseTransformation() * shot.get_world_pos();
 		if (pos[2] <= 0) {
 			to_sort.emplace_back(&shot, pos.squared_length());
 		}

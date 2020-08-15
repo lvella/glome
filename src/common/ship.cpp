@@ -39,11 +39,11 @@ Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
 	ctrl = NULL;
 }
 
-std::vector<std::weak_ptr<SubObject>>
-Ship::create_sub_objects()
+
+void Ship::create_sub_objects(std::vector<std::weak_ptr<SubObject>>& objs)
 {
 	fx_engine = std::make_shared<Fire>(weak_from_this(), 0.001f);
-	return {fx_engine};
+	objs.push_back(fx_engine);
 }
 
 void
