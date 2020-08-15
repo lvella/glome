@@ -5,6 +5,31 @@
 
 #include "object.hpp"
 
+class SubObject;
+
+/** Object that contains and manages other objects.
+ *
+ * The SuperObject must own the shared_ptr to its SubObjects, and
+ * SubObject's transformation is relative to its SuperObject.
+ */
+class SuperObject:
+	virtual public Object,
+	public std::enable_shared_from_this<SuperObject>
+{
+public:
+	virtual ~SuperObject() = default;
+	const std::vector<std::weak_ptr<SubObject>>& get_sub_objects();
+
+protected:
+	virtual void create_sub_objects(std::vector<std::weak_ptr<SubObject>>&) = 0;
+
+private:
+	virtual void invalidate_cache() override;
+
+	std::vector<std::weak_ptr<SubObject>> objs;
+	bool initialized = false;
+};
+
 /** Object contained in another object.
  *
  * For simplicity, must not be Updatable.
@@ -26,10 +51,7 @@ public:
 	virtual const QRot& get_world_t() const final override;
 
 private:
-	void invalidate_sub_cache()
-	{
-		dirty = true;
-	}
+	virtual void invalidate_cache() override;
 	friend class SuperObject;
 
 	ParentRef parent;
@@ -37,25 +59,6 @@ private:
 	mutable bool dirty;
 };
 
-/** Object that contains and manages other objects.
- *
- * The SuperObject must own the shared_ptr to its SubObjects, and
- * SubObject's transformation is relative to its SuperObject.
- */
-class SuperObject:
-	virtual public Object,
-	public std::enable_shared_from_this<SuperObject>
-{
-public:
-	virtual ~SuperObject() = default;
-	const std::vector<std::weak_ptr<SubObject>>& get_sub_objects();
 
-	virtual void invalidate_cache() final override;
-
-protected:
-	virtual void create_sub_objects(std::vector<std::weak_ptr<SubObject>>&) = 0;
-
-private:
-	std::vector<std::weak_ptr<SubObject>> objs;
-	bool initialized = false;
-};
+// TODO: if needed, implement "InterObject", that is both "SuperObject" and "SubObject", and
+// specialize InterObject::invalidate_cache().
