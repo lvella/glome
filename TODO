@@ -4,7 +4,7 @@
   - Focus on CLang and MSVC
 - CI (Rui)
 - Game menu with scoreboard:
-  - Kill player when collide with supernova, finishing the game (Lucas)
+  - Kill player when collide with supernova, finishing the game
   - HUD displaying current score
     - Maybe use guichan
   - Show score, then ask to try again
@@ -12,7 +12,7 @@
 - Transfer momentum on collision between objects (ships, flying spagetti monsters)
   - At least prevent them from intersecting, change their velocity away from one another
   - How to fit that to current crazy FSM movement?
-- Fix supernova appearance:
+- Fix supernova appearance: (Lucas)
   - you can see briefly see the other side when it is half size (you must not)
     - don't draw the opposite side to fix this
 - Implement stereo rendering using OpenVR API (Helder)
