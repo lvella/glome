@@ -3,6 +3,7 @@
 #include <iostream>
 #include <cassert>
 #include <map>
+#include <memory>
 #include <set>
 #include <utility>
 #include <GL/glew.h>
@@ -15,7 +16,7 @@
 
 using namespace std;
 
-static Mesh* mesh_list[Mesh::MESH_COUNT] = {NULL};
+static std::weak_ptr<Mesh> mesh_list[Mesh::MESH_COUNT];
 
 const char* mesh_filename[Mesh::MESH_COUNT] =
 	{
@@ -31,8 +32,7 @@ Mesh::~Mesh()
 	glDeleteBuffers(2, bufobjs);
 }
 
-Mesh::Mesh(Types type):
-	ref_count(1)
+Mesh::Mesh(Types type)
 {
 	assert(size_t(type) < MESH_COUNT);
 
@@ -386,21 +386,23 @@ Mesh::draw(Camera& c)
 		glDisableVertexAttribArray(Shader::ATTR_COLOR);
 }
 
-Mesh*
+std::shared_ptr<Mesh>
 Mesh::get_mesh(Types type)
 {
-	Mesh *&m = mesh_list[int(type)];
-	if(m)
-		++m->ref_count;
-	else
-		m = new Mesh(type);
-	return m;
-}
+	auto &wptr = mesh_list[int(type)];
+	std::shared_ptr<Mesh> ptr = wptr.lock();
+	if(ptr) {
+		return ptr;
+	}
 
-void
-Mesh::release_mesh(Mesh* m)
-{
-	--m->ref_count;
-	if(!m->ref_count)
-		delete(m);
+	// Trick from https://stackoverflow.com/a/25069711/578749
+	struct MakeSharedEnabler: public Mesh
+	{
+		MakeSharedEnabler(Types type):
+			Mesh(type)
+		{}
+	};
+	wptr = ptr = std::make_shared<MakeSharedEnabler>(type);
+
+	return ptr;
 }

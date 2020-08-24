@@ -14,7 +14,6 @@ class Ship : public SuperObject, public Updatable, public Glome::Drawable
 {
 public:
 	Ship(Mesh::Types type, ShipStats::shared_ptr sstats);
-	~Ship() = default;
 
 	void create_sub_objects(std::vector<std::weak_ptr<SubObject>>&) override;
 
@@ -35,7 +34,7 @@ protected:
 	static constexpr RotDir turn =
 		qrotation(Vector3(0.0, math::sqrt1_2, math::sqrt1_2));
 
-	Mesh* mesh;
+	std::shared_ptr<Mesh> mesh;
 
 	// Attributes of the ship
 	ShipStats::shared_ptr stats;

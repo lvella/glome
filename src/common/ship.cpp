@@ -26,9 +26,9 @@ Ship::set_controller(const std::shared_ptr<ShipController>& pctrl)
 }
 
 Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
+	mesh(Mesh::get_mesh(type)),
 	stats(std::move(sstats))
 {
-	mesh = Mesh::get_mesh(type);
 	set_radius(mesh->get_radius());
 
 	load_guns(type);
