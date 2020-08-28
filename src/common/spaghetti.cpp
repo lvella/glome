@@ -11,6 +11,8 @@
 #include <random>
 #include <typeinfo>
 
+#include <boost/math/quadrature/gauss_kronrod.hpp>
+
 #include "object.hpp"
 #include "math.hpp"
 #include "random.hpp"
@@ -64,6 +66,33 @@ CubicInterpolate(
 	return (a0*mu*mu2 + a1*mu2 + a2*mu + a3);
 }
 
+// Calculates the length of the Bézier curve.
+//
+// As per [1], the arc length is the integral from 0 to 1 of |dB(t)/dt| dt,
+// where B(t) is the 3 component vector of the Bézier curve.
+// B'(t) = dB(t)/dt is given by [2].
+//
+// The integration is done numerically by Gauss-Kronrod Quadrature,
+// from Boost [3].
+//
+// [1]: https://www.khanacademy.org/math/ap-calculus-bc/bc-advanced-functions-new/bc-9-3/v/parametric-curve-arc-length
+// [2]: https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Cubic_B%C3%A9zier_curves
+// [3]: https://www.boost.org/doc/libs/1_74_0/libs/math/doc/html/math_toolkit/gauss_kronrod.html
+template <class T>
+float BezierLength(T *p)
+{
+	using quadrature = boost::math::quadrature::gauss_kronrod<float, 31>;
+
+	return quadrature::integrate([p] (float t) {
+		float u = 1.0f - t;
+		const auto d =
+			(p[1] - p[0])*3*u*u +
+			(p[2] - p[1])*6*u*t +
+			(p[3] - p[2])*3*t*t;
+		return d.length();
+	}, 0.0f, 1.0f, 5, 1e-4);
+};
+
 constexpr float radius_mu = 0.011f;
 constexpr float radius_sigma = 0.0045f;
 
@@ -76,7 +105,7 @@ Spaghetti::Spaghetti():
 	VolSphere(std::max(0.003f, Random::normalDistribution(radius_mu, radius_sigma)))
 {
 	{
-		float fragility_mean = Random::normalDistribution(1.5 * SEGMENTS, 0.5 * SEGMENTS);
+		float fragility_mean = Random::normalDistribution(30.f, 15.f);
 		fragility = std::normal_distribution<>{fragility_mean, fragility_mean * 0.1};
 	}
 
@@ -93,9 +122,6 @@ Spaghetti::Spaghetti():
 
 	// Displacement along radius
 	const QRot R_DISP = xw_qrot(radius);
-
-	// Number of line segments to draw
-	count = spaghetti_count * SEGMENTS;
 
 	std::vector<Vector4> bezier((spaghetti_count * 3)+2);
 	std::vector<Vector3> colors(spaghetti_count + 3);
@@ -127,18 +153,18 @@ Spaghetti::Spaghetti():
 	colors[spaghetti_count + 1] = colors[1];
 	colors[spaghetti_count + 2] = colors[2];
 
-
 	// Build the Vertex Buffer Object
 	{
 		std::vector<Vertex> vertices;
-		vertices.reserve(++count);
 
 		for(int i = 0; i < spaghetti_count; ++i) {
 			Vector4 *curve = &bezier[(i*3)+1];
+			const float curve_length = BezierLength(curve);
+			const unsigned segments = std::ceil(curve_length / SEG_SIZE);
 
-			for(int j = 0; j < SEGMENTS; ++j) {
+			for(int j = 0; j < segments; ++j) {
 				// Position Bezier interpolation
-				float val = j / float(SEGMENTS);
+				float val = j / float(segments);
 				Vector4 v = CalculateBezierPoint(val, curve);
 				v.w = -1.0;
 				v = v.normalized();
@@ -154,9 +180,8 @@ Spaghetti::Spaghetti():
 			}
 		}
 		vertices.push_back(vertices[0]);
-		assert(vertices.size() == count);
 
-		vbuf_size = count;
+		vbuf_size = count = vertices.size();
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, vbuf_size * sizeof(vertices[0]),

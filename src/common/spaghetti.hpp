@@ -41,8 +41,8 @@ private:
 
   static constexpr uint16_t separator = std::numeric_limits<uint16_t>::max();
 
-  // Number of line segments used to draw each curve
-  static constexpr uint8_t SEGMENTS = 20;
+  // Average line segment size used to draw each curves.
+  static constexpr float SEG_SIZE = 0.0015f;
 
   static unsigned filter_IBO_segments(std::vector<uint16_t>& idata);
 
