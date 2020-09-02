@@ -39,7 +39,7 @@ class VolSphere: virtual public Object
     // Tells if a given point is contained in the sphere
     bool contains(const Vector4 &p) const
     {
-      return get_world_pos().dot(p) < std::cos(radius);
+      return get_world_pos().dot(p) >= std::cos(radius);
     }
 
     float get_radius() const
