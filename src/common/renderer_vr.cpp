@@ -11,7 +11,6 @@
 #include "fire.hpp"
 #include "dustfield.hpp"
 #include "camera.hpp"
-#include "renderer.hpp"
 #include "vector4.hpp"
 #include "data_file.hpp"
 
@@ -70,7 +69,7 @@ RendererVR::setup_display()
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
-RendererVR::RendererVR(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, std::shared_ptr<vr::IVRSystem> pHMD) :
+RendererVR::RendererVR(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, /*std::shared_ptr<vr::IVRSystem>*/ vr::IVRSystem* const pHMD) :
 	Renderer(pp, audio_world)
 {
 
@@ -84,41 +83,18 @@ RendererVR::RendererVR(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audi
         exit(-1);
     }
 
-	//-------------------------------------------------------------------------------------------------------------------------------------//
-	//                                 I dont know how this stuff works yet                                                                //
-	//-------------------------------------------------------------------------------------------------------------------------------------//
+	// for VR, we have two viewports, one for the left eye and another for the right eye 
+	int h = height / 2;
+	int w = width / 2;
 
-	// // get data dir path
-	// auto fname = get_data_path("actions.json");
+	left_eye = std::make_shared<Viewport>(pp[0], 0, height - h, w, h, audio_world);
+	left_eye = std::make_shared<Viewport>(pp[0], w, height - 1.5f * h, w, h, audio_world);
 
-    // vr::VRInput()->SetActionManifestPath( Path_MakeAbsolute( fname.c_str(), Path_StripFilename( Path_GetExecutablePath() ) ).c_str() );
+	left_eye_framebuffer = 0;
+	right_eye_framebuffer = 1;
 
-	// vr::VRInput()->GetActionHandle( "/actions/demo/in/HideCubes", &m_actionHideCubes );
-	// vr::VRInput()->GetActionHandle( "/actions/demo/in/HideThisController", &m_actionHideThisController);
-	// vr::VRInput()->GetActionHandle( "/actions/demo/in/TriggerHaptic", &m_actionTriggerHaptic );
-	// vr::VRInput()->GetActionHandle( "/actions/demo/in/AnalogInput", &m_actionAnalongInput );
-
-	// vr::VRInput()->GetActionSetHandle( "/actions/demo", &m_actionsetDemo );
-
-	// vr::VRInput()->GetActionHandle( "/actions/demo/out/Haptic_Left", &m_rHand[Left].m_actionHaptic );
-	// vr::VRInput()->GetInputSourceHandle( "/user/hand/left", &m_rHand[Left].m_source );
-	// vr::VRInput()->GetActionHandle( "/actions/demo/in/Hand_Left", &m_rHand[Left].m_actionPose );
-
-	// vr::VRInput()->GetActionHandle( "/actions/demo/out/Haptic_Right", &m_rHand[Right].m_actionHaptic );
-	// vr::VRInput()->GetInputSourceHandle( "/user/hand/right", &m_rHand[Right].m_source );
-	// vr::VRInput()->GetActionHandle( "/actions/demo/in/Hand_Right", &m_rHand[Right].m_actionPose );
-
-	//-------------------------------------------------------------------------------------------------------------------------------------//
-	//                                                                 I dont know how this stuff works yet                                //
-	//-------------------------------------------------------------------------------------------------------------------------------------//
-
-	assert(pp.size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
-	int h = height / (pp.size() > 2 ? 2 : 1);
-	int w = width / (pp.size() > 1 ? 2 : 1);
-
-	for(int i = 0; i < pp.size(); ++i) {
-		players.emplace_back(pp[i], (i%2) * w, height - (i/2 + 1) * h, w, h, audio_world);
-	}
+	glGenFramebuffers(1, &left_eye_framebuffer);
+	glGenFramebuffers(1, &right_eye_framebuffer);
 
 	Fire::set_width(w);
 
@@ -128,38 +104,53 @@ RendererVR::RendererVR(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audi
 void
 RendererVR::update(float dt)
 {
-	for(Viewport& v: players) {
-		v.update(dt);
-		v.Audio::Listener::update(dt, v.transformation());
-	}
+	left_eye->update(dt);
+	left_eye->Audio::Listener::update(dt, left_eye->transformation());
+
+	right_eye->update(dt);
+	right_eye->Audio::Listener::update(dt, right_eye->transformation());
 }
 
 void
 RendererVR::draw(ObjSet& objs)
 {
-    
-    if ( m_pHMD )
-	{
-		// RenderControllerAxes();
-		RenderStereoTargets();
-		RenderCompanionWindow();
-
-		vr::Texture_t leftEyeTexture = {(void*)(uintptr_t)leftEyeDesc.m_nResolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
-		vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture );
-		vr::Texture_t rightEyeTexture = {(void*)(uintptr_t)rightEyeDesc.m_nResolveTextureId, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
-		vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture );
-	}
-
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for(active = begin(players); active != end(players); ++active) {
-		active->enable();
+	// texture for left eye
+	glBindTexture(GL_TEXTURE_2D, left_eye_texture );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
-		auto drawn_objs = draw_objs_in_world(objs);
+	left_eye->enable();
 
-		MiniMap::draw(active->_x, active->_y, this,
-			active->transformation().inverse(), drawn_objs
-		);
+ 	// RenderScene( vr::Eye_Left );
+ 	glBindFramebuffer( GL_FRAMEBUFFER, left_eye_framebuffer );
+
+	// draw stuff for left eye
+	auto drawn_objs = draw_objs_in_world(objs);
+
+	glBindTexture(GL_TEXTURE_2D, right_eye_texture );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+	right_eye->enable();
+
+ 	// RenderScene( vr::Eye_Right );
+ 	glBindFramebuffer( GL_FRAMEBUFFER, right_eye_framebuffer );
+
+	// draw stuff for right eye
+	drawn_objs = draw_objs_in_world(objs);
+
+	if ( m_pHMD )
+	{
+		vr::Texture_t leftEyeTexture = {(void*)(uintptr_t)left_eye_texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
+		vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture );
+		vr::Texture_t rightEyeTexture = {(void*)(uintptr_t)right_eye_texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
+		vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture );
 	}
 }
 
@@ -266,81 +257,3 @@ const QRot RendererVR::Viewport::cam_offset(
 	zw_qrot(-0.015) *
 	yw_qrot(-0.01)
 );
-
-
-
-
-
-void RenderCompanionWindow()
-{
-	glDisable(GL_DEPTH_TEST);
-	glViewport( 0, 0, m_nCompanionWindowWidth, m_nCompanionWindowHeight );
-
-	glBindVertexArray( m_unCompanionWindowVAO );
-	glUseProgram( m_unCompanionWindowProgramID );
-
-	// render left eye (first half of index array )
-	glBindTexture(GL_TEXTURE_2D, leftEyeDesc.m_nResolveTextureId );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	glDrawElements( GL_TRIANGLES, m_uiCompanionWindowIndexSize/2, GL_UNSIGNED_SHORT, 0 );
-
-	// render right eye (second half of index array )
-	glBindTexture(GL_TEXTURE_2D, rightEyeDesc.m_nResolveTextureId  );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-	glDrawElements( GL_TRIANGLES, m_uiCompanionWindowIndexSize/2, GL_UNSIGNED_SHORT, (const void *)(uintptr_t)(m_uiCompanionWindowIndexSize) );
-
-	glBindVertexArray( 0 );
-	glUseProgram( 0 );
-}
-
-
-
-void RenderStereoTargets()
-{
-	glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-	glEnable( GL_MULTISAMPLE );
-
-	// Left Eye
-	glBindFramebuffer( GL_FRAMEBUFFER, leftEyeDesc.m_nRenderFramebufferId );
- 	glViewport(0, 0, m_nRenderWidth, m_nRenderHeight );
- 	RenderScene( vr::Eye_Left );
- 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
-	
-	glDisable( GL_MULTISAMPLE );
-	 	
- 	glBindFramebuffer(GL_READ_FRAMEBUFFER, leftEyeDesc.m_nRenderFramebufferId);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, leftEyeDesc.m_nResolveFramebufferId );
-
-    glBlitFramebuffer( 0, 0, m_nRenderWidth, m_nRenderHeight, 0, 0, m_nRenderWidth, m_nRenderHeight, 
-		GL_COLOR_BUFFER_BIT,
- 		GL_LINEAR );
-
- 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0 );	
-
-	glEnable( GL_MULTISAMPLE );
-
-	// Right Eye
-	glBindFramebuffer( GL_FRAMEBUFFER, rightEyeDesc.m_nRenderFramebufferId );
- 	glViewport(0, 0, m_nRenderWidth, m_nRenderHeight );
- 	RenderScene( vr::Eye_Right );
- 	glBindFramebuffer( GL_FRAMEBUFFER, 0 );
- 	
-	glDisable( GL_MULTISAMPLE );
-
- 	glBindFramebuffer(GL_READ_FRAMEBUFFER, rightEyeDesc.m_nRenderFramebufferId );
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, rightEyeDesc.m_nResolveFramebufferId );
-	
-    glBlitFramebuffer( 0, 0, m_nRenderWidth, m_nRenderHeight, 0, 0, m_nRenderWidth, m_nRenderHeight, 
-		GL_COLOR_BUFFER_BIT,
- 		GL_LINEAR  );
-
- 	glBindFramebuffer(GL_READ_FRAMEBUFFER, 0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0 );
-}

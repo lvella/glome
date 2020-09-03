@@ -25,7 +25,7 @@ public:
 		std::weak_ptr<Glome::Drawable>
 	>;
 
-	RendererVR(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, std::shared_ptr<vr::IVRSystem> pHMD);
+	RendererVR(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, /*std::shared_ptr<vr::IVRSystem>*/ vr::IVRSystem* const pHMD);
 
 	void update(float dt);
 	void draw(ObjSet& objs);
@@ -35,10 +35,6 @@ public:
 	void setup_display();
 	void fill_minimap(const std::vector<std::shared_ptr<Glome::Drawable>>& objs,
 		Camera& cam);
-
-	void RenderCompanionWindow();
-
-	void RenderStereoTargets();
 
 protected:
 	struct Viewport: public Audio::Listener
@@ -81,11 +77,17 @@ protected:
 		static const QRot cam_offset;
 	};
 
-	std::vector<Viewport> players;
-
-	std::vector<Viewport>::iterator active;
+	std::shared_ptr<Viewport> left_eye;
+	std::shared_ptr<Viewport> right_eye;
 
 	Frustum frustum_at_origin;
 
-	std::shared_ptr<vr::IVRSystem> m_pHMD;
+	GLuint left_eye_framebuffer;
+	GLuint right_eye_framebuffer;
+
+	GLuint left_eye_texture;
+	GLuint right_eye_texture;
+
+	// std::shared_ptr<vr::IVRSystem> m_pHMD;
+	vr::IVRSystem* m_pHMD;
 };

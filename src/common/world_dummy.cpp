@@ -1,6 +1,7 @@
 #include "world_dummy.hpp"
 
 #include <memory>
+#include <stdio.h>
 
 #include "input.hpp"
 #include "options.hpp"
@@ -55,20 +56,26 @@ WorldDummy::WorldDummy():
 
 	// Loading the SteamVR Runtime
 	vr::EVRInitError eError = vr::VRInitError_None;
-	m_pHMD = std::make_shared<vr::IVRSystem>(
-		vr::VR_Init( &eError, vr::VRApplication_Scene )
-	);
+	// m_pHMD = std::make_shared<vr::IVRSystem>(
+	// 	vr::VR_Init( &eError, vr::VRApplication_Scene )
+	// );
+	m_pHMD = vr::VR_Init( &eError, vr::VRApplication_Scene );
 
 	if ( eError != vr::VRInitError_None )
 	{
 		m_pHMD = nullptr;
-		std::cout << "Unable to init VR runtime: %s", vr::VR_GetVRInitErrorAsEnglishDescription( eError ) << '\n';
-		std::cout << "Launching in non-VR mode" << std::endl;
+		printf("Unable to init VR runtime: %s\n", vr::VR_GetVRInitErrorAsEnglishDescription( eError ) );
+		printf("Launching in non-VR mode\n");
+		_render = new Renderer(std::move(players), *this);
+	}
+	else if (players.size() > 1)
+	{
+		std::cout << "VR only supported on single player" << std::endl;
 		_render = new Renderer(std::move(players), *this);
 	}
 	else
 	{
-		_render = new RendererVR(std::move(players), *this, m_pHMD.);
+		_render = new RendererVR(std::move(players), *this, m_pHMD );
 	}
 
 	// Add unmanaged meridians
@@ -109,4 +116,7 @@ WorldDummy::~WorldDummy()
 		delete e;
 	}
 	ai_controls.resize(0);
+
+	vr::VR_Shutdown();
+	m_pHMD = NULL;
 }

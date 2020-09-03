@@ -133,5 +133,9 @@ target_include_directories(common PUBLIC
 	${OPENVR_PATH}/headers
 )
 
+target_link_libraries(common PUBLIC
+	${OPENVR_PATH}/lib/linux64/libopenvr_api.so
+)
+
 find_package(Threads)
 target_link_libraries(common PUBLIC ${CMAKE_THREAD_LIBS_INIT})

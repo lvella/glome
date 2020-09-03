@@ -47,8 +47,8 @@ find_library(OPENVR_LIBRARIES
 	NAMES
 		openvr_api
 	PATHS
-		${OPENVR_PATH}/bin
-		${OPENVR_PATH}/lib
+		${OPENVR_PATH}/bin/linux64
+		${OPENVR_PATH}/lib/linux64
 )
 message(STATUS "OPENVR_PATH: ${OPENVR_PATH}")
 
