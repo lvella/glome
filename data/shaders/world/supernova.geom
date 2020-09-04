@@ -24,10 +24,11 @@ float sq_distance(vec4 a, vec4 b)
 
 void main()
 {
-	if(max(sq_distance(pos_3d[0], pos_3d[1]),
-		max(sq_distance(pos_3d[1], pos_3d[2]),
-			sq_distance(pos_3d[2], pos_3d[0]))) > 9.0)
-	{
+	if(
+		sq_distance(pos_3d[0], pos_3d[1]) > 9.0 ||
+		sq_distance(pos_3d[1], pos_3d[2]) > 9.0 ||
+		sq_distance(pos_3d[2], pos_3d[0]) > 9.0
+	) {
 		return;
 	}
 
