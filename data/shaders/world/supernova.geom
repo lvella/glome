@@ -35,8 +35,8 @@ void main()
 	uint i;
 	for(i = 0u; i < 3u; ++i) {
 		vec4 pos = pos_3d[i];
-		normal = normalize(pos.xyz - center.xyz);
-		frag_pos = normalize(pos.xyz);
+		normal = pos.xyz - center.xyz;
+		frag_pos = pos.xyz;
 
 		gl_Position = projection * pos;
 		fog_coord = gl_Position.w;
