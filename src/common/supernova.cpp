@@ -26,6 +26,7 @@ public:
 			"world/supernova.vert",
 			"world/modelview.vert",
 			"common/quaternion.vert",
+			"world/supernova.geom",
 			"world/supernova.frag",
 			"world/world_fog.frag",
 			"world/fog.frag",
