@@ -12,6 +12,7 @@
 
 #include "openvr.h"
 
+
 using namespace std;
 
 WorldDummy::WorldDummy():
@@ -75,6 +76,7 @@ WorldDummy::WorldDummy():
 	}
 	else
 	{
+		std::cout << "Launching glome in VR mode" << std::endl;
 		_render = new RendererVR(std::move(players), *this, m_pHMD );
 	}
 

@@ -139,3 +139,8 @@ target_link_libraries(common PUBLIC
 
 find_package(Threads)
 target_link_libraries(common PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+
+if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+	target_compile_options(common PRIVATE -g)
+endif()
+

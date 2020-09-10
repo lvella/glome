@@ -33,3 +33,8 @@ endif()
 
 separate_arguments(EXTRA_LD_FLAGS)
 target_link_libraries(glome ${EXTRA_LD_FLAGS})
+
+if (CMAKE_BUILD_TYPE EQUAL "DEBUG")
+	target_compile_options(glome PRIVATE -g)
+endif()
+
