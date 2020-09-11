@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <cassert>
+#include <limits>
 #include <map>
 #include <memory>
 #include <set>
@@ -201,13 +202,37 @@ void Mesh::generate_uvsphere()
 	radius = 1.0f;
 }
 
+constexpr std::array<size_t, 3> icosphere_sizes(size_t subdivisions)
+{
+	if(subdivisions == 0) {
+		return {20, 20*3 / 2, 20 * 3 / 5};
+	}
+
+	auto prev = icosphere_sizes(subdivisions - 1);
+
+	size_t faces = prev[0] * 4;
+	size_t edges = faces * 3 / 2;
+	size_t vertices = prev[2] + prev[1];
+
+	return {faces, edges, vertices};
+}
+
 // based on http://blog.andreaskahler.com/2009/06/creating-icosphere-mesh-in-code.html
 void Mesh::generate_icosphere()
 {
+	static constexpr unsigned char SUBDIVISIONS = 4;
+	static constexpr auto SIZES = icosphere_sizes(SUBDIVISIONS);
+	static_assert(SIZES[0] <= std::numeric_limits<uint16_t>::max());
+	static_assert(SIZES[1] <= std::numeric_limits<uint16_t>::max());
+	static_assert(SIZES[2] <= std::numeric_limits<uint16_t>::max());
+
 	struct Builder {
-		uint16_t e[480][2];
-		uint16_t faces[320][3];
-		Vector4 v[12 + 30 + 120];
+		// See script icosphere.py for these values.
+
+		uint16_t faces[SIZES[0]][3];
+		uint16_t e[SIZES[1]][2];
+		Vector4 v[SIZES[2]];
+
 		map<pair<uint16_t, uint16_t>, uint16_t> vertices;
 		set<pair<uint16_t, uint16_t>> edges;
 		uint16_t iv;
@@ -221,7 +246,6 @@ void Mesh::generate_icosphere()
 			ifaces = 0;
 
 			const float P = float((1.0 + sqrtf(5.0)) / 2.0); // golden ratio, used in building of an icosahedron
-			const unsigned char SUB = 2; // number of subdivisions, maximum 2
 
 			// initial vertexes
 			const float VERTS[12][3] =
@@ -246,7 +270,7 @@ void Mesh::generate_icosphere()
 			}
 
 			// initial faces for recursive subdivision
-			const uint16_t FACES[20][3] =
+			constexpr uint16_t FACES[20][3] =
 			{
 					// 5 faces around point 0
 					{0, 11, 5},
@@ -277,12 +301,16 @@ void Mesh::generate_icosphere()
 					{9, 8, 1},
 			};
 			for(int i = 0; i < 20; ++i) {
-				face_subdivide(SUB, FACES[i][0], FACES[i][1], FACES[i][2]);
+				face_subdivide(SUBDIVISIONS, FACES[i][0], FACES[i][1], FACES[i][2]);
 			}
 
-			assert(iv == sizeof(v) / sizeof(Vector4));
-			assert(ie == sizeof(e) / 4);
+			static_assert(SIZES[0] == sizeof(faces) / 6);
+			static_assert(SIZES[1] == sizeof(e) / 4);
+			static_assert(SIZES[2] == sizeof(v) / sizeof(Vector4));
+
 			assert(ifaces == sizeof(faces) / 6);
+			assert(ie == sizeof(e) / 4);
+			assert(iv == sizeof(v) / sizeof(Vector4));
 		}
 
 		uint16_t middle_vert(uint16_t a, uint16_t b)
