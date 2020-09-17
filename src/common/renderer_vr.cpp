@@ -140,20 +140,10 @@ RendererVR::draw(ObjSet& objs)
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 
-	// set the texture as otu colour attachment #0
+	// set the texture as out colour attachment #0
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, left_eye_texture, 0);
 
-	// set the list of draw buffers
-	GLenum DrawBuffers[1] = {GL_COLOR_ATTACHMENT0};
-	glDrawBuffers(1, DrawBuffers); // 1 is the size
-
-	// check if our framebuffer is ok
-	if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
-		std::cout << "Something wrong with our framebuffer :(((((" << std::endl;
-	
-	// why do we need this again?
-	glBindFramebuffer(GL_FRAMEBUFFER, temp_framebuffer);
-	glViewport(0, 0, active->_w, active->_h);
+	// TODO: move camera slightly to the left
 
 	// render scene for left eye
 	active->enable();
@@ -161,13 +151,7 @@ RendererVR::draw(ObjSet& objs)
 	// draw stuff for left eye
 	auto drawn_objs = draw_objs_in_world(objs);
 
-	// glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, left_eye_texture, 0);
- 	// glReadBuffer(GL_COLOR_ATTACHMENT0);
-
-	glBindFramebuffer(GL_READ_FRAMEBUFFER, temp_framebuffer);
-	// copy rendered framebuffer into left eye's texture
-	glBlitFramebuffer( 0, 0, players[0]._w, players[0]._h, 0, 0, players[0]._w, players[0]._h, GL_COLOR_BUFFER_BIT, GL_LINEAR );
-
+	//debug code for dumping texture to disk
 	// std::cout << "Frame dimensions: " << active->_w << "x" << active->_h << std::endl;
 	// std::cout << active->_w << " * " << active->_h << " * " << sizeof(GL_UNSIGNED_BYTE) << " * 3  = "
 	// 	<< active->_w * active->_h * sizeof(GL_UNSIGNED_BYTE) * 3
@@ -175,11 +159,11 @@ RendererVR::draw(ObjSet& objs)
 	// size_t im_size = active->_w * active->_h;
 	// char* pixels = (char*) malloc(sizeof(GL_UNSIGNED_BYTE) * 3 * im_size);
 	// glReadPixels(0,0, active->_w, active->_h, GL_RGB, GL_UNSIGNED_BYTE, (void*)pixels);
-	// FILE* f_image = fopen("texture.rgb", "wb");
+	// FILE* f_image = fopen("texture_left.rgb", "wb");
 	// fwrite(pixels, 3 * im_size, sizeof(GL_UNSIGNED_BYTE), f_image);
 	// fclose(f_image);
 	// free(pixels);
-	// exit(0);
+	// // exit(0);
 
 	/***********************************************************/
 	/*               RIGHT EYE                                 */
@@ -200,17 +184,8 @@ RendererVR::draw(ObjSet& objs)
 
 	// set the texture as out colour attachment #0
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, right_eye_texture, 0);
-
-	// set the list of draw buffers
-	glDrawBuffers(1, DrawBuffers); // 1 is the size
-
-	// check if our framebuffer is ok
-	if( glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE )
-		std::cout << "Something wrong with our framebuffer :(((((" << std::endl;
 	
-	// why do we need this again?
-	glBindFramebuffer(GL_FRAMEBUFFER, temp_framebuffer);
-	glViewport(0, 0, active->_w, active->_h);
+	// TODO: move camera slightly to the left
 
 	// render scene for left eye
 	active->enable();
@@ -218,8 +193,19 @@ RendererVR::draw(ObjSet& objs)
 	// draw stuff for right eye
 	drawn_objs = draw_objs_in_world(objs);
 
-	// copy rendered framebuffer into left eye's texture
-	glBlitFramebuffer( 0, 0, active->_w, active->_h, 0, 0, active->_w, active->_h, GL_COLOR_BUFFER_BIT, GL_LINEAR );
+	//debug code for dumping texture to disk
+	// std::cout << "Frame dimensions: " << active->_w << "x" << active->_h << std::endl;
+	// std::cout << active->_w << " * " << active->_h << " * " << sizeof(GL_UNSIGNED_BYTE) << " * 3  = "
+	// 	<< active->_w * active->_h * sizeof(GL_UNSIGNED_BYTE) * 3
+	// 	<< std::endl;
+	// im_size = active->_w * active->_h;
+	// pixels = (char*) malloc(sizeof(GL_UNSIGNED_BYTE) * 3 * im_size);
+	// glReadPixels(0,0, active->_w, active->_h, GL_RGB, GL_UNSIGNED_BYTE, (void*)pixels);
+	// f_image = fopen("texture_right.rgb", "wb");
+	// fwrite(pixels, 3 * im_size, sizeof(GL_UNSIGNED_BYTE), f_image);
+	// fclose(f_image);
+	// free(pixels);
+	// exit(0);
 
 	/***********************************************************/
 	/*               VR stuff                                  */
@@ -227,11 +213,16 @@ RendererVR::draw(ObjSet& objs)
 
 	if ( m_pHMD )
 	{
+		vr::TrackedDevicePose_t trackedDevicePose[vr::k_unMaxTrackedDeviceCount];
+		vr::VRCompositor()->WaitGetPoses(trackedDevicePose, vr::k_unMaxTrackedDeviceCount, nullptr, 0);
+		
 		std::cout << "Submit frame to VRCompositor..." << '\n';
 		vr::Texture_t leftEyeTexture = {(void*)(uintptr_t)left_eye_texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
 		vr::Texture_t rightEyeTexture = {(void*)(uintptr_t)right_eye_texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
 		vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture );
 		vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture );
+
+		vr::VRCompositor()->PostPresentHandoff();
 	}
 }
 

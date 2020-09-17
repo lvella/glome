@@ -38,7 +38,7 @@ endif()
 if(CMAKE_HOST_UNIX)
 	find_file(OPENVRPATHS openvrpaths.vrpath PATHS $ENV{HOME}/.config/openvr "$ENV{HOME}/Library/Application Support/OpenVR/.openvr")
 	if(${OPENVRPATHS} MATCHES OPENVRPATHS-NOTFOUND)
-		message(FATAL_ERROR "${OPENVRPATHS} Please install SteamVR SDK to continue..")
+		message(WARNING "${OPENVRPATHS} Please install SteamVR SDK to continue..")
 	endif()
 endif()
 

@@ -56,28 +56,33 @@ WorldDummy::WorldDummy():
 	}
 
 	// Loading the SteamVR Runtime
-	vr::EVRInitError eError = vr::VRInitError_None;
+	vr::EVRInitError peError = vr::VRInitError_None;
 	// m_pHMD = std::make_shared<vr::IVRSystem>(
 	// 	vr::VR_Init( &eError, vr::VRApplication_Scene )
 	// );
-	m_pHMD = vr::VR_Init( &eError, vr::VRApplication_Scene );
+	m_pHMD = vr::VR_Init( &peError, vr::VRApplication_Scene );
 
-	if ( eError != vr::VRInitError_None )
-	{
-		m_pHMD = nullptr;
-		printf("Unable to init VR runtime: %s\n", vr::VR_GetVRInitErrorAsEnglishDescription( eError ) );
-		printf("Launching in non-VR mode\n");
-		_render = new Renderer(std::move(players), *this);
-	}
-	else if (players.size() > 1)
-	{
-		std::cout << "VR only supported on single player" << std::endl;
-		_render = new Renderer(std::move(players), *this);
-	}
-	else
+	if ( peError == vr::VRInitError_None && players.size() == 1 )
 	{
 		std::cout << "Launching glome in VR mode" << std::endl;
 		_render = new RendererVR(std::move(players), *this, m_pHMD );
+	}
+	else
+	{
+		if ( !vr::VR_IsRuntimeInstalled() )
+		{
+			std::cout << "OpenVR Runtime not detected on the system" << '\n';
+		}
+		else if ( !vr::VR_IsHmdPresent() )
+		{
+			std::cout << "Error : HMD not detected on the system" << '\n';
+		}
+		else if ( players.size() > 1 )
+		{
+			std::cout << "VR only supported on single player" << '\n';
+		}
+		std::cout << "Launching in non-VR mode" << std::endl;
+		_render = new Renderer(std::move(players), *this);
 	}
 
 	// Add unmanaged meridians
