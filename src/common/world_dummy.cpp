@@ -27,7 +27,11 @@ WorldDummy::WorldDummy():
 		auto s = std::make_shared<Ship>(
 			Mesh::Types(Random::range(0, Mesh::UFO)), stats
 		);
-		s->set_controller(Input::create_ship_controller(0));
+
+		auto controller = std::make_shared<ShipController>();
+		Input::register_ship_controller(0, controller);
+		s->set_controller(controller);
+
 		players.push_back(s);
 		ships.push_back(s);
 
@@ -36,14 +40,14 @@ WorldDummy::WorldDummy():
 
 	for(int i = 0; i < Options::numBots; ++i)
 	{
-		AiController *ctrl_ai;
-
 		auto s = std::make_shared<Ship>(
 			Mesh::Types(Random::range(0, Mesh::UFO)), stats
 		);
-		ctrl_ai = new AiController();
-		s->set_controller(ctrl_ai);
+
+		auto ctrl_ai = std::make_shared<AiController>();
 		ai_controls.push_back(ctrl_ai);
+		s->set_controller(ctrl_ai);
+
 		bot.push_back(s);
 		ships.push_back(s);
 

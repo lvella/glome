@@ -5,13 +5,13 @@
 #include "drawable.hpp"
 #include "collidable.hpp"
 #include "mesh.hpp"
+#include <memory>
 
 // Supernova that expands and eats the whole world!
 class Supernova final: public Glome::Drawable, public Updatable, public Collidable
 {
 public:
 	Supernova();
-	~Supernova();
 
 	bool update(float dt, UpdatableAdder &) override;
 	void draw(Camera &c) override;
@@ -27,7 +27,7 @@ private:
 	Vector2 slerp;
 
 	// Stuff that should be static:
-	Mesh* map_mesh;
+	std::shared_ptr<Mesh> map_mesh;
 	SpaceShader map_shader;
 	Uniform map_slerp_arc;
 };

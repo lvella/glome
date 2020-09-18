@@ -19,16 +19,16 @@ using namespace Glome;
 extern const char* mesh_filename[Mesh::MESH_COUNT];
 
 void
-Ship::set_controller(ShipController* pctrl)
+Ship::set_controller(const std::shared_ptr<ShipController>& pctrl)
 {
 	ctrl = pctrl;
 	ctrl->stats = stats.get();
 }
 
 Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
+	mesh(Mesh::get_mesh(type)),
 	stats(std::move(sstats))
 {
-	mesh = Mesh::get_mesh(type);
 	set_radius(mesh->get_radius());
 
 	load_guns(type);
@@ -39,11 +39,11 @@ Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
 	ctrl = NULL;
 }
 
-std::vector<std::weak_ptr<SubObject>>
-Ship::create_sub_objects()
+
+void Ship::create_sub_objects(std::vector<std::weak_ptr<SubObject>>& objs)
 {
 	fx_engine = std::make_shared<Fire>(weak_from_this(), 0.001f);
-	return {fx_engine};
+	objs.push_back(fx_engine);
 }
 
 void
@@ -184,8 +184,7 @@ Ship::update(float dt, UpdatableAdder& adder)
 				// bringing the bullet closer to the cannon:
 				const float offset = speed * (ctrl->shot_countdown + dt);
 
-				Projectile::shot(ctrl,
-					get_t()
+				Projectile::shot(ctrl, get_t()
 					* (ctrl->canon_shot_last ? l_canon : r_canon)
 					* zw_qrot(offset), speed
 				);

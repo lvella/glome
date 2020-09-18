@@ -14,16 +14,15 @@ class Ship : public SuperObject, public Updatable, public Glome::Drawable
 {
 public:
 	Ship(Mesh::Types type, ShipStats::shared_ptr sstats);
-	~Ship() = default;
 
-	std::vector<std::weak_ptr<SubObject>> create_sub_objects() override;
+	void create_sub_objects(std::vector<std::weak_ptr<SubObject>>&) override;
 
 	virtual void draw(Camera& c) override;
 	virtual bool update(float dt, UpdatableAdder&) override;
 	void load_guns(Mesh::Types type); //TODO: This method is similar to load_engines, change it!
 	void load_engines(Mesh::Types type);
-	void set_controller(ShipController* pctrl);
-	ShipController* ctrl;
+	void set_controller(const std::shared_ptr<ShipController>& pctrl);
+	std::shared_ptr<ShipController> ctrl;
 
 	#ifdef STATS_TUNING
 	float get_scale() {
@@ -35,7 +34,7 @@ protected:
 	static constexpr RotDir turn =
 		qrotation(Vector3(0.0, math::sqrt1_2, math::sqrt1_2));
 
-	Mesh* mesh;
+	std::shared_ptr<Mesh> mesh;
 
 	// Attributes of the ship
 	ShipStats::shared_ptr stats;

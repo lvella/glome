@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 #include <unordered_map>
 #include <SDL.h>
 #include <iostream>
@@ -12,14 +13,9 @@
 
 namespace Input
 {
-	/*
-	* Generic Callback function for input
-	* TODO: Make this work for variable number of arguments:
-	* http://en.wikipedia.org/wiki/Variadic_templates
-	*/
-	extern std::unordered_map<int, ShipController*> ship_controllers;
+	extern std::vector<std::shared_ptr<ShipController>> ship_controllers;
 
-	ShipController* create_ship_controller(int);
+	void register_ship_controller(size_t controller_id, std::shared_ptr<ShipController>&);
 
 	void read_controllers_settings();
 

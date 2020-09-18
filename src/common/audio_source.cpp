@@ -30,7 +30,7 @@ void Source::playForListener(Sound *sound, size_t listener, bool loop, float off
 
    // Before actually playing, reset the position and velocity
    // of the source, to avoid artifacts from bad initialization
-   s.prev_pos = position();
+   s.prev_pos = get_world_pos();
    s.update(1.0, this, l->transformation());
 
    sound->selfPlay(s.al_source, loop, offset);
@@ -87,7 +87,7 @@ Source::SourceForListener::SourceForListener(Source *s)
 
 void Source::SourceForListener::update(float dt, Source *s, const QRot& transform)
 {
-   Vector3 pos = (transform * s->position()).stereo_proj();
+   Vector3 pos = (transform * s->get_world_pos()).stereo_proj();
    Vector3 velo = (pos - prev_pos) * (1.0f/dt);
 
    alSource3f(al_source, AL_VELOCITY, velo.x, velo.y, velo.z);

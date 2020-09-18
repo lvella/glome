@@ -11,10 +11,10 @@ using namespace std::string_literals;
 
 struct ltstr
 {
-  bool operator()(const char* s1, const char* s2) const
-  {
-    return strcmp(s1, s2) < 0;
-  }
+	bool operator()(const char* s1, const char* s2) const
+	{
+		return strcmp(s1, s2) < 0;
+	}
 };
 static std::map<const char*, GLuint, ltstr> loaded_shaders;
 
@@ -34,13 +34,17 @@ void Shader::setup_shader(const SourceVector& sources)
 	for(const char* name: sources) {
 		if(loaded_shaders.find(name) == loaded_shaders.end())
 		{
-			if(strrchr(name, '.')[1] == 'v')
-			{
+			switch(strrchr(name, '.')[1]) {
+			case 'v':
 				type = GL_VERTEX_SHADER;
-			}
-			else
-			{
+				break;
+			case 'g':
+				type = GL_GEOMETRY_SHADER;
+				break;
+			case 'f':
+			default:
 				type = GL_FRAGMENT_SHADER;
+				break;
 			}
 
 			auto fl = load_data_file("shaders/"s + name);

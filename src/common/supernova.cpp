@@ -3,10 +3,11 @@
 
 #include "textures.hpp"
 #include "supernova.hpp"
+#include <memory>
 
 namespace {
 
-Mesh* mesh;
+std::shared_ptr<Mesh> mesh;
 CamShader shader;
 Uniform slerp_arc;
 Uniform center;
@@ -25,6 +26,7 @@ public:
 			"world/supernova.vert",
 			"world/modelview.vert",
 			"common/quaternion.vert",
+			"world/supernova.geom",
 			"world/supernova.frag",
 			"world/world_fog.frag",
 			"world/fog.frag",
@@ -70,12 +72,6 @@ Supernova::Supernova():
 
 	// Better place to start...
 	set_t(zw_qrot(-math::pi_2) * qrotation(Random::arc(), Random::direction()));
-}
-
-Supernova::~Supernova()
-{
-	Mesh::release_mesh(map_mesh);
-	Mesh::release_mesh(mesh);
 }
 
 bool Supernova::update(float dt, UpdatableAdder&)
