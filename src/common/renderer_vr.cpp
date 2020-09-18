@@ -59,16 +59,6 @@ private:
 
 }
 
-// void
-// RendererVR::setup_display()
-// {
-// 	glEnable(GL_DEPTH_TEST);
-// 	glEnable(GL_BLEND);
-// 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-// 	glViewport(0, 0, width, height);
-// 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-// }
-
 RendererVR::RendererVR(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, /*std::shared_ptr<vr::IVRSystem>*/ vr::IVRSystem* const pHMD) :
 	Renderer(pp, audio_world)
 {	
@@ -116,12 +106,8 @@ void
 RendererVR::draw(ObjSet& objs)
 {
 	// assert(players.size() == 1);
-	// for(active = begin(players); active != end(players); ++active)
-	// 	active->enable();
 	active = begin(players);
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
+	auto original_transform = active->transformation();
 
 	/***********************************************************/
 	/*               LEFT EYE                                  */
@@ -143,27 +129,16 @@ RendererVR::draw(ObjSet& objs)
 	// set the texture as out colour attachment #0
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, left_eye_texture, 0);
 
-	// TODO: move camera slightly to the left
+	// move camera slightly to the left
+	active->curr_qrot = xw_qrot(0.005) * original_transform;
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// render scene for left eye
 	active->enable();
 
 	// draw stuff for left eye
 	auto drawn_objs = draw_objs_in_world(objs);
-
-	//debug code for dumping texture to disk
-	// std::cout << "Frame dimensions: " << active->_w << "x" << active->_h << std::endl;
-	// std::cout << active->_w << " * " << active->_h << " * " << sizeof(GL_UNSIGNED_BYTE) << " * 3  = "
-	// 	<< active->_w * active->_h * sizeof(GL_UNSIGNED_BYTE) * 3
-	// 	<< std::endl;
-	// size_t im_size = active->_w * active->_h;
-	// char* pixels = (char*) malloc(sizeof(GL_UNSIGNED_BYTE) * 3 * im_size);
-	// glReadPixels(0,0, active->_w, active->_h, GL_RGB, GL_UNSIGNED_BYTE, (void*)pixels);
-	// FILE* f_image = fopen("texture_left.rgb", "wb");
-	// fwrite(pixels, 3 * im_size, sizeof(GL_UNSIGNED_BYTE), f_image);
-	// fclose(f_image);
-	// free(pixels);
-	// // exit(0);
 
 	/***********************************************************/
 	/*               RIGHT EYE                                 */
@@ -185,28 +160,17 @@ RendererVR::draw(ObjSet& objs)
 	// set the texture as out colour attachment #0
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, right_eye_texture, 0);
 	
-	// TODO: move camera slightly to the left
+	// move camera slightly to the right
+	active->curr_qrot = xw_qrot(-0.005) * original_transform;
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// render scene for left eye
 	active->enable();
 
 	// draw stuff for right eye
 	drawn_objs = draw_objs_in_world(objs);
-
-	//debug code for dumping texture to disk
-	// std::cout << "Frame dimensions: " << active->_w << "x" << active->_h << std::endl;
-	// std::cout << active->_w << " * " << active->_h << " * " << sizeof(GL_UNSIGNED_BYTE) << " * 3  = "
-	// 	<< active->_w * active->_h * sizeof(GL_UNSIGNED_BYTE) * 3
-	// 	<< std::endl;
-	// im_size = active->_w * active->_h;
-	// pixels = (char*) malloc(sizeof(GL_UNSIGNED_BYTE) * 3 * im_size);
-	// glReadPixels(0,0, active->_w, active->_h, GL_RGB, GL_UNSIGNED_BYTE, (void*)pixels);
-	// f_image = fopen("texture_right.rgb", "wb");
-	// fwrite(pixels, 3 * im_size, sizeof(GL_UNSIGNED_BYTE), f_image);
-	// fclose(f_image);
-	// free(pixels);
-	// exit(0);
-
+	
 	/***********************************************************/
 	/*               VR stuff                                  */
 	/***********************************************************/
@@ -224,130 +188,7 @@ RendererVR::draw(ObjSet& objs)
 
 		vr::VRCompositor()->PostPresentHandoff();
 	}
+
+	// restore original transform (before VR distortion)
+	active->curr_qrot = original_transform;
 }
-
-// vector<std::shared_ptr<Glome::Drawable>>
-// RendererVR::draw_objs_in_world(ObjSet& objs)
-// {
-// 	Camera camera(active->transformation());
-// 	SpecsTracker specs(camera);
-
-// 	const Vector4 cam_pos = active->transformation().inverse().position();
-
-// 	vector<std::shared_ptr<Glome::Drawable>> remaining_objs;
-// 	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
-
-// 	Frustum frustum = active->transformation().inverse() * frustum_at_origin;
-
-// 	for(auto iter = objs.begin(); iter != objs.end();) {
-// 		auto ptr = iter->second.lock();
-// 		if(!ptr) {
-// 			iter = objs.erase(iter);
-// 			continue;
-// 		}
-
-// 		Vector4 world_pos = ptr->get_world_t().position();
-// 		if(frustum.isIn(*ptr, world_pos)) {
-// 			if(ptr->is_transparent()) {
-// 				float dist = std::acos(cam_pos.dot(world_pos))
-// 					- ptr->get_radius();
-// 				assert(!std::isnan(dist));
-// 				transparent_objs.push_back({dist, ptr.get()});
-// 			} else {
-// 				specs.maybe_set(iter->first);
-// 				ptr->draw(camera);
-// 			}
-// 		}
-
-// 		remaining_objs.emplace_back(std::move(ptr));
-// 		++iter;
-// 	}
-
-// 	std::sort(transparent_objs.begin(), transparent_objs.end(),
-// 		[] (auto& a, auto& b) {
-// 			return a.first > b.first;
-// 		}
-// 	);
-
-// 	auto sorted_projs = Projectile::cull_sort_from_camera(camera);
-// 	Projectile::draw_many(sorted_projs, camera);
-
-// 	for(auto &pair: transparent_objs) {
-// 		auto& obj = *pair.second;
-// 		specs.maybe_set(&obj.get_draw_specs());
-// 		obj.draw(camera);
-// 	}
-
-// 	DustField::draw(camera);
-
-// 	return remaining_objs;
-// }
-
-// void
-// RendererVR::fill_minimap(const vector<std::shared_ptr<Glome::Drawable>>& objs, Camera &cam)
-// {
-// 	std::shared_ptr<Glome::Drawable> curr = active->t.lock();
-
-// 	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
-// 	// Probably so insignificant it is not worth the effort.
-// 	for(auto &obj: objs) {
-// 		if(obj != curr)
-// 			obj->minimap_draw(cam);
-// 	}
-// }
-
-// void
-// RendererVR::Viewport::update(float dt)
-// {
-// 	QRot new_trans;
-// 	if(auto ptr = t.lock()) {
-// 		new_trans = cam_offset * ptr->get_t().inverse();
-// 	} else {
-// 		new_trans = cam_hist.front().t;
-// 	}
-
-// 	cam_hist.push_back({dt, new_trans});
-
-// 	while(cam_hist.front().dt <= dt) {
-// 		dt -= cam_hist.front().dt;
-// 		curr_qrot = cam_hist.front().t;
-
-// 		cam_hist.pop_front();
-// 		assert(!cam_hist.empty());
-// 	}
-
-// 	PathPoint& next = cam_hist.front();
-// 	const float slerp_factor = dt / next.dt; // range [0, 1]
-
-// 	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
-// 	next.dt -= dt;
-
-// }
-
-// const QRot RendererVR::Viewport::cam_offset(
-// 	yz_qrot(0.2) *
-// 	zw_qrot(-0.015) *
-// 	yw_qrot(-0.01)
-// );
-
-// void read_framebuffer_onto_texture(int fboIn, int textureOut)
-// {
-//     // Bind input FBO + texture to a color attachment
-//     glBindFramebuffer(GL_READ_FRAMEBUFFER, fboIn);
-//     glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, textureIn, 0);
-//     glReadBuffer(GL_COLOR_ATTACHMENT0);
-
-//     // Bind destination FBO + texture to another color attachment
-//     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboOut);
-//     glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, textureOut, 0);
-//     glDrawBuffer(GL_COLOR_ATTACHMENT1);
-
-//     // specify source, destination drawing (sub)rectangles.
-//     glBlitFramebuffer(0, 0, width, height,
-//                         0, 0, width, height,
-//                         GL_COLOR_BUFFER_BIT, GL_NEAREST);
-
-//     // unbind the color attachments
-//     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, 0, 0);
-//     glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, 0, 0);
-// }

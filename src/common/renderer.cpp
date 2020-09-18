@@ -11,6 +11,7 @@
 #include "fire.hpp"
 #include "dustfield.hpp"
 #include "camera.hpp"
+#include "renderer.hpp"
 #include "vector4.hpp"
 
 #include <algorithm>

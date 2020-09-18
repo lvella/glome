@@ -30,56 +30,7 @@ public:
 	void update(float dt) override;
 	void draw(ObjSet& objs) override;
 
-	// std::vector<std::shared_ptr<Glome::Drawable>> draw_objs_in_world(ObjSet& objs);
-
-	// void setup_display();
-	// void fill_minimap(const std::vector<std::shared_ptr<Glome::Drawable>>& objs,
-	// 	Camera& cam);
-
 protected:
-	// struct Viewport: public Audio::Listener
-	// {
-	// 	Viewport(std::weak_ptr<Ship> target,
-	// 		int x, int y, int w, int h,
-	// 		Audio::World &audio_world
-	// 	):
-	// 		Audio::Listener(&audio_world),
-	// 		t(target), _x(x), _y(y), _w(w), _h(h)
-	// 	{
-	// 		curr_qrot = cam_offset;
-	// 		cam_hist.push_back({1.0f / 6.0f, cam_offset});
-	// 	}
-
-	// 	void enable()
-	// 	{
-	// 		glViewport(_x, _y, _w, _h);
-	// 	}
-
-	// 	virtual const QRot &transformation() const override
-	// 	{
-	// 		return curr_qrot;
-	// 	}
-
-	// 	void update(float dt);
-
-	// 	struct PathPoint {
-	// 		float dt;
-	// 		QRot t;
-	// 	};
-
-	// 	std::weak_ptr<Ship> t;
-	// 	QRot curr_qrot;
-	// 	std::deque<PathPoint> cam_hist;
-
-	// 	int _x, _y, _w, _h;
-
-	// 	// Camera position relative to target...
-	// 	static const QRot cam_offset;
-	// };
-
-	// std::vector<Viewport> players;
-
-	// Frustum frustum_at_origin;
 
 	GLuint temp_framebuffer;
 
