@@ -11,6 +11,8 @@ set(DATA_DIR "data" CACHE STRING "Path to data directory")
 set(EXTRA_CXX_FLAGS "" CACHE STRING "Extra C++ flags used during compilation")
 set(EXTRA_LD_FLAGS "" CACHE STRING "Extra flags used during linking")
 
+get_filename_component(OPENVR_PATH ${OPENVR_PATH} ABSOLUTE)
+
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
