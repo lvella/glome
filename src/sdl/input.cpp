@@ -1,5 +1,6 @@
 #include <iostream>
 #include <fstream>
+#include <memory>
 #include <utility>
 #include <string>
 
@@ -24,11 +25,25 @@ std::unordered_map<int, pfunction> pfunctions_to_inputs;
 /*
 * Map poiters to ShipControllers based on controller_id
 */
-std::unordered_map<int, ShipController*> ship_controllers;
+std::vector<std::shared_ptr<ShipController>> ship_controllers;
 
-ShipController* create_ship_controller(int controller_id)
+static void resize_ship_controller(size_t minimum_size)
 {
-	return ship_controllers[controller_id];
+	static std::shared_ptr<ShipController> dummy = std::make_shared<ShipController>();
+
+	// We currently support only 4 players:
+	assert(minimum_size <= 4);
+
+	ship_controllers.reserve(minimum_size);
+	while(ship_controllers.size() < minimum_size) {
+		ship_controllers.emplace_back(dummy);
+	}
+}
+
+void register_ship_controller(size_t controller_id, std::shared_ptr<ShipController>& sc)
+{
+	resize_ship_controller(controller_id + 1);
+	ship_controllers[controller_id] = sc;
 }
 
 /*
@@ -47,11 +62,7 @@ void read_controllers_settings()
 	for(int i = 0; i < number_of_controllers; ++i)
 	{
 		ifs >> input_type >> controller_id >> number_of_functions;
-
-		std::pair <int, ShipController* > temp;
-		temp.first = controller_id;
-		temp.second = new ShipController();
-		ship_controllers.insert(temp);
+		resize_ship_controller(controller_id + 1);
 
 		switch(input_type)
 		{

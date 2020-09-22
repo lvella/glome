@@ -29,14 +29,12 @@ Destroyer::Destroyer():
 	other_jet->set_intensity(1.0f);
 }
 
-std::vector<std::weak_ptr<SubObject>> Destroyer::create_sub_objects()
+void Destroyer::create_sub_objects(std::vector<std::weak_ptr<SubObject>>& objs)
 {
-	auto ret = Ship::create_sub_objects();
+	Ship::create_sub_objects(objs);
 
 	other_jet = std::make_shared<Fire>(weak_from_this(), 0.0006f);
-	ret.push_back(other_jet);
-
-	return ret;
+	objs.push_back(other_jet);
 }
 
 void Destroyer::draw(Camera &c)

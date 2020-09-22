@@ -130,10 +130,9 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 			continue;
 		}
 
-		Vector4 world_pos = ptr->get_world_t().position();
-		if(frustum.isIn(*ptr, world_pos)) {
+		if(frustum.isIn(*ptr)) {
 			if(ptr->is_transparent()) {
-				float dist = std::acos(cam_pos.dot(world_pos))
+				float dist = std::acos(cam_pos.dot(ptr->get_world_pos()))
 					- ptr->get_radius();
 				assert(!std::isnan(dist));
 				transparent_objs.push_back({dist, ptr.get()});

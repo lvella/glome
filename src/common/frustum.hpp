@@ -10,7 +10,7 @@ class Frustum {
 public:
 
     static void initializeAtOrigin(Frustum& frustum);
-    bool isIn(const Glome::Drawable& obj, const Vector4& world_pos) const;
+    bool isIn(const Glome::Drawable& obj) const;
 
     friend std::ostream& operator<<(std::ostream& o, const Frustum& f);
 
