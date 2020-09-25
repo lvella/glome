@@ -11,6 +11,8 @@
 #include "jsinput.hpp"
 #include "events.hpp"
 
+extern bool is_paused;
+
 namespace Input
 {
 /*
@@ -21,11 +23,25 @@ std::unordered_map<int, pfunction> pfunctions_to_inputs;
 /*
 * Map poiters to ShipControllers based on controller_id
 */
-std::unordered_map<int, ShipController*> ship_controllers;
+std::vector<std::shared_ptr<ShipController>> ship_controllers;
 
-ShipController* create_ship_controller(int controller_id)
+static void resize_ship_controller(size_t minimum_size)
 {
-	return ship_controllers[controller_id];
+	static std::shared_ptr<ShipController> dummy = std::make_shared<ShipController>();
+
+	// We currently support only 4 players:
+	assert(minimum_size <= 4);
+
+	ship_controllers.reserve(minimum_size);
+	while(ship_controllers.size() < minimum_size) {
+		ship_controllers.emplace_back(dummy);
+	}
+}
+
+void register_ship_controller(size_t controller_id, std::shared_ptr<ShipController>& sc)
+{
+	resize_ship_controller(controller_id + 1);
+	ship_controllers[controller_id] = sc;
 }
 
 /*
@@ -45,10 +61,7 @@ void read_controllers_settings()
 	{
 		ifs >> input_type >> controller_id >> number_of_functions;
 
-		std::pair<int, ShipController*> temp;
-		temp.first = controller_id;
-		temp.second = new ShipController();
-		ship_controllers.insert(temp);
+		resize_ship_controller(controller_id + 1);
 
 		switch(input_type)
 		{
@@ -127,5 +140,64 @@ handle()
 	return run;
 }
 
+bool
+handle_paused()
+{
+	assert(is_paused);
+
+	SDL_Event e;
+	while(SDL_WaitEvent(&e))
+	{
+		switch(e.type)
+		{
+		case SDL_QUIT:
+			return false;
+		case SDL_KEYDOWN:
+			if(e.key.keysym.sym == SDLK_ESCAPE) {
+				game_pause(0, 1.0f);
+				return true;
+			}
+			if(e.key.keysym.sym == SDLK_q) {
+				return false;
+			}
+		}
+	}
+
+	std::cout << "Error on wait event: " << SDL_GetError() << std::endl;
+	assert(0);
+	return false;
 }
 
+float normalize_button(int e)
+{
+	switch(Event(e))
+	{
+	case Event::SHOOT:
+	case Event::MOVE_BACKWARD:
+	case Event::MOVE_RIGHT:
+	case Event::MOVE_UP:
+	case Event::MOVE_SPINL:
+		return 1.0;
+	case Event::MOVE_DOWN:
+	case Event::MOVE_LEFT:
+	case Event::MOVE_SPINR:
+	case Event::MOVE_FORWARD:
+		return -1.0;
+	case Event::PAUSE:
+		return 1.0;
+	default:
+		return 0.0;
+	}
+}
+
+void game_pause(int b, float a)
+{
+	if(a > 0.5f) {
+		//Game::switch_state(paused ? Game::WORLD : Game::MENU);
+		is_paused = !is_paused;
+
+		SDL_SetRelativeMouseMode(SDL_bool(!is_paused));
+	}
+}
+
+}

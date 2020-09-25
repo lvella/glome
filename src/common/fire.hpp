@@ -3,17 +3,20 @@
 #include "particle_system.hpp"
 #include "updatable.hpp"
 #include "drawable.hpp"
+#include "sub_object.hpp"
 
-class Fire final: public ParticleSystem, public Updatable, public Glome::NoMapDrawable
+class Fire final: public ParticleSystem, public SubObject, public Glome::NoMapDrawable
 {
 public:
-	Fire(float radius);
+	Fire(ParentRef&& parent, float radius);
 
-	bool update(float dt, UpdatableAdder&) override;
 	void draw(Camera& c) override;
-	void setIntensity(float i);
+	bool is_transparent() const override;
+	void set_intensity(float i);
 
-	static void initialize();
+	void update(float dt);
+
+	DrawSpecsBase& get_draw_specs() const override;
 
 	// Little hackish: must be called if viewport ever happens to change size.
 	static void set_width(int w);
@@ -25,7 +28,5 @@ private:
 	float speed;
 
 	uint16_t target_count;
-
-	static int width;
 };
 

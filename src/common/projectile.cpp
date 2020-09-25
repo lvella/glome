@@ -2,11 +2,13 @@
 
 #include <ctime>
 #include <algorithm>
+#include <memory>
 #include <vector>
 
 #include "shader.hpp"
 #include "math.hpp"
 #include "textures.hpp"
+#include "initialization.hpp"
 
 using namespace std;
 
@@ -22,7 +24,7 @@ static std::vector<Vector4> minimap_buf;
 
 Projectile::SList Projectile::shots;
 
-void Projectile::initialize()
+static RegisterInitialization ini{[]
 {
 	{
 		const float data[] = {
@@ -64,9 +66,9 @@ void Projectile::initialize()
 
 	uniform_has_tex = glGetUniformLocation(
 		program_bullet.program(), "has_tex");
-}
+}};
 
-void Projectile::shot(ShipController * s, const QRot& from, float speed)
+void Projectile::shot(const std::shared_ptr<Scorer>& s, const QRot& from, float speed)
 {
 	// TODO: find a non-hackish way to use emplace_front...
 	shots.push_front(Projectile{s, from, speed});
@@ -95,7 +97,7 @@ void Projectile::update_all(float dt)
 		{
 			size_t i = 0;
 			for (auto& e: shots) {
-				minimap_buf[i++] = e.position();
+				minimap_buf[i++] = e.get_world_pos();
 			}
 		}
 
@@ -141,7 +143,7 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 	to_sort.reserve(shots.size());
 
 	for(auto & shot: shots) {
-		Vector4 pos = cam.transformation() * shot.position();
+		Vector4 pos = cam.getBaseTransformation() * shot.get_world_pos();
 		if (pos[2] <= 0) {
 			to_sort.emplace_back(&shot, pos.squared_length());
 		}
@@ -160,25 +162,24 @@ Projectile::cull_sort_from_camera(const Camera & cam)
 void Projectile::draw_many(const std::vector<Projectile*>& shots, Camera & c)
 {
 	if (shots.size() != 0) {
-		c.pushShader(&program_bullet);
+		c.setShader(&program_bullet);
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glUniform1i(uniform_has_tex, 1);
 		glBindTexture(GL_TEXTURE_2D, texture);
 
-		glEnableVertexAttribArray(program_bullet.colorAttr());
+		glEnableVertexAttribArray(Shader::ATTR_COLOR);
 
-		glVertexAttribPointer(program_bullet.posAttr(), 2, GL_FLOAT,
+		glVertexAttribPointer(Shader::ATTR_POSITION, 2, GL_FLOAT,
 				      GL_FALSE, 5 * sizeof(float),
 				      (float *)0 + 3);
-		glVertexAttribPointer(program_bullet.colorAttr(), 3, GL_FLOAT,
+		glVertexAttribPointer(Shader::ATTR_COLOR, 3, GL_FLOAT,
 				      GL_FALSE, 5 * sizeof(float), (float *)0);
 
 		for(auto i: shots)
 			i->draw(c);
 
-		glDisableVertexAttribArray(program_bullet.colorAttr());
-		c.popShader();
+		glDisableVertexAttribArray(Shader::ATTR_COLOR);
 	}
 }
 
@@ -193,20 +194,20 @@ void Projectile::draw_in_minimap()
 
 }
 
-Projectile::Projectile(ShipController * s, const QRot& from, float speed):
+Projectile::Projectile(const std::shared_ptr<Scorer>& s,
+	const QRot& from, float speed):
     Object(from), VolSphere(0.004),
-    speed(speed), owner(s),
+    speed(speed),
     ttl(0.0), max_ttl((2 * math::pi - 0.05) / speed),
-    max_ttl_2(max_ttl / 2), alpha(255u)
+    max_ttl_2(max_ttl / 2), alpha(255u),
+    scorer(s)
 {
 }
 
 void Projectile::draw(Camera & c)
 {
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
-	c.popMat();
-
 }
 
 void Projectile::update(float dt)

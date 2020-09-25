@@ -3,6 +3,8 @@
 #include <cmath>
 #include <cassert>
 
+#include <boost/math/quadrature/gauss_kronrod.hpp>
+
 #include "object.hpp"
 #include "math.hpp"
 #include "random.hpp"
@@ -56,12 +58,47 @@ CubicInterpolate(
 	return (a0*mu*mu2 + a1*mu2 + a2*mu + a3);
 }
 
+// Calculates the length of the Bézier curve.
+//
+// As per [1], the arc length is the integral from 0 to 1 of |dB(t)/dt| dt,
+// where B(t) is the 3 component vector of the Bézier curve.
+// B'(t) = dB(t)/dt is given by [2].
+//
+// The integration is done numerically by Gauss-Kronrod Quadrature,
+// from Boost [3].
+//
+// [1]: https://www.khanacademy.org/math/ap-calculus-bc/bc-advanced-functions-new/bc-9-3/v/parametric-curve-arc-length
+// [2]: https://en.wikipedia.org/wiki/B%C3%A9zier_curve#Cubic_B%C3%A9zier_curves
+// [3]: https://www.boost.org/doc/libs/1_74_0/libs/math/doc/html/math_toolkit/gauss_kronrod.html
+template <class T>
+float BezierLength(T *p)
+{
+	using quadrature = boost::math::quadrature::gauss_kronrod<float, 31>;
+
+	return quadrature::integrate([p] (float t) {
+		float u = 1.0f - t;
+		const auto d =
+			(p[1] - p[0])*3*u*u +
+			(p[2] - p[1])*6*u*t +
+			(p[3] - p[2])*3*t*t;
+		return d.length();
+	}, 0.0f, 1.0f, 5, 1e-4);
+};
+
+constexpr float radius_mu = 0.011f;
+constexpr float radius_sigma = 0.0045f;
+
+// The following constants were calculated with
+// the script "scripts/probabilities-calculator.py"
+constexpr float dmg_mu = 32.67f;
+constexpr float dmg_sigma = 34.8f;
+
 Spaghetti::Spaghetti():
-	VolSphere(std::max(0.003f, Random::normalDistribution(0.011f, 0.0045f)))
+	VolSphere(std::max(0.003f, Random::normalDistribution(radius_mu, radius_sigma)))
 {
 	{
-		float frailty_mean = Random::normalDistribution(1.5 * SEGMENTS, 0.5 * SEGMENTS);
-		frailty = std::normal_distribution<>{frailty_mean, frailty_mean * 0.1};
+		float fragility_mean = Random::normalDistribution(30.f, 15.f);
+		fragility = std::normal_distribution<>{fragility_mean, fragility_mean * 0.1};
 	}
 
 	// Random spaghetti propertiers:
@@ -73,12 +110,10 @@ Spaghetti::Spaghetti():
 
 	// Number of cubic Bézier curves
 	const size_t spaghetti_count = roundf(radius * density);
+	assert(spaghetti_count > 1);
 
 	// Displacement along radius
 	const QRot R_DISP = xw_qrot(radius);
-
-	// Number of line segments to draw
-	count = spaghetti_count * SEGMENTS;
 
 	std::vector<Vector4> bezier((spaghetti_count * 3)+2);
 	std::vector<Vector3> colors(spaghetti_count + 3);
@@ -110,18 +145,18 @@ Spaghetti::Spaghetti():
 	colors[spaghetti_count + 1] = colors[1];
 	colors[spaghetti_count + 2] = colors[2];
 
-
 	// Build the Vertex Buffer Object
 	{
 		std::vector<Vertex> vertices;
-		vertices.reserve(++count);
 
 		for(int i = 0; i < spaghetti_count; ++i) {
 			Vector4 *curve = &bezier[(i*3)+1];
+			const float curve_length = BezierLength(curve);
+			const unsigned segments = std::ceil(curve_length / SEG_SIZE);
 
-			for(int j = 0; j < SEGMENTS; ++j) {
+			for(int j = 0; j < segments; ++j) {
 				// Position Bezier interpolation
-				float val = j / float(SEGMENTS);
+				float val = j / float(segments);
 				Vector4 v = CalculateBezierPoint(val, curve);
 				v.w = -1.0;
 				v = v.normalized();
@@ -137,9 +172,8 @@ Spaghetti::Spaghetti():
 			}
 		}
 		vertices.push_back(vertices[0]);
-		assert(vertices.size() == count);
 
-		vbuf_size = count;
+		vbuf_size = count = vertices.size();
 
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, vbuf_size * sizeof(vertices[0]),
@@ -170,14 +204,13 @@ Spaghetti::Spaghetti():
 void Spaghetti::draw(Camera& c)
 {
 	auto &s = *c.getShader();
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	glEnableVertexAttribArray(s.colorAttr());
 
-	glVertexAttribPointer(s.posAttr(), 4, GL_FLOAT, GL_FALSE,
+	glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE,
 		sizeof(Vertex), (GLvoid*) offsetof(Vertex, pos));
-	glVertexAttribPointer(s.colorAttr(), 4, GL_FLOAT, GL_FALSE,
+	glVertexAttribPointer(Shader::ATTR_COLOR, 4, GL_FLOAT, GL_FALSE,
 		sizeof(Vertex), (GLvoid*) offsetof(Vertex, color));
 
 	if(ibo) {
@@ -187,17 +220,63 @@ void Spaghetti::draw(Camera& c)
 	} else {
 		glDrawArrays(GL_LINE_STRIP, 0, count);
 	}
+}
 
-	c.popMat();
+Spaghetti::Damager* Spaghetti::get_damager(const std::shared_ptr<Scorer>& scorer)
+{
+	if(!scorer)
+	{
+		return nullptr;
+	}
+
+	for(Damager &d: damage_log) {
+		if(d.scorer == scorer) {
+			return &d;
+		}
+	}
+	damage_log.push_back({scorer, 0});
+	return &damage_log.back();
+}
+
+uint64_t Spaghetti::compute_score(unsigned damage_done)
+{
+	// Radius multiplier. Smaller is better:
+	const double rad = std::exp((radius_mu - get_radius()) / radius_sigma);
+
+	// Damage multiplier. The more damage it took to die, the better.
+	const double dam = std::exp((total_damage - dmg_mu) / dmg_sigma);
+
+	const double ret = (100u * damage_done / double(total_damage)) * rad * dam;
+
+	return std::lround(ret);
 }
 
 bool Spaghetti::update(float dt, UpdatableAdder& adder)
 {
-	while(!impact.empty()) {
-		if(!chip(adder, impact.back())) {
+	while(!impacts.empty()) {
+		auto& back = impacts.back();
+
+		unsigned damage;
+		bool survived = chip(adder, back.location, damage);
+		total_damage += damage;
+
+		Damager *dmgr = get_damager(back.scorer);
+		if(dmgr) {
+			dmgr->damage += damage;
+		}
+
+		if(!survived) {
+			// Score is only computed if it was
+			// not supernova who killed the spaghetti.
+			if(dmgr) {
+				for(auto& d: damage_log) {
+					d.scorer->add_points(compute_score(d.damage));
+				}
+			}
 			return false;
 		}
-		impact.pop_back();
+
+		impacts.pop_back();
 	}
 
 	QRot velo = qrotation(
@@ -216,17 +295,19 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 	if(typeid(other) == typeid(const Projectile&) ||
 		typeid(other) == typeid(const Supernova&))
 	{
-		const Vector4 impact_point = rotate_unit_vec_towards(
-			position(), other.position(), get_radius()
-		);
-
-		impact.push_back(get_t().inverse() * impact_point);
+		impacts.push_back({
+			(typeid(other) == typeid(const Projectile&) ?
+			 	static_cast<const Projectile&>(other).get_scorer() :
+				std::shared_ptr<Scorer>{}),
+			rotate_unit_vec_towards(get_world_pos(),
+				other.get_world_pos(), get_radius())
+		});
 	}
 }
 
 static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
 
-bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
+bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point, unsigned& damage)
 {
 	TimeGuard timer(chip_time);
 
@@ -277,7 +358,7 @@ bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 	});
 
 	// Each damage unit strips a fragment from the spaghetti.
-	unsigned damage = std::max(1l, std::lround(bullet_damage(Random::gen)));
+	damage = std::max(1l, std::lround(bullet_damage(Random::gen)));
 	auto sorted_iter = cos_dists.begin();
 	for(unsigned i = 0; i < damage; ++i)
 	{
@@ -296,7 +377,7 @@ bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		const unsigned closest_vert = sorted_iter->second;
 
 		// Number of segments in the fragment:
-		unsigned num_segs = std::max(2l, std::lround(frailty(Random::gen)));
+		unsigned num_segs = std::max(2l, std::lround(fragility(Random::gen)));
 
 		// Find where the fragment may start
 		int start = closest_vert;
@@ -358,7 +439,7 @@ bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point)
 		}
 
 		// Create the fragment.
-		adder.add_updatable(std::make_shared<SpaghettiFragment>(
+		adder.add(std::make_shared<SpaghettiFragment>(
 			get_t(), vdata, idata[start], num_segs + 1
 		));
 
@@ -481,7 +562,7 @@ void Spaghetti::explode(UpdatableAdder& adder, const std::vector<uint16_t>& idat
 		if(frag_vcount) {
 			if(idata[idx] == separator) {
 				// End of fragment:
-				adder.add_updatable(std::make_shared<SpaghettiFragment>(
+				adder.add(std::make_shared<SpaghettiFragment>(
 					get_t(), vdata, frag_start, frag_vcount
 				));
 				frag_vcount = 0;
@@ -496,7 +577,7 @@ void Spaghetti::explode(UpdatableAdder& adder, const std::vector<uint16_t>& idat
 		}
 	}
 	if(frag_vcount) {
-		adder.add_updatable(std::make_shared<SpaghettiFragment>(
+		adder.add(std::make_shared<SpaghettiFragment>(
 			get_t(), vdata, frag_start, frag_vcount
 		));
 	}

@@ -1,0 +1,25 @@
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
+build-lx-clang:
+  image: ruimario/glome
+  stage: build
+  script:
+  - export
+  - mkdir build
+  - cd build
+  - cmake .. -G Ninja -DCMAKE_TOOLCHAIN_FILE=../toolchain/clang.cmake
+  - cmake --build ./
+  artifacts:
+    paths:
+    - $CI_PROJECT_DIR/build/src/sdl/glome
+  # only:
+  # - master
+
+# build-lx-gcc:
+#   image: ubuntu:glome
+# ...
+
+# build-win:
+  # image: ???
+# ...

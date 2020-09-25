@@ -1,0 +1,18 @@
+# build docker image
+docker build -t <image-name> -f fikalab.Dockerfile .
+
+# create container and run interactively
+docker run -it --name <container-name> <image-name> bash # prefix with winpty in windows
+
+# start container and run interactively
+docker start -i <container-name> # prefix with winpty in windows
+
+# rename image according to repo on DockerHub
+docker tag <image-name> <dockerID>/<repo>:<tag>
+
+# push image to remote
+docker push <dockerID>/<repo>:<tag>
+docker push <dockerID>/<repo>:latest # to create latest image that will pull by default
+
+# pull image
+docker pull <dockerID>/<repo>:<tag>

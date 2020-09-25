@@ -1,10 +1,11 @@
 #pragma once
 
 #include "ship_stats.hpp"
+#include "scorer.hpp"
 
 class Ship;
 
-class ShipController
+class ShipController: public Scorer
 {
 public:
 	ShipController();

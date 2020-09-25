@@ -28,7 +28,7 @@ class VolSphere: virtual public Object
     // Tells if this intersects with a given great sphere.
     bool intersects_great_sphere(const Vector4& center) const
     {
-      return center.dot(position()) >= cos_great_dist;
+      return center.dot(get_world_pos()) >= cos_great_dist;
     }
 
     // Tells if two given sphere intersects
@@ -38,7 +38,7 @@ class VolSphere: virtual public Object
     // Tells if a given point is contained in the sphere
     bool contains(const Vector4 &p) const
     {
-      return this->position().dot(p) < std::cos(radius);
+      return get_world_pos().dot(p) >= std::cos(radius);
     }
 
     float get_radius() const

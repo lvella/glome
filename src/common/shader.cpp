@@ -8,10 +8,10 @@ using namespace std::string_literals;
 
 struct ltstr
 {
-  bool operator()(const char* s1, const char* s2) const
-  {
-    return strcmp(s1, s2) < 0;
-  }
+	bool operator()(const char* s1, const char* s2) const
+	{
+		return strcmp(s1, s2) < 0;
+	}
 };
 static std::map<const char*, GLuint, ltstr> loaded_shaders;
 
@@ -31,13 +31,17 @@ void Shader::setup_shader(const SourceVector& sources)
 	for(const char* name: sources) {
 		if(loaded_shaders.find(name) == loaded_shaders.end())
 		{
-			if(strrchr(name, '.')[1] == 'v')
-			{
+			switch(strrchr(name, '.')[1]) {
+			case 'v':
 				type = GL_VERTEX_SHADER;
-			}
-			else
-			{
+				break;
+			case 'g':
+				type = GL_GEOMETRY_SHADER;
+				break;
+			case 'f':
+			default:
 				type = GL_FRAGMENT_SHADER;
+				break;
 			}
 
 			auto fl = load_data_file("shaders/"s + name);
@@ -74,8 +78,11 @@ void Shader::setup_shader(const SourceVector& sources)
 
 		glAttachShader(prog, shader);
 	}
-	// We expect every shader to have a "position" attribute, to be the reference attribute
-	glBindAttribLocation(prog, 0, "position");
+
+	for(unsigned i = 0; i < NUM_ATTRIBUTES; ++i) {
+		glBindAttribLocation(prog, i, attr_names[i]);
+	}
+
 	glLinkProgram(prog);
 	{
 		GLsizei length;
@@ -91,9 +98,11 @@ void Shader::setup_shader(const SourceVector& sources)
 			std::cout << "]:\n" << err << std::endl;
 		}
 	}
+}
 
-	attr_color = glGetAttribLocation(prog, "color");
-	attr_texcoord = glGetAttribLocation(prog, "texcoord");
+void Shader::enable() const
+{
+	glUseProgram(prog);
 }
 
 Shader::~Shader()

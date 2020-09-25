@@ -3,30 +3,63 @@
 
 #include "textures.hpp"
 #include "supernova.hpp"
+#include <memory>
+
+namespace {
+
+std::shared_ptr<Mesh> mesh;
+CamShader shader;
+Uniform slerp_arc;
+Uniform center;
+
+class SupernovaSpecs: public DrawSpecs<SupernovaSpecs>
+{
+public:
+	template<class Token> SupernovaSpecs(const Token& t):
+		DrawSpecs(t)
+	{
+		bg_noise = create_noise_texture(800, 600, 1.0f / 50.0f, Vector2(Random::arc(), Random::arc()) * 20.0f);
+
+		mesh = Mesh::get_mesh(Mesh::Type::ICOSPHERE);
+
+		shader.setup_shader({
+			"world/supernova.vert",
+			"world/modelview.vert",
+			"common/quaternion.vert",
+			"world/supernova.geom",
+			"world/supernova.frag",
+			"world/world_fog.frag",
+			"world/fog.frag",
+			"world/noise3D.frag"
+		});
+		slerp_arc = shader.getUniform("slerp_arc");
+		center = shader.getUniform("center");
+		shader.enable();
+		shader.getUniform("texbase").set(0);
+	}
+
+	void setup_draw_state(Camera& c) override
+	{
+		c.setShader(&shader);
+		glBindTexture(GL_TEXTURE_2D, bg_noise);
+	}
+
+	void shutdown_draw_state(Camera&) override
+	{
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
+
+private:
+	GLuint bg_noise;
+};
+
+}
 
 Supernova::Supernova():
 	VolSphere(0.0f),
-	mesh(Mesh::get_mesh(Mesh::Type::ICOSPHERE)),
 	map_mesh(Mesh::get_mesh(Mesh::Type::UVSPHERE))
 {
-	transparent = true;
-
 	// TODO: initialize this stuff only once
-	bg_noise = create_noise_texture(800, 600, 1.0f / 50.0f, Vector2(Random::arc(), Random::arc()) * 20.0f);
-
-	shader.setup_shader({
-		"world/supernova.vert",
-		"world/modelview.vert",
-		"common/quaternion.vert",
-		"world/supernova.frag",
-		"world/world_fog.frag",
-		"world/fog.frag",
-		"world/noise3D.frag"
-	});
-	slerp_arc = shader.getUniform("slerp_arc");
-	center = shader.getUniform("center");
-	shader.enable();
-	shader.getUniform("texbase").set(0);
 
 	map_shader.setup_shader({
 		"minimap/map_supernova.vert",
@@ -41,12 +74,6 @@ Supernova::Supernova():
 	set_t(zw_qrot(-math::pi_2) * qrotation(Random::arc(), Random::direction()));
 }
 
-Supernova::~Supernova()
-{
-	Mesh::release_mesh(map_mesh);
-	Mesh::release_mesh(mesh);
-}
-
 bool Supernova::update(float dt, UpdatableAdder&)
 {
 	// Based on http://math.stackexchange.com/a/99171/7721
@@ -55,8 +82,6 @@ bool Supernova::update(float dt, UpdatableAdder&)
 	float radius = get_radius();
 	radius += dt * 0.03;
 	set_radius(radius);
-
-	transparent = radius < math::pi_2;
 
 	slerp[0] = std::sin(radius);
 	slerp[1] = std::cos(radius);
@@ -69,14 +94,12 @@ bool Supernova::update(float dt, UpdatableAdder&)
 
 void Supernova::draw(Camera &c)
 {
-	c.pushShader(&shader);
-
-	c.pushMultQRot(get_t());
-
 	{
+		const QRot trans = c.setQRot(get_t());
+
 		// Calculate the center of the projected sphere, to use in the yellow gloom effect.
 		// TODO: For a better effect, increase the LOD if the player gets close enough.
-		Vector4 pos = c.transformation().position();
+		const Vector4 pos = trans.position();
 		const float radius = get_radius();
 		float center_angle = acosf(pos.w);
 		float p1d = sinf(center_angle + radius) / (1.0f - cosf(center_angle + radius));
@@ -94,27 +117,33 @@ void Supernova::draw(Camera &c)
 
 	slerp_arc.set(slerp);
 
-	glBindTexture(GL_TEXTURE_2D, bg_noise);
-
 	mesh->draw(c);
+}
 
-	c.popMat();
-	c.popShader();
+DrawSpecsBase& Supernova::get_draw_specs() const
+{
+	return DrawSpecsBase::get_instance<SupernovaSpecs>();
 }
 
 void Supernova::minimap_draw(Camera &c)
 {
-	c.pushShader(&map_shader);
-	c.pushMultQRot(get_t());
+	const SpaceShader* prev = c.getShader();
+
+	c.setShader(&map_shader);
+	c.setQRot(get_t());
 
 	map_slerp_arc.set(slerp);
-	glVertexAttrib3f(map_shader.colorAttr(), 1.0f, 1.0f, 1.0f);
+	glVertexAttrib3f(Shader::ATTR_COLOR, 1.0f, 1.0f, 1.0f);
 	map_mesh->draw(c);
 
-	c.popMat();
-	c.popShader();
+	c.setShader(prev);
 }
 
 void Supernova::collided_with(const Collidable& other, float)
 {
+}
+
+bool Supernova::is_transparent() const
+{
+	return get_radius() < math::pi_2;
 }

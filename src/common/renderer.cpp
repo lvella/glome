@@ -1,26 +1,59 @@
 #include "renderer.hpp"
 
+#include <algorithm>
+#include <memory>
+#include <iomanip>
+#include <cstdlib>
+
+#include "drawable.hpp"
 #include "options.hpp"
 #include "meridian.hpp"
 #include "minimap.hpp"
 #include "projectile.hpp"
 #include "fire.hpp"
 #include "dustfield.hpp"
-
-#include <algorithm>
-#include <memory>
+#include "camera.hpp"
+#include "renderer.hpp"
+#include "vector4.hpp"
 
 using namespace std;
 using namespace Options;
 
-void
-Renderer::initialize()
+namespace {
+
+class SpecsTracker
 {
-	shader.setup_shader({
-		"world/world.vert", "world/modelview.vert", "common/quaternion.vert",
-		"world/world.frag", "world/world_fog.frag",
-		"common/no_texture.frag", "world/fog.frag"
-	});
+public:
+	SpecsTracker(Camera& camera):
+		c(camera)
+	{}
+
+	~SpecsTracker()
+	{
+		shutdown();
+	}
+
+	void maybe_set(DrawSpecsBase* s)
+	{
+		if(s != active) {
+			shutdown();
+			active = s;
+			if(s) s->setup_draw_state(c);
+		}
+	}
+
+private:
+	void shutdown()
+	{
+		if(active) {
+			active->shutdown_draw_state(c);
+		}
+	}
+
+	Camera& c;
+	DrawSpecsBase *active = nullptr;
+};
+
 }
 
 void
@@ -44,6 +77,8 @@ Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_wo
 	}
 
 	Fire::set_width(w);
+
+	Frustum::initializeAtOrigin(frustum_at_origin);
 }
 
 void
@@ -56,52 +91,75 @@ Renderer::update(float dt)
 }
 
 void
-Renderer::draw(vector<std::shared_ptr<Glome::Drawable>>&& objs)
+Renderer::draw(ObjSet& objs)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	for(active = begin(players); active != end(players); ++active) {
 		active->enable();
 
-		camera.reset(active->transformation());
-		camera.pushShader(&shader);
+		auto drawn_objs = draw_objs_in_world(objs);
 
-		draw_meridians(camera);
+		MiniMap::draw(active->_x, active->_y, this,
+			active->transformation().inverse(), drawn_objs
+		);
+	}
+}
 
-		const QRot inv_trans = active->transformation().inverse();
-		const Vector4 cam_pos = inv_trans.position();
+vector<std::shared_ptr<Glome::Drawable>>
+Renderer::draw_objs_in_world(ObjSet& objs)
+{
+	Camera camera(active->transformation());
+	SpecsTracker specs(camera);
 
-		vector<std::pair<float, Glome::Drawable*>> transparent_objs;
-		for(auto& ptr: objs) {
+	const Vector4 cam_pos = active->transformation().inverse().position();
+
+	vector<std::shared_ptr<Glome::Drawable>> remaining_objs;
+	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
+
+	Frustum frustum = active->transformation().inverse() * frustum_at_origin;
+
+	for(auto iter = objs.begin(); iter != objs.end();) {
+		auto ptr = iter->second.lock();
+		if(!ptr) {
+			iter = objs.erase(iter);
+			continue;
+		}
+
+		if(frustum.isIn(*ptr)) {
 			if(ptr->is_transparent()) {
-				float dist = std::acos(cam_pos.dot(ptr->position()))
+				float dist = std::acos(cam_pos.dot(ptr->get_world_pos()))
 					- ptr->get_radius();
 				assert(!std::isnan(dist));
 				transparent_objs.push_back({dist, ptr.get()});
 			} else {
+				specs.maybe_set(iter->first);
 				ptr->draw(camera);
 			}
 		}
 
-		std::sort(transparent_objs.begin(), transparent_objs.end(),
-			[] (auto& a, auto& b) {
-				return a.first > b.first;
-			}
-		);
-
-		auto sorted_projs = Projectile::cull_sort_from_camera(camera);
-		Projectile::draw_many(sorted_projs, camera);
-
-		for(auto &pair: transparent_objs) {
-			pair.second->draw(camera);
-		}
-
-		DustField::draw(camera);
-
-		MiniMap::draw(active->_x, active->_y, this,
-			inv_trans, objs
-		);
+		remaining_objs.emplace_back(std::move(ptr));
+		++iter;
 	}
+
+	std::sort(transparent_objs.begin(), transparent_objs.end(),
+		[] (auto& a, auto& b) {
+			return a.first > b.first;
+		}
+	);
+
+	auto sorted_projs = Projectile::cull_sort_from_camera(camera);
+	Projectile::draw_many(sorted_projs, camera);
+
+	for(auto &pair: transparent_objs) {
+		auto& obj = *pair.second;
+		specs.maybe_set(&obj.get_draw_specs());
+		obj.draw(camera);
+	}
+
+	DustField::draw(camera);
+
+	return remaining_objs;
 }
 
 void
@@ -142,9 +200,9 @@ Renderer::Viewport::update(float dt)
 
 	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
 	next.dt -= dt;
+
 }
 
-CamShader Renderer::shader;
 const QRot Renderer::Viewport::cam_offset(
 	yz_qrot(0.2) *
 	zw_qrot(-0.015) *

@@ -10,8 +10,6 @@ class SpaghettiFragment final:
 	public Glome::NoMapDrawable
 {
 public:
-	static void initialize();
-
 	SpaghettiFragment(const QRot& orig_transformation,
 		const std::vector<Spaghetti::Vertex>& vdata,
 		uint16_t start, uint16_t size);
@@ -19,11 +17,9 @@ public:
 	bool update(float dt, UpdatableAdder& adder) override;
 	void draw(Camera& c) override;
 
-private:
-	static class CamShader shader;
-	static class Uniform burn_progress_uniform;
-	static GLint center_dist_attr;
+	DrawSpecsBase& get_draw_specs() const override;
 
+private:
 	struct Vertex {
 		Spaghetti::Vertex sv;
 		float length;

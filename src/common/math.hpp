@@ -118,3 +118,5 @@ T clamp(T min, T val, T max)
 		return max;
 	return val;
 }
+
+bool test_sphere_intersection(float radius_a, float radius_b, float cos_dist);

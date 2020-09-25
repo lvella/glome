@@ -5,6 +5,7 @@
 #include "vector4.hpp"
 #include "random.hpp"
 #include "shader.hpp"
+#include "initialization.hpp"
 #include "gl.hpp"
 
 namespace DustField
@@ -34,8 +35,7 @@ static Uniform old_transform;
  * the line the vertex is. */
 GLint attrib_endpoint;
 
-void initialize()
-{
+static RegisterInitialization ini{[] {
 	std::vector<Star> dust(DUST_SIZE);
 
 	for(auto &e: dust)
@@ -61,27 +61,25 @@ void initialize()
 	attrib_endpoint = glGetAttribLocation(program.program(), "endpoint");
 
 	old_transform = program.getUniform("old_transform");
-}
+}};
 
 static QRot old_cam_transform;
 
 void draw(Camera& cam)
 {
-    cam.pushShader(&program);
+    cam.setShader(&program);
 
     old_transform.set(old_cam_transform);
-    old_cam_transform = cam.transformation();
+    old_cam_transform = cam.getBaseTransformation();
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
     glEnableVertexAttribArray(attrib_endpoint);
 
-    glVertexAttribPointer(program.posAttr(), 4, GL_FLOAT, GL_FALSE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, pos));
+    glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, pos));
     glVertexAttribPointer(attrib_endpoint, 1, GL_FLOAT, GL_FALSE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, end));
 
     glDrawArrays(GL_LINES, 0, DUST_SIZE*2);
-
-    cam.popShader();
 }
 
 }

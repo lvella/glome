@@ -7,7 +7,7 @@ namespace Game
 {
 	constexpr unsigned MIN_FPS = 50;
 	extern RunContext* context;
-	enum class State {EXIT, MENU, WORLD};
+	enum class State {MENU, WORLD};
 
 	/** Process and renders a game frame. */
 	void frame(std::chrono::duration<float> frame_time);

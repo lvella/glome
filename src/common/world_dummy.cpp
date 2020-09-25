@@ -11,7 +11,8 @@
 
 using namespace std;
 
-WorldDummy::WorldDummy()
+WorldDummy::WorldDummy():
+	meridians{std::make_shared<Meridians>()}
 {
 	std::vector<std::weak_ptr<Ship>> bot;
 	std::vector<std::weak_ptr<Ship>> players;
@@ -22,7 +23,11 @@ WorldDummy::WorldDummy()
 		auto s = std::make_shared<Ship>(
 			Mesh::Type(Random::range(0, size_t(Mesh::Type::UFO))), stats
 		);
-		s->set_controller(Input::create_ship_controller(0));
+
+		auto controller = std::make_shared<ShipController>();
+		Input::register_ship_controller(0, controller);
+		s->set_controller(controller);
+
 		players.push_back(s);
 		ships.push_back(s);
 
@@ -31,14 +36,14 @@ WorldDummy::WorldDummy()
 
 	for(int i = 0; i < Options::numBots; ++i)
 	{
-		AiController *ctrl_ai;
-
 		auto s = std::make_shared<Ship>(
 			Mesh::Type(Random::range(0, size_t(Mesh::Type::UFO))), stats
 		);
-		ctrl_ai = new AiController();
-		s->set_controller(ctrl_ai);
+
+		auto ctrl_ai = std::make_shared<AiController>();
 		ai_controls.push_back(ctrl_ai);
+		s->set_controller(ctrl_ai);
+
 		bot.push_back(s);
 		ships.push_back(s);
 
@@ -50,6 +55,9 @@ WorldDummy::WorldDummy()
 			bot.begin() + min(bot.size(), 4 - players.size()));
 	}
 	_render = new Renderer(std::move(players), *this);
+
+	// Add unmanaged meridians
+	add_unmanaged(meridians);
 
 	// Create supernova
 	add_updatable(std::make_shared<Supernova>());
@@ -66,7 +74,7 @@ WorldDummy::WorldDummy()
 				);
 
 				for(size_t j = i; j < max; ++j) {
-					adder.add_updatable(
+					adder.add(
 						std::make_shared<Spaghetti>()
 					);
 				}
@@ -81,9 +89,4 @@ WorldDummy::WorldDummy()
 WorldDummy::~WorldDummy()
 {
 	delete _render;
-
-	for(AiController* e : ai_controls) {
-		delete e;
-	}
-	ai_controls.resize(0);
 }

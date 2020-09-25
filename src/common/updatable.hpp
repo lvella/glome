@@ -1,29 +1,18 @@
 #pragma once
 
-#include "object.hpp"
-
 #include <memory>
 #include <vector>
 #include <mutex>
+
+#include "object.hpp"
+#include "object_adder.hpp"
+
+using UpdatableAdder = ObjectAdder<std::shared_ptr<class Updatable>>;
 
 class Updatable : virtual public Object
 {
 public:
 	virtual ~Updatable() = default;
 
-	virtual bool update(float dt, class UpdatableAdder& adder) = 0;
-};
-
-class UpdatableAdder
-{
-public:
-	void add_updatable(std::shared_ptr<class Updatable> new_obj)
-	{
-		std::lock_guard l(mutex);
-		new_elems.push_back(new_obj);
-	}
-
-protected:
-	std::mutex mutex;
-	std::vector<std::shared_ptr<class Updatable>> new_elems;
+	virtual bool update(float dt, UpdatableAdder& adder) = 0;
 };

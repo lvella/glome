@@ -1,6 +1,7 @@
 #pragma once
 
 #include "qrot.hpp"
+#include "camera.hpp"
 
 class Object
 {
@@ -11,7 +12,7 @@ public:
 	}
 	virtual ~Object() = 0;
 
-	const QRot &get_t() const
+	const QRot& get_t() const
 	{
 		return _t;
 	}
@@ -19,7 +20,7 @@ public:
 	void set_t(const QRot& ref)
 	{
 		_t = ref;
-		pos = ref.position();
+		invalidate_cache();
 	}
 
 	void mul_t(const QRot& ref)
@@ -27,11 +28,15 @@ public:
 		set_t(_t * ref);
 	}
 
-	const Vector4& position() const {
-		return pos;
-	}
+	const Vector4 get_world_pos() const;
+
+	virtual const QRot& get_world_t() const;
+
+protected:
+	virtual void invalidate_cache();
 
 private:
 	QRot _t;
-	Vector4 pos;
+	mutable Vector4 pos;
+	mutable bool dirty;
 };

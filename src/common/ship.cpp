@@ -15,20 +15,16 @@ using namespace Glome;
 extern const char* mesh_filename[size_t(Mesh::Type::MESH_COUNT)];
 
 void
-Ship::set_controller(ShipController* pctrl)
+Ship::set_controller(const std::shared_ptr<ShipController>& pctrl)
 {
 	ctrl = pctrl;
 	ctrl->stats = stats.get();
 }
 
 Ship::Ship(Mesh::Type type, ShipStats::shared_ptr sstats):
-		fx_engine(0.001f),
-		stats(std::move(sstats))
+	mesh(Mesh::get_mesh(type)),
+	stats(std::move(sstats))
 {
-	// Not the ship itself, but the fire.
-	transparent = true;
-
-	mesh = Mesh::get_mesh(type);
 	set_radius(mesh->get_radius());
 
 	load_guns(type);
@@ -37,6 +33,13 @@ Ship::Ship(Mesh::Type type, ShipStats::shared_ptr sstats):
 	rel_speed = 0.0f;
 
 	ctrl = nullptr;
+}
+
+
+void Ship::create_sub_objects(std::vector<std::weak_ptr<SubObject>>& objs)
+{
+	fx_engine = std::make_shared<Fire>(weak_from_this(), 0.001f);
+	objs.push_back(fx_engine);
 }
 
 void
@@ -113,10 +116,8 @@ Ship::load_engines(Mesh::Type type)
 void
 Ship::draw(Camera& c)
 {
-	c.pushMultQRot(get_t());
+	c.setQRot(get_t());
 	mesh->draw(c);
-	fx_engine.draw(c);
-	c.popMat();
 }
 
 bool
@@ -179,8 +180,7 @@ Ship::update(float dt, UpdatableAdder& adder)
 				// bringing the bullet closer to the cannon:
 				const float offset = speed * (ctrl->shot_countdown + dt);
 
-				Projectile::shot(ctrl,
-					get_t()
+				Projectile::shot(ctrl, get_t()
 					* (ctrl->canon_shot_last ? l_canon : r_canon)
 					* zw_qrot(offset), speed
 				);
@@ -201,9 +201,9 @@ Ship::update(float dt, UpdatableAdder& adder)
 			* turn(-dt * ctrl->h_tilt)
 		);
 
-		fx_engine.setIntensity(std::max(0.0f, rel_speed));
+		fx_engine->set_intensity(std::max(0.0f, rel_speed));
 	}
-	fx_engine.update(dt, adder);
+	fx_engine->update(dt);
 
 	return true;
 }

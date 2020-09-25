@@ -10,18 +10,19 @@
 #include "fire.hpp"
 #include "rot_dir.hpp"
 
-class Ship : public Updatable, public Glome::Drawable
+class Ship : public SuperObject, public Updatable, public Glome::Drawable
 {
 public:
 	Ship(Mesh::Type type, ShipStats::shared_ptr sstats);
-	~Ship() = default;
+
+	void create_sub_objects(std::vector<std::weak_ptr<SubObject>>&) override;
 
 	virtual void draw(Camera& c) override;
 	virtual bool update(float dt, UpdatableAdder&) override;
 	void load_guns(Mesh::Type type); //TODO: This method is similar to load_engines, change it!
 	void load_engines(Mesh::Type type);
-	void set_controller(ShipController* pctrl);
-	ShipController* ctrl;
+	void set_controller(const std::shared_ptr<ShipController>& pctrl);
+	std::shared_ptr<ShipController> ctrl;
 
 	#ifdef STATS_TUNING
 	float get_scale() {
@@ -33,7 +34,7 @@ protected:
 	static constexpr RotDir turn =
 		qrotation(Vector3(0.0, math::sqrt1_2, math::sqrt1_2));
 
-	Mesh* mesh;
+	std::shared_ptr<Mesh> mesh;
 
 	// Attributes of the ship
 	ShipStats::shared_ptr stats;
@@ -43,11 +44,10 @@ protected:
 	uint16_t nguns;
 
 	// Engine properties
-	Fire fx_engine;
+	std::shared_ptr<Fire> fx_engine;
 	float rel_speed;
 	uint16_t nengines;
 
 	// Shield properties
 	uint16_t life;
 };
-

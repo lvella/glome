@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cstdio>
+#include <memory>
+
 #include "shader.hpp"
 #include "vector3.hpp"
 #include "camera.hpp"
@@ -18,8 +21,7 @@ public:
 
 	void draw(Camera& c);
 
-	static Mesh* get_mesh(Type type);
-	static void release_mesh(Mesh* m);
+	static std::shared_ptr<Mesh> get_mesh(Type type);
 
 private:
 	void load_from_file(const char* name);
@@ -31,9 +33,6 @@ private:
 		Vector4 color;
 	};
 	void fill_VBO(const std::vector<VertexData>& vdata, float scale=1.0f);
-
-	// a reference counter for shapes
-	unsigned int ref_count;
 
 	union {
 		struct {

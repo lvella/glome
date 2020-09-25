@@ -29,6 +29,8 @@ SDL_Window *window;
 SDL_GLContext glcontext;
 std::vector<SDL_GLContext> threads_glcontexts;
 
+bool is_paused = false;
+
 static void initialize_SDL()
 {
 	/* SDL Startup */
@@ -152,13 +154,23 @@ static void main_loop()
 	uint64_t frame_count = 0;
 	bool running = true;
 
-	auto start = Timer::now();
-	auto prev_time = start;
+	Timer::duration running_time{};
+	auto prev_time = Timer::now();
 	while(running)
 	{
 		auto curr_time = Timer::now();
+		auto frame_time = curr_time - prev_time;
+		running_time += frame_time;
+
+		if(is_paused) {
+			if(!Input::handle_paused()) {
+				break;
+			}
+			curr_time = Timer::now();
+		}
+
 		running = Input::handle();
-		Game::frame(curr_time - prev_time);
+		Game::frame(frame_time);
 		SDL_GL_SwapWindow(window);
 
 		// Fix framerate at FIXED_FPS
@@ -178,9 +190,9 @@ static void main_loop()
 		++frame_count;
 	}
 
-	std::chrono::duration<float> time_running = Timer::now() - start;
+	std::chrono::duration<float> running_time_sec = running_time;
 	std::cout << frame_count << " frames rendered at "
-		<< frame_count / time_running.count() << " FPS.\n";
+		<< frame_count / running_time_sec.count() << " FPS.\n";
 }
 
 int main(int argc, char **argv)

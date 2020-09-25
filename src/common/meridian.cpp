@@ -2,13 +2,10 @@
 
 #include "gl.hpp"
 #include "math.hpp"
-#include "world.hpp"
+#include "minimap.hpp"
+#include "initialization.hpp"
 
-static GLuint vbo;
-
-void
-initialize_meridians()
-{
+RegisterInitialization Meridians::ini{[] {
   glGenBuffers(1, &vbo);
   float vdata[360*4];
 
@@ -24,48 +21,57 @@ initialize_meridians()
     }
 
   glBufferData(GL_ARRAY_BUFFER, sizeof(vdata), (GLvoid*)vdata, GL_STATIC_DRAW);
-}
+}};
 
 void
-draw_meridians(Camera &c)
+Meridians::draw(Camera &c)
 {
 	const Shader *s = c.getShader();
+
+	glDisableVertexAttribArray(Shader::ATTR_COLOR);
 
 	glBindBuffer(GL_ARRAY_BUFFER, vbo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-	glVertexAttribPointer(s->posAttr(), 4, GL_FLOAT, GL_FALSE, 0, nullptr);
+	glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 
-	glVertexAttrib4f(s->colorAttr(), 1.0f, 1.0f, 0.0f, 1.0f);
+	c.setQRot(QRot::IDENTITY());
+	glVertexAttrib4f(Shader::ATTR_COLOR, 1.0f, 1.0f, 0.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
 
 	QRot t = xz_qrot(math::pi_2);
-	c.pushMultQRot(t);
-	glVertexAttrib4f(s->colorAttr(), .0f, 1.f, 1.0f, 1.0f);
+	c.setQRot(t);
+	glVertexAttrib4f(Shader::ATTR_COLOR, .0f, 1.f, 1.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
-	c.popMat();
 
 	t *= yz_qrot(math::pi_2);
-	c.pushMultQRot(t);
-	glVertexAttrib4f(s->colorAttr(), 1.0f, .0f, 1.0f, 1.0f);
+	c.setQRot(t);
+	glVertexAttrib4f(Shader::ATTR_COLOR, 1.0f, .0f, 1.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
-	c.popMat();
 
 	t *= xw_qrot(-math::pi_2);
-	c.pushMultQRot(t);
-	glVertexAttrib4f(s->colorAttr(), 1.0f, .0f, .0f, 1.0f);
+	c.setQRot(t);
+	glVertexAttrib4f(Shader::ATTR_COLOR, 1.0f, .0f, .0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
-	c.popMat();
 
 	t *= yw_qrot(-math::pi_2);
-	c.pushMultQRot(t);
-	glVertexAttrib4f(s->colorAttr(), .0f, .0f, 1.0f, 1.0f);
+	c.setQRot(t);
+	glVertexAttrib4f(Shader::ATTR_COLOR, .0f, .0f, 1.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
-	c.popMat();
 
 	t *= yz_qrot(math::pi_2);
-	c.pushMultQRot(t);
-	glVertexAttrib4f(s->colorAttr(), .0f, 1.0f, 0.0f, 1.0f);
+	c.setQRot(t);
+	glVertexAttrib4f(Shader::ATTR_COLOR, .0f, 1.0f, 0.0f, 1.0f);
 	glDrawArrays(GL_LINES, 0, 360);
-	c.popMat();
+
+	glEnableVertexAttribArray(Shader::ATTR_COLOR);
 }
+
+void
+Meridians::minimap_draw(Camera& c)
+{
+	glUniform1i(MiniMap::proj_has_tex, 0);
+	draw(c);
+}
+
+GLuint Meridians::vbo;
