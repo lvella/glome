@@ -25,7 +25,7 @@ public:
 		std::weak_ptr<Glome::Drawable>
 	>;
 
-	RendererVR(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, /*std::shared_ptr<vr::IVRSystem>*/ vr::IVRSystem* const pHMD);
+	RendererVR(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, vr::IVRSystem* const pHMD);
 
 	void update(float dt) override;
 	void draw(ObjSet& objs) override;
@@ -37,6 +37,5 @@ protected:
 	GLuint left_eye_texture;
 	GLuint right_eye_texture;
 
-	// std::shared_ptr<vr::IVRSystem> m_pHMD;
 	vr::IVRSystem* m_pHMD;
 };

@@ -61,11 +61,7 @@ WorldDummy::WorldDummy():
 
 	// Loading the SteamVR Runtime
 	vr::EVRInitError peError = vr::VRInitError_None;
-	// m_pHMD = std::make_shared<vr::IVRSystem>(
-	// 	vr::VR_Init( &eError, vr::VRApplication_Scene )
-	// );
 	m_pHMD = vr::VR_Init( &peError, vr::VRApplication_Scene );
-
 	if ( peError == vr::VRInitError_None && players.size() == 1 )
 	{
 		std::cout << "Launching glome in VR mode" << std::endl;

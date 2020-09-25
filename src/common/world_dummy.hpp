@@ -17,6 +17,5 @@ public:
 
 private:
 	std::shared_ptr<Meridians> meridians;
-	// std::shared_ptr<vr::IVRSystem> m_pHMD;
 	vr::IVRSystem* m_pHMD = NULL;
 };
