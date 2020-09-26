@@ -38,6 +38,7 @@ add_library(common STATIC
 	fire.hpp
 	game.cpp
 	game.hpp
+	gltext.cpp
 	initialization.hpp
 	initialization.cpp
 	make_array.hpp
@@ -113,6 +114,7 @@ add_library(common STATIC
 target_include_directories(common PUBLIC
 	"."
 	"${glome_SOURCE_DIR}/external/concurrentqueue"
+	"${glome_SOURCE_DIR}/external/glText"
 )
 
 if(USE_PKG_CONFIG)
