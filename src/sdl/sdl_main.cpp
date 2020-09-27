@@ -55,7 +55,7 @@ static void initialize_gl_context()
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
@@ -97,9 +97,9 @@ static void initialize_gl_context()
 		fatal_user_error(ss.str().c_str());
 	}
 
-	if(! GLEW_VERSION_3_2)
+	if(! GLEW_VERSION_3_3)
 	{
-		fatal_user_error("Error: Glome requires at least OpenGL 3.2");
+		fatal_user_error("Error: Glome requires at least OpenGL 3.3");
 	}
 
 	int major, minor, mask;

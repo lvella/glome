@@ -1,5 +1,6 @@
 #include "game.hpp"
 
+
 //#include "menu.hpp"
 #include "options.hpp"
 #include "meridian.hpp"
@@ -13,6 +14,7 @@
 #include "profiling.hpp"
 #include "spaghetti_fragment.hpp"
 #include "initialization.hpp"
+#include "gltext.hpp"
 
 namespace Game
 {
@@ -38,22 +40,10 @@ frame(std::chrono::duration<float> frame_time)
 void
 initialize()
 {
-	// OpenGL nonchanging settings
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
-	glEnableVertexAttribArray(0);
+	bool glt_inited = gltInit();
+	assert(glt_inited);
 
-	glEnableVertexAttribArray(0);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClearDepth(1.0f);
-
-	glEnable(GL_CULL_FACE);
-
-	glLineWidth(1.5f);
-
-	glEnable(GL_PRIMITIVE_RESTART);
-	glPrimitiveRestartIndex(std::numeric_limits<uint16_t>::max());
+	Renderer::initialize();
 
 	// Must be the first to initialize, so shaders
 	// can be created with the correct perspective
@@ -73,6 +63,7 @@ void
 shutdown()
 {
 	Audio::shutdown();
+	gltTerminate();
 }
 
 void switch_state(state s)

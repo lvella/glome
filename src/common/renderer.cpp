@@ -2,6 +2,7 @@
 
 #include <algorithm>
 #include <memory>
+#include <cstdio>
 
 #include "drawable.hpp"
 #include "options.hpp"
@@ -13,11 +14,6 @@
 #include "camera.hpp"
 #include "renderer.hpp"
 #include "vector4.hpp"
-
-#include <algorithm>
-#include <memory>
-#include <iomanip>
-#include <stdlib.h>
 
 using namespace std;
 using namespace Options;
@@ -57,6 +53,23 @@ private:
 	DrawSpecsBase *active = nullptr;
 };
 
+}
+
+void Renderer::initialize()
+{	// OpenGL nonchanging settings
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+
+	glEnableVertexAttribArray(0);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearDepth(1.0f);
+
+	glEnable(GL_CULL_FACE);
+
+	glLineWidth(1.5f);
+
+	glEnable(GL_PRIMITIVE_RESTART);
+	glPrimitiveRestartIndex(std::numeric_limits<uint16_t>::max());
 }
 
 void
@@ -103,6 +116,13 @@ Renderer::draw(ObjSet& objs)
 		active->enable();
 
 		auto drawn_objs = draw_objs_in_world(objs);
+
+		// Draw score text:
+		gltBeginDraw();
+		gltColor(1.0f, 0.5f, 0.5f, 1.0f);
+		gltDrawText2D(active->score, 15.0f, 15.0f, 3.0f);
+		gltEndDraw();
+		glBindVertexArray(VertexArrayID);
 
 		MiniMap::draw(active->_x, active->_y, this,
 			active->transformation(), drawn_objs
@@ -179,12 +199,22 @@ Renderer::fill_minimap(const vector<std::shared_ptr<Glome::Drawable>>& objs, Cam
 	}
 }
 
+void Renderer::Viewport::set_score(uint64_t points)
+{
+	char score_text[64];
+	snprintf(score_text, sizeof score_text, "Score: %lu", points);
+	gltSetText(score, score_text);
+
+	glBindVertexArray(VertexArrayID);
+}
+
 void
 Renderer::Viewport::update(float dt)
 {
 	QRot new_trans;
 	if(auto ptr = t.lock()) {
 		new_trans = cam_offset * ptr->get_t().inverse();
+		set_score(ptr->ctrl->get_points());
 	} else {
 		new_trans = cam_hist.front().t;
 	}
@@ -204,7 +234,6 @@ Renderer::Viewport::update(float dt)
 
 	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
 	next.dt -= dt;
-
 }
 
 const QRot Renderer::Viewport::cam_offset(
@@ -212,3 +241,5 @@ const QRot Renderer::Viewport::cam_offset(
 	zw_qrot(-0.015) *
 	yw_qrot(-0.01)
 );
+
+GLuint Renderer::VertexArrayID;

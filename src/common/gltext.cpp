@@ -2,9 +2,9 @@
 // and is expanded when GLT_IMPLEMENTATION is defined.
 //
 // So, this is the compilation unit where glText is compiled.
-// Do not define GLT_IMPLEMENTATION when using gltext.h from other files.
 
 #include "gl.hpp"
 
+#define GLT_IMPORTS
 #define GLT_IMPLEMENTATION
 #include <gltext.h>

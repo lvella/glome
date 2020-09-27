@@ -39,6 +39,7 @@ add_library(common STATIC
 	game.cpp
 	game.hpp
 	gltext.cpp
+	gltext.hpp
 	initialization.hpp
 	initialization.cpp
 	make_array.hpp
