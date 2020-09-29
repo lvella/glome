@@ -24,6 +24,7 @@ DEBUG_OPT bool showBotScreen = false;
 bool fullscreen = false;
 int width = 800;
 int height = 600;
+bool vr_enable = false;
 
 // Network options
 // TODO: Make use of these:
@@ -51,7 +52,8 @@ void usage()
 			"\t-h/--host [ip]\t\t: host ip\n"
 			"\t-s/--is-server\t\t: run as a server\n"
 			"\t-c/--is-client\t\t: run as a client\n"
-			"\t-p/--port [number]\t: host port\n\n"
+			"\t-p/--port [number]\t: host port\n"
+			"\t-r/--vr\t\t\t: enable VR\n\n"
 			//TODO: Make the following true: "NOTICE: This arguments can be changed/stored in the game later\n"
 			"Glome is free software.  See COPYING for details.\n"
 	);
@@ -73,13 +75,14 @@ int parse_args(int argc, char** argv)
 			{"host",	required_argument,	0,	'h'},
 			{"port",	required_argument,	0,	'p'},
 			{"no-split",	no_argument,		0,	'l'},
+			{"vr",			no_argument, 	0, 'r'},
 			{0, 0, 0, 0}
 	};
 
 	char option;
 	int option_index = 0;
 
-	while ((option = getopt_long(argc, argv, "fx:y:csh:p:", long_options, &option_index)) != EOF)
+	while ((option = getopt_long(argc, argv, "fx:y:csh:p:r", long_options, &option_index)) != EOF)
 	{
 		switch (option)
 		{
@@ -114,6 +117,9 @@ int parse_args(int argc, char** argv)
 		case 's':
 			isServer = true;
 			isClient = false;
+			break;
+		case 'r':
+			vr_enable = true;
 			break;
 		case '?':
 			usage();
