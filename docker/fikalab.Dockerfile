@@ -35,7 +35,7 @@ USER $USER_NAME
 WORKDIR $WORKDIR
 
 # install openvr
-RUN git clone https://github.com/ValveSoftware/openvr.git /home//developer/openvr
+RUN git clone https://github.com/ValveSoftware/openvr.git /home/developer/openvr
 
 # run this command so that docker does not exit immediatly
 CMD sleep 1
