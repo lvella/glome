@@ -61,28 +61,23 @@ private:
 
 RendererVR::RendererVR(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, vr::IVRSystem* const pHMD) :
 	Renderer(pp, audio_world)
-{	
-	assert(pp.size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
-	int h = height / (pp.size() > 2 ? 2 : 1);
-	int w = width / (pp.size() > 1 ? 2 : 1);
+{
+	players.emplace_back(pp[0], 0, 0, width, height, audio_world);
+	active = begin(players);
 
-	for(int i = 0; i < pp.size(); ++i) {
-		players.emplace_back(pp[i], (i%2) * w, height - (i/2 + 1) * h, w, h, audio_world);
-	}
-
-	Fire::set_width(w);
+	Fire::set_width(width);
 
 	Frustum::initializeAtOrigin(frustum_at_origin);
 
 	m_pHMD = pHMD;
 
-    vr::EVRInitError eError = vr::VRInitError_None;
-    
-    if ( !vr::VRCompositor() )
-    {
-        std::cout << "Failed to init VR Compositor: %s" << vr::VR_GetVRInitErrorAsEnglishDescription( eError ) << std::endl;
-        exit(-1);
-    }
+	vr::EVRInitError eError = vr::VRInitError_None;
+
+	if ( !vr::VRCompositor() )
+	{
+		std::cout << "Failed to init VR Compositor: %s" << vr::VR_GetVRInitErrorAsEnglishDescription( eError ) << std::endl;
+		exit(-1);
+	}
 
 	// framebuffer for offscreen rendering
 	glGenFramebuffers(1, &temp_framebuffer);
@@ -105,8 +100,6 @@ RendererVR::update(float dt)
 void
 RendererVR::draw(ObjSet& objs)
 {
-	// assert(players.size() == 1);
-	active = begin(players);
 	auto original_transform = active->transformation();
 
 	/***********************************************************/

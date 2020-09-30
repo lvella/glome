@@ -65,9 +65,9 @@ static void initialize_gl_context()
 			video_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
 		window = SDL_CreateWindow(
-		"Glome",
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
+			"Glome",
+			SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_UNDEFINED,
 			Options::width,
 			Options::height,
 			video_flags);
