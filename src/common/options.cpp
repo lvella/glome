@@ -126,8 +126,18 @@ int parse_args(int argc, char** argv)
 			return 1;
 		}
 	}
+
+	// Check for incompatibilities
+	if(showBotScreen && vr_enable)
+	{
+		printf("Can't show more than one player in VR mode.\n");
+		return 1;
+	}
+
 	return 0;
 }
+
+
 
 }
 
