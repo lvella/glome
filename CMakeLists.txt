@@ -6,12 +6,9 @@ project(glome)
 # options
 option(STATS_TUNING "Enable ship statistics tunning")
 option(ENABLE_IPO "Enable interprocedural optimization, if available")
-set(OPENVR_PATH "~/openvr" CACHE STRING "Path to openvr on the system")
 set(DATA_DIR "data" CACHE STRING "Path to data directory")
 set(EXTRA_CXX_FLAGS "" CACHE STRING "Extra C++ flags used during compilation")
 set(EXTRA_LD_FLAGS "" CACHE STRING "Extra flags used during linking")
-
-get_filename_component(OPENVR_PATH ${OPENVR_PATH} ABSOLUTE)
 
 # specify the C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -40,19 +37,9 @@ endif()
 if(CMAKE_HOST_UNIX)
 	find_file(OPENVRPATHS openvrpaths.vrpath PATHS $ENV{HOME}/.config/openvr "$ENV{HOME}/Library/Application Support/OpenVR/.openvr")
 	if(${OPENVRPATHS} MATCHES OPENVRPATHS-NOTFOUND)
-		message(WARNING "${OPENVRPATHS} Please install SteamVR SDK to continue..")
+		message(WARNING "${OPENVRPATHS} You won't be able to use VR without SteamVR.")
 	endif()
 endif()
-
-# OpenVR API path
-find_library(OPENVR_LIBRARIES
-	NAMES
-		openvr_api
-	PATHS
-		${OPENVR_PATH}/bin/linux64
-		${OPENVR_PATH}/lib/linux64
-)
-message(STATUS "OPENVR_PATH: ${OPENVR_PATH}")
 
 target_include_directories(common PUBLIC
 	"${PROJECT_BINARY_DIR}/src"
