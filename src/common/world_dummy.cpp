@@ -10,6 +10,7 @@
 #include "spaghetti.hpp"
 #include "thread_pool.hpp"
 
+#include <SDL.h>
 #include "openvr.h"
 
 
@@ -65,27 +66,35 @@ WorldDummy::WorldDummy():
 		vr::EVRInitError peError = vr::VRInitError_None;
 		m_pHMD = vr::VR_Init( &peError, vr::VRApplication_Scene );
 
-		if ( peError == vr::VRInitError_None && players.size() == 1 )
+		if ( peError == vr::VRInitError_None )
 		{
 			std::cout << "Launching glome in VR mode" << std::endl;
 			_render = new RendererVR(std::move(players), *this, m_pHMD );
 		}
 		else
 		{
-			if ( !vr::VR_IsRuntimeInstalled() )
-			{
-				std::cout << "OpenVR Runtime not detected on the system" << '\n';
+			if ( !vr::VR_IsRuntimeInstalled() ) {
+				std::cerr << "Error : OpenVR Runtime not detected on the system" << '\n';
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+					"Error",
+					"OpenVR Runtime not detected on the system",
+					NULL);
 			}
-			else if ( !vr::VR_IsHmdPresent() )
-			{
-				std::cout << "Error : HMD not detected on the system" << '\n';
+			else if ( !vr::VR_IsHmdPresent() ) {
+				std::cerr << "Error : HMD not detected on the system" << '\n';
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+					"Error",
+					"HMD not detected on the system",
+					NULL);
 			}
-			else if ( players.size() > 1 )
-			{
-				std::cout << "VR only supported on single player" << '\n';
+			else {
+				std::cerr << "Errror : " << vr::VR_GetVRInitErrorAsEnglishDescription(peError) << '\n';
+				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+					"Error",
+					vr::VR_GetVRInitErrorAsEnglishDescription(peError),
+					NULL);
 			}
-			std::cout << "Launching in non-VR mode" << std::endl;
-			_render = new Renderer(std::move(players), *this);
+			exit(1);
 		}
 	}
 	else

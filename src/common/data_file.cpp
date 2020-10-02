@@ -8,6 +8,9 @@
 #include <iostream>
 #include <tuple>
 
+#include <sstream>
+#include <SDL.h>
+
 static std::tuple<std::filesystem::path, DataFile>
 assemble_and_check_path(const std::string& path)
 {
@@ -17,20 +20,25 @@ assemble_and_check_path(const std::string& path)
 	errno = 0;
 	DataFile file(full_path);
 	if(!file) {
-		std::cout << "FATAL ERROR: Failed to open game file: "
+		std::stringstream error_reason;
+		error_reason << "FATAL ERROR: Failed to open game file: "
 			<< full_path << '\n';
 		if(errno) {
-			std::cout << "  Reason: " << strerror(errno) << '\n';
+			error_reason << "  Reason: " << strerror(errno) << '\n';
 		}
-		std::cout << "  Please be sure game data is in the " <<
+		error_reason << "  Please be sure game data is in the " <<
 			(full_path.is_absolute() ? "absolute": "relative") << " path "
 			"\"" << DATA_DIR << "\" and ";
 		if(full_path.is_absolute()) {
-			std::cout << "you have permission to read it.";
+			error_reason << "you have permission to read it.";
 		} else {
-			std::cout << "it is accessible from game's working directory.";
+			error_reason << "it is accessible from game's working directory.";
 		}
-		std::cout << std::endl;
+		std::cerr << error_reason.str() << std::endl;
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+			"FATAL_ERROR",
+			error_reason.str().c_str(),
+			NULL);
 		exit(1);
 	}
 

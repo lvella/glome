@@ -4,6 +4,8 @@
 #include <cstdio>
 #include <getopt.h>
 
+#include <SDL.h>
+
 using namespace std;
 
 namespace Options
@@ -130,7 +132,11 @@ int parse_args(int argc, char** argv)
 	// Check for incompatibilities
 	if(showBotScreen && vr_enable)
 	{
-		printf("Can't show more than one player in VR mode.\n");
+		fprintf(stderr, "Error : Can't show more than one player in VR mode.");
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+			"Error",
+			"Can't show more than one player in VR mode.",
+			NULL);
 		return 1;
 	}
 
