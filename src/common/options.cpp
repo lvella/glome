@@ -1,10 +1,10 @@
 #include "options.hpp"
 
+#include <popup_window.hpp>
+
 #include <cstdlib>
 #include <cstdio>
 #include <getopt.h>
-
-#include <SDL.h>
 
 using namespace std;
 
@@ -132,11 +132,11 @@ int parse_args(int argc, char** argv)
 	// Check for incompatibilities
 	if(showBotScreen && vr_enable)
 	{
-		fprintf(stderr, "Error : Can't show more than one player in VR mode.");
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+		fprintf(stderr, "Error : Can't show more than one player in VR mode.\n");
+		fatal_user_error(
 			"Error",
-			"Can't show more than one player in VR mode.",
-			NULL);
+			"Can't show more than one player in VR mode"
+		);
 		return 1;
 	}
 

@@ -1,15 +1,14 @@
 #include "data_file.hpp"
 
 #include "config.hpp"
+#include "popup_window.hpp"
 
 #include <cerrno>
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <tuple>
-
 #include <sstream>
-#include <SDL.h>
 
 static std::tuple<std::filesystem::path, DataFile>
 assemble_and_check_path(const std::string& path)
@@ -35,10 +34,10 @@ assemble_and_check_path(const std::string& path)
 			error_reason << "it is accessible from game's working directory.";
 		}
 		std::cerr << error_reason.str() << std::endl;
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-			"FATAL_ERROR",
-			error_reason.str().c_str(),
-			NULL);
+		fatal_user_error(
+			"Error",
+			error_reason.str().c_str()
+		);
 		exit(1);
 	}
 

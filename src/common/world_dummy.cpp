@@ -9,8 +9,8 @@
 #include "supernova.hpp"
 #include "spaghetti.hpp"
 #include "thread_pool.hpp"
+#include "popup_window.hpp"
 
-#include <SDL.h>
 #include "openvr.h"
 
 
@@ -75,24 +75,24 @@ WorldDummy::WorldDummy():
 		{
 			if ( !vr::VR_IsRuntimeInstalled() ) {
 				std::cerr << "Error : OpenVR Runtime not detected on the system" << '\n';
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+				fatal_user_error(
 					"Error",
-					"OpenVR Runtime not detected on the system",
-					NULL);
+					"OpenVR Runtime not detected on the system"
+				);
 			}
 			else if ( !vr::VR_IsHmdPresent() ) {
 				std::cerr << "Error : HMD not detected on the system" << '\n';
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+				fatal_user_error(
 					"Error",
-					"HMD not detected on the system",
-					NULL);
+					"HMD not detected on the system"
+				);
 			}
 			else {
-				std::cerr << "Errror : " << vr::VR_GetVRInitErrorAsEnglishDescription(peError) << '\n';
-				SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+				std::cerr << "Error : " << vr::VR_GetVRInitErrorAsEnglishDescription(peError) << '\n';
+				fatal_user_error(
 					"Error",
-					vr::VR_GetVRInitErrorAsEnglishDescription(peError),
-					NULL);
+					vr::VR_GetVRInitErrorAsEnglishDescription(peError)
+				);
 			}
 			exit(1);
 		}
