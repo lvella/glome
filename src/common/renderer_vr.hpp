@@ -17,6 +17,11 @@
 #include "renderer.hpp"
 #include "openvr.h"
 
+enum Eye {
+	left=0, 
+	right
+};
+
 class RendererVR : public Renderer
 {
 public:
@@ -29,6 +34,9 @@ public:
 
 	void update(float dt) override;
 	void draw(ObjSet& objs) override;
+
+	std::vector<std::shared_ptr<Glome::Drawable>>
+	draw_eye(const GLuint texture, const GLuint framebuffer, const Eye eye, const QRot original_transform, ObjSet& objs);
 
 protected:
 

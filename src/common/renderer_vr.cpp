@@ -102,72 +102,13 @@ RendererVR::draw(ObjSet& objs)
 {
 	auto original_transform = active->transformation();
 
-	/***********************************************************/
-	/*               LEFT EYE                                  */
-	/***********************************************************/
+	// left eye
+	draw_eye(left_eye_texture, temp_framebuffer, Eye::left, original_transform, objs);
 
-	glBindFramebuffer(GL_FRAMEBUFFER, temp_framebuffer);
-	// "Bind" this texture, so future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, left_eye_texture);
+	// right eye
+	draw_eye(right_eye_texture, temp_framebuffer, Eye::right, original_transform, objs);
 
-	// give an empty image to the texture (the last "0")
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, active->_w, active->_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-	
-	// apparently this is also needed
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
-	// set the texture as out colour attachment #0
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, left_eye_texture, 0);
-
-	// move camera slightly to the left
-	active->curr_qrot = xw_qrot(0.005) * original_transform;
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// render scene for left eye
-	active->enable();
-
-	// draw stuff for left eye
-	auto drawn_objs = draw_objs_in_world(objs);
-
-	/***********************************************************/
-	/*               RIGHT EYE                                 */
-	/***********************************************************/
-
-	glBindFramebuffer(GL_FRAMEBUFFER, temp_framebuffer);
-	// "Bind" this texture, so future texture functions will modify this texture
-	glBindTexture(GL_TEXTURE_2D, right_eye_texture);
-
-	// give an empty image to the texture (the last "0")
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, active->_w, active->_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-	
-	// apparently this is also needed
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
-	// set the texture as out colour attachment #0
-	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, right_eye_texture, 0);
-	
-	// move camera slightly to the right
-	active->curr_qrot = xw_qrot(-0.005) * original_transform;
-	
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	// render scene for left eye
-	active->enable();
-
-	// draw stuff for right eye
-	drawn_objs = draw_objs_in_world(objs);
-	
-	/***********************************************************/
-	/*               VR stuff                                  */
-	/***********************************************************/
-
+	// vr stuff
 	if ( m_pHMD )
 	{
 		vr::TrackedDevicePose_t trackedDevicePose[vr::k_unMaxTrackedDeviceCount];
@@ -183,4 +124,43 @@ RendererVR::draw(ObjSet& objs)
 
 	// restore original transform (before VR distortion)
 	active->curr_qrot = original_transform;
+}
+
+std::vector<std::shared_ptr<Glome::Drawable>>
+draw_eye(const GLuint texture, const GLuint framebuffer, const Eye eye, const QRot original_transform, ObjSet& objs)
+{
+
+	// bind the frambebuffer
+	glBindFramebuffer(GL_FRAMEBUFFER, framebuffer);
+
+	// bind the texture
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	// give an empty image to the texture (the last "0")
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, active->_w, active->_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
+	
+	// apparently this is also needed
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+	// set the texture as colour attachment #0
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture, 0);
+
+	// move camera slightly 
+	//    if left eye, to the left
+	//    if left right, to the right
+	active->curr_qrot = xw_qrot((eye * -1) * 0.005) * original_transform;
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+	// render scene for left eye
+	active->enable();
+
+	// draw stuff for left eye
+	auto drawn_objs = draw_objs_in_world(objs);
+
+	return drawn_objs;
+
 }
