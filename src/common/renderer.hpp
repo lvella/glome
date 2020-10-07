@@ -23,6 +23,7 @@ public:
 	>;
 
 	Renderer(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world);
+	virtual ~Renderer() = default;
 
 	virtual void update(float dt);
 	virtual void draw(ObjSet& objs);
