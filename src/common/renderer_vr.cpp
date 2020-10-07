@@ -22,43 +22,6 @@
 using namespace std;
 using namespace Options;
 
-namespace {
-
-class SpecsTracker
-{
-public:
-	SpecsTracker(Camera& camera):
-		c(camera)
-	{}
-
-	~SpecsTracker()
-	{
-		shutdown();
-	}
-
-	void maybe_set(DrawSpecsBase* s)
-	{
-		if(s != active) {
-			shutdown();
-			active = s;
-			if(s) s->setup_draw_state(c);
-		}
-	}
-
-private:
-	void shutdown()
-	{
-		if(active) {
-			active->shutdown_draw_state(c);
-		}
-	}
-
-	Camera& c;
-	DrawSpecsBase *active = nullptr;
-};
-
-}
-
 RendererVR::RendererVR(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, vr::IVRSystem* const pHMD) :
 	Renderer(pp, audio_world)
 {
@@ -113,7 +76,7 @@ RendererVR::draw(ObjSet& objs)
 	{
 		vr::TrackedDevicePose_t trackedDevicePose[vr::k_unMaxTrackedDeviceCount];
 		vr::VRCompositor()->WaitGetPoses(trackedDevicePose, vr::k_unMaxTrackedDeviceCount, nullptr, 0);
-		
+
 		vr::Texture_t leftEyeTexture = {(void*)(uintptr_t)left_eye_texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
 		vr::Texture_t rightEyeTexture = {(void*)(uintptr_t)right_eye_texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
 		vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture );
@@ -138,7 +101,7 @@ RendererVR::draw_eye(const GLuint texture, const GLuint framebuffer, const Eye e
 
 	// give an empty image to the texture (the last "0")
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, active->_w, active->_h, 0, GL_RGB, GL_UNSIGNED_BYTE, 0);
-	
+
 	// apparently this is also needed
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
 	glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
@@ -148,7 +111,7 @@ RendererVR::draw_eye(const GLuint texture, const GLuint framebuffer, const Eye e
 	// set the texture as colour attachment #0
 	glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, texture, 0);
 
-	// move camera slightly 
+	// move camera slightly
 	//    if left eye, to the left
 	//    if left right, to the right
 	active->curr_qrot = xw_qrot((eye * -1) * 0.005) * original_transform;
