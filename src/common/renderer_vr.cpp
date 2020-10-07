@@ -23,16 +23,17 @@ using namespace std;
 using namespace Options;
 
 RendererVR::RendererVR(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, vr::IVRSystem* const pHMD) :
-	Renderer(pp, audio_world)
+	Renderer(pp, audio_world),
+	m_pHMD{pHMD}
 {
+	assert(m_pHMD);
+
 	players.emplace_back(pp[0], 0, 0, width, height, audio_world);
 	active = begin(players);
 
 	Fire::set_width(width);
 
 	Frustum::initializeAtOrigin(frustum_at_origin);
-
-	m_pHMD = pHMD;
 
 	vr::EVRInitError eError = vr::VRInitError_None;
 
@@ -72,18 +73,15 @@ RendererVR::draw(ObjSet& objs)
 	draw_eye(right_eye_texture, temp_framebuffer, Eye::right, original_transform, objs);
 
 	// vr stuff
-	if ( m_pHMD )
-	{
-		vr::TrackedDevicePose_t trackedDevicePose[vr::k_unMaxTrackedDeviceCount];
-		vr::VRCompositor()->WaitGetPoses(trackedDevicePose, vr::k_unMaxTrackedDeviceCount, nullptr, 0);
+	vr::TrackedDevicePose_t trackedDevicePose[vr::k_unMaxTrackedDeviceCount];
+	vr::VRCompositor()->WaitGetPoses(trackedDevicePose, vr::k_unMaxTrackedDeviceCount, nullptr, 0);
 
-		vr::Texture_t leftEyeTexture = {(void*)(uintptr_t)left_eye_texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
-		vr::Texture_t rightEyeTexture = {(void*)(uintptr_t)right_eye_texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
-		vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture );
-		vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture );
+	vr::Texture_t leftEyeTexture = {(void*)(uintptr_t)left_eye_texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
+	vr::Texture_t rightEyeTexture = {(void*)(uintptr_t)right_eye_texture, vr::TextureType_OpenGL, vr::ColorSpace_Gamma };
+	vr::VRCompositor()->Submit(vr::Eye_Left, &leftEyeTexture );
+	vr::VRCompositor()->Submit(vr::Eye_Right, &rightEyeTexture );
 
-		vr::VRCompositor()->PostPresentHandoff();
-	}
+	vr::VRCompositor()->PostPresentHandoff();
 
 	// restore original transform (before VR distortion)
 	active->curr_qrot = original_transform;
