@@ -18,6 +18,7 @@ list(INSERT CMAKE_CXX_FLAGS 0 "${EXTRA_CXX_FLAGS}")
 
 configure_file(src/config.hpp.in src/config.hpp)
 
+add_subdirectory(external/openvr)
 add_subdirectory(src/common)
 add_subdirectory(src/sdl)
 
@@ -29,15 +30,6 @@ if(ENABLE_IPO)
 	if(HAS_IPO)
 		set_property(TARGET common PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
 		set_property(TARGET glome PROPERTY INTERPROCEDURAL_OPTIMIZATION TRUE)
-	endif()
-endif()
-
-# Check that the steamVR SDK is installed 
-# (needed to prevent a segfault in OpenVR).
-if(CMAKE_HOST_UNIX)
-	find_file(OPENVRPATHS openvrpaths.vrpath PATHS $ENV{HOME}/.config/openvr "$ENV{HOME}/Library/Application Support/OpenVR/.openvr")
-	if(${OPENVRPATHS} MATCHES OPENVRPATHS-NOTFOUND)
-		message(WARNING "${OPENVRPATHS} You won't be able to use VR without SteamVR.")
 	endif()
 endif()
 

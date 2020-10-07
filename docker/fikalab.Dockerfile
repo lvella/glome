@@ -34,16 +34,5 @@ RUN echo "ALL   ALL = (ALL) NOPASSWD: ALL" >> /etc/sudoers
 USER $USER_NAME
 WORKDIR $WORKDIR
 
-# install openvr
-RUN git clone https://github.com/ValveSoftware/openvr.git /home/developer/openvr
-RUN mkdir openvr_build 	\
-	&& cd openvr_build 	\
-	&& cmake /home/developer/openvr \
-	&& make -j 			\
-	&& sudo make install 	\
-	&& cd .. && rm -rf openvr_build \
-	&& rm -rf /home/developer/openvr
-
-
 # run this command so that docker does not exit immediatly
 CMD sleep 1
