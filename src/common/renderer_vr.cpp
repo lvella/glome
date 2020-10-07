@@ -127,7 +127,7 @@ RendererVR::draw(ObjSet& objs)
 }
 
 std::vector<std::shared_ptr<Glome::Drawable>>
-draw_eye(const GLuint texture, const GLuint framebuffer, const Eye eye, const QRot original_transform, ObjSet& objs)
+RendererVR::draw_eye(const GLuint texture, const GLuint framebuffer, const Eye eye, const QRot original_transform, ObjSet& objs)
 {
 
 	// bind the frambebuffer
