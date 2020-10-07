@@ -1,9 +1,15 @@
-#include <popup_window.hpp>
+#include "popup_window.hpp"
 
-void fatal_user_error(const char* title, const char* msg) {
+#include <iostream>
+#include <SDL.h>
 
+void fatal_user_error(const char* msg)
+{
+	std::cerr << msg << std::endl;
 	SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-					title,
+					"Fatal Error!",
 					msg,
 					NULL);
+
+	exit(1);
 }

@@ -2,6 +2,7 @@
 #include <cstdlib>
 #include <chrono>
 #include <thread>
+#include <sstream>
 
 #include <GL/glew.h>
 #ifdef _WIN32
@@ -20,7 +21,7 @@
 #include "jsinput.hpp"
 #include "thread_pool.hpp"
 #include "random.hpp"
-
+#include "popup_window.hpp"
 #include "native.hpp"
 
 static bool v_sync_enabled = true;
@@ -90,20 +91,15 @@ static void initialize_gl_context()
 	// Using GLEW to get the OpenGL functions
 	GLenum err = glewInit();
 	if(err != GLEW_OK) {
-		std::cerr << "Unable to initialize GLEW:\n"
+		std::stringstream ss;
+		ss << "Error: Unable to initialize GLEW:\n"
 			<< glewGetErrorString(err) << std::endl;
-		exit(1);
+		fatal_user_error(ss.str().c_str());
 	}
 
 	if(! GLEW_VERSION_3_2)
 	{
-		const char *msg = "Glome requires at least OpenGL 3.2";
-		#ifdef WIN32
-		MessageBoxA(NULL, msg, NULL, MB_OK);
-		#else
-		std::cerr << msg << std::endl;
-		#endif
-		exit(1);
+		fatal_user_error("Error: Glome requires at least OpenGL 3.2");
 	}
 
 	int major, minor, mask;

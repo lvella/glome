@@ -1,10 +1,10 @@
 #include "options.hpp"
 
-#include <popup_window.hpp>
-
 #include <cstdlib>
 #include <cstdio>
 #include <getopt.h>
+
+#include "popup_window.hpp"
 
 using namespace std;
 
@@ -132,12 +132,10 @@ int parse_args(int argc, char** argv)
 	// Check for incompatibilities
 	if(showBotScreen && vr_enable)
 	{
-		fprintf(stderr, "Error : Can't show more than one player in VR mode.\n");
 		fatal_user_error(
-			"Error",
+			"Error: --vr and --bot-screen options are mutually exclusive!\n"
 			"Can't show more than one player in VR mode"
 		);
-		return 1;
 	}
 
 	return 0;

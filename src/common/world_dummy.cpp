@@ -61,7 +61,7 @@ WorldDummy::WorldDummy():
 	}
 
 	if ( Options::vr_enable ) {
-		
+
 		// Loading the SteamVR Runtime
 		vr::EVRInitError peError = vr::VRInitError_None;
 		m_pHMD = vr::VR_Init( &peError, vr::VRApplication_Scene );
@@ -73,28 +73,19 @@ WorldDummy::WorldDummy():
 		}
 		else
 		{
+			std::stringstream ss;
+			ss << "OpenVR error: ";
+
 			if ( !vr::VR_IsRuntimeInstalled() ) {
-				std::cerr << "Error : OpenVR Runtime not detected on the system" << '\n';
-				fatal_user_error(
-					"Error",
-					"OpenVR Runtime not detected on the system"
-				);
+				ss << "OpenVR Runtime not detected on the system";
 			}
 			else if ( !vr::VR_IsHmdPresent() ) {
-				std::cerr << "Error : HMD not detected on the system" << '\n';
-				fatal_user_error(
-					"Error",
-					"HMD not detected on the system"
-				);
+				ss << "HMD not detected on the system";
 			}
 			else {
-				std::cerr << "Error : " << vr::VR_GetVRInitErrorAsEnglishDescription(peError) << '\n';
-				fatal_user_error(
-					"Error",
-					vr::VR_GetVRInitErrorAsEnglishDescription(peError)
-				);
+				ss << vr::VR_GetVRInitErrorAsEnglishDescription(peError);
 			}
-			exit(1);
+			fatal_user_error(ss.str().c_str());
 		}
 	}
 	else
@@ -102,7 +93,7 @@ WorldDummy::WorldDummy():
 		std::cout << "Launching in non-VR mode" << std::endl;
 		_render = new Renderer(std::move(players), *this);
 	}
-	
+
 
 	// Add unmanaged meridians
 	add_unmanaged(meridians);
