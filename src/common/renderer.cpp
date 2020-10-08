@@ -82,6 +82,7 @@ Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_wo
 	Fire::set_width(w);
 
 	Frustum::initializeAtOrigin(frustum_at_origin);
+
 }
 
 void

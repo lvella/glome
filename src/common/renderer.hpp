@@ -23,9 +23,10 @@ public:
 	>;
 
 	Renderer(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world);
+	virtual ~Renderer() = default;
 
-	void update(float dt);
-	void draw(ObjSet& objs);
+	virtual void update(float dt);
+	virtual void draw(ObjSet& objs);
 
 	std::vector<std::shared_ptr<Glome::Drawable>> draw_objs_in_world(ObjSet& objs);
 
