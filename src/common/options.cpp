@@ -1,10 +1,10 @@
 #include "options.hpp"
 
-#include <popup_window.hpp>
-
 #include <cstdlib>
 #include <cstdio>
 #include <getopt.h>
+
+#include "popup_window.hpp"
 
 using namespace std;
 
@@ -66,18 +66,18 @@ int parse_args(int argc, char** argv)
 	static struct option long_options[] =
 	{
 #ifndef NDEBUG
-			{"bot-count",   required_argument,	0,	'b'},
-			{"bot-screen",  no_argument,		0,	'v'},
+			{"bot-count",	required_argument,	0,	'b'},
+			{"bot-screen",	no_argument,		0,	'v'},
 #endif
 			{"full-screen",	no_argument,		0,	'f'},
-			{"width",		required_argument,	0,	'x'},
-			{"height",		required_argument,	0,	'y'},
+			{"width",	required_argument,	0,	'x'},
+			{"height",	required_argument,	0,	'y'},
 			{"is-server",	no_argument,		0,	's'},
 			{"is-client",	no_argument,		0,	'c'},
-			{"host",		required_argument,	0,	'h'},
-			{"port",		required_argument,	0,	'p'},
+			{"host",	required_argument,	0,	'h'},
+			{"port",	required_argument,	0,	'p'},
 			{"no-split",	no_argument,		0,	'l'},
-			{"vr",			no_argument, 		0,	'r'},
+			{"vr",		no_argument,		0,	'r'},
 			{0, 0, 0, 0}
 	};
 
@@ -132,12 +132,10 @@ int parse_args(int argc, char** argv)
 	// Check for incompatibilities
 	if(showBotScreen && vr_enable)
 	{
-		fprintf(stderr, "Error : Can't show more than one player in VR mode.\n");
 		fatal_user_error(
-			"Error",
+			"Error: --vr and --bot-screen options are mutually exclusive!\n"
 			"Can't show more than one player in VR mode"
 		);
-		return 1;
 	}
 
 	return 0;

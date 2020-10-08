@@ -18,7 +18,7 @@
 #include "openvr.h"
 
 enum Eye {
-	left=0, 
+	left=0,
 	right
 };
 

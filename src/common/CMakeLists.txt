@@ -5,7 +5,6 @@ project(glome_common)
 option(USE_PKG_CONFIG "Try to find pkg-config, which can be used to find OpenAL and Opusfile" ON)
 option(FIND_OPENAL "If using pkg-config, try to find OpenAL" ON)
 option(FIND_OPUSFILE "If using pkg-config, try to find Opusfile" ON)
-option(FIND_OPENVR "If using pkg-config, try to find OpenVR" ON)
 
 add_library(common STATIC
 	ai_controller.cpp
@@ -129,12 +128,10 @@ if(USE_PKG_CONFIG)
 		target_link_libraries(common PUBLIC PkgConfig::OPENAL)
 	endif()
 
-	if(FIND_OPENVR)
-		pkg_check_modules(OPENVR REQUIRED IMPORTED_TARGET openvr)
-		target_link_libraries(common PUBLIC PkgConfig::OPENVR)
-		target_include_directories(common PUBLIC PkgConfig::OPENVR)
-	endif()
 endif()
 
 find_package(Threads)
 target_link_libraries(common PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+
+target_link_libraries(common PUBLIC openvr_api)
+target_include_directories(common PUBLIC openvr_api)

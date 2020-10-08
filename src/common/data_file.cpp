@@ -1,14 +1,14 @@
 #include "data_file.hpp"
 
-#include "config.hpp"
-#include "popup_window.hpp"
-
 #include <cerrno>
 #include <cstring>
 #include <fstream>
 #include <iostream>
 #include <tuple>
 #include <sstream>
+
+#include "config.hpp"
+#include "popup_window.hpp"
 
 static std::tuple<std::filesystem::path, DataFile>
 assemble_and_check_path(const std::string& path)
@@ -20,7 +20,7 @@ assemble_and_check_path(const std::string& path)
 	DataFile file(full_path);
 	if(!file) {
 		std::stringstream error_reason;
-		error_reason << "FATAL ERROR: Failed to open game file: "
+		error_reason << "Failed to open game file: "
 			<< full_path << '\n';
 		if(errno) {
 			error_reason << "  Reason: " << strerror(errno) << '\n';
@@ -33,12 +33,8 @@ assemble_and_check_path(const std::string& path)
 		} else {
 			error_reason << "it is accessible from game's working directory.";
 		}
-		std::cerr << error_reason.str() << std::endl;
-		fatal_user_error(
-			"Error",
-			error_reason.str().c_str()
-		);
-		exit(1);
+
+		fatal_user_error(error_reason.str().c_str());
 	}
 
 	return {full_path, std::move(file)};
