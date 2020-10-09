@@ -1,6 +1,7 @@
 #include "world_dummy.hpp"
 
 #include <memory>
+#include <stdio.h>
 
 #include "input.hpp"
 #include "options.hpp"
@@ -8,6 +9,10 @@
 #include "supernova.hpp"
 #include "spaghetti.hpp"
 #include "thread_pool.hpp"
+#include "popup_window.hpp"
+
+#include "openvr.h"
+
 
 using namespace std;
 
@@ -54,7 +59,41 @@ WorldDummy::WorldDummy():
 		players.insert(players.end(), bot.begin(),
 			bot.begin() + min(bot.size(), 4 - players.size()));
 	}
-	_render = new Renderer(std::move(players), *this);
+
+	if ( Options::vr_enable ) {
+
+		// Loading the SteamVR Runtime
+		vr::EVRInitError peError = vr::VRInitError_None;
+		m_pHMD = vr::VR_Init( &peError, vr::VRApplication_Scene );
+
+		if ( peError == vr::VRInitError_None )
+		{
+			std::cout << "Launching glome in VR mode" << std::endl;
+			_render = new RendererVR(std::move(players), *this, m_pHMD );
+		}
+		else
+		{
+			std::stringstream ss;
+			ss << "OpenVR error: ";
+
+			if ( !vr::VR_IsRuntimeInstalled() ) {
+				ss << "OpenVR Runtime not detected on the system";
+			}
+			else if ( !vr::VR_IsHmdPresent() ) {
+				ss << "HMD not detected on the system";
+			}
+			else {
+				ss << vr::VR_GetVRInitErrorAsEnglishDescription(peError);
+			}
+			fatal_user_error(ss.str().c_str());
+		}
+	}
+	else
+	{
+		std::cout << "Launching in non-VR mode" << std::endl;
+		_render = new Renderer(std::move(players), *this);
+	}
+
 
 	// Add unmanaged meridians
 	add_unmanaged(meridians);
@@ -89,4 +128,10 @@ WorldDummy::WorldDummy():
 WorldDummy::~WorldDummy()
 {
 	delete _render;
+
+	if (Options::vr_enable)
+	{
+		vr::VR_Shutdown();
+		m_pHMD = NULL;
+	}
 }

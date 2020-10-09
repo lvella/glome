@@ -13,6 +13,7 @@ add_executable(glome
 	jsinput.cpp
 	jsinput.hpp
 	sdl_main.cpp
+	popup_window.cpp
 )
 
 set(OpenGL_GL_PREFERENCE GLVND)

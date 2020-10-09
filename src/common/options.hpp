@@ -19,6 +19,7 @@ extern DEBUG_OPT bool showBotScreen;
 extern bool fullscreen;
 extern int width;
 extern int height;
+extern bool vr_enable;
 
 // Network options
 // TODO: Make use of these:
