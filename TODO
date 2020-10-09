@@ -1,18 +1,14 @@
 == Needs for FIKALAB game ==
 
-- Support Windows build (Diogo)
-  - Focus on CLang and MSVC
-- CI (Rui)
+- Fix dustfield
+- Fix minimap orientation
+- Fix minimap in Windows/Wine
 - Game menu with scoreboard:
   - Kill player when collide with supernova, finishing the game
   - HUD displaying current score (Lucas)
     - Maybe use guichan
   - Show score, then ask to try again
     - Take care to make it compatible with VR UI
-- Transfer momentum on collision between objects (ships, flying spagetti monsters)
-  - At least prevent them from intersecting, change their velocity away from one another
-  - How to fit that to current crazy FSM movement?
-- Implement stereo rendering using OpenVR API (Helder)
 - Handle headset input:
   - Headset orientation changes camera view relative to ship position
 - Figure VR inputs
@@ -21,7 +17,11 @@
   - 2 hand canons, maybe?
     - laser targetting
     - each cannon position given by each controller position
-- Change ship design to fit VR
+- Fix supernova appearence when camere is inside it
+  - May happen when flying very close to it
+  - Draw something crazy and transparent so to make it obvious
+    the viewer is inside supernova, even if the ship isn't.
+  - Draw something as the background if looking to the interior of supernova
 - Sound effects:
   - Shot
   - Hit
@@ -29,8 +29,21 @@
   - Flying spagetti monster
   - Splash into supernova
   - others?
-- Update audio in parallel with drawing
 - Fix destroyer's double flame positions
+- Create HMD object outside of World-derived class. (Helder)
+  - Figure a way to neatly integrate players, VR, and world creation
+    - May involve refactoring game initialization a bit
+- Change ship design to fit VR
+- Devise some UI that works better in VR
+- CI
+  - Install dependencies from somewhere.
+    - Maybe Conan? I don't think there are any other realistic alternatives
+      - Create Conan recipe for SDL2?
+  - Linux must still use system packages
+- Transfer momentum on collision between objects (ships, flying spagetti monsters)
+  - At least prevent them from intersecting, change their velocity away from one another
+  - How to fit that to current crazy FSM movement?
+- Update audio in parallel with drawing
 - Display on map only the volume unconsumed by supernova
 - Visual cue of cannon heat
   - Maybe remove cannon heat stuff?
