@@ -12,7 +12,7 @@ build-lx-clang:
   - cmake --build ./
   artifacts:
     paths:
-    - $CI_PROJECT_DIR/build/src/sdl/glome
+    - $CI_PROJECT_DIR/build-clang/src/sdl/glome
   # only:
   # - master
 
@@ -27,10 +27,21 @@ build-lx-g++:
   - cmake --build ./
   artifacts:
     paths:
-    - $CI_PROJECT_DIR/build/src/sdl/glome
+    - $CI_PROJECT_DIR/build-gcc/src/sdl/glome
   # only:
   # - master
 
-# build-win:
-  # image: ???
-# ...
+build-mswin64-g++:
+  image: lucasvellactw/glome-ci
+  stage: build
+  script:
+  - export
+  - mkdir build-mswin64
+  - cd build-mswin64
+  - /opt/windows-deps/windows-build-cross.sh ..
+  - cmake --build ./
+  artifacts:
+    paths:
+    - $CI_PROJECT_DIR/build-mswin64/src/sdl/glome.exe
+  # only:
+  # - master
