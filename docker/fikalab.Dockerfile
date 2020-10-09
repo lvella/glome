@@ -1,14 +1,15 @@
-FROM ubuntu:20.04
+FROM ubuntu:20.04 AS fikalab_ci
 
 ARG DEBIAN_FRONTEND=noninteractive
 
 # install dependencies for glome
-RUN apt-get update
-RUN apt-get -y install build-essential clang cmake ninja-build libtool  \
-	libgl1-mesa-dev libglu1-mesa-dev libglew1.5-dev libsdl2-dev  		\
-	libboost-thread-dev libboost-system-dev libguichan-0.8.1-1v5 		\
-	libguichan-opengl-0.8.1-1v5 libguichan-sdl-0.8.1-1v5 libguichan-dev \
-	libopusfile-dev libopenal-dev
+RUN apt-get update && \
+    apt-get -y install build-essential clang cmake ninja-build \
+    libgl1-mesa-dev libglew1.5-dev libsdl2-dev libboost-thread-dev \
+    libboost-system-dev libopusfile-dev libopenal-dev && \
+    apt-get -y clean
+
+FROM fikalab_ci AS fikalab_developer
 
 # install utilities
 RUN apt-get -y install vim sudo git htop
