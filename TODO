@@ -9,7 +9,7 @@
     - Maybe use guichan
   - Show score, then ask to try again
     - Take care to make it compatible with VR UI
-- Handle headset input:
+- Handle headset input: (Helder)
   - Headset orientation changes camera view relative to ship position
 - Figure VR inputs
   - Study the possibilities
@@ -30,7 +30,7 @@
   - Splash into supernova
   - others?
 - Fix destroyer's double flame positions
-- Create HMD object outside of World-derived class. (Helder)
+- Create HMD object outside of World-derived class.
   - Figure a way to neatly integrate players, VR, and world creation
     - May involve refactoring game initialization a bit
 - Change ship design to fit VR
@@ -40,7 +40,7 @@
     - Maybe Conan? I don't think there are any other realistic alternatives
       - Create Conan recipe for SDL2?
   - Linux must still use system packages
-- Transfer momentum on collision between objects (ships, flying spagetti monsters)
+- Transfer momentum on collision between objects (ships, flying spagetti monsters) (Rui)
   - At least prevent them from intersecting, change their velocity away from one another
   - How to fit that to current crazy FSM movement?
 - Update audio in parallel with drawing
