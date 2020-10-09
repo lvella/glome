@@ -18,6 +18,7 @@ list(INSERT CMAKE_CXX_FLAGS 0 "${EXTRA_CXX_FLAGS}")
 
 configure_file(src/config.hpp.in src/config.hpp)
 
+add_subdirectory(external/openvr)
 add_subdirectory(src/common)
 add_subdirectory(src/sdl)
 
