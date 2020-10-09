@@ -132,6 +132,4 @@ endif()
 
 find_package(Threads)
 target_link_libraries(common PUBLIC ${CMAKE_THREAD_LIBS_INIT})
-
-target_link_libraries(common PUBLIC openvr_api)
-target_include_directories(common PUBLIC openvr_api)
+target_link_libraries(common PUBLIC ${OPENVR_LIB})
