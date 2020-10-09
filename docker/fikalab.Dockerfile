@@ -4,7 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 
 # install dependencies for glome
 RUN apt-get update && \
-    apt-get -y install build-essential clang cmake ninja-build \
+    apt-get -y install build-essential g++ clang cmake ninja-build \
     libgl1-mesa-dev libglew1.5-dev libsdl2-dev libboost-thread-dev \
     libboost-system-dev libopusfile-dev libopenal-dev && \
     apt-get -y clean
