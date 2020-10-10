@@ -15,7 +15,7 @@ namespace MiniMap
  * @param world Use to draw minimap in world
  * @param center Center of minimap
  */
-  void draw(int wstart, int hstart, Renderer* world, const QRot& center,
+  void draw(int wstart, int hstart, Renderer* world, const QRot& inv_cam_t,
       const std::vector<std::shared_ptr<Glome::Drawable>>& objs);
   void draw_dot(const Object &obj);
   void update();

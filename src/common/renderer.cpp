@@ -105,7 +105,7 @@ Renderer::draw(ObjSet& objs)
 		auto drawn_objs = draw_objs_in_world(objs);
 
 		MiniMap::draw(active->_x, active->_y, this,
-			active->transformation().inverse(), drawn_objs
+			active->transformation(), drawn_objs
 		);
 	}
 }
