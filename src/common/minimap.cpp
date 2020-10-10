@@ -34,7 +34,7 @@ namespace MiniMap {
 GLint proj_has_tex;
 
 void
-draw(int wstart, int hstart, Renderer* rend, const QRot& center,
+draw(int wstart, int hstart, Renderer* rend, const QRot& inv_cam_t,
 	const std::vector<std::shared_ptr<Glome::Drawable>>& objs)
 {
 	const int b = 10;
@@ -72,7 +72,7 @@ draw(int wstart, int hstart, Renderer* rend, const QRot& center,
 	glDrawArrays(GL_TRIANGLE_FAN, 0, 4);
 
 	// From now on, use the camera with transform stack to draw objects
-	Camera camera(yz_qrot(math::pi_2) * center);
+	Camera camera(yz_qrot(math::pi_2) * inv_cam_t);
 	camera.setShader(&map_projection);
 
 	// Draw shots
