@@ -1,11 +1,11 @@
 == Needs for FIKALAB game ==
 
 - Fix dustfield (João)
-- Fix minimap orientation
+- Fix minimap orientation (Lucas)
 - Fix minimap in Windows/Wine
 - Game menu with scoreboard:
   - Kill player when collide with supernova, finishing the game
-  - HUD displaying current score (Lucas)
+  - HUD displaying current score
     - Maybe use guichan
   - Show score, then ask to try again
     - Take care to make it compatible with VR UI
@@ -59,7 +59,7 @@
 - Export meshes with CMake
 - Bring code to C++11:
   - Always use "override"
-  - Remove all new/delete (Diogo)
+  - Remove all new/delete
 - Make dustfield independent of FPS
   - Reuse camera history code
 - Port to Vulkan (maybe we can use it to improve performance)
