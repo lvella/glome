@@ -8,7 +8,7 @@ build-lx-clang:
   - export
   - mkdir build-clang
   - cd build-clang
-  - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../toolchain/clang.cmake -DENABLE_IPO=On -DEXTRA_CXX_FLAGS="-Ofast -march=haswell -mtune=generic" -DUSE_LIBCXX=Off
+  - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DCMAKE_TOOLCHAIN_FILE=../toolchain/clang.cmake -DENABLE_IPO=On -DEXTRA_CXX_FLAGS="-Ofast -mtune=generic" -DUSE_LIBCXX=Off
   - cmake --build ./
   artifacts:
     paths:
@@ -23,7 +23,7 @@ build-lx-g++:
   - export
   - mkdir build-gcc
   - cd build-gcc
-  - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=On -DEXTRA_CXX_FLAGS="-Ofast -march=haswell -mtune=generic"
+  - cmake .. -G Ninja -DCMAKE_BUILD_TYPE=Release -DENABLE_IPO=On -DEXTRA_CXX_FLAGS="-Ofast -mtune=generic"
   - cmake --build ./
   artifacts:
     paths:
