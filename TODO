@@ -1,8 +1,7 @@
 == Needs for FIKALAB game ==
 
 - Fix dustfield (João)
-- Fix minimap orientation (Lucas)
-- Fix minimap in Windows/Wine
+- Fix minimap in Windows/Wine (Lucas)
 - Game menu with scoreboard:
   - Kill player when collide with supernova, finishing the game
   - HUD displaying current score
