@@ -132,4 +132,7 @@ endif()
 
 find_package(Threads)
 target_link_libraries(common PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+
+# Due to a bug in OpenVR, this is needed otherwise Windows build with GCC is broken:
+target_compile_definitions(common PUBLIC OPENVR_BUILD_STATIC)
 target_link_libraries(common PUBLIC ${OPENVR_LIB})
