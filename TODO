@@ -1,10 +1,9 @@
 == Needs for FIKALAB game ==
 
 - Fix dustfield (João)
-- Fix minimap in Windows/Wine (Lucas)
 - Game menu with scoreboard:
   - Kill player when collide with supernova, finishing the game
-  - HUD displaying current score
+  - HUD displaying current score (Lucas)
     - Maybe use guichan
   - Show score, then ask to try again
     - Take care to make it compatible with VR UI
