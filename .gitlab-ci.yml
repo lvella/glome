@@ -2,7 +2,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 build-lx-clang:
-  image: lucasvellactw/glome-ci
+  image: registry.gitlab.com/fikalab/4-d-space-shooter-on-vr/ci-build
   stage: build
   script:
   - export
@@ -17,7 +17,7 @@ build-lx-clang:
   # - master
 
 build-lx-g++:
-  image: lucasvellactw/glome-ci
+  image: registry.gitlab.com/fikalab/4-d-space-shooter-on-vr/ci-build
   stage: build
   script:
   - export
@@ -32,7 +32,7 @@ build-lx-g++:
   # - master
 
 build-mswin64-g++:
-  image: lucasvellactw/glome-ci
+  image: registry.gitlab.com/fikalab/4-d-space-shooter-on-vr/ci-build
   stage: build
   script:
   - export
