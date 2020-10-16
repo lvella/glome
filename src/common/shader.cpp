@@ -110,7 +110,9 @@ void Shader::enable() const
 
 Shader::~Shader()
 {
-	glDeleteProgram(prog);
+	if(prog) {
+		glDeleteProgram(prog);
+	}
 }
 
 Uniform Shader::getUniform(const char *name) const {
