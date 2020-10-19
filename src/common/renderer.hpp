@@ -94,6 +94,9 @@ protected:
 
 	private:
 		void set_score(uint64_t points);
+		void set_score_if_different(uint64_t points);
+
+		uint64_t last_set_score;
 	};
 
 	std::list<Viewport> players;

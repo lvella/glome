@@ -199,13 +199,24 @@ Renderer::fill_minimap(const vector<std::shared_ptr<Glome::Drawable>>& objs, Cam
 	}
 }
 
-void Renderer::Viewport::set_score(uint64_t points)
+void
+Renderer::Viewport::set_score(uint64_t points)
 {
 	char score_text[64];
 	snprintf(score_text, sizeof score_text, "Score: %lu", points);
-	gltSetText(score, score_text);
 
+	gltSetText(score, score_text);
 	glBindVertexArray(VertexArrayID);
+
+	last_set_score = points;
+}
+
+void
+Renderer::Viewport::set_score_if_different(uint64_t points)
+{
+	if(points != last_set_score) {
+		set_score(points);
+	}
 }
 
 void
@@ -214,7 +225,7 @@ Renderer::Viewport::update(float dt)
 	QRot new_trans;
 	if(auto ptr = t.lock()) {
 		new_trans = cam_offset * ptr->get_t().inverse();
-		set_score(ptr->ctrl->get_points());
+		set_score_if_different(ptr->ctrl->get_points());
 	} else {
 		new_trans = cam_hist.front().t;
 	}
