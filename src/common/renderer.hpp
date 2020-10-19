@@ -76,6 +76,8 @@ protected:
 
 		void update(float dt);
 
+		void draw_score();
+
 		struct PathPoint {
 			float dt;
 			QRot t;
@@ -97,6 +99,7 @@ protected:
 		void set_score_if_different(uint64_t points);
 
 		uint64_t last_set_score;
+		float score_anim_effect = 0.0f;
 	};
 
 	std::list<Viewport> players;

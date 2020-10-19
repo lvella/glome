@@ -117,12 +117,7 @@ Renderer::draw(ObjSet& objs)
 
 		auto drawn_objs = draw_objs_in_world(objs);
 
-		// Draw score text:
-		gltBeginDraw();
-		gltColor(1.0f, 0.5f, 0.5f, 1.0f);
-		gltDrawText2D(active->score, 15.0f, 15.0f, 3.0f);
-		gltEndDraw();
-		glBindVertexArray(VertexArrayID);
+		active->draw_score();
 
 		MiniMap::draw(active->_x, active->_y, this,
 			active->transformation(), drawn_objs
@@ -200,6 +195,17 @@ Renderer::fill_minimap(const vector<std::shared_ptr<Glome::Drawable>>& objs, Cam
 }
 
 void
+Renderer::Viewport::draw_score()
+{
+	// Draw score text:
+	gltBeginDraw();
+	gltColor(1.0f, 0.5f, std::min(1.0f, 0.5f + score_anim_effect), 1.0f);
+	gltDrawText2D(score, 15.0f, 15.0f, 3.0f + score_anim_effect);
+	gltEndDraw();
+	glBindVertexArray(VertexArrayID);
+}
+
+void
 Renderer::Viewport::set_score(uint64_t points)
 {
 	char score_text[64];
@@ -216,12 +222,17 @@ Renderer::Viewport::set_score_if_different(uint64_t points)
 {
 	if(points != last_set_score) {
 		set_score(points);
+		// Animate text at every score change:
+		score_anim_effect += 0.7;
 	}
 }
 
 void
 Renderer::Viewport::update(float dt)
 {
+	// Scale of the score text fades after 1 second:
+	score_anim_effect = std::max(0.0f, score_anim_effect - dt);
+
 	QRot new_trans;
 	if(auto ptr = t.lock()) {
 		new_trans = cam_offset * ptr->get_t().inverse();
