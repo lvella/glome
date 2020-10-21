@@ -4,3 +4,6 @@
 [submodule "external/openvr"]
 	path = external/openvr
 	url = https://github.com/ValveSoftware/openvr.git
+[submodule "external/glText"]
+	path = external/glText
+	url = https://github.com/vallentin/glText.git

@@ -2,9 +2,7 @@
 
 - Fix dustfield (João)
 - Game menu with scoreboard:
-  - Kill player when collide with supernova, finishing the game
-  - HUD displaying current score (Lucas)
-    - Maybe use guichan
+  - Kill player when collide with supernova, finishing the game (Lucas)
   - Show score, then ask to try again
     - Take care to make it compatible with VR UI
 - Handle headset input: (Helder)
@@ -48,6 +46,9 @@
 
 == GENERAL IMPROVEMENTS (low priority) ==
 
+- Revert OpenGL version to 3.2
+  - OpenGL 3.3 is a requirement of glText, but I doubt it won't work on 3.2
+    - Port glText to 3.2
 - Properly setup and use VertexArrays (VAO) for each object type
   - Possibly right after shader setup
 - Use glDrawElementsInstanced to draw projectile

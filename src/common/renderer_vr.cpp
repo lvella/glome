@@ -57,8 +57,8 @@ RendererVR::update(float dt)
 	// actionSet.ulActionSet = m_actionsetDemo;
 	vr::VRInput()->UpdateActionState( &actionSet, sizeof(actionSet), 1 );
 
-	players[0].update(dt);
-	players[0].Audio::Listener::update(dt, players[0].transformation());
+	active->update(dt);
+	active->Audio::Listener::update(dt, active->transformation());
 }
 
 void
