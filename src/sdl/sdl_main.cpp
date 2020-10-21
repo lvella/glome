@@ -3,6 +3,7 @@
 #include <chrono>
 #include <thread>
 #include <sstream>
+#include <mutex>
 
 #include <GL/glew.h>
 #ifdef _WIN32
@@ -84,7 +85,9 @@ static void initialize_gl_context()
 	glcontext = SDL_GL_CreateContext(window);
 
 	// Setup one context per thread
-	globalThreadPool.run_in_all_pool_threads([](unsigned idx) {
+	std::mutex mtx;
+	globalThreadPool.run_in_all_pool_threads([&mtx](unsigned idx) {
+		std::lock_guard<std::mutex> lock(mtx);
 		SDL_GL_MakeCurrent(window, threads_glcontexts[idx]);
 	});
 
