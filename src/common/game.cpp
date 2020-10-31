@@ -50,13 +50,11 @@ initialize()
 	// matrix.
 	CamShader::initialize(float(Options::width) / float(Options::height));
 
-	//Menu::initialize();
-
 	initialize_registered();
 
 	world.reset(new WorldDummy());
-
-	switch_state(WORLD);
+	context = world.get();
+	context->setup_display();
 }
 
 void
@@ -66,18 +64,5 @@ shutdown()
 	gltTerminate();
 }
 
-void switch_state(state s)
-{
-	switch(s)
-	{
-	case MENU:
-		//context = menu.get();
-		break;
-	case WORLD:
-		context = world.get();
-		break;
-	}
-	context->setup_display();
-}
 }
 
