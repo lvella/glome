@@ -2,37 +2,34 @@
 
 #include <list>
 #include <memory>
+#include "drawable.hpp"
 #include "matrix4.hpp"
+#include "updatable.hpp"
 #include "vector4.hpp"
 #include "collidable.hpp"
 #include "scorer.hpp"
 
-class Projectile final: virtual public Object, public Collidable
+class Projectile final:
+	public Updatable,
+	public Glome::NoMapDrawable,
+	public Collidable
 {
 public:
-	static void shot(const std::shared_ptr<Scorer>& s,
-		const QRot& from, float speed);
-
-	static void draw_many(const std::vector<Projectile*>& shots, Camera& cam);
-	static void draw_in_minimap();
-	static void update_all(float dt);
-	static std::vector<Collidable*> get_collision_volumes();
-	static std::vector<Projectile*> cull_sort_from_camera(const Camera& cam);
+	Projectile(const std::shared_ptr<Scorer>& s, const QRot& from, float speed);
 
 	const std::shared_ptr<Scorer>& get_scorer() const
 	{
 		return scorer;
 	}
 
-	void collided_with(const Collidable& other, float) override
-	{
-		die();
-	}
+	void collided_with(const Collidable& other, float) override;
+	bool update(float dt, UpdatableAdder&) override;
+
+	DrawSpecsBase& get_draw_specs() const override;
 
 private:
-	Projectile(const std::shared_ptr<Scorer>& s, const QRot& from, float speed);
-	void draw(Camera& cam);
-	void update(float dt);
+	void draw(Camera& cam) override;
+
 	inline bool is_dead() const
 	{
 		// Maximum Time To Live

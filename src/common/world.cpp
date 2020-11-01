@@ -79,9 +79,6 @@ bool World::update(float dt)
 			return !elem;
 		});
 		adder.add_elems_to_world(*this);
-
-		// Projectile must be updated after ships, because they may have fired.
-		Projectile::update_all(dt);
 	}
 
 	{
@@ -98,10 +95,7 @@ bool World::update(float dt)
 			sptrs.push_back(std::move(ptr));
 		});
 
-		collision_tree.collide(
-			Projectile::get_collision_volumes(),
-			std::move(ptrs)
-		);
+		collision_tree.collide({}, std::move(ptrs));
 	}
 
 	{

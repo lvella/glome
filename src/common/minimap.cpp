@@ -75,10 +75,6 @@ draw(int wstart, int hstart, Renderer* rend, const QRot& inv_cam_t,
 	Camera camera(yz_qrot(math::pi_2) * inv_cam_t);
 	camera.setShader(&map_projection);
 
-	// Draw shots
-	glUniform1i(proj_has_tex, 0);
-	Projectile::draw_in_minimap();
-
 	// Draw map objects
 	glUniform1i(proj_has_tex, 1);
 	glBindTexture(GL_TEXTURE_2D, tex_object);

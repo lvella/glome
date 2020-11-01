@@ -167,9 +167,6 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 		}
 	);
 
-	auto sorted_projs = Projectile::cull_sort_from_camera(camera);
-	Projectile::draw_many(sorted_projs, camera);
-
 	for(auto &pair: transparent_objs) {
 		auto& obj = *pair.second;
 		specs.maybe_set(&obj.get_draw_specs());

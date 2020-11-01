@@ -3,6 +3,7 @@
 
 #include "textures.hpp"
 #include "supernova.hpp"
+#include "utils.hpp"
 #include <memory>
 
 namespace {
@@ -122,7 +123,7 @@ void Supernova::draw(Camera &c)
 
 DrawSpecsBase& Supernova::get_draw_specs() const
 {
-	return DrawSpecsBase::get_instance<SupernovaSpecs>();
+	return MandatorySingleton::get_instance<SupernovaSpecs>();
 }
 
 void Supernova::minimap_draw(Camera &c)
