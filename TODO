@@ -2,8 +2,7 @@
 
 - Fix dustfield (João)
 - Game menu with scoreboard:
-  - Kill player when collide with supernova, finishing the game (Lucas)
-  - Show score, then ask to try again
+  - Show score, then ask to try again (Lucas)
     - Take care to make it compatible with VR UI
 - Handle headset input: (Helder)
   - Headset orientation changes camera view relative to ship position
