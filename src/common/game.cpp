@@ -1,27 +1,32 @@
 #include "game.hpp"
 
-
-//#include "menu.hpp"
-#include "options.hpp"
-#include "meridian.hpp"
-#include "minimap.hpp"
-#include "projectile.hpp"
-#include "particle_system.hpp"
-#include "world_dummy.hpp"
-#include "random.hpp"
-#include "dustfield.hpp"
-#include "audio.hpp"
-#include "profiling.hpp"
-#include "spaghetti_fragment.hpp"
-#include "initialization.hpp"
 #include "gltext.hpp"
+#include "profiling.hpp"
+#include "audio.hpp"
+#include "game_state_machine.hpp"
+#include <memory>
 
-namespace Game
+namespace
 {
 
 RunContext* context;
 
-static std::unique_ptr<World> world;
+std::unique_ptr<GameStateMachine> game_state_machine;
+
+void advance_game_state()
+{
+	assert(game_state_machine);
+	context = game_state_machine->get_next_context();
+
+	assert(context);
+	context->setup_display();
+}
+
+} // anonymous namespace
+
+
+namespace Game
+{
 
 void
 frame(std::chrono::duration<float> frame_time)
@@ -33,7 +38,10 @@ frame(std::chrono::duration<float> frame_time)
 	constexpr float max_physics_dt = 1.0 / MIN_FPS;
 	const float dt = std::min(max_physics_dt, frame_time.count());
 
-	context->update(dt);
+	while(!context->update(dt)) {
+		advance_game_state();
+	}
+
 	context->draw();
 }
 
@@ -52,9 +60,8 @@ initialize()
 
 	initialize_registered();
 
-	world.reset(new WorldDummy());
-	context = world.get();
-	context->setup_display();
+	game_state_machine = std::make_unique<DummyStateMachine>();
+	advance_game_state();
 }
 
 void
@@ -64,5 +71,4 @@ shutdown()
 	gltTerminate();
 }
 
-}
-
+} // namespace Game

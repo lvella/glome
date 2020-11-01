@@ -42,7 +42,7 @@ void World::add_updatable(std::shared_ptr<Updatable>&& new_obj)
 	updatables.emplace_back(std::move(new_obj));
 }
 
-void World::update(float dt)
+bool World::update(float dt)
 {
 	LatchWaiter waiter;
 	{
@@ -111,6 +111,8 @@ void World::update(float dt)
 
 		_render->update(dt);
 	}
+
+	return true;
 }
 
 void World::draw()

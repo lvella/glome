@@ -27,7 +27,7 @@ public:
 		_render->setup_display();
 	}
 
-	void update(float dt) override;
+	bool update(float dt) override;
 	void draw() override;
 
 protected:
