@@ -16,6 +16,9 @@ public:
 	~WorldDummy();
 
 private:
+	bool is_alive() override;
+
+	std::vector<std::weak_ptr<Ship>> players;
 	std::shared_ptr<Meridians> meridians;
 	vr::IVRSystem* m_pHMD = NULL;
 };

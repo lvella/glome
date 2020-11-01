@@ -112,7 +112,7 @@ bool World::update(float dt)
 		_render->update(dt);
 	}
 
-	return true;
+	return is_alive();
 }
 
 void World::draw()
