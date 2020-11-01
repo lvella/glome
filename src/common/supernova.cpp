@@ -80,7 +80,7 @@ bool Supernova::update(float dt, UpdatableAdder&)
 	// Expanding rate; 0 is collapsed at origin, M_PI is
 	// collapsed at opposite pole.
 	float radius = get_radius();
-	radius += dt * 0.03;
+	radius = std::min(math::pi, radius + dt * 0.03f);
 	set_radius(radius);
 
 	slerp[0] = std::sin(radius);
