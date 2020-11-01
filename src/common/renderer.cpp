@@ -238,7 +238,7 @@ Renderer::Viewport::update(float dt)
 		new_trans = cam_offset * ptr->get_t().inverse();
 		set_score_if_different(ptr->ctrl->get_points());
 	} else {
-		new_trans = cam_hist.front().t;
+		new_trans = cam_hist.back().t;
 	}
 
 	cam_hist.push_back({dt, new_trans});

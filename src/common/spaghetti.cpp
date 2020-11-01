@@ -298,7 +298,7 @@ bool Spaghetti::update(float dt, UpdatableAdder& adder)
 }
 
 
-void Spaghetti::collided_with(const Collidable& other, float cos_dist)
+void Spaghetti::collided_with(const Collidable& other, float)
 {
 	if(typeid(other) == typeid(const Projectile&) ||
 		typeid(other) == typeid(const Supernova&))

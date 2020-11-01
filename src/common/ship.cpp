@@ -10,6 +10,7 @@
 #include "projectile.hpp"
 #include "data_file.hpp"
 #include "vector4.hpp"
+#include "supernova.hpp"
 
 #include <iostream>
 
@@ -209,5 +210,13 @@ Ship::update(float dt, UpdatableAdder& adder)
 	}
 	fx_engine->update(dt);
 
-	return true;
+	return alive;
+}
+
+void Ship::collided_with(const Collidable& other, float)
+{
+	if(typeid(other) == typeid(const Supernova&))
+	{
+		alive = false;
+	}
 }
