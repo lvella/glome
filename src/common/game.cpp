@@ -63,6 +63,7 @@ void
 shutdown()
 {
 	Audio::shutdown();
+	world.reset();
 	gltTerminate();
 }
 
