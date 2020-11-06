@@ -27,7 +27,7 @@ public:
 		_render->setup_display();
 	}
 
-	void update(float dt) override;
+	bool update(float dt) override;
 	void draw() override;
 
 protected:
@@ -53,6 +53,7 @@ protected:
 	std::vector<std::shared_ptr<AiController>> ai_controls;
 
 private:
+	virtual bool is_alive() = 0;
 
 	std::vector<GLsync> threads_sync;
 

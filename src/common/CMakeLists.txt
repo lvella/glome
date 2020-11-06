@@ -38,6 +38,7 @@ add_library(common STATIC
 	fire.hpp
 	game.cpp
 	game.hpp
+	game_state_machine.hpp
 	gltext.cpp
 	gltext.hpp
 	initialization.hpp

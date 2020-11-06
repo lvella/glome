@@ -42,7 +42,7 @@ void World::add_updatable(std::shared_ptr<Updatable>&& new_obj)
 	updatables.emplace_back(std::move(new_obj));
 }
 
-void World::update(float dt)
+bool World::update(float dt)
 {
 	LatchWaiter waiter;
 	{
@@ -79,9 +79,6 @@ void World::update(float dt)
 			return !elem;
 		});
 		adder.add_elems_to_world(*this);
-
-		// Projectile must be updated after ships, because they may have fired.
-		Projectile::update_all(dt);
 	}
 
 	{
@@ -98,10 +95,7 @@ void World::update(float dt)
 			sptrs.push_back(std::move(ptr));
 		});
 
-		collision_tree.collide(
-			Projectile::get_collision_volumes(),
-			std::move(ptrs)
-		);
+		collision_tree.collide({}, std::move(ptrs));
 	}
 
 	{
@@ -111,6 +105,8 @@ void World::update(float dt)
 
 		_render->update(dt);
 	}
+
+	return is_alive();
 }
 
 void World::draw()

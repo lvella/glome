@@ -2,8 +2,7 @@
 
 - Fix dustfield (João)
 - Game menu with scoreboard:
-  - Kill player when collide with supernova, finishing the game (Lucas)
-  - Show score, then ask to try again
+  - Show score, then ask to try again (Lucas)
     - Take care to make it compatible with VR UI
 - Handle headset input: (Helder)
   - Headset orientation changes camera view relative to ship position
@@ -36,6 +35,7 @@
     - Maybe Conan? I don't think there are any other realistic alternatives
       - Create Conan recipe for SDL2?
   - Linux must still use system packages
+- Restore minimap drawing of projectile.
 - Transfer momentum on collision between objects (ships, flying spagetti monsters) (Rui)
   - At least prevent them from intersecting, change their velocity away from one another
   - How to fit that to current crazy FSM movement?
@@ -46,6 +46,8 @@
 
 == GENERAL IMPROVEMENTS (low priority) ==
 
+- Generalize inter/intra collision stuff in octree.
+  - Prevent projectile from testing against itself.
 - Revert OpenGL version to 3.2
   - OpenGL 3.3 is a requirement of glText, but I doubt it won't work on 3.2
     - Port glText to 3.2

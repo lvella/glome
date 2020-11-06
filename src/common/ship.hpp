@@ -2,6 +2,7 @@
 
 #include <memory>
 
+#include "collidable.hpp"
 #include "updatable.hpp"
 #include "drawable.hpp"
 #include "ai_controller.hpp"
@@ -10,7 +11,11 @@
 #include "fire.hpp"
 #include "rot_dir.hpp"
 
-class Ship : public SuperObject, public Updatable, public Glome::Drawable
+class Ship :
+	public SuperObject,
+	public Updatable,
+	public Glome::Drawable,
+	public Collidable
 {
 public:
 	Ship(Mesh::Types type, ShipStats::shared_ptr sstats);
@@ -19,6 +24,9 @@ public:
 
 	virtual void draw(Camera& c) override;
 	virtual bool update(float dt, UpdatableAdder&) override;
+
+	void collided_with(const Collidable& other, float) override;
+
 	void load_guns(Mesh::Types type); //TODO: This method is similar to load_engines, change it!
 	void load_engines(Mesh::Types type);
 	void set_controller(const std::shared_ptr<ShipController>& pctrl);
@@ -48,6 +56,6 @@ protected:
 	float rel_speed;
 	uint16_t nengines;
 
-	// Shield properties
-	uint16_t life;
+	// Ship state
+	bool alive = true;
 };

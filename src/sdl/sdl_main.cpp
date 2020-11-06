@@ -16,7 +16,6 @@
 #include <SDL.h>
 
 #include "input.hpp"
-#include "menu.hpp"
 #include "options.hpp"
 #include "game.hpp"
 #include "jsinput.hpp"
@@ -200,8 +199,6 @@ int main(int argc, char **argv)
 
 	if (Options::parse_args(argc, argv))
 		return 1;
-
-	/* TODO: Network in game archive. */
 
 	initialize_SDL();
 	initialize_gl_context();

@@ -3,6 +3,7 @@
 
 #include "textures.hpp"
 #include "supernova.hpp"
+#include "utils.hpp"
 #include <memory>
 
 namespace {
@@ -80,7 +81,7 @@ bool Supernova::update(float dt, UpdatableAdder&)
 	// Expanding rate; 0 is collapsed at origin, M_PI is
 	// collapsed at opposite pole.
 	float radius = get_radius();
-	radius += dt * 0.03;
+	radius = std::min(math::pi, radius + dt * 0.03f);
 	set_radius(radius);
 
 	slerp[0] = std::sin(radius);
@@ -122,7 +123,7 @@ void Supernova::draw(Camera &c)
 
 DrawSpecsBase& Supernova::get_draw_specs() const
 {
-	return DrawSpecsBase::get_instance<SupernovaSpecs>();
+	return MandatorySingleton::get_instance<SupernovaSpecs>();
 }
 
 void Supernova::minimap_draw(Camera &c)

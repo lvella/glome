@@ -20,7 +20,6 @@ WorldDummy::WorldDummy():
 	meridians{std::make_shared<Meridians>()}
 {
 	std::vector<std::weak_ptr<Ship>> bot;
-	std::vector<std::weak_ptr<Ship>> players;
 	ShipStats::shared_ptr stats(ShipStats::get());
 
 	// Create single player:
@@ -134,4 +133,13 @@ WorldDummy::~WorldDummy()
 		vr::VR_Shutdown();
 		m_pHMD = NULL;
 	}
+}
+
+bool WorldDummy::is_alive()
+{
+	remove_if(players, [](const std::weak_ptr<Ship>& wptr) {
+		return wptr.expired();
+	});
+
+	return !players.empty();
 }

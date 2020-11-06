@@ -167,9 +167,6 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 		}
 	);
 
-	auto sorted_projs = Projectile::cull_sort_from_camera(camera);
-	Projectile::draw_many(sorted_projs, camera);
-
 	for(auto &pair: transparent_objs) {
 		auto& obj = *pair.second;
 		specs.maybe_set(&obj.get_draw_specs());
@@ -238,7 +235,7 @@ Renderer::Viewport::update(float dt)
 		new_trans = cam_offset * ptr->get_t().inverse();
 		set_score_if_different(ptr->ctrl->get_points());
 	} else {
-		new_trans = cam_hist.front().t;
+		new_trans = cam_hist.back().t;
 	}
 
 	cam_hist.push_back({dt, new_trans});
