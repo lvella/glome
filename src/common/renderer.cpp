@@ -55,8 +55,19 @@ private:
 
 }
 
+GLuint Renderer::VertexArrayID;
+
+const QRot Renderer::cam_offset {
+	yz_qrot(0.2) *
+	zw_qrot(-0.015) *
+	yw_qrot(-0.01)
+};
+
+const Frustum Renderer::frustum_at_origin = Frustum::atOrigin();
+
 void Renderer::initialize()
-{	// OpenGL nonchanging settings
+{
+	// OpenGL nonchanging settings
 	glGenVertexArrays(1, &VertexArrayID);
 	glBindVertexArray(VertexArrayID);
 
@@ -72,166 +83,63 @@ void Renderer::initialize()
 	glPrimitiveRestartIndex(std::numeric_limits<uint16_t>::max());
 }
 
-void
-Renderer::setup_display()
+MultiViewRenderer::MultiViewRenderer(std::vector<std::unique_ptr<Renderer>>&& sub)
 {
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glViewport(0, 0, width, height);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-}
+	assert(sub.size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
+	int h = height / (sub.size() > 2 ? 2 : 1);
+	int w = width / (sub.size() > 1 ? 2 : 1);
 
-Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world)
-{
-	assert(pp.size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
-	int h = height / (pp.size() > 2 ? 2 : 1);
-	int w = width / (pp.size() > 1 ? 2 : 1);
+	viewports.reserve(sub.size());
 
-	for(int i = 0; i < pp.size(); ++i) {
-		players.emplace_back(pp[i], (i%2) * w, height - (i/2 + 1) * h, w, h, audio_world);
+	for(int i = 0; i < sub.size(); ++i) {
+		viewports.push_back({std::move(sub[i]),
+			(i%2) * w, height - (i/2 + 1) * h, w, h});
 	}
 
 	Fire::set_width(w);
-
-	Frustum::initializeAtOrigin(frustum_at_origin);
-
 }
 
 void
-Renderer::update(float dt)
+MultiViewRenderer::update(float dt)
 {
-	for(Viewport& v: players) {
-		v.update(dt);
-		v.Audio::Listener::update(dt, v.transformation());
+	for(Viewport& v: this->viewports) {
+		v.renderer->update(dt);
 	}
 }
 
 void
-Renderer::draw(ObjSet& objs)
+MultiViewRenderer::draw(ObjSet& objs)
 {
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-	for(active = begin(players); active != end(players); ++active) {
-		active->enable();
-
-		auto drawn_objs = draw_objs_in_world(objs);
-
-		active->draw_score();
-
-		MiniMap::draw(active->_x, active->_y, this,
-			active->transformation(), drawn_objs
-		);
+	for(Viewport& v: viewports) {
+		glViewport(v._x, v._y, v._w, v._h);
+		v.renderer->draw(objs);
 	}
 }
 
-vector<std::shared_ptr<Glome::Drawable>>
-Renderer::draw_objs_in_world(ObjSet& objs)
+PlayerScoreRenderer::PlayerScoreRenderer(std::weak_ptr<Ship> player, Audio::World &audio_world):
+	Audio::Listener(&audio_world),
+	target(player),
+	curr_qrot(cam_offset),
+	score(gltCreateText(), gltDeleteText)
 {
-	Camera camera(active->transformation());
-	SpecsTracker specs(camera);
+	assert(score);
 
-	const Vector4 cam_pos = active->transformation().inverse().position();
+	set_score(0);
 
-	vector<std::shared_ptr<Glome::Drawable>> remaining_objs;
-	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
-
-	Frustum frustum = active->transformation().inverse() * frustum_at_origin;
-
-	for(auto iter = objs.begin(); iter != objs.end();) {
-		auto ptr = iter->second.lock();
-		if(!ptr) {
-			iter = objs.erase(iter);
-			continue;
-		}
-
-		if(frustum.isIn(*ptr)) {
-			if(ptr->is_transparent()) {
-				float dist = std::acos(cam_pos.dot(ptr->get_world_pos()))
-					- ptr->get_radius();
-				assert(!std::isnan(dist));
-				transparent_objs.push_back({dist, ptr.get()});
-			} else {
-				specs.maybe_set(iter->first);
-				ptr->draw(camera);
-			}
-		}
-
-		remaining_objs.emplace_back(std::move(ptr));
-		++iter;
-	}
-
-	std::sort(transparent_objs.begin(), transparent_objs.end(),
-		[] (auto& a, auto& b) {
-			return a.first > b.first;
-		}
-	);
-
-	for(auto &pair: transparent_objs) {
-		auto& obj = *pair.second;
-		specs.maybe_set(&obj.get_draw_specs());
-		obj.draw(camera);
-	}
-
-	DustField::draw(camera);
-
-	return remaining_objs;
-}
-
-void
-Renderer::fill_minimap(const vector<std::shared_ptr<Glome::Drawable>>& objs, Camera &cam)
-{
-	std::shared_ptr<Glome::Drawable> curr = active->t.lock();
-
-	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
-	// Probably so insignificant it is not worth the effort.
-	for(auto &obj: objs) {
-		if(obj != curr)
-			obj->minimap_draw(cam);
-	}
-}
-
-void
-Renderer::Viewport::draw_score()
-{
-	// Draw score text:
-	gltBeginDraw();
-	gltColor(1.0f, 0.5f, std::min(1.0f, 0.5f + score_anim_effect), 1.0f);
-	gltDrawText2D(score, 15.0f, 15.0f, 3.0f + score_anim_effect);
-	gltEndDraw();
-	glBindVertexArray(VertexArrayID);
-}
-
-void
-Renderer::Viewport::set_score(uint64_t points)
-{
-	char score_text[64];
-	snprintf(score_text, sizeof score_text, "Score: %lu", points);
-
-	gltSetText(score, score_text);
+	// gltCreateText() messes with VAO, so we need to reset:
 	glBindVertexArray(VertexArrayID);
 
-	last_set_score = points;
+	cam_hist.push_back({1.0f / 6.0f, cam_offset});
 }
 
 void
-Renderer::Viewport::set_score_if_different(uint64_t points)
-{
-	if(points != last_set_score) {
-		set_score(points);
-		// Animate text at every score change:
-		score_anim_effect += 0.7;
-	}
-}
-
-void
-Renderer::Viewport::update(float dt)
+PlayerScoreRenderer::update(float dt)
 {
 	// Scale of the score text fades after 1 second:
 	score_anim_effect = std::max(0.0f, score_anim_effect - dt);
 
 	QRot new_trans;
-	if(auto ptr = t.lock()) {
+	if(auto ptr = target.lock()) {
 		new_trans = cam_offset * ptr->get_t().inverse();
 		set_score_if_different(ptr->ctrl->get_points());
 	} else {
@@ -252,13 +160,127 @@ Renderer::Viewport::update(float dt)
 	const float slerp_factor = dt / next.dt; // range [0, 1]
 
 	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
+
+	Audio::Listener::update(dt);
+
 	next.dt -= dt;
 }
 
-const QRot Renderer::Viewport::cam_offset(
-	yz_qrot(0.2) *
-	zw_qrot(-0.015) *
-	yw_qrot(-0.01)
-);
+void
+PlayerScoreRenderer::draw(ObjSet& objs)
+{
+	// Setup GL state
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-GLuint Renderer::VertexArrayID;
+	Camera camera(transformation());
+
+	draw_objects(camera, objs);
+
+	DustField::draw(camera);
+
+	draw_score();
+
+	MiniMap::draw(this, transformation(), objs);
+}
+
+void
+PlayerScoreRenderer::fill_minimap(const ObjSet& objs, Camera &cam)
+{
+	std::shared_ptr<Glome::Drawable> curr = target.lock();
+
+	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
+	// Probably so insignificant it is not worth the effort.
+	for(auto &e: objs) {
+		auto obj = e.second.lock();
+
+		if(obj && obj != curr)
+			obj->minimap_draw(cam);
+	}
+}
+
+void
+PlayerScoreRenderer::draw_objects(Camera& camera, ObjSet& objs)
+{
+	SpecsTracker specs(camera);
+
+	const Vector4 cam_pos = transformation().inverse().position();
+
+	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
+
+	Frustum frustum = transformation().inverse() * frustum_at_origin;
+
+	for(auto iter = objs.begin(); iter != objs.end();) {
+		auto ptr = iter->second.lock();
+		if(!ptr) {
+			iter = objs.erase(iter);
+			continue;
+		}
+
+		if(frustum.isIn(*ptr)) {
+			if(ptr->is_transparent()) {
+				float dist = std::acos(cam_pos.dot(ptr->get_world_pos()))
+					- ptr->get_radius();
+				assert(!std::isnan(dist));
+				transparent_objs.push_back({dist, ptr.get()});
+			} else {
+				specs.maybe_set(iter->first);
+				ptr->draw(camera);
+			}
+		}
+
+		++iter;
+	}
+
+	std::sort(transparent_objs.begin(), transparent_objs.end(),
+		[] (auto& a, auto& b) {
+			return a.first > b.first;
+		}
+	);
+
+	for(auto &pair: transparent_objs) {
+		auto& obj = *pair.second;
+		specs.maybe_set(&obj.get_draw_specs());
+		obj.draw(camera);
+	}
+}
+
+void
+PlayerScoreRenderer::draw_score()
+{
+	// Draw score text:
+	gltBeginDraw();
+	gltColor(1.0f, 0.5f, std::min(1.0f, 0.5f + score_anim_effect), 1.0f);
+	gltDrawText2D(score.get(), 15.0f, 15.0f, 3.0f + score_anim_effect);
+	gltEndDraw();
+	glBindVertexArray(VertexArrayID);
+}
+
+const QRot &PlayerScoreRenderer::transformation() const
+{
+	return curr_qrot;
+}
+
+void
+PlayerScoreRenderer::set_score(uint64_t points)
+{
+	char score_text[64];
+	snprintf(score_text, sizeof score_text, "Score: %lu", points);
+
+	gltSetText(score.get(), score_text);
+	glBindVertexArray(VertexArrayID);
+
+	last_set_score = points;
+}
+
+void
+PlayerScoreRenderer::set_score_if_different(uint64_t points)
+{
+	if(points != last_set_score) {
+		set_score(points);
+		// Animate text at every score change:
+		score_anim_effect += 0.7;
+	}
+}

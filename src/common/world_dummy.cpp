@@ -2,6 +2,7 @@
 
 #include <memory>
 #include <stdio.h>
+#include <openvr.h>
 
 #include "input.hpp"
 #include "options.hpp"
@@ -9,10 +10,7 @@
 #include "supernova.hpp"
 #include "spaghetti.hpp"
 #include "thread_pool.hpp"
-#include "popup_window.hpp"
-
-#include "openvr.h"
-
+#include "fatal_error.hpp"
 
 using namespace std;
 
@@ -54,11 +52,6 @@ WorldDummy::WorldDummy():
 		add_updatable(std::move(s));
 	}
 
-	if(Options::showBotScreen && players.size() < 3) {
-		players.insert(players.end(), bot.begin(),
-			bot.begin() + min(bot.size(), 4 - players.size()));
-	}
-
 	if ( Options::vr_enable ) {
 
 		// Loading the SteamVR Runtime
@@ -68,7 +61,7 @@ WorldDummy::WorldDummy():
 		if ( peError == vr::VRInitError_None )
 		{
 			std::cout << "Launching glome in VR mode" << std::endl;
-			_render = new RendererVR(std::move(players), *this, m_pHMD );
+			_render = new RendererVR(players.front(), *this, m_pHMD);
 		}
 		else
 		{
@@ -90,7 +83,18 @@ WorldDummy::WorldDummy():
 	else
 	{
 		std::cout << "Launching in non-VR mode" << std::endl;
-		_render = new Renderer(std::move(players), *this);
+
+		if(Options::showBotScreen && players.size() < 3) {
+			players.insert(players.end(), bot.begin(),
+				bot.begin() + min(bot.size(), 4 - players.size()));
+		}
+
+		std::vector<std::unique_ptr<Renderer>> views;
+		views.reserve(players.size());
+		for(auto& p: players) {
+			views.push_back(std::make_unique<PlayerScoreRenderer>(p, *this));
+		}
+		_render = new MultiViewRenderer(std::move(views));
 	}
 
 

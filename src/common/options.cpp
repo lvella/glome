@@ -4,7 +4,7 @@
 #include <cstdio>
 #include <getopt.h>
 
-#include "popup_window.hpp"
+#include "fatal_error.hpp"
 
 using namespace std;
 

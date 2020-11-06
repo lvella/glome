@@ -19,94 +19,84 @@
 class Renderer
 {
 public:
+	static void initialize();
+
 	using ObjSet = std::unordered_multimap<
 		DrawSpecsBase*,
 		std::weak_ptr<Glome::Drawable>
 	>;
 
-	static void initialize();
-
-	Renderer(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world);
 	virtual ~Renderer() = default;
 
-	virtual void update(float dt);
-	virtual void draw(ObjSet& objs);
-
-	std::vector<std::shared_ptr<Glome::Drawable>> draw_objs_in_world(ObjSet& objs);
-
-	void setup_display();
-	void fill_minimap(const std::vector<std::shared_ptr<Glome::Drawable>>& objs,
-		Camera& cam);
+	virtual void update(float dt) = 0;
+	virtual void draw(ObjSet& objs) = 0;
 
 protected:
-	struct Viewport: public Audio::Listener
+	static GLuint VertexArrayID;
+
+	// Camera position relative to target...
+	static const QRot cam_offset;
+
+	static const Frustum frustum_at_origin;
+};
+
+class MapRenderer
+{
+public:
+	virtual ~MapRenderer() = default;
+	virtual void fill_minimap(const Renderer::ObjSet& objs, Camera& cam) = 0;
+};
+
+class MultiViewRenderer final: public Renderer
+{
+public:
+	MultiViewRenderer(std::vector<std::unique_ptr<Renderer>>&& sub_renderers);
+
+	void update(float dt) override;
+	void draw(ObjSet& objs) override;
+
+private:
+	struct Viewport
 	{
-		Viewport(std::weak_ptr<Ship> target,
-			int x, int y, int w, int h,
-			Audio::World &audio_world
-		):
-			Audio::Listener(&audio_world),
-			t(target), _x(x), _y(y), _w(w), _h(h),
-			score(gltCreateText())
-		{
-			assert(score);
-			set_score(0);
-
-			// gltCreateText() messes with VAO, so we need to reset:
-			glBindVertexArray(VertexArrayID);
-
-			curr_qrot = cam_offset;
-			cam_hist.push_back({1.0f / 6.0f, cam_offset});
-		}
-
-		~Viewport()
-		{
-			gltDeleteText(score);
-		}
-
-		void enable()
-		{
-			glViewport(_x, _y, _w, _h);
-		}
-
-		virtual const QRot &transformation() const override
-		{
-			return curr_qrot;
-		}
-
-		void update(float dt);
-
-		void draw_score();
-
-		struct PathPoint {
-			float dt;
-			QRot t;
-		};
-
-		std::weak_ptr<Ship> t;
-		QRot curr_qrot;
-		std::deque<PathPoint> cam_hist;
-
+		std::unique_ptr<Renderer> renderer;
 		int _x, _y, _w, _h;
-
-		GLTtext *score = nullptr;
-
-		// Camera position relative to target...
-		static const QRot cam_offset;
-
-	private:
-		void set_score(uint64_t points);
-		void set_score_if_different(uint64_t points);
-
-		uint64_t last_set_score;
-		float score_anim_effect = 0.0f;
 	};
 
-	std::list<Viewport> players;
+	std::vector<Viewport> viewports;
+};
 
-	std::list<Viewport>::iterator active;
+class PlayerScoreRenderer:
+	public Renderer,
+	public MapRenderer,
+	public Audio::Listener,
+	public NonCopyable
+{
+public:
+	PlayerScoreRenderer(std::weak_ptr<Ship> player, Audio::World &audio_world);
 
-	Frustum frustum_at_origin;
+	virtual void update(float dt) override;
+	virtual void draw(ObjSet& objs) override;
 
-	static GLuint VertexArrayID;
+	virtual void fill_minimap(const ObjSet& objs, Camera& cam) final;
+
+	virtual const QRot &transformation() const override;
+protected:
+
+	void set_score(uint64_t points);
+	void set_score_if_different(uint64_t points);
+	void draw_objects(Camera& camera, ObjSet& objs);
+	void draw_score();
+
+	struct PathPoint {
+		float dt;
+		QRot t;
+	};
+
+	std::weak_ptr<Ship> target;
+	std::deque<PathPoint> cam_hist;
+	QRot curr_qrot;
+
+	std::unique_ptr<GLTtext, decltype(&gltDeleteText)> score;
+	uint64_t last_set_score;
+	float score_anim_effect = 0.0f;
 };

@@ -21,7 +21,7 @@
 #include "jsinput.hpp"
 #include "thread_pool.hpp"
 #include "random.hpp"
-#include "popup_window.hpp"
+#include "fatal_error.hpp"
 #include "native.hpp"
 
 static bool v_sync_enabled = true;

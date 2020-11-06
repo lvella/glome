@@ -2,8 +2,10 @@
 
 #include <memory>
 
+#include <openvr.h>
 #include "runcontext.hpp"
 #include "world_dummy.hpp"
+#include "fatal_error.hpp"
 
 /** Controls high level game state. */
 class GameStateMachine

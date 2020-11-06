@@ -1,4 +1,4 @@
-#include "popup_window.hpp"
+#include "fatal_error.hpp"
 
 #include <iostream>
 #include <SDL.h>
