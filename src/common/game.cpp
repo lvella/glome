@@ -68,7 +68,7 @@ void
 shutdown()
 {
 	Audio::shutdown();
-	world.reset();
+	game_state_machine.reset();
 	gltTerminate();
 }
 
