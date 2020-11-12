@@ -1,6 +1,5 @@
 == Needs for FIKALAB game ==
 
-- Fix dustfield (João)
 - Game menu with scoreboard:
   - Show score, then ask to try again (Lucas)
     - Take care to make it compatible with VR UI

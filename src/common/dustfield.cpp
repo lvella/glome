@@ -68,6 +68,7 @@ static QRot old_cam_transform;
 void draw(Camera& cam)
 {
 	cam.setShader(&program);
+	cam.setQRot(QRot::IDENTITY());
 
 	old_transform.set(old_cam_transform);
 	old_cam_transform = cam.getBaseTransformation();
