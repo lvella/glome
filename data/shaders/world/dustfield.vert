@@ -5,8 +5,8 @@ uniform mat4 projection;
 uniform vec4 transformation[2];
 uniform vec4 old_transform[2];
 
-in float endpoint;
 in vec4 position;
+in uint endpoint;
 
 // Output
 out vec4 v_color;
@@ -19,7 +19,7 @@ vec4 quat_rotate(in vec4 rotation[2], in vec4 p);
 void main()
 {
   vec4 tmp = quat_rotate(
-    endpoint > 0.5 ? transformation : old_transform,
+    endpoint != 0u ? transformation : old_transform,
     position
   );
 
