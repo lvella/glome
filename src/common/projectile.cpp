@@ -124,6 +124,11 @@ bool Projectile::update(float dt, UpdatableAdder&)
 	return !is_dead();
 }
 
+bool Projectile::is_transparent() const
+{
+	return true;
+}
+
 DrawSpecsBase& Projectile::get_draw_specs() const
 {
 	return MandatorySingleton::get_instance<ProjectileSpecs>();

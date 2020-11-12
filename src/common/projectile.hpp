@@ -27,6 +27,8 @@ public:
 
 	DrawSpecsBase& get_draw_specs() const override;
 
+	bool is_transparent() const override;
+
 private:
 	void draw(Camera& cam) override;
 
