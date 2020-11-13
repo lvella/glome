@@ -19,7 +19,7 @@ struct StarPoint
 
 struct Star
 {
-    StarPoint endpoints[2];
+	StarPoint endpoints[2];
 };
 
 const size_t DUST_SIZE = 200000;
