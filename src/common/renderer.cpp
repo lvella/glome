@@ -116,32 +116,20 @@ MultiViewRenderer::draw(ObjSet& objs)
 	}
 }
 
-PlayerScoreRenderer::PlayerScoreRenderer(std::weak_ptr<Ship> player, Audio::World &audio_world):
+SpaceViewRenderer::SpaceViewRenderer(std::weak_ptr<Ship> player, Audio::World &audio_world):
 	Audio::Listener(&audio_world),
 	target(player),
-	curr_qrot(cam_offset),
-	score(gltCreateText(), gltDeleteText)
+	curr_qrot(cam_offset)
 {
-	assert(score);
-
-	set_score(0);
-
-	// gltCreateText() messes with VAO, so we need to reset:
-	glBindVertexArray(VertexArrayID);
-
 	cam_hist.push_back({1.0f / 6.0f, cam_offset});
 }
 
 void
-PlayerScoreRenderer::update(float dt)
+SpaceViewRenderer::update(float dt)
 {
-	// Scale of the score text fades after 1 second:
-	score_anim_effect = std::max(0.0f, score_anim_effect - dt);
-
 	QRot new_trans;
 	if(auto ptr = target.lock()) {
 		new_trans = cam_offset * ptr->get_t().inverse();
-		set_score_if_different(ptr->ctrl->get_points());
 	} else {
 		new_trans = cam_hist.back().t;
 	}
@@ -167,7 +155,7 @@ PlayerScoreRenderer::update(float dt)
 }
 
 void
-PlayerScoreRenderer::draw(ObjSet& objs)
+SpaceViewRenderer::draw(ObjSet& objs)
 {
 	// Setup GL state
 	glEnable(GL_DEPTH_TEST);
@@ -181,13 +169,11 @@ PlayerScoreRenderer::draw(ObjSet& objs)
 
 	DustField::draw(camera);
 
-	draw_score();
-
 	MiniMap::draw(this, transformation(), objs);
 }
 
 void
-PlayerScoreRenderer::fill_minimap(const ObjSet& objs, Camera &cam)
+SpaceViewRenderer::fill_minimap(const ObjSet& objs, Camera &cam)
 {
 	std::shared_ptr<Glome::Drawable> curr = target.lock();
 
@@ -202,7 +188,7 @@ PlayerScoreRenderer::fill_minimap(const ObjSet& objs, Camera &cam)
 }
 
 void
-PlayerScoreRenderer::draw_objects(Camera& camera, ObjSet& objs)
+SpaceViewRenderer::draw_objects(Camera& camera, ObjSet& objs)
 {
 	SpecsTracker specs(camera);
 
@@ -247,9 +233,27 @@ PlayerScoreRenderer::draw_objects(Camera& camera, ObjSet& objs)
 	}
 }
 
-void
-PlayerScoreRenderer::draw_score()
+const QRot &SpaceViewRenderer::transformation() const
 {
+	return curr_qrot;
+}
+
+void ScoreRenderer::update(float dt)
+{
+	// Scale of the score text fades after 1 second:
+	score_anim_effect = std::max(0.0f, score_anim_effect - dt);
+
+	if(auto ptr = target.lock()) {
+		set_score_if_different(ptr->ctrl->get_points());
+	}
+
+	SpaceViewRenderer::update(dt);
+}
+
+void ScoreRenderer::draw(ObjSet& objs)
+{
+	SpaceViewRenderer::draw(objs);
+
 	// Draw score text:
 	gltBeginDraw();
 	gltColor(1.0f, 0.5f, std::min(1.0f, 0.5f + score_anim_effect), 1.0f);
@@ -258,13 +262,8 @@ PlayerScoreRenderer::draw_score()
 	glBindVertexArray(VertexArrayID);
 }
 
-const QRot &PlayerScoreRenderer::transformation() const
-{
-	return curr_qrot;
-}
-
 void
-PlayerScoreRenderer::set_score(uint64_t points)
+ScoreRenderer::set_score(uint64_t points)
 {
 	char score_text[64];
 	snprintf(score_text, sizeof score_text, "Score: %lu", points);
@@ -276,7 +275,7 @@ PlayerScoreRenderer::set_score(uint64_t points)
 }
 
 void
-PlayerScoreRenderer::set_score_if_different(uint64_t points)
+ScoreRenderer::set_score_if_different(uint64_t points)
 {
 	if(points != last_set_score) {
 		set_score(points);

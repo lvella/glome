@@ -44,7 +44,7 @@ protected:
 
 	Octree::Hypercube collision_tree;
 
-	Renderer* _render;
+	std::unique_ptr<Renderer> _render;
 	std::vector<std::weak_ptr<Ship>> ships;
 	std::vector<std::shared_ptr<AiController>> ai_controls;
 

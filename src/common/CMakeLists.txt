@@ -107,8 +107,8 @@ add_library(common STATIC
 	vol_sphere.hpp
 	world.cpp
 	world.hpp
-	world_dummy.cpp
-	world_dummy.hpp
+	world_spaghetti_hunt.cpp
+	world_spaghetti_hunt.hpp
 	frustum.cpp
 	frustum.hpp
 )

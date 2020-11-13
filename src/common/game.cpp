@@ -58,7 +58,7 @@ initialize()
 
 	initialize_registered();
 
-	game_state_machine = std::make_unique<DummyStateMachine>();
+	game_state_machine = std::make_unique<SpaghettiHuntStateMachine>();
 	advance_game_state();
 }
 

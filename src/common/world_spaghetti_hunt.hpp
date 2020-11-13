@@ -9,16 +9,17 @@
 
 #include "openvr.h"
 
-class WorldDummy final: public World
+class WorldSpaghettiHunt final:
+	public World,
+	public NonCopyable
 {
 public:
-	WorldDummy();
-	~WorldDummy();
+	WorldSpaghettiHunt(vr::IVRSystem* hmd);
 
 private:
 	bool is_alive() override;
 
-	std::vector<std::weak_ptr<Ship>> players;
+	std::weak_ptr<Ship> player;
 	std::shared_ptr<Meridians> meridians;
-	vr::IVRSystem* m_pHMD = NULL;
+	vr::IVRSystem* hmd;
 };

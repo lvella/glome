@@ -22,7 +22,7 @@ enum Eye {
 	right
 };
 
-class RendererVR : public PlayerScoreRenderer
+class RendererVR : public SpaceViewRenderer
 {
 public:
 	using ObjSet = std::unordered_multimap<

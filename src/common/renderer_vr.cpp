@@ -25,7 +25,7 @@ using namespace Options;
 
 RendererVR::RendererVR(std::weak_ptr<Ship> player,
 		Audio::World &audio_world, vr::IVRSystem* const pHMD) :
-	PlayerScoreRenderer(player, audio_world),
+	SpaceViewRenderer(player, audio_world),
 	m_pHMD{pHMD}
 {
 	assert(m_pHMD);
@@ -65,7 +65,7 @@ RendererVR::update(float dt)
 	// actionSet.ulActionSet = m_actionsetDemo;
 	vr::VRInput()->UpdateActionState( &actionSet, sizeof(actionSet), 1 );
 
-	PlayerScoreRenderer::update(dt);
+	SpaceViewRenderer::update(dt);
 }
 
 void
@@ -124,5 +124,5 @@ RendererVR::draw_eye(const GLuint texture, const GLuint framebuffer, const Eye e
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	// render scene for left eye
-	PlayerScoreRenderer::draw(objs);
+	SpaceViewRenderer::draw(objs);
 }

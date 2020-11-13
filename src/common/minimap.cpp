@@ -42,11 +42,9 @@ draw(MapRenderer* rend, const QRot& inv_cam_t,
 	const int t = 160;
 	const int r = 160;
 
-	{
-		int viewport[4];
-		glGetIntegerv(GL_VIEWPORT, viewport);
-		glViewport(viewport[0] + l, viewport[1] + b, r, t);
-	}
+	int viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glViewport(viewport[0] + l, viewport[1] + b, r, t);
 
 	// Draw 2D green background.
 	hud.enable();
@@ -84,6 +82,8 @@ draw(MapRenderer* rend, const QRot& inv_cam_t,
 	glBindTexture(GL_TEXTURE_2D, tex_object);
 	rend->fill_minimap(objs, camera);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
 }
