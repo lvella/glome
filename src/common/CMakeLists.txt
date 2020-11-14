@@ -76,6 +76,8 @@ add_library(common STATIC
 	renderer_vr.cpp
 	renderer_vr.hpp
 	rot_dir.hpp
+	score_renderer.cpp
+	score_renderer.hpp
 	shader.cpp
 	shader.hpp
 	ship.cpp

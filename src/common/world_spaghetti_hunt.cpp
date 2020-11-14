@@ -11,6 +11,7 @@
 #include "spaghetti.hpp"
 #include "thread_pool.hpp"
 #include "fatal_error.hpp"
+#include "score_renderer.hpp"
 
 using namespace std;
 
@@ -76,5 +77,17 @@ WorldSpaghettiHunt::WorldSpaghettiHunt(vr::IVRSystem* hmd):
 
 bool WorldSpaghettiHunt::is_alive()
 {
-	return !player.expired();
+	if(was_alive && player.expired()) {
+		if(!hmd) {
+			ScoreRenderer &sr = static_cast<ScoreRenderer&>(*_render);
+			_render = std::make_unique<FullViewRenderer<
+				ScoreGameOverRenderer>>(
+					std::move(sr)
+				);
+		}
+
+		was_alive = false;
+	}
+
+	return true;
 }

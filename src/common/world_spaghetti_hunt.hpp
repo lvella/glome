@@ -18,6 +18,7 @@ public:
 
 private:
 	bool is_alive() override;
+	bool was_alive = true;
 
 	std::weak_ptr<Ship> player;
 	std::shared_ptr<Meridians> meridians;
