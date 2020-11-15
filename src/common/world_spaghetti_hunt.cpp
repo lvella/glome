@@ -11,7 +11,6 @@
 #include "spaghetti.hpp"
 #include "thread_pool.hpp"
 #include "fatal_error.hpp"
-#include "score_renderer.hpp"
 
 using namespace std;
 
@@ -27,7 +26,7 @@ WorldSpaghettiHunt::WorldSpaghettiHunt(vr::IVRSystem* hmd):
 			Mesh::Types(Random::range(0, Mesh::UFO)), stats
 		);
 
-		auto controller = std::make_shared<ShipController>();
+		controller = std::make_shared<ShipController>();
 		Input::register_ship_controller(0, controller);
 		s->set_controller(controller);
 
@@ -80,14 +79,18 @@ bool WorldSpaghettiHunt::is_alive()
 	if(was_alive && player.expired()) {
 		if(!hmd) {
 			ScoreRenderer &sr = static_cast<ScoreRenderer&>(*_render);
-			_render = std::make_unique<FullViewRenderer<
+			auto new_render = std::make_unique<FullViewRenderer<
 				ScoreGameOverRenderer>>(
+					controller,
 					std::move(sr)
 				);
+
+			game_over_render = new_render.get();
+			_render = std::move(new_render);
 		}
 
 		was_alive = false;
 	}
 
-	return true;
+	return !(game_over_render && game_over_render->done());
 }

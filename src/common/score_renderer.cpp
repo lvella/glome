@@ -48,23 +48,29 @@ ScoreRenderer::set_score_if_different(uint64_t points)
 	}
 }
 
-ScoreGameOverRenderer::ScoreGameOverRenderer(ScoreRenderer&& sr):
+ScoreGameOverRenderer::ScoreGameOverRenderer(
+	std::shared_ptr<ShipController> c, ScoreRenderer&& sr
+):
 	SpaceViewRenderer(std::move(sr)),
 	score(std::move(sr.score)),
 	game_over(gltCreateText(), gltDeleteText),
+	restart_msg(gltCreateText(), gltDeleteText),
 	x{ScoreRenderer::score_offset, final_offset},
 	y{ScoreRenderer::score_offset, 80.0f},
 	scale{3.0f + sr.score_anim_effect, 5.0f},
 	score_g{0.5f, 1.0f},
-	score_b{std::min(1.0f, 0.5f + sr.score_anim_effect), 0.2f}
+	score_b{std::min(1.0f, 0.5f + sr.score_anim_effect), 0.2f},
+	controller{std::move(c)}
 {
 	gltSetText(game_over.get(), "Game over.");
+	gltSetText(restart_msg.get(), "Press \"Fire\" to restart");
 
 	int viewport[4];
 	glGetIntegerv(GL_VIEWPORT, viewport);
 
-	// Screen center:
-	center = Vector2(viewport[2], viewport[3]) * 0.5f;
+	// Screen size:
+	width = viewport[2];
+	height =  viewport[3];
 
 	// Limit maximum score width to screen visibility:
 	const float max_width = viewport[2] - 2.0f * final_offset;
@@ -95,9 +101,20 @@ void ScoreGameOverRenderer::draw(ObjSet& objs)
 
 	gltColor(1.0f, 0.8f, 0.8f, t);
 	gltDrawText2DAligned(
-		game_over.get(), center.x, center.y, 6.0f,
+		game_over.get(), width * 0.5f, height * 0.5f, 6.0f,
 		GLT_CENTER, GLT_CENTER
 	);
+
+	const float post_anim_time = time - anim_duration;
+	if(post_anim_time > 0.0f)
+	{
+		gltColor(1.0f, 0.8f, 0.8f, std::min(1.0f, post_anim_time));
+		gltDrawText2DAligned(
+			restart_msg.get(),
+			width-5.0f, height, 3.0f,
+			GLT_RIGHT, GLT_BOTTOM
+		);
+	}
 
 	gltEndDraw();
 	glBindVertexArray(VertexArrayID);
@@ -106,4 +123,9 @@ void ScoreGameOverRenderer::draw(ObjSet& objs)
 float ScoreGameOverRenderer::Interpolator::operator()(float t)
 {
 	return from + t * (to - from);
+}
+
+bool ScoreGameOverRenderer::done()
+{
+	return time > anim_duration && controller->get_shot();
 }

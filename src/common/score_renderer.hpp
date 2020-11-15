@@ -39,10 +39,13 @@ class ScoreGameOverRenderer:
 	public SpaceViewRenderer
 {
 public:
-	ScoreGameOverRenderer(ScoreRenderer&& sr);
+	ScoreGameOverRenderer(std::shared_ptr<ShipController> c, ScoreRenderer&& sr);
 
 	virtual void update(float dt) override;
 	virtual void draw(ObjSet& objs) override;
+
+	bool done();
+
 private:
 	struct Interpolator
 	{
@@ -54,13 +57,16 @@ private:
 
 	std::unique_ptr<GLTtext, decltype(&gltDeleteText)> score;
 	std::unique_ptr<GLTtext, decltype(&gltDeleteText)> game_over;
+	std::unique_ptr<GLTtext, decltype(&gltDeleteText)> restart_msg;
 
 	static constexpr float final_offset = 40.0f;
 	static constexpr float anim_duration = 3.5f; // In seconds
 
-	Vector2 center;
 	float time = 0.0f;
 	float t = 0.0f;
+	float width, height;
 	Interpolator x, y, scale,
 		score_g, score_b;
+
+	std::shared_ptr<ShipController> controller;
 };
