@@ -13,6 +13,10 @@ public:
 	void draw(Camera& c) override;
 	bool is_transparent() const override;
 	void set_intensity(float i);
+	float get_intensity() const
+	{
+		return intensity;
+	}
 
 	void update(float dt);
 

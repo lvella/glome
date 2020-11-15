@@ -6,11 +6,10 @@
 class Destroyer final: public Ship
 {
 public:
-	Destroyer();
+	Destroyer(ShipStats::shared_ptr& sstats);
 
 	void create_sub_objects(std::vector<std::weak_ptr<SubObject>>&) override;
 
-	void draw(Camera &c) override;
 	bool update(float dt, UpdatableAdder& adder) override;
 
 private:

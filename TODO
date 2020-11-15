@@ -23,7 +23,6 @@
   - Flying spagetti monster
   - Splash into supernova
   - others?
-- Fix destroyer's double flame positions (Lucas)
 - Figure a way to neatly integrate players, VR, and world creation
   - May involve refactoring game initialization a bit
 - Change ship design to fit VR
@@ -41,7 +40,7 @@
 - Display on map only the volume unconsumed by supernova
 - Visual cue of cannon heat
   - Maybe remove cannon heat stuff?
-- Reuse VBO from monster in fragment
+- Reuse VBO from monster in fragment (Lucas)
 
 == GENERAL IMPROVEMENTS (low priority) ==
 
@@ -52,10 +51,12 @@
     - Port glText to 3.2
 - Properly setup and use VertexArrays (VAO) for each object type
   - Possibly right after shader setup
+    - Be careful: VAOs are thread local/context specific
 - Use glDrawElementsInstanced to draw projectile
   - Apparently has to use Uniform Buffer Object:
     https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
 - Bring exporter up to date with current blender
+  - Read Fire ammount and properties from exported file
 - Export meshes with CMake
 - Bring code to C++11:
   - Always use "override"

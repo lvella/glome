@@ -11,6 +11,7 @@
 #include "data_file.hpp"
 #include "vector4.hpp"
 #include "supernova.hpp"
+#include "destroyer.hpp"
 
 #include <iostream>
 
@@ -26,9 +27,10 @@ Ship::set_controller(const std::shared_ptr<ShipController>& pctrl)
 	ctrl->stats = stats.get();
 }
 
-Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
+Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats, float fire_radius):
 	mesh(Mesh::get_mesh(type)),
-	stats(std::move(sstats))
+	stats(std::move(sstats)),
+	fire_radius(fire_radius)
 {
 	set_radius(mesh->get_radius());
 
@@ -43,7 +45,7 @@ Ship::Ship(Mesh::Types type, ShipStats::shared_ptr sstats):
 
 void Ship::create_sub_objects(std::vector<std::weak_ptr<SubObject>>& objs)
 {
-	fx_engine = std::make_shared<Fire>(weak_from_this(), 0.001f);
+	fx_engine = std::make_shared<Fire>(weak_from_this(), fire_radius);
 	objs.push_back(fx_engine);
 }
 
@@ -104,8 +106,8 @@ Ship::load_engines(Mesh::Types type)
 
 	{
 		// Reading Engine Matrix
-		ret = fread(&nengines, sizeof(nengines), 1, fd);
-		assert(ret == 1);
+		//ret = fread(&nengines, sizeof(nengines), 1, fd);
+		//assert(ret == 1);
 
 		// This matrix does nothing...
 		// TODO: clean this up
@@ -221,5 +223,14 @@ void Ship::collided_with(const Collidable& other, float)
 	if(typeid(other) == typeid(const Supernova&))
 	{
 		alive = false;
+	}
+}
+
+std::shared_ptr<Ship> Ship::make_shared_ship(Mesh::Types type, ShipStats::shared_ptr sstats)
+{
+	if(type == Mesh::Types::DESTROYER) {
+		return std::make_shared<Destroyer>(sstats);
+	} else {
+		return std::make_shared<Ship>(type, sstats);
 	}
 }

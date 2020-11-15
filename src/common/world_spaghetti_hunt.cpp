@@ -22,7 +22,7 @@ WorldSpaghettiHunt::WorldSpaghettiHunt(vr::IVRSystem* hmd):
 
 	// Create single player:
 	{
-		auto s = std::make_shared<Ship>(
+		auto s = Ship::make_shared_ship(
 			Mesh::Types(Random::range(0, Mesh::UFO)), stats
 		);
 
