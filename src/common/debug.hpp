@@ -10,15 +10,16 @@ void glClearError() {
 
 bool glLogCall(const char* function, const char* file, int line)
 {
+	bool hasError = false;
 	while (GLenum error = glGetError())
 	{
 		std::cout << "[OpenGL Error] (" << error << ") " 
 			<< gluErrorString(error) << " : "
 			<< function << " " << file << ":" << line
 			<< std::endl;
-		return false;
+		hasError = true;
 	}
-	return true;
+	return hasError;
 }
 
 #define glDebug(x)  \
