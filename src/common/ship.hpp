@@ -18,7 +18,7 @@ class Ship :
 	public Collidable
 {
 public:
-	Ship(Mesh::Types type, ShipStats::shared_ptr sstats);
+	Ship(Mesh::Types type, ShipStats::shared_ptr sstats, float fire_radius=0.001f);
 
 	void create_sub_objects(std::vector<std::weak_ptr<SubObject>>&) override;
 
@@ -31,6 +31,8 @@ public:
 	void load_engines(Mesh::Types type);
 	void set_controller(const std::shared_ptr<ShipController>& pctrl);
 	std::shared_ptr<ShipController> ctrl;
+
+	static std::shared_ptr<Ship> make_shared_ship(Mesh::Types type, ShipStats::shared_ptr sstats);
 
 	#ifdef STATS_TUNING
 	float get_scale() {
@@ -53,8 +55,8 @@ protected:
 
 	// Engine properties
 	std::shared_ptr<Fire> fx_engine;
+	float fire_radius;
 	float rel_speed;
-	uint16_t nengines;
 
 	// Ship state
 	bool alive = true;
