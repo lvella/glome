@@ -8,8 +8,8 @@
 
 class Frustum {
 public:
+    static Frustum atOrigin();
 
-    static void initializeAtOrigin(Frustum& frustum);
     bool isIn(const Glome::Drawable& obj) const;
 
     friend std::ostream& operator<<(std::ostream& o, const Frustum& f);
@@ -22,4 +22,4 @@ public:
     float far_wall_radius;
 };
 
-Frustum operator*(const QRot& cameraTransform, Frustum& f);
+Frustum operator*(const QRot& cameraTransform, const Frustum& f);

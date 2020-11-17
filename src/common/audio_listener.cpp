@@ -14,8 +14,7 @@ Listener::Listener(Listener&& other) {
 	world->listeners[pos_in_world] = this;
 }
 
-void Listener::update(float dt, const QRot& transform)
+void Listener::update(float dt)
 {
-	world->updateFromListener(dt, pos_in_world, transform);
+	world->updateFromListener(dt, pos_in_world, transformation());
 }
-

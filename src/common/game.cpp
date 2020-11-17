@@ -17,9 +17,7 @@ void advance_game_state()
 {
 	assert(game_state_machine);
 	context = game_state_machine->get_next_context();
-
 	assert(context);
-	context->setup_display();
 }
 
 } // anonymous namespace
@@ -60,7 +58,7 @@ initialize()
 
 	initialize_registered();
 
-	game_state_machine = std::make_unique<DummyStateMachine>();
+	game_state_machine = std::make_unique<SpaghettiHuntStateMachine>();
 	advance_game_state();
 }
 

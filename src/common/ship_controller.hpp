@@ -45,6 +45,11 @@ public:
 		shot = s;
 	}
 
+	inline bool get_shot()
+	{
+		return shot;
+	}
+
 private:
 	friend class Ship;
 

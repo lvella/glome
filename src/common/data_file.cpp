@@ -8,7 +8,7 @@
 #include <sstream>
 
 #include "config.hpp"
-#include "popup_window.hpp"
+#include "fatal_error.hpp"
 
 static std::tuple<std::filesystem::path, DataFile>
 assemble_and_check_path(const std::string& path)

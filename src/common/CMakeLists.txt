@@ -76,6 +76,8 @@ add_library(common STATIC
 	renderer_vr.cpp
 	renderer_vr.hpp
 	rot_dir.hpp
+	score_renderer.cpp
+	score_renderer.hpp
 	shader.cpp
 	shader.hpp
 	ship.cpp
@@ -107,8 +109,8 @@ add_library(common STATIC
 	vol_sphere.hpp
 	world.cpp
 	world.hpp
-	world_dummy.cpp
-	world_dummy.hpp
+	world_spaghetti_hunt.cpp
+	world_spaghetti_hunt.hpp
 	frustum.cpp
 	frustum.hpp
 )

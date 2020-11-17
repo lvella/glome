@@ -1,7 +1,6 @@
 == Needs for FIKALAB game ==
 
 - Game menu with scoreboard:
-  - Show score, then ask to try again (Lucas)
     - Take care to make it compatible with VR UI
 - Handle headset input: (Helder)
   - Headset orientation changes camera view relative to ship position
@@ -23,10 +22,9 @@
   - Flying spagetti monster
   - Splash into supernova
   - others?
-- Fix destroyer's double flame positions
-- Create HMD object outside of World-derived class.
-  - Figure a way to neatly integrate players, VR, and world creation
-    - May involve refactoring game initialization a bit
+- Fix destroyer's double flame positions (Lucas)
+- Figure a way to neatly integrate players, VR, and world creation
+  - May involve refactoring game initialization a bit
 - Change ship design to fit VR
 - Devise some UI that works better in VR
 - CI
@@ -42,6 +40,7 @@
 - Display on map only the volume unconsumed by supernova
 - Visual cue of cannon heat
   - Maybe remove cannon heat stuff?
+- Reuse VBO from monster in fragment
 
 == GENERAL IMPROVEMENTS (low priority) ==
 

@@ -42,6 +42,8 @@ public:
 		glEnable(GL_PROGRAM_POINT_SIZE);
 
 		create_circle_texture(64, 0.1, 0, 255, tex_particle, true);
+
+		Fire::set_width(Options::width);
 	}
 
 	void setup_draw_state(Camera& c) override

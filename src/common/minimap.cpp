@@ -34,15 +34,17 @@ namespace MiniMap {
 GLint proj_has_tex;
 
 void
-draw(int wstart, int hstart, Renderer* rend, const QRot& inv_cam_t,
-	const std::vector<std::shared_ptr<Glome::Drawable>>& objs)
+draw(MapRenderer* rend, const QRot& inv_cam_t,
+	const Renderer::ObjSet& objs)
 {
 	const int b = 10;
 	const int l = 10;
 	const int t = 160;
 	const int r = 160;
 
-	glViewport(wstart + l, hstart + b, r, t);
+	int viewport[4];
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glViewport(viewport[0] + l, viewport[1] + b, r, t);
 
 	// Draw 2D green background.
 	hud.enable();
@@ -80,6 +82,8 @@ draw(int wstart, int hstart, Renderer* rend, const QRot& inv_cam_t,
 	glBindTexture(GL_TEXTURE_2D, tex_object);
 	rend->fill_minimap(objs, camera);
 	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glViewport(viewport[0], viewport[1], viewport[2], viewport[3]);
 }
 
 }

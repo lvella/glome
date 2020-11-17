@@ -13,7 +13,8 @@
 #include "audio_world.hpp"
 
 /** Every game mode should derive this class.
- * TODO: Based upon similarities between the game modes, refactor this class to hold what is common.
+ * TODO: Based upon similarities between the game modes,
+ * refactor this class to hold what is common.
  */
 class World: public RunContext, public Audio::World
 {
@@ -21,11 +22,6 @@ public:
 	World();
 
 	virtual ~World() = default;
-
-	void setup_display() override
-	{
-		_render->setup_display();
-	}
 
 	bool update(float dt) override;
 	void draw() override;
@@ -48,7 +44,7 @@ protected:
 
 	Octree::Hypercube collision_tree;
 
-	Renderer* _render;
+	std::unique_ptr<Renderer> _render;
 	std::vector<std::weak_ptr<Ship>> ships;
 	std::vector<std::shared_ptr<AiController>> ai_controls;
 

@@ -22,7 +22,7 @@ enum Eye {
 	right
 };
 
-class RendererVR : public Renderer
+class RendererVR : public SpaceViewRenderer
 {
 public:
 	using ObjSet = std::unordered_multimap<
@@ -30,20 +30,24 @@ public:
 		std::weak_ptr<Glome::Drawable>
 	>;
 
-	RendererVR(const std::vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world, vr::IVRSystem* const pHMD);
+	RendererVR(std::weak_ptr<Ship> player,
+		Audio::World &audio_world, vr::IVRSystem* const pHMD);
+
+	~RendererVR();
 
 	void update(float dt) override;
 	void draw(ObjSet& objs) override;
 
-	std::vector<std::shared_ptr<Glome::Drawable>>
-	draw_eye(const GLuint texture, const GLuint framebuffer, const Eye eye, const QRot original_transform, ObjSet& objs);
-
-protected:
+private:
+	void draw_eye(const GLuint texture, const GLuint framebuffer,
+		const Eye eye, const QRot original_transform, ObjSet& objs);
 
 	GLuint temp_framebuffer;
 
 	GLuint left_eye_texture;
 	GLuint right_eye_texture;
+
+	uint32_t width, height;
 
 	vr::IVRSystem* m_pHMD;
 };
