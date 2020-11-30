@@ -305,10 +305,9 @@ void Spaghetti::collided_with(const Collidable& other, float cos_dist)
 	}
 }
 
-static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
-
 bool Spaghetti::chip(UpdatableAdder& adder, const Vector4& impact_point, unsigned& damage)
 {
+	static TimeAccumulator& chip_time = globalProfiler.newTimer("Spaghetti chip time");
 	TimeGuard timer(chip_time);
 
 	// Sanity check
