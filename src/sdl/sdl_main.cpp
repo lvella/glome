@@ -2,6 +2,8 @@
 #include <cstdlib>
 #include <chrono>
 #include <thread>
+#include <sstream>
+#include <mutex>
 
 #include <GL/glew.h>
 #ifdef _WIN32
@@ -14,13 +16,12 @@
 #include <SDL.h>
 
 #include "input.hpp"
-#include "menu.hpp"
 #include "options.hpp"
 #include "game.hpp"
 #include "jsinput.hpp"
 #include "thread_pool.hpp"
 #include "random.hpp"
-
+#include "fatal_error.hpp"
 #include "native.hpp"
 
 static bool v_sync_enabled = true;
@@ -54,7 +55,7 @@ static void initialize_gl_context()
 	SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+	SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 	SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
 
 	SDL_GL_SetAttribute(SDL_GL_SHARE_WITH_CURRENT_CONTEXT, 1);
@@ -65,9 +66,9 @@ static void initialize_gl_context()
 			video_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
 
 		window = SDL_CreateWindow(
-		"Glome",
-		SDL_WINDOWPOS_UNDEFINED,
-		SDL_WINDOWPOS_UNDEFINED,
+			"Glome",
+			SDL_WINDOWPOS_UNDEFINED,
+			SDL_WINDOWPOS_UNDEFINED,
 			Options::width,
 			Options::height,
 			video_flags);
@@ -83,27 +84,24 @@ static void initialize_gl_context()
 	glcontext = SDL_GL_CreateContext(window);
 
 	// Setup one context per thread
-	globalThreadPool.run_in_all_pool_threads([](unsigned idx) {
+	std::mutex mtx;
+	globalThreadPool.run_in_all_pool_threads([&mtx](unsigned idx) {
+		std::lock_guard<std::mutex> lock(mtx);
 		SDL_GL_MakeCurrent(window, threads_glcontexts[idx]);
 	});
 
 	// Using GLEW to get the OpenGL functions
 	GLenum err = glewInit();
 	if(err != GLEW_OK) {
-		std::cerr << "Unable to initialize GLEW:\n"
+		std::stringstream ss;
+		ss << "Error: Unable to initialize GLEW:\n"
 			<< glewGetErrorString(err) << std::endl;
-		exit(1);
+		fatal_user_error(ss.str().c_str());
 	}
 
-	if(! GLEW_VERSION_3_2)
+	if(! GLEW_VERSION_3_3)
 	{
-		const char *msg = "Glome requires at least OpenGL 3.2";
-		#ifdef WIN32
-		MessageBoxA(nullptr, msg, nullptr, MB_OK);
-		#else
-		std::cerr << msg << std::endl;
-		#endif
-		exit(1);
+		fatal_user_error("Error: Glome requires at least OpenGL 3.3");
 	}
 
 	int major, minor, mask;
@@ -201,8 +199,6 @@ int main(int argc, char **argv)
 
 	if (Options::parse_args(argc, argv))
 		return 1;
-
-	/* TODO: Network in game archive. */
 
 	initialize_SDL();
 	initialize_gl_context();

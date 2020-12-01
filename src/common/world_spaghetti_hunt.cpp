@@ -1,6 +1,8 @@
-#include "world_dummy.hpp"
+#include "world_spaghetti_hunt.hpp"
 
 #include <memory>
+#include <stdio.h>
+#include <openvr.h>
 
 #include "input.hpp"
 #include "options.hpp"
@@ -8,53 +10,39 @@
 #include "supernova.hpp"
 #include "spaghetti.hpp"
 #include "thread_pool.hpp"
+#include "fatal_error.hpp"
 
 using namespace std;
 
-WorldDummy::WorldDummy():
-	meridians{std::make_shared<Meridians>()}
+WorldSpaghettiHunt::WorldSpaghettiHunt(vr::IVRSystem* hmd):
+	meridians{std::make_shared<Meridians>()},
+	hmd{hmd}
 {
-	std::vector<std::weak_ptr<Ship>> bot;
-	std::vector<std::weak_ptr<Ship>> players;
 	ShipStats::shared_ptr stats(ShipStats::get());
 
 	// Create single player:
 	{
-		auto s = std::make_shared<Ship>(
+		auto s = Ship::make_shared_ship(
 			Mesh::Type(Random::range(0, size_t(Mesh::Type::UFO))), stats
 		);
 
-		auto controller = std::make_shared<ShipController>();
+		controller = std::make_shared<ShipController>();
 		Input::register_ship_controller(0, controller);
 		s->set_controller(controller);
 
-		players.push_back(s);
+		player = s;
 		ships.push_back(s);
 
 		add_updatable(std::move(s));
 	}
 
-	for(int i = 0; i < Options::numBots; ++i)
-	{
-		auto s = std::make_shared<Ship>(
-			Mesh::Type(Random::range(0, size_t(Mesh::Type::UFO))), stats
+	if(hmd) {
+		_render = std::make_unique<RendererVR>(player, *this, hmd);
+	} else {
+		_render = std::make_unique<FullViewRenderer<ScoreRenderer>>(
+			player, *this
 		);
-
-		auto ctrl_ai = std::make_shared<AiController>();
-		ai_controls.push_back(ctrl_ai);
-		s->set_controller(ctrl_ai);
-
-		bot.push_back(s);
-		ships.push_back(s);
-
-		add_updatable(std::move(s));
 	}
-
-	if(Options::showBotScreen && players.size() < 3) {
-		players.insert(players.end(), bot.begin(),
-			bot.begin() + min(bot.size(), 4 - players.size()));
-	}
-	_render = new Renderer(std::move(players), *this);
 
 	// Add unmanaged meridians
 	add_unmanaged(meridians);
@@ -86,7 +74,23 @@ WorldDummy::WorldDummy():
 	std::cout << "World initialized!" << std::endl;
 }
 
-WorldDummy::~WorldDummy()
+bool WorldSpaghettiHunt::is_alive()
 {
-	delete _render;
+	if(was_alive && player.expired()) {
+		if(!hmd) {
+			ScoreRenderer &sr = static_cast<ScoreRenderer&>(*_render);
+			auto new_render = std::make_unique<FullViewRenderer<
+				ScoreGameOverRenderer>>(
+					controller,
+					std::move(sr)
+				);
+
+			game_over_render = new_render.get();
+			_render = std::move(new_render);
+		}
+
+		was_alive = false;
+	}
+
+	return !(game_over_render && game_over_render->done());
 }

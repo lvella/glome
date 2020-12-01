@@ -13,13 +13,13 @@ namespace DustField
 
 struct StarPoint
 {
-    Vector4 pos;
-    float end;
+	Vector4 pos;
+	uint8_t end;
 };
 
 struct Star
 {
-    StarPoint endpoints[2];
+	StarPoint endpoints[2];
 };
 
 const size_t DUST_SIZE = 200000;
@@ -41,8 +41,8 @@ static RegisterInitialization ini{[] {
 	for(auto &e: dust)
 	{
 		e.endpoints[0].pos = e.endpoints[1].pos = Random::point();
-		e.endpoints[0].end = 0.0f;
-		e.endpoints[1].end = 1.0f;
+		e.endpoints[0].end = 0;
+		e.endpoints[1].end = 1;
 	}
 
 	glGenBuffers(1, &vbo);
@@ -67,19 +67,20 @@ static QRot old_cam_transform;
 
 void draw(Camera& cam)
 {
-    cam.setShader(&program);
+	cam.setShader(&program);
+	cam.setQRot(QRot::IDENTITY());
 
-    old_transform.set(old_cam_transform);
-    old_cam_transform = cam.getBaseTransformation();
+	old_transform.set(old_cam_transform);
+	old_cam_transform = cam.getBaseTransformation();
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-    glEnableVertexAttribArray(attrib_endpoint);
+	glBindBuffer(GL_ARRAY_BUFFER, vbo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glEnableVertexAttribArray(attrib_endpoint);
 
-    glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, pos));
-    glVertexAttribPointer(attrib_endpoint, 1, GL_FLOAT, GL_FALSE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, end));
+	glVertexAttribPointer(Shader::ATTR_POSITION, 4, GL_FLOAT, GL_FALSE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, pos));
+	glVertexAttribIPointer(attrib_endpoint, 1, GL_UNSIGNED_BYTE, sizeof(StarPoint), (GLvoid*) offsetof(StarPoint, end));
 
-    glDrawArrays(GL_LINES, 0, DUST_SIZE*2);
+	glDrawArrays(GL_LINES, 0, DUST_SIZE*2);
 }
 
 }

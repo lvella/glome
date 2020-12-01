@@ -1,19 +1,8 @@
 == Needs for FIKALAB game ==
 
-- Support Windows build (Diogo)
-  - Focus on CLang and MSVC
-- CI (Rui)
 - Game menu with scoreboard:
-  - Kill player when collide with supernova, finishing the game
-  - HUD displaying current score (Lucas)
-    - Maybe use guichan
-  - Show score, then ask to try again
     - Take care to make it compatible with VR UI
-- Transfer momentum on collision between objects (ships, flying spagetti monsters)
-  - At least prevent them from intersecting, change their velocity away from one another
-  - How to fit that to current crazy FSM movement?
-- Implement stereo rendering using OpenVR API (Helder)
-- Handle headset input:
+- Handle headset input: (Helder)
   - Headset orientation changes camera view relative to ship position
 - Figure VR inputs
   - Study the possibilities
@@ -21,7 +10,11 @@
   - 2 hand canons, maybe?
     - laser targetting
     - each cannon position given by each controller position
-- Change ship design to fit VR
+- Fix supernova appearence when camere is inside it
+  - May happen when flying very close to it
+  - Draw something crazy and transparent so to make it obvious
+    the viewer is inside supernova, even if the ship isn't.
+  - Draw something as the background if looking to the interior of supernova
 - Sound effects:
   - Shot
   - Hit
@@ -29,24 +22,44 @@
   - Flying spagetti monster
   - Splash into supernova
   - others?
+- Figure a way to neatly integrate players, VR, and world creation
+  - May involve refactoring game initialization a bit
+- Change ship design to fit VR
+- Devise some UI that works better in VR
+- CI
+  - Install dependencies from somewhere.
+    - Maybe Conan? I don't think there are any other realistic alternatives
+      - Create Conan recipe for SDL2?
+  - Linux must still use system packages
+- Restore minimap drawing of projectile.
+- Transfer momentum on collision between objects (ships, flying spagetti monsters) (Rui)
+  - At least prevent them from intersecting, change their velocity away from one another
+  - How to fit that to current crazy FSM movement?
 - Update audio in parallel with drawing
-- Fix destroyer's double flame positions
 - Display on map only the volume unconsumed by supernova
 - Visual cue of cannon heat
   - Maybe remove cannon heat stuff?
+- Reuse VBO from monster in fragment (Lucas)
 
 == GENERAL IMPROVEMENTS (low priority) ==
 
+- Generalize inter/intra collision stuff in octree.
+  - Prevent projectile from testing against itself.
+- Revert OpenGL version to 3.2
+  - OpenGL 3.3 is a requirement of glText, but I doubt it won't work on 3.2
+    - Port glText to 3.2
 - Properly setup and use VertexArrays (VAO) for each object type
   - Possibly right after shader setup
+    - Be careful: VAOs are thread local/context specific
 - Use glDrawElementsInstanced to draw projectile
   - Apparently has to use Uniform Buffer Object:
     https://www.khronos.org/opengl/wiki/Uniform_Buffer_Object
 - Bring exporter up to date with current blender
+  - Read Fire ammount and properties from exported file
 - Export meshes with CMake
 - Bring code to C++11:
   - Always use "override"
-  - Remove all new/delete (Diogo)
+  - Remove all new/delete
 - Make dustfield independent of FPS
   - Reuse camera history code
 - Port to Vulkan (maybe we can use it to improve performance)

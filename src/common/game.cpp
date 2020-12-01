@@ -1,25 +1,30 @@
 #include "game.hpp"
 
-//#include "menu.hpp"
-#include "options.hpp"
-#include "meridian.hpp"
-#include "minimap.hpp"
-#include "projectile.hpp"
-#include "particle_system.hpp"
-#include "world_dummy.hpp"
-#include "random.hpp"
-#include "dustfield.hpp"
-#include "audio.hpp"
+#include "gltext.hpp"
 #include "profiling.hpp"
-#include "spaghetti_fragment.hpp"
-#include "initialization.hpp"
+#include "audio.hpp"
+#include "game_state_machine.hpp"
+#include <memory>
 
-namespace Game
+namespace
 {
 
 RunContext* context;
 
-static std::unique_ptr<World> world;
+std::unique_ptr<GameStateMachine> game_state_machine;
+
+void advance_game_state()
+{
+	assert(game_state_machine);
+	context = game_state_machine->get_next_context();
+	assert(context);
+}
+
+} // anonymous namespace
+
+
+namespace Game
+{
 
 void
 frame(std::chrono::duration<float> frame_time)
@@ -31,62 +36,38 @@ frame(std::chrono::duration<float> frame_time)
 	constexpr float max_physics_dt = 1.0 / MIN_FPS;
 	const float dt = std::min(max_physics_dt, frame_time.count());
 
-	context->update(dt);
+	while(!context->update(dt)) {
+		advance_game_state();
+	}
+
 	context->draw();
 }
 
 void
 initialize()
 {
-	// OpenGL nonchanging settings
-	GLuint VertexArrayID;
-	glGenVertexArrays(1, &VertexArrayID);
-	glBindVertexArray(VertexArrayID);
-	glEnableVertexAttribArray(0);
+	bool glt_inited = gltInit();
+	assert(glt_inited);
 
-	glEnableVertexAttribArray(0);
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	glClearDepth(1.0f);
-
-	glEnable(GL_CULL_FACE);
-
-	glLineWidth(1.5f);
-
-	glEnable(GL_PRIMITIVE_RESTART);
-	glPrimitiveRestartIndex(std::numeric_limits<uint16_t>::max());
+	Renderer::initialize();
 
 	// Must be the first to initialize, so shaders
 	// can be created with the correct perspective
 	// matrix.
 	CamShader::initialize(float(Options::width) / float(Options::height));
 
-	//Menu::initialize();
-
 	initialize_registered();
 
-	world.reset(new WorldDummy());
-
-	switch_state(State::WORLD);
+	game_state_machine = std::make_unique<SpaghettiHuntStateMachine>();
+	advance_game_state();
 }
 
 void
 shutdown()
 {
 	Audio::shutdown();
+	game_state_machine.reset();
+	gltTerminate();
 }
 
-void switch_state(State s)
-{
-	switch(s)
-	{
-	case State::MENU:
-		//context = menu.get();
-		break;
-	case State::WORLD:
-		context = world.get();
-		break;
-	}
-	context->setup_display();
-}
-}
-
+} // namespace Game

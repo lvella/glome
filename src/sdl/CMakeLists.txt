@@ -6,6 +6,8 @@ option(FIND_SDL2 "Try to find SDL2" ON)
 option(FIND_GLEW "Try to find GLEW" ON)
 
 add_executable(glome
+	fatal_error.cpp
+	fatal_error.hpp
 	input.cpp
 	input.hpp
 	kbinput.cpp

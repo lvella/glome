@@ -2,8 +2,7 @@
 
 #include <algorithm>
 #include <memory>
-#include <iomanip>
-#include <cstdlib>
+#include <cstdio>
 
 #include "drawable.hpp"
 #include "options.hpp"
@@ -56,68 +55,148 @@ private:
 
 }
 
-void
-Renderer::setup_display()
+GLuint Renderer::VertexArrayID;
+
+const QRot Renderer::cam_offset {
+	yz_qrot(0.2) *
+	zw_qrot(-0.015) *
+	yw_qrot(-0.01)
+};
+
+const Frustum Renderer::frustum_at_origin = Frustum::atOrigin();
+
+void Renderer::initialize()
 {
-	glEnable(GL_DEPTH_TEST);
-	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glViewport(0, 0, width, height);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	// OpenGL nonchanging settings
+	glGenVertexArrays(1, &VertexArrayID);
+	glBindVertexArray(VertexArrayID);
+
+	glEnableVertexAttribArray(0);
+	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+	glClearDepth(1.0f);
+
+	glEnable(GL_CULL_FACE);
+
+	glLineWidth(1.5f);
+
+	glEnable(GL_PRIMITIVE_RESTART);
+	glPrimitiveRestartIndex(std::numeric_limits<uint16_t>::max());
 }
 
-Renderer::Renderer(const vector<std::weak_ptr<Ship>>& pp, Audio::World &audio_world)
+MultiViewRenderer::MultiViewRenderer(std::vector<std::unique_ptr<Renderer>>&& sub)
 {
-	assert(pp.size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
-	int h = height / (pp.size() > 2 ? 2 : 1);
-	int w = width / (pp.size() > 1 ? 2 : 1);
+	assert(sub.size() <= 4 && "I don't know how to draw more than 4 players on the screen!");
+	int h = height / (sub.size() > 2 ? 2 : 1);
+	int w = width / (sub.size() > 1 ? 2 : 1);
 
-	for(int i = 0; i < pp.size(); ++i) {
-		players.emplace_back(pp[i], (i%2) * w, height - (i/2 + 1) * h, w, h, audio_world);
+	viewports.reserve(sub.size());
+
+	for(int i = 0; i < sub.size(); ++i) {
+		viewports.push_back({std::move(sub[i]),
+			(i%2) * w, height - (i/2 + 1) * h, w, h});
 	}
 
 	Fire::set_width(w);
-
-	Frustum::initializeAtOrigin(frustum_at_origin);
 }
 
 void
-Renderer::update(float dt)
+MultiViewRenderer::update(float dt)
 {
-	for(Viewport& v: players) {
-		v.update(dt);
-		v.Audio::Listener::update(dt, v.transformation());
+	for(Viewport& v: this->viewports) {
+		v.renderer->update(dt);
 	}
 }
 
 void
-Renderer::draw(ObjSet& objs)
+MultiViewRenderer::draw(ObjSet& objs)
 {
+	for(Viewport& v: viewports) {
+		glViewport(v._x, v._y, v._w, v._h);
+		v.renderer->draw(objs);
+	}
+}
+
+SpaceViewRenderer::SpaceViewRenderer(std::weak_ptr<Ship> player, Audio::World &audio_world):
+	Audio::Listener(&audio_world),
+	target(player),
+	curr_qrot(cam_offset)
+{
+	cam_hist.push_back({1.0f / 6.0f, cam_offset});
+}
+
+void
+SpaceViewRenderer::update(float dt)
+{
+	QRot new_trans;
+	if(auto ptr = target.lock()) {
+		new_trans = cam_offset * ptr->get_t().inverse();
+	} else {
+		new_trans = cam_hist.back().t;
+	}
+
+	cam_hist.push_back({dt, new_trans});
+
+	while(cam_hist.front().dt <= dt) {
+		dt -= cam_hist.front().dt;
+		curr_qrot = cam_hist.front().t;
+
+		cam_hist.pop_front();
+		assert(!cam_hist.empty());
+	}
+
+	PathPoint& next = cam_hist.front();
+	const float slerp_factor = dt / next.dt; // range [0, 1]
+
+	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
+
+	Audio::Listener::update(dt);
+
+	next.dt -= dt;
+}
+
+void
+SpaceViewRenderer::draw(ObjSet& objs)
+{
+	// Setup GL state
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	for(active = begin(players); active != end(players); ++active) {
-		active->enable();
+	Camera camera(transformation());
 
-		auto drawn_objs = draw_objs_in_world(objs);
+	draw_objects(camera, objs);
 
-		MiniMap::draw(active->_x, active->_y, this,
-			active->transformation().inverse(), drawn_objs
-		);
+	DustField::draw(camera);
+
+	MiniMap::draw(this, transformation(), objs);
+}
+
+void
+SpaceViewRenderer::fill_minimap(const ObjSet& objs, Camera &cam)
+{
+	std::shared_ptr<Glome::Drawable> curr = target.lock();
+
+	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
+	// Probably so insignificant it is not worth the effort.
+	for(auto &e: objs) {
+		auto obj = e.second.lock();
+
+		if(obj && obj != curr)
+			obj->minimap_draw(cam);
 	}
 }
 
-vector<std::shared_ptr<Glome::Drawable>>
-Renderer::draw_objs_in_world(ObjSet& objs)
+void
+SpaceViewRenderer::draw_objects(Camera& camera, ObjSet& objs)
 {
-	Camera camera(active->transformation());
 	SpecsTracker specs(camera);
 
-	const Vector4 cam_pos = active->transformation().inverse().position();
+	const Vector4 cam_pos = transformation().inverse().position();
 
-	vector<std::shared_ptr<Glome::Drawable>> remaining_objs;
 	vector<std::pair<float, Glome::Drawable*>> transparent_objs;
 
-	Frustum frustum = active->transformation().inverse() * frustum_at_origin;
+	Frustum frustum = transformation().inverse() * frustum_at_origin;
 
 	for(auto iter = objs.begin(); iter != objs.end();) {
 		auto ptr = iter->second.lock();
@@ -138,7 +217,6 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 			}
 		}
 
-		remaining_objs.emplace_back(std::move(ptr));
 		++iter;
 	}
 
@@ -148,63 +226,14 @@ Renderer::draw_objs_in_world(ObjSet& objs)
 		}
 	);
 
-	auto sorted_projs = Projectile::cull_sort_from_camera(camera);
-	Projectile::draw_many(sorted_projs, camera);
-
 	for(auto &pair: transparent_objs) {
 		auto& obj = *pair.second;
 		specs.maybe_set(&obj.get_draw_specs());
 		obj.draw(camera);
 	}
-
-	DustField::draw(camera);
-
-	return remaining_objs;
 }
 
-void
-Renderer::fill_minimap(const vector<std::shared_ptr<Glome::Drawable>>& objs, Camera &cam)
+const QRot &SpaceViewRenderer::transformation() const
 {
-	std::shared_ptr<Glome::Drawable> curr = active->t.lock();
-
-	// TODO: This rendering is slow. Using GL_POINTS may be much faster.
-	// Probably so insignificant it is not worth the effort.
-	for(auto &obj: objs) {
-		if(obj != curr)
-			obj->minimap_draw(cam);
-	}
+	return curr_qrot;
 }
-
-void
-Renderer::Viewport::update(float dt)
-{
-	QRot new_trans;
-	if(auto ptr = t.lock()) {
-		new_trans = cam_offset * ptr->get_t().inverse();
-	} else {
-		new_trans = cam_hist.front().t;
-	}
-
-	cam_hist.push_back({dt, new_trans});
-
-	while(cam_hist.front().dt <= dt) {
-		dt -= cam_hist.front().dt;
-		curr_qrot = cam_hist.front().t;
-
-		cam_hist.pop_front();
-		assert(!cam_hist.empty());
-	}
-
-	PathPoint& next = cam_hist.front();
-	const float slerp_factor = dt / next.dt; // range [0, 1]
-
-	curr_qrot = nlerp(curr_qrot, next.t, slerp_factor);
-	next.dt -= dt;
-
-}
-
-const QRot Renderer::Viewport::cam_offset(
-	yz_qrot(0.2) *
-	zw_qrot(-0.015) *
-	yw_qrot(-0.01)
-);

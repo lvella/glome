@@ -38,6 +38,9 @@ add_library(common STATIC
 	fire.hpp
 	game.cpp
 	game.hpp
+	game_state_machine.hpp
+	gltext.cpp
+	gltext.hpp
 	initialization.hpp
 	initialization.cpp
 	make_array.hpp
@@ -70,7 +73,11 @@ add_library(common STATIC
 	random.hpp
 	renderer.cpp
 	renderer.hpp
+	renderer_vr.cpp
+	renderer_vr.hpp
 	rot_dir.hpp
+	score_renderer.cpp
+	score_renderer.hpp
 	shader.cpp
 	shader.hpp
 	ship.cpp
@@ -102,8 +109,8 @@ add_library(common STATIC
 	vol_sphere.hpp
 	world.cpp
 	world.hpp
-	world_dummy.cpp
-	world_dummy.hpp
+	world_spaghetti_hunt.cpp
+	world_spaghetti_hunt.hpp
 	frustum.cpp
 	frustum.hpp
 )
@@ -111,6 +118,7 @@ add_library(common STATIC
 target_include_directories(common PUBLIC
 	"."
 	"${glome_SOURCE_DIR}/external/concurrentqueue"
+	"${glome_SOURCE_DIR}/external/glText"
 )
 
 if(USE_PKG_CONFIG)
@@ -125,7 +133,12 @@ if(USE_PKG_CONFIG)
 		pkg_check_modules(OPENAL REQUIRED IMPORTED_TARGET openal)
 		target_link_libraries(common PUBLIC PkgConfig::OPENAL)
 	endif()
+
 endif()
 
 find_package(Threads)
 target_link_libraries(common PUBLIC ${CMAKE_THREAD_LIBS_INIT})
+
+# Due to a bug in OpenVR, this is needed otherwise Windows build with GCC is broken:
+target_compile_definitions(common PUBLIC OPENVR_BUILD_STATIC)
+target_link_libraries(common PUBLIC ${OPENVR_LIB})

@@ -1,6 +1,8 @@
 #include "frustum.hpp"
 
-void Frustum::initializeAtOrigin(Frustum& frustum) {
+Frustum Frustum::atOrigin()
+{
+    Frustum frustum;
 
     // the centers of the 5 planes/circles are 90º from the player/ship
     frustum.top_wall_center    = Vector4(0,-1,0,0);
@@ -32,6 +34,8 @@ void Frustum::initializeAtOrigin(Frustum& frustum) {
     Vector4 S = Vector3(0,0,-CamShader::Z_FAR).inverse_stereo_proj();
     frustum.far_wall_center = -((Vector4{0,0,0,1} + S)*0.5).normalized();
     frustum.far_wall_radius = std::acos(Vector4(0,0,0,1).dot(frustum.far_wall_center));
+
+    return frustum;
 }
 
 bool Frustum::isIn(const Glome::Drawable& obj) const {
@@ -58,7 +62,7 @@ std::ostream& operator<<(std::ostream& o, const Frustum& f) {
     return o;
 }
 
-Frustum operator*(const QRot& cameraTransform, Frustum& f) {
+Frustum operator*(const QRot& cameraTransform, const Frustum& f) {
     Frustum frustum;
     frustum.top_wall_center     = cameraTransform * f.top_wall_center;
     frustum.bottom_wall_center  = cameraTransform * f.bottom_wall_center;
