@@ -63,7 +63,7 @@ static void initialize_gl_context()
 	{
 		Uint32 video_flags = SDL_WINDOW_OPENGL;
 		if(Options::fullscreen)
-			video_flags |= SDL_WINDOW_FULLSCREEN_DESKTOP;
+			video_flags |= SDL_WINDOW_FULLSCREEN;
 
 		window = SDL_CreateWindow(
 			"Glome",
@@ -72,6 +72,11 @@ static void initialize_gl_context()
 			Options::width,
 			Options::height,
 			video_flags);
+		
+		if(Options::fullscreen) {
+			// Update Options with actual window size (important for fullscreen)
+			SDL_GetWindowSize(window, &Options::width, &Options::height);
+		}
 	}
 
 	// Create one SDL context per thread

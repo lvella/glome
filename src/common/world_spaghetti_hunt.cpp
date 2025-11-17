@@ -51,7 +51,7 @@ WorldSpaghettiHunt::WorldSpaghettiHunt(vr::IVRSystem* hmd):
 	add_updatable(std::make_shared<Supernova>());
 
 	// Create flying spaghetti monsters in parallel
-	constexpr size_t NUM_FSMS = 5000;
+	constexpr size_t NUM_FSMS = 50;
 	Adder adder;
 	globalThreadPool.parallel_run_and_wait([&] (auto&& add_task) {
 		for(size_t i = 0; i < NUM_FSMS; i += CHUNCK_SIZE) {
