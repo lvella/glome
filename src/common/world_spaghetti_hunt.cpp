@@ -5,12 +5,10 @@
 #include <openvr.h>
 
 #include "input.hpp"
-#include "options.hpp"
 #include "random.hpp"
 #include "supernova.hpp"
 #include "spaghetti.hpp"
 #include "thread_pool.hpp"
-#include "fatal_error.hpp"
 
 using namespace std;
 
