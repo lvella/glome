@@ -98,7 +98,8 @@ Spaghetti::Spaghetti():
 {
 	{
 		float fragility_mean = Random::normalDistribution(30.f, 15.f);
-		fragility = std::normal_distribution<>{fragility_mean, fragility_mean * 0.1};
+		float fragility_stddev = std::max(0.1f, fragility_mean * 0.1f);
+		fragility = std::normal_distribution<>{fragility_mean, fragility_stddev};
 	}
 
 	// Random spaghetti propertiers:
